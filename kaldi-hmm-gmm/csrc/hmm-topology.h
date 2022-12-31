@@ -120,6 +120,9 @@ class HmmTopology {
   /// a single (prototype) state.
   using TopologyEntry = std::vector<HmmState>;
 
+  // Checks that the object is valid, and throw exception otherwise.
+  void Check();
+
   // Allow default assignment operator and copy constructor.
  private:
   std::vector<int32_t> phones_;     // list of all phones we have topology for.
