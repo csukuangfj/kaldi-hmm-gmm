@@ -3,7 +3,9 @@
 // Copyright (c)  2022  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_EVENT_MAP_H_
 #define KALDI_HMM_GMM_CSRC_EVENT_MAP_H_
+
 #include <cstdint>
+#include <limits>
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -11,6 +13,7 @@
 #include <utility>
 #include <vector>
 
+#include "kaldi-hmm-gmm/csrc/const-integer-set.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"
 
@@ -294,6 +297,103 @@ class TableEventMap : public EventMap {
   EventKeyType key_;
   std::vector<EventMap *> table_;
 };
+
+// A decision tree [non-leaf] node.
+class SplitEventMap : public EventMap {
+ public:
+  bool Map(const EventType &event, EventAnswerType *ans) const override {
+    EventValueType value;
+    if (Lookup(event, key_, &value)) {
+      // if (std::binary_search(yes_set_.begin(), yes_set_.end(), value)) {
+      if (yes_set_.count(value)) {
+        return yes_->Map(event, ans);
+      }
+      return no_->Map(event, ans);
+    }
+    return false;
+  }
+
+  void MultiMap(const EventType &event,
+                std::vector<EventAnswerType> *ans) const override {
+    EventValueType tmp;
+    if (Lookup(event, key_, &tmp)) {
+      if (std::binary_search(yes_set_.begin(), yes_set_.end(), tmp)) {
+        yes_->MultiMap(event, ans);
+      } else {
+        no_->MultiMap(event, ans);
+      }
+    } else {  // both yes and no contribute.
+      yes_->MultiMap(event, ans);
+      no_->MultiMap(event, ans);
+    }
+  }
+
+  void GetChildren(std::vector<EventMap *> *out) const override {
+    out->clear();
+    out->push_back(yes_);
+    out->push_back(no_);
+  }
+
+  EventMap *Copy(const std::vector<EventMap *> &new_leaves) const override {
+    return new SplitEventMap(key_, yes_set_, yes_->Copy(new_leaves),
+                             no_->Copy(new_leaves));
+  }
+
+  void Write(std::ostream &os, bool binary) override;
+  static SplitEventMap *Read(std::istream &is, bool binary);
+
+  EventMap *Prune() const override;
+
+  EventMap *MapValues(const std::unordered_set<EventKeyType> &keys_to_map,
+                      const std::unordered_map<EventValueType, EventValueType>
+                          &value_map) const override;
+
+  virtual ~SplitEventMap() { Destroy(); }
+
+  /// This constructor takes ownership of the "yes" and "no" arguments.
+  SplitEventMap(EventKeyType key, const std::vector<EventValueType> &yes_set,
+                EventMap *yes, EventMap *no)
+      : key_(key), yes_set_(yes_set), yes_(yes), no_(no) {
+    assert(IsSorted(yes_set));
+    KHG_ASSERT(yes_ != NULL && no_ != NULL);
+  }
+
+ private:
+  /// This constructor used in the Copy() function.
+  SplitEventMap(EventKeyType key,
+                const ConstIntegerSet<EventValueType> &yes_set, EventMap *yes,
+                EventMap *no)
+      : key_(key), yes_set_(yes_set), yes_(yes), no_(no) {
+    KHG_ASSERT(yes_ != NULL && no_ != NULL);
+  }
+  void Destroy() {
+    delete yes_;
+    delete no_;
+  }
+  EventKeyType key_;
+  //  std::vector<EventValueType> yes_set_;
+  ConstIntegerSet<EventValueType> yes_set_;  // more efficient Map function.
+  EventMap *yes_;                            // owned here.
+  EventMap *no_;                             // owned here.
+  SplitEventMap &operator=(const SplitEventMap &other);  // Disallow.
+};
+
+/**
+   This function gets the tree structure of the EventMap "map" in a convenient
+   form. If "map" corresponds to a tree structure (not necessarily binary) with
+   leaves uniquely numbered from 0 to num_leaves-1, then the function will
+   return true, output "num_leaves", and set "parent" to a vector of size equal
+   to the number of nodes in the tree (nonleaf and leaf), where each index
+   corresponds to a node and the leaf indices correspond to the values returned
+   by the EventMap from that leaf; for an index i, parent[i] equals the parent
+   of that node in the tree structure, where parent[i] > i, except for the last
+   (root) node where parent[i] == i. If the EventMap does not have this
+   structure (e.g. if multiple different leaf nodes share the same number), then
+   it will return false.
+*/
+
+bool GetTreeStructure(const EventMap &map, int32_t *num_leaves,
+                      std::vector<int32_t> *parents);
 
 }  // namespace khg
 

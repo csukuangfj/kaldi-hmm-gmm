@@ -1,4 +1,4 @@
-// kaldi_native_io/csrc/stl-utils.h
+// kaldi-hmm-gmm/csrc/stl-utils.h
 //
 // Copyright (c)  2022  Xiaomi Corporation
 
@@ -14,6 +14,20 @@
 #include "kaldi-hmm-gmm/csrc/log.h"
 
 namespace khg {
+
+/// Returns true if the vector is sorted.
+template <typename T>
+inline bool IsSorted(const std::vector<T> &vec) {
+  typename std::vector<T>::const_iterator iter = vec.begin(), end = vec.end();
+  if (iter == end) return true;
+  while (1) {
+    typename std::vector<T>::const_iterator next_iter = iter;
+    ++next_iter;
+    if (next_iter == end) return true;  // end of loop and nothing out of order
+    if (*next_iter < *iter) return false;
+    iter = next_iter;
+  }
+}
 
 /// Sorts and uniq's (removes duplicates) from a vector.
 template <typename T>
