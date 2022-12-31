@@ -125,11 +125,11 @@ EventMap *EventMap::Read(std::istream &is, bool binary) {
   char c = kaldiio::Peek(is, binary);
   if (c == 'N') {
     kaldiio::ExpectToken(is, binary, "NULL");
-    return NULL;
+    return nullptr;
   } else if (c == 'C') {
     return ConstantEventMap::Read(is, binary);
   } else if (c == 'T') {
-    // return TableEventMap::Read(is, binary);
+    return TableEventMap::Read(is, binary);
   } else if (c == 'S') {
     // return SplitEventMap::Read(is, binary);
   } else {
@@ -154,6 +154,107 @@ ConstantEventMap *ConstantEventMap::Read(std::istream &is, bool binary) {
   EventAnswerType answer;
   kaldiio::ReadBasicType(is, binary, &answer);
   return new ConstantEventMap(answer);
+}
+
+EventMap *TableEventMap::Prune() const {
+  std::vector<EventMap *> table;
+  table.reserve(table_.size());
+  EventValueType size = table_.size();
+  for (EventKeyType value = 0; value < size; ++value) {
+    if (table_[value] != nullptr) {
+      EventMap *pruned_map = table_[value]->Prune();
+      if (pruned_map != nullptr) {
+        table.resize(value + 1, nullptr);
+        table[value] = pruned_map;
+      }
+    }
+  }
+  if (table.empty()) {
+    return nullptr;
+  } else {
+    return new TableEventMap(key_, table);
+  }
+}
+
+EventMap *TableEventMap::MapValues(
+    const std::unordered_set<EventKeyType> &keys_to_map,
+    const std::unordered_map<EventValueType, EventValueType> &value_map) const {
+  std::vector<EventMap *> table;
+  table.reserve(table_.size());
+  EventValueType size = table_.size();
+
+  for (EventValueType value = 0; value < size; ++value) {
+    if (table_[value] != nullptr) {
+      EventMap *this_map = table_[value]->MapValues(keys_to_map, value_map);
+      EventValueType mapped_value;
+
+      if (keys_to_map.count(key_) == 0) {
+        mapped_value = value;
+      } else {
+        auto iter = value_map.find(value);
+        if (iter == value_map.end()) {
+          KHG_ERR << "Could not map value " << value << " for key " << key_;
+        }
+        mapped_value = iter->second;
+      }
+      KHG_ASSERT(mapped_value >= 0);
+
+      if (static_cast<EventValueType>(table.size()) <= mapped_value) {
+        table.resize(mapped_value + 1, nullptr);
+      }
+
+      if (table[mapped_value] != nullptr) {
+        KHG_ERR << "Multiple values map to the same point: this code cannot "
+                << "handle this case.";
+      }
+      table[mapped_value] = this_map;
+    }
+  }
+  return new TableEventMap(key_, table);
+}
+
+void TableEventMap::Write(std::ostream &os, bool binary) {
+  kaldiio::WriteToken(os, binary, "TE");
+  kaldiio::WriteBasicType(os, binary, key_);
+  uint32_t size = table_.size();
+
+  kaldiio::WriteBasicType(os, binary, size);
+  kaldiio::WriteToken(os, binary, "(");
+
+  for (size_t t = 0; t < size; ++t) {
+    // This Write function works for NULL pointers.
+    EventMap::Write(os, binary, table_[t]);
+  }
+
+  kaldiio::WriteToken(os, binary, ")");
+
+  if (!binary) {
+    os << '\n';
+  }
+
+  if (os.fail()) {
+    KHG_ERR << "TableEventMap::Write(), could not write to stream.";
+  }
+}
+
+// static member function.
+TableEventMap *TableEventMap::Read(std::istream &is, bool binary) {
+  kaldiio::ExpectToken(is, binary, "TE");
+
+  EventKeyType key;
+  kaldiio::ReadBasicType(is, binary, &key);
+
+  uint32_t size;
+  kaldiio::ReadBasicType(is, binary, &size);
+
+  std::vector<EventMap *> table(size);
+  kaldiio::ExpectToken(is, binary, "(");
+  for (size_t t = 0; t < size; t++) {
+    // This Read function works for NULL pointers.
+    table[t] = EventMap::Read(is, binary);
+  }
+  kaldiio::ExpectToken(is, binary, ")");
+  return new TableEventMap(key, table);
 }
 
 }  // namespace khg

@@ -76,7 +76,7 @@ template <class T>
 inline void ReadIntegerVector(std::istream &is, bool binary,
                               std::vector<T> *v) {
   static_assert(std::is_integral<T>::value, "");
-  KHG_ASSERT(v != NULL);
+  KHG_ASSERT(v != nullptr);
   if (binary) {
     int sz = is.peek();
     if (sz == sizeof(T)) {
@@ -128,6 +128,20 @@ inline void ReadIntegerVector(std::istream &is, bool binary,
   if (!is.fail()) return;
 bad:
   KHG_ERR << "ReadIntegerVector: read failure at file position " << is.tellg();
+}
+
+/// Deletes any non-NULL pointers in the vector v, and sets
+/// the corresponding entries of v to NULL
+template <class A>
+void DeletePointers(std::vector<A *> *v) {
+  KHG_ASSERT(v != nullptr);
+  typename std::vector<A *>::iterator iter = v->begin(), end = v->end();
+  for (; iter != end; ++iter) {
+    if (*iter != nullptr) {
+      delete *iter;
+      *iter = nullptr;  // set to NULL for extra safety.
+    }
+  }
 }
 
 }  // namespace khg

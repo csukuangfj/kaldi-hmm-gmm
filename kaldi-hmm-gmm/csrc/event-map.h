@@ -4,6 +4,7 @@
 #ifndef KALDI_HMM_GMM_CSRC_EVENT_MAP_H_
 #define KALDI_HMM_GMM_CSRC_EVENT_MAP_H_
 #include <cstdint>
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -11,6 +12,7 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/log.h"
+#include "kaldi-hmm-gmm/csrc/stl-utils.h"
 
 // this file is copied and modified from
 // kaldi/src/tree/event-map.h
@@ -209,6 +211,88 @@ class ConstantEventMap : public EventMap {
 
  private:
   EventAnswerType answer_;
+};
+
+class TableEventMap : public EventMap {
+ public:
+  TableEventMap(const TableEventMap &) = delete;
+  TableEventMap &operator=(const TableEventMap &) = delete;
+
+  bool Map(const EventType &event, EventAnswerType *ans) const override {
+    EventValueType tmp;
+
+    *ans = -1;  // means no answer
+
+    if (Lookup(event, key_, &tmp) && tmp >= 0 &&
+        tmp < (EventValueType)table_.size() && table_[tmp] != nullptr) {
+      return table_[tmp]->Map(event, ans);
+    }
+    return false;
+  }
+
+  void GetChildren(std::vector<EventMap *> *out) const override {
+    out->clear();
+    for (size_t i = 0; i < table_.size(); ++i) {
+      if (table_[i] != nullptr) {
+        out->push_back(table_[i]);
+      }
+    }
+  }
+
+  void MultiMap(const EventType &event,
+                std::vector<EventAnswerType> *ans) const override {
+    EventValueType tmp;
+    if (Lookup(event, key_, &tmp)) {
+      if (tmp >= 0 && tmp < (EventValueType)table_.size() &&
+          table_[tmp] != nullptr)
+        return table_[tmp]->MultiMap(event, ans);
+      // else no answers.
+    } else {  // all answers are possible if no such key.
+      for (size_t i = 0; i < table_.size(); ++i) {
+        if (table_[i] != nullptr) {
+          // append.
+          table_[i]->MultiMap(event, ans);
+        }
+      }
+    }
+  }
+
+  EventMap *Prune() const override;
+
+  EventMap *MapValues(const std::unordered_set<EventKeyType> &keys_to_map,
+                      const std::unordered_map<EventValueType, EventValueType>
+                          &value_map) const override;
+
+  /// Takes ownership of pointers.
+  TableEventMap(EventKeyType key, const std::vector<EventMap *> &table)
+      : key_(key), table_(table) {}
+
+  /// Takes ownership of pointers.
+  TableEventMap(EventKeyType key,
+                const std::map<EventValueType, EventMap *> &map_in);
+
+  /// This initializer creates a ConstantEventMap for each value in the map.
+  TableEventMap(EventKeyType key,
+                const std::map<EventValueType, EventAnswerType> &map_in);
+
+  void Write(std::ostream &os, bool binary) override;
+  static TableEventMap *Read(std::istream &is, bool binary);
+
+  EventMap *Copy(const std::vector<EventMap *> &new_leaves) const override {
+    std::vector<EventMap *> new_table_(table_.size(), nullptr);
+    for (size_t i = 0; i < table_.size(); i++) {
+      if (table_[i]) {
+        new_table_[i] = table_[i]->Copy(new_leaves);
+      }
+    }
+
+    return new TableEventMap(key_, new_table_);
+  }
+  virtual ~TableEventMap() { DeletePointers(&table_); }
+
+ private:
+  EventKeyType key_;
+  std::vector<EventMap *> table_;
 };
 
 }  // namespace khg
