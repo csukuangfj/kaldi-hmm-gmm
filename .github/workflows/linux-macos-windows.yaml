@@ -45,7 +45,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         uses: microsoft/setup-msbuild@v1.0.2
 
-      - name: Configure Cmake
+      - name: Configure CMake
         shell: bash
         run: |
           mkdir build
@@ -67,4 +67,4 @@ jobs:
           cd build
           cmake --build . --config Release -- -m:2
 
-          ls -lh ./*/*
+          ls -lh ./lib/Release/*
