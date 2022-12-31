@@ -1,0 +1,135 @@
+// kaldi_native_io/csrc/stl-utils.h
+//
+// Copyright (c)  2022  Xiaomi Corporation
+
+// this file is copied and modified from
+// kaldi/src/util/stl-utils.h
+
+#ifndef KALDI_HMM_GMM_CSRC_STL_UTILS_H_
+#define KALDI_HMM_GMM_CSRC_STL_UTILS_H_
+#include <algorithm>
+#include <istream>
+#include <vector>
+
+#include "kaldi-hmm-gmm/csrc/log.h"
+
+namespace khg {
+
+/// Sorts and uniq's (removes duplicates) from a vector.
+template <typename T>
+inline void SortAndUniq(std::vector<T> *vec) {
+  std::sort(vec->begin(), vec->end());
+  vec->erase(std::unique(vec->begin(), vec->end()), vec->end());
+}
+
+/// Returns true if the vector is sorted and contains each element
+/// only once.
+template <typename T>
+inline bool IsSortedAndUniq(const std::vector<T> &vec) {
+  typename std::vector<T>::const_iterator iter = vec.begin(), end = vec.end();
+  if (iter == end) return true;
+  while (1) {
+    typename std::vector<T>::const_iterator next_iter = iter;
+    ++next_iter;
+    if (next_iter == end) return true;  // end of loop and nothing out of order
+    if (*next_iter <= *iter) return false;
+    iter = next_iter;
+  }
+}
+
+template <class T>
+inline void WriteIntegerVector(std::ostream &os, bool binary,
+                               const std::vector<T> &v) {
+  // Compile time assertion that this is not called with a wrong type.
+  static_assert(std::is_integral<T>::value, "");
+  if (binary) {
+    char sz = sizeof(T);  // this is currently just a check.
+    os.write(&sz, 1);
+    int32_t vecsz = static_cast<int32_t>(v.size());
+    KHG_ASSERT((size_t)vecsz == v.size());
+
+    os.write(reinterpret_cast<const char *>(&vecsz), sizeof(vecsz));
+    if (vecsz != 0) {
+      os.write(reinterpret_cast<const char *>(&(v[0])), sizeof(T) * vecsz);
+    }
+  } else {
+    // focus here is on prettiness of text form rather than
+    // efficiency of reading-in.
+    // reading-in is dominated by low-level operations anyway:
+    // for efficiency use binary.
+    os << "[ ";
+    typename std::vector<T>::const_iterator iter = v.begin(), end = v.end();
+    for (; iter != end; ++iter) {
+      if (sizeof(T) == 1)
+        os << static_cast<int16_t>(*iter) << " ";
+      else
+        os << *iter << " ";
+    }
+    os << "]\n";
+  }
+  if (os.fail()) {
+    KHG_ERR << "Write failure in WriteIntegerVector.";
+  }
+}
+
+template <class T>
+inline void ReadIntegerVector(std::istream &is, bool binary,
+                              std::vector<T> *v) {
+  static_assert(std::is_integral<T>::value, "");
+  KHG_ASSERT(v != NULL);
+  if (binary) {
+    int sz = is.peek();
+    if (sz == sizeof(T)) {
+      is.get();
+    } else {  // this is currently just a check.
+      KHG_ERR << "ReadIntegerVector: expected to see type of size " << sizeof(T)
+              << ", saw instead " << sz << ", at file position " << is.tellg();
+    }
+    int32_t vecsz;
+    is.read(reinterpret_cast<char *>(&vecsz), sizeof(vecsz));
+    if (is.fail() || vecsz < 0) goto bad;
+
+    v->resize(vecsz);
+
+    if (vecsz > 0) {
+      is.read(reinterpret_cast<char *>(&((*v)[0])), sizeof(T) * vecsz);
+    }
+  } else {
+    std::vector<T> tmp_v;  // use temporary so v doesn't use extra memory
+                           // due to resizing.
+    is >> std::ws;
+    if (is.peek() != static_cast<int>('[')) {
+      KHG_ERR << "ReadIntegerVector: expected to see [, saw " << is.peek()
+              << ", at file position " << is.tellg();
+    }
+    is.get();       // consume the '['.
+    is >> std::ws;  // consume whitespace.
+    while (is.peek() != static_cast<int>(']')) {
+      if (sizeof(T) == 1) {  // read/write chars as numbers.
+        int16_t next_t;
+        is >> next_t >> std::ws;
+        if (is.fail())
+          goto bad;
+        else
+          tmp_v.push_back((T)next_t);
+      } else {
+        T next_t;
+        is >> next_t >> std::ws;
+        if (is.fail())
+          goto bad;
+        else
+          tmp_v.push_back(next_t);
+      }
+    }
+    is.get();    // get the final ']'.
+    *v = tmp_v;  // could use std::swap to use less temporary memory, but this
+    // uses less permanent memory.
+  }
+  if (!is.fail()) return;
+bad:
+  KHG_ERR << "ReadIntegerVector: read failure at file position " << is.tellg();
+}
+
+}  // namespace khg
+
+#endif  // KALDI_HMM_GMM_CSRC_STL_UTILS_H_
