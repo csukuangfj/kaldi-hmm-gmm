@@ -34,4 +34,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 option(BUILD_SHARED_LIBS "Whether to build shared libraries" ON)
 
+include(kaldi-native-io)
+
 add_subdirectory(kaldi-hmm-gmm)
