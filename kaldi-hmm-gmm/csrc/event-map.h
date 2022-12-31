@@ -165,6 +165,52 @@ class EventMap {
   static EventMap *Read(std::istream &is, bool binary);
 };
 
+class ConstantEventMap : public EventMap {
+ public:
+  ConstantEventMap(const ConstantEventMap &) = delete;
+  ConstantEventMap &operator=(const ConstantEventMap &) = delete;
+
+  bool Map(const EventType &event, EventAnswerType *ans) const override {
+    *ans = answer_;
+    return true;
+  }
+
+  void MultiMap(const EventType &,
+                std::vector<EventAnswerType> *ans) const override {
+    ans->push_back(answer_);
+  }
+
+  void GetChildren(std::vector<EventMap *> *out) const override {
+    out->clear();
+  }
+
+  EventMap *Copy(const std::vector<EventMap *> &new_leaves) const override {
+    if (answer_ < 0 || answer_ >= (EventAnswerType)new_leaves.size() ||
+        new_leaves[answer_] == nullptr)
+      return new ConstantEventMap(answer_);
+    else
+      return new_leaves[answer_]->Copy();
+  }
+
+  EventMap *MapValues(const std::unordered_set<EventKeyType> &keys_to_map,
+                      const std::unordered_map<EventValueType, EventValueType>
+                          &value_map) const override {
+    return new ConstantEventMap(answer_);
+  }
+
+  EventMap *Prune() const override {
+    return (answer_ == -1 ? nullptr : new ConstantEventMap(answer_));
+  }
+
+  explicit ConstantEventMap(EventAnswerType answer) : answer_(answer) {}
+
+  void Write(std::ostream &os, bool binary) override;
+  static ConstantEventMap *Read(std::istream &is, bool binary);
+
+ private:
+  EventAnswerType answer_;
+};
+
 }  // namespace khg
 
 #endif  // KALDI_HMM_GMM_CSRC_EVENT_MAP_H_

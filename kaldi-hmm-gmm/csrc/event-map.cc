@@ -127,7 +127,7 @@ EventMap *EventMap::Read(std::istream &is, bool binary) {
     kaldiio::ExpectToken(is, binary, "NULL");
     return NULL;
   } else if (c == 'C') {
-    // return ConstantEventMap::Read(is, binary);
+    return ConstantEventMap::Read(is, binary);
   } else if (c == 'T') {
     // return TableEventMap::Read(is, binary);
   } else if (c == 'S') {
@@ -138,6 +138,22 @@ EventMap *EventMap::Read(std::istream &is, bool binary) {
     return nullptr;  // suppress warning.
   }
   return nullptr;  // TODO(fangjun): remove me
+}
+
+void ConstantEventMap::Write(std::ostream &os, bool binary) {
+  kaldiio::WriteToken(os, binary, "CE");
+  kaldiio::WriteBasicType(os, binary, answer_);
+  if (os.fail()) {
+    KHG_ERR << "ConstantEventMap::Write(), could not write to stream.";
+  }
+}
+
+// static member function.
+ConstantEventMap *ConstantEventMap::Read(std::istream &is, bool binary) {
+  kaldiio::ExpectToken(is, binary, "CE");
+  EventAnswerType answer;
+  kaldiio::ReadBasicType(is, binary, &answer);
+  return new ConstantEventMap(answer);
 }
 
 }  // namespace khg
