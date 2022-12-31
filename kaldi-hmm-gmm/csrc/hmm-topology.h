@@ -145,6 +145,20 @@ class HmmTopology {
   /// will throw exception if phone not covered by the topology.
   const TopologyEntry &TopologyForPhone(int32_t phone) const;
 
+  /// Returns the number of \ref pdf_class "pdf-classes" for this phone;
+  /// throws exception if phone not covered by this topology.
+  int32_t NumPdfClasses(int32_t phone) const;
+
+  /// Outputs a vector of int32, indexed by phone, that gives the
+  /// number of \ref pdf_class pdf-classes for the phones; this is
+  /// used by tree-building code such as BuildTree().
+  void GetPhoneToNumPdfClasses(
+      std::vector<int32_t> *phone2num_pdf_classes) const;
+
+  // Returns the minimum number of frames it takes to traverse this model for
+  // this phone: e.g. 3 for the normal HMM topology.
+  int32_t MinLength(int32_t phone) const;
+
   // Allow default assignment operator and copy constructor.
  private:
   std::vector<int32_t> phones_;     // list of all phones we have topology for.
