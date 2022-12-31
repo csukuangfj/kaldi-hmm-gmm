@@ -112,16 +112,38 @@ class HmmTopology {
     HmmState() : forward_pdf_class(-1), self_loop_pdf_class(-1) {}
   };
 
-  HmmTopology() = default;
-
-  void Read(std::istream &is, bool binary);
-
   /// TopologyEntry is a typedef that represents the topology of
   /// a single (prototype) state.
   using TopologyEntry = std::vector<HmmState>;
 
+  HmmTopology() = default;
+
+  void Read(std::istream &is, bool binary);
+  void Write(std::ostream &os, bool binary) const;
+
+  /// Returns true if this HmmTopology is really 'hmm-like', i.e. the pdf-class
+  /// on the self-loops and forward transitions of all states are identical.
+  /// [note: in HMMs, the densities are associated with the states.] We have
+  /// extended this to support 'non-hmm-like' topologies (where those
+  /// pdf-classes are different), in order to make for more compact decoding
+  /// graphs in our so-called 'chain models' (AKA lattice-free MMI), where we
+  /// use 1-state topologies that have different pdf-classes for the self-loop
+  /// and the forward transition. Note that we always use the 'reorder=true'
+  /// option so the 'forward transition' actually comes before the self-loop.
+  bool IsHmm() const;
+
   // Checks that the object is valid, and throw exception otherwise.
   void Check();
+
+  /// Returns a reference to a sorted, unique list of phones covered by
+  /// the topology (these phones will be positive integers, and usually
+  /// contiguous and starting from one but the toolkit doesn't assume
+  /// they are contiguous).
+  const std::vector<int32_t> &GetPhones() const { return phones_; }
+
+  /// Returns the topology entry (i.e. vector of HmmState) for this phone;
+  /// will throw exception if phone not covered by the topology.
+  const TopologyEntry &TopologyForPhone(int32_t phone) const;
 
   // Allow default assignment operator and copy constructor.
  private:

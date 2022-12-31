@@ -38,6 +38,41 @@ inline bool IsSortedAndUniq(const std::vector<T> &vec) {
 }
 
 template <class T>
+inline void WriteIntegerVector(std::ostream &os, bool binary,
+                               const std::vector<T> &v) {
+  // Compile time assertion that this is not called with a wrong type.
+  static_assert(std::is_integral<T>::value, "");
+  if (binary) {
+    char sz = sizeof(T);  // this is currently just a check.
+    os.write(&sz, 1);
+    int32_t vecsz = static_cast<int32_t>(v.size());
+    KHG_ASSERT((size_t)vecsz == v.size());
+
+    os.write(reinterpret_cast<const char *>(&vecsz), sizeof(vecsz));
+    if (vecsz != 0) {
+      os.write(reinterpret_cast<const char *>(&(v[0])), sizeof(T) * vecsz);
+    }
+  } else {
+    // focus here is on prettiness of text form rather than
+    // efficiency of reading-in.
+    // reading-in is dominated by low-level operations anyway:
+    // for efficiency use binary.
+    os << "[ ";
+    typename std::vector<T>::const_iterator iter = v.begin(), end = v.end();
+    for (; iter != end; ++iter) {
+      if (sizeof(T) == 1)
+        os << static_cast<int16_t>(*iter) << " ";
+      else
+        os << *iter << " ";
+    }
+    os << "]\n";
+  }
+  if (os.fail()) {
+    KHG_ERR << "Write failure in WriteIntegerVector.";
+  }
+}
+
+template <class T>
 inline void ReadIntegerVector(std::istream &is, bool binary,
                               std::vector<T> *v) {
   static_assert(std::is_integral<T>::value, "");

@@ -181,6 +181,132 @@ void HmmTopology::Read(std::istream &is, bool binary) {
   Check();  // Will throw if not ok.
 }
 
+void HmmTopology::Write(std::ostream &os, bool binary) const {
+  bool is_hmm = IsHmm();
+  kaldiio::WriteToken(os, binary, "<Topology>");
+  if (!binary) {  // Text-mode write.
+    os << "\n";
+    for (int32_t i = 0; i < static_cast<int32_t>(entries_.size()); ++i) {
+      kaldiio::WriteToken(os, binary, "<TopologyEntry>");
+      os << "\n";
+      kaldiio::WriteToken(os, binary, "<ForPhones>");
+      os << "\n";
+      for (size_t j = 0; j < phone2idx_.size(); ++j) {
+        if (phone2idx_[j] == i) {
+          os << j << " ";
+        }
+      }
+
+      os << "\n";
+      kaldiio::WriteToken(os, binary, "</ForPhones>");
+      os << "\n";
+
+      for (size_t j = 0; j < entries_[i].size(); ++j) {
+        kaldiio::WriteToken(os, binary, "<State>");
+        kaldiio::WriteBasicType(os, binary, static_cast<int32_t>(j));
+
+        if (entries_[i][j].forward_pdf_class != kNoPdf) {
+          if (is_hmm) {
+            kaldiio::WriteToken(os, binary, "<PdfClass>");
+            kaldiio::WriteBasicType(os, binary,
+                                    entries_[i][j].forward_pdf_class);
+          } else {
+            kaldiio::WriteToken(os, binary, "<ForwardPdfClass>");
+            kaldiio::WriteBasicType(os, binary,
+                                    entries_[i][j].forward_pdf_class);
+            KHG_ASSERT(entries_[i][j].self_loop_pdf_class != kNoPdf);
+            kaldiio::WriteToken(os, binary, "<SelfLoopPdfClass>");
+            kaldiio::WriteBasicType(os, binary,
+                                    entries_[i][j].self_loop_pdf_class);
+          }
+        }
+
+        for (size_t k = 0; k < entries_[i][j].transitions.size(); ++k) {
+          kaldiio::WriteToken(os, binary, "<Transition>");
+          kaldiio::WriteBasicType(os, binary,
+                                  entries_[i][j].transitions[k].first);
+          kaldiio::WriteBasicType(os, binary,
+                                  entries_[i][j].transitions[k].second);
+        }
+
+        kaldiio::WriteToken(os, binary, "</State>");
+        os << "\n";
+      }
+
+      kaldiio::WriteToken(os, binary, "</TopologyEntry>");
+      os << "\n";
+    }
+  } else {
+    // for binary
+    WriteIntegerVector(os, binary, phones_);
+    WriteIntegerVector(os, binary, phone2idx_);
+    // -1 is put here as a signal that the object has the new,
+    // extended format with SelfLoopPdfClass
+    if (!is_hmm) {
+      kaldiio::WriteBasicType(os, binary, static_cast<int32_t>(-1));
+    }
+
+    kaldiio::WriteBasicType(os, binary, static_cast<int32_t>(entries_.size()));
+
+    for (size_t i = 0; i < entries_.size(); ++i) {
+      kaldiio::WriteBasicType(os, binary,
+                              static_cast<int32_t>(entries_[i].size()));
+
+      for (size_t j = 0; j < entries_[i].size(); ++j) {
+        kaldiio::WriteBasicType(os, binary, entries_[i][j].forward_pdf_class);
+
+        if (!is_hmm) {
+          kaldiio::WriteBasicType(os, binary,
+                                  entries_[i][j].self_loop_pdf_class);
+        }
+
+        kaldiio::WriteBasicType(
+            os, binary,
+            static_cast<int32_t>(entries_[i][j].transitions.size()));
+
+        for (size_t k = 0; k < entries_[i][j].transitions.size(); ++k) {
+          kaldiio::WriteBasicType(os, binary,
+                                  entries_[i][j].transitions[k].first);
+          kaldiio::WriteBasicType(os, binary,
+                                  entries_[i][j].transitions[k].second);
+        }
+      }
+    }
+  }
+  kaldiio::WriteToken(os, binary, "</Topology>");
+  if (!binary) {
+    os << "\n";
+  }
+}
+
+bool HmmTopology::IsHmm() const {
+  const std::vector<int32_t> &phones = GetPhones();
+  KHG_ASSERT(!phones.empty());
+  for (size_t i = 0; i < phones.size(); ++i) {
+    int32_t phone = phones[i];
+    const TopologyEntry &entry = TopologyForPhone(phone);
+    for (int32_t j = 0; j < static_cast<int32_t>(entry.size());
+         ++j) {  // for each state...
+      int32_t forward_pdf_class = entry[j].forward_pdf_class,
+              self_loop_pdf_class = entry[j].self_loop_pdf_class;
+
+      if (forward_pdf_class != self_loop_pdf_class) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+const HmmTopology::TopologyEntry &HmmTopology::TopologyForPhone(
+    int32_t phone) const {  // Will throw if phone not covered.
+  if (static_cast<size_t>(phone) >= phone2idx_.size() ||
+      phone2idx_[phone] == -1) {
+    KHG_ERR << "TopologyForPhone(), phone " << phone << " not covered.";
+  }
+  return entries_[phone2idx_[phone]];
+}
+
 void HmmTopology::Check() {
   if (entries_.empty() || phones_.empty() || phone2idx_.empty()) {
     KHG_ERR << "HmmTopology::Check(), empty object.";
