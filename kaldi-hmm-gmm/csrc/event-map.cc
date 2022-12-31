@@ -257,4 +257,40 @@ TableEventMap *TableEventMap::Read(std::istream &is, bool binary) {
   return new TableEventMap(key, table);
 }
 
+TableEventMap::TableEventMap(EventKeyType key,
+                             const std::map<EventValueType, EventMap *> &map_in)
+    : key_(key) {
+  if (map_in.size() == 0) {
+    return;  // empty table.
+  } else {
+    EventValueType highest_val = map_in.rbegin()->first;
+    table_.resize(highest_val + 1, nullptr);
+    auto iter = map_in.begin(), end = map_in.end();
+
+    for (; iter != end; ++iter) {
+      KHG_ASSERT(iter->first >= 0 && iter->first <= highest_val);
+
+      table_[iter->first] = iter->second;
+    }
+  }
+}
+
+TableEventMap::TableEventMap(
+    EventKeyType key, const std::map<EventValueType, EventAnswerType> &map_in)
+    : key_(key) {
+  if (map_in.size() == 0) {
+    return;  // empty table.
+  } else {
+    EventValueType highest_val = map_in.rbegin()->first;
+
+    table_.resize(highest_val + 1, nullptr);
+    auto iter = map_in.begin(), end = map_in.end();
+
+    for (; iter != end; ++iter) {
+      KHG_ASSERT(iter->first >= 0 && iter->first <= highest_val);
+      table_[iter->first] = new ConstantEventMap(iter->second);
+    }
+  }
+}
+
 }  // namespace khg
