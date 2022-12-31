@@ -67,4 +67,4 @@ jobs:
           cd build
           cmake --build . --config Release -- -m:2
 
-          ls -lh ./bin/Release/
+          ls -lh ./*/*
