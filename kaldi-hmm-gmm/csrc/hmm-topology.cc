@@ -424,4 +424,69 @@ void HmmTopology::Check() {
   }
 }
 
+int32_t HmmTopology::NumPdfClasses(int32_t phone) const {
+  // will throw if phone not covered.
+  const TopologyEntry &entry = TopologyForPhone(phone);
+  int32_t max_pdf_class = 0;
+  for (size_t i = 0; i < entry.size(); ++i) {
+    max_pdf_class = std::max(max_pdf_class, entry[i].forward_pdf_class);
+    max_pdf_class = std::max(max_pdf_class, entry[i].self_loop_pdf_class);
+  }
+  return max_pdf_class + 1;
+}
+
+void HmmTopology::GetPhoneToNumPdfClasses(
+    std::vector<int32_t> *phone2num_pdf_classes) const {
+  KHG_ASSERT(!phones_.empty());
+
+  phone2num_pdf_classes->clear();
+  phone2num_pdf_classes->resize(phones_.back() + 1, -1);
+
+  for (size_t i = 0; i < phones_.size(); ++i)
+    (*phone2num_pdf_classes)[phones_[i]] = NumPdfClasses(phones_[i]);
+}
+
+int32_t HmmTopology::MinLength(int32_t phone) const {
+  const TopologyEntry &entry = TopologyForPhone(phone);
+
+  // min_length[state] gives the minimum length for sequences up to and
+  // including that state.
+  std::vector<int32_t> min_length(entry.size(),
+                                  std::numeric_limits<int32_t>::max());
+  KHG_ASSERT(!entry.empty());
+
+  min_length[0] = (entry[0].forward_pdf_class == -1 ? 0 : 1);
+
+  int32_t num_states = min_length.size();
+  bool changed = true;
+  while (changed) {
+    changed = false;
+    for (int32_t s = 0; s < num_states; ++s) {
+      const HmmState &this_state = entry[s];
+
+      std::vector<std::pair<int32_t, float>>::const_iterator
+          iter = this_state.transitions.begin(),
+          end = this_state.transitions.end();
+
+      for (; iter != end; ++iter) {
+        int32_t next_state = iter->first;
+        KHG_ASSERT(next_state < num_states);
+
+        int32_t next_state_min_length =
+            min_length[s] + (entry[next_state].forward_pdf_class == -1 ? 0 : 1);
+        if (next_state_min_length < min_length[next_state]) {
+          min_length[next_state] = next_state_min_length;
+          if (next_state < s) {
+            changed = true;
+          }
+          // the test of 'next_state < s' is an optimization for speed.
+        }
+      }
+    }
+  }
+  KHG_ASSERT(min_length.back() != std::numeric_limits<int32_t>::max());
+  // the last state is the final-state.
+  return min_length.back();
+}
+
 }  // namespace khg
