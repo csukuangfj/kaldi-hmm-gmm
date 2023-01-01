@@ -1,2 +1,4 @@
 build
 __pycache__
+kaldi_hmm_gmm.egg-info
+dist/

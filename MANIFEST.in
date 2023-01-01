@@ -1,0 +1,7 @@
+include setup.py
+include LICENSE
+include README.md
+include CMakeLists.txt
+exclude pyproject.toml
+recursive-include kaldi-hmm-gmm *.*
+recursive-include cmake *.*
