@@ -7,6 +7,7 @@ set(srcs
   event-map.cc
   hmm-topology.cc
   tree-renderer.cc
+  transition-model.cc
 )
 add_library(kaldi-hmm-gmm-core ${srcs})
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldi_native_io_core)
