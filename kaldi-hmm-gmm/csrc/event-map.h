@@ -191,10 +191,11 @@ class ConstantEventMap : public EventMap {
 
   EventMap *Copy(const std::vector<EventMap *> &new_leaves) const override {
     if (answer_ < 0 || answer_ >= (EventAnswerType)new_leaves.size() ||
-        new_leaves[answer_] == nullptr)
+        new_leaves[answer_] == nullptr) {
       return new ConstantEventMap(answer_);
-    else
+    } else {
       return new_leaves[answer_]->Copy();
+    }
   }
 
   EventMap *MapValues(const std::unordered_set<EventKeyType> &keys_to_map,

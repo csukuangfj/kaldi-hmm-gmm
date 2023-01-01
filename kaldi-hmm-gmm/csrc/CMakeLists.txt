@@ -7,3 +7,29 @@ set(srcs
 )
 add_library(kaldi-hmm-gmm-core ${srcs})
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldi_native_io_core)
+
+if(KHG_ENABLE_TESTS)
+  set(test_srcs
+    event-map-test.cc
+  )
+
+  function(khg_add_test source)
+    get_filename_component(name ${source} NAME_WE)
+    set(target_name "${name}")
+    add_executable(${target_name} ${source})
+    target_link_libraries(${target_name}
+      PRIVATE
+      gtest
+      gtest_main
+      kaldi-hmm-gmm-core
+    )
+    add_test(NAME "Test.${target_name}"
+      COMMAND
+      $<TARGET_FILE:${target_name}>
+    )
+  endfunction()
+
+  foreach(source IN LISTS test_srcs)
+    khg_add_test(${source})
+  endforeach()
+endif()

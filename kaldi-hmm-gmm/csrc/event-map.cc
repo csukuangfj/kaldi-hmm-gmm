@@ -29,10 +29,11 @@ void WriteEventType(std::ostream &os, bool binary, const EventType &evec) {
 void ReadEventType(std::istream &is, bool binary, EventType *evec) {
   KHG_ASSERT(evec != NULL);
   kaldiio::ExpectToken(is, binary, "EV");
-  uint32_t size;
 
+  uint32_t size;
   kaldiio::ReadBasicType(is, binary, &size);
   evec->resize(size);
+
   for (size_t i = 0; i < size; i++) {
     kaldiio::ReadBasicType(is, binary, &((*evec)[i].first));
     kaldiio::ReadBasicType(is, binary, &((*evec)[i].second));
@@ -40,14 +41,14 @@ void ReadEventType(std::istream &is, bool binary, EventType *evec) {
 }
 
 std::string EventTypeToString(const EventType &evec) {
-  std::stringstream ss;
-  EventType::const_iterator iter = evec.begin(), end = evec.end();
+  std::ostringstream os;
+  auto iter = evec.begin(), end = evec.end();
   std::string sep = "";
   for (; iter != end; ++iter) {
-    ss << sep << iter->first << ":" << iter->second;
+    os << sep << iter->first << ":" << iter->second;
     sep = " ";
   }
-  return ss.str();
+  return os.str();
 }
 
 size_t EventMapVectorHash::operator()(const EventType &vec) const {
@@ -86,17 +87,16 @@ bool EventMap::Lookup(const EventType &event, EventKeyType key,
 #ifdef DEBUG
   Check(event);
 #endif
-  std::vector<std::pair<EventKeyType, EventValueType>>::const_iterator
-      begin = event.begin(),
-      end = event.end(),
-      middle;  // "middle" is used as a temporary variable in the algorithm.
+  auto begin = event.begin(), end = event.end();
+  decltype(begin) middle;
+  // "middle" is used as a temporary variable in the algorithm.
   // begin and sz store the current region where the first instance of
   // "value" might appear.
   // This is like this stl algorithm "lower_bound".
   size_t sz = end - begin, half;
   while (sz > 0) {
     half = sz >> 1;
-    middle = begin + half;  // "end" here is now reallly the middle.
+    middle = begin + half;  // "end" here is now really the middle.
     if (middle->first < key) {
       begin = middle;
       ++begin;
@@ -131,13 +131,12 @@ EventMap *EventMap::Read(std::istream &is, bool binary) {
   } else if (c == 'T') {
     return TableEventMap::Read(is, binary);
   } else if (c == 'S') {
-    // return SplitEventMap::Read(is, binary);
+    return SplitEventMap::Read(is, binary);
   } else {
     KHG_ERR << "EventMap::read, was not expecting character "
             << kaldiio::CharToString(c) << ", at file position " << is.tellg();
     return nullptr;  // suppress warning.
   }
-  return nullptr;  // TODO(fangjun): remove me
 }
 
 void ConstantEventMap::Write(std::ostream &os, bool binary) {
