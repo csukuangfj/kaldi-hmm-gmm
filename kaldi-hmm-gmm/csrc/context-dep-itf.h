@@ -3,6 +3,7 @@
 // Copyright (c)  2022  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_CONTEXT_DEP_ITF_H_
 #define KALDI_HMM_GMM_CSRC_CONTEXT_DEP_ITF_H_
+#include <cstdint>
 #include <utility>
 #include <vector>
 

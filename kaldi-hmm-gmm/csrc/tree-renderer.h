@@ -20,14 +20,15 @@ namespace khg {
 class TreeRenderer {
  public:
   // normal width of the edges and state contours
-  const static int32_t kEdgeWidth;
-  const static int32_t kEdgeWidthQuery;  // edge and state width when in query
-  const static std::string kEdgeColor;   // normal color for states and edges
-  const static std::string
-      kEdgeColorQuery;  // edge and state color when in query
+  static const int32_t kEdgeWidth;
+  static const int32_t kEdgeWidthQuery;  // edge and state width when in query
+  static const char *kEdgeColor;         // normal color for states and edges
+  static const char *kEdgeColorQuery;    // edge and state color when in query
 
-  TreeRenderer(std::istream &is, bool binary, std::ostream &os,
-               fst::SymbolTable &phone_syms, bool use_tooltips)
+  TreeRenderer(std::istream &is, bool binary,
+               std::ostream &os,              // NOLINT
+               fst::SymbolTable &phone_syms,  // NOLINT
+               bool use_tooltips)
       : phone_syms_(phone_syms),
         is_(is),
         out_(os),

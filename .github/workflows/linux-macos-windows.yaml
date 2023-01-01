@@ -54,10 +54,22 @@ jobs:
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
 
+      - name: Install dependencies (ubuntu)
+        if: startsWith(matrix.os, 'ubuntu')
+        shell: bash
+        run: |
+          sudo apt-get -qq install graphviz
+
+      - name: Install dependencies (macos)
+        if: startsWith(matrix.os, 'macos')
+        shell: bash
+        run: |
+          brew install graphviz
+
       - name: Install dependencies
         shell: bash
         run: |
-          python3 -m pip install -U pip wheel numpy graphviz
+          python3 -m pip install -U pip graphviz
 
       - name: Configure CMake
         shell: bash
@@ -71,7 +83,7 @@ jobs:
         run: |
           cd build
           make -j2
-          make test
+          ctest --output-on-failure
 
       - name: Build sherpa for windows
         if: startsWith(matrix.os, 'windows')

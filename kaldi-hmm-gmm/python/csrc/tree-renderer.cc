@@ -7,6 +7,9 @@
 
 #include "kaldi-hmm-gmm/python/csrc/tree-renderer.h"
 
+#include <string>
+#include <utility>
+
 #include "fst/fstlib.h"
 #include "kaldi-hmm-gmm/csrc/context-dep.h"
 #include "kaldi-hmm-gmm/csrc/log.h"

@@ -6,6 +6,9 @@
 // kaldi/src/tree/tree-renderer.cc
 #include "kaldi-hmm-gmm/csrc/tree-renderer.h"
 
+#include <string>
+#include <utility>
+
 #include "kaldi-hmm-gmm/csrc/context-dep.h"
 #include "kaldi_native_io/csrc/io-funcs.h"
 #include "kaldi_native_io/csrc/kaldi-utils.h"
@@ -15,8 +18,8 @@ namespace khg {
 
 const int32_t TreeRenderer::kEdgeWidth = 1;
 const int32_t TreeRenderer::kEdgeWidthQuery = 3;
-const std::string TreeRenderer::kEdgeColor = "black";
-const std::string TreeRenderer::kEdgeColorQuery = "red";
+const char *TreeRenderer::kEdgeColor = "black";
+const char *TreeRenderer::kEdgeColorQuery = "red";
 
 void TreeRenderer::RenderNonLeaf(int32_t id, const EventKeyType &key,
                                  bool in_query) {
@@ -33,9 +36,9 @@ void TreeRenderer::RenderNonLeaf(int32_t id, const EventKeyType &key,
   } else if (key == 2 && N_ == 3 && P_ == 1) {
     label = "\"RContext = ?\"";
   } else if (key >= 0 && key <= N_ - 1) {
-    if (P_ == key)
+    if (P_ == key) {
       label = "\"Center = ?\"";
-    else {
+    } else {
       std::ostringstream oss;
       oss << "\"Ctx Position " << key << " = ?\"";
       label = oss.str();

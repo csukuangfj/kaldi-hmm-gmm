@@ -3,9 +3,10 @@
 // Copyright (c)  2022  Xiaomi Corporation
 #include "kaldi-hmm-gmm/python/csrc/context-dep.h"
 
+#include <string>
+
 #include "kaldi-hmm-gmm/csrc/context-dep.h"
 #include "kaldi_native_io/csrc/kaldi-io.h"
-
 namespace khg {
 
 void PybinContextDep(py::module *m) {
