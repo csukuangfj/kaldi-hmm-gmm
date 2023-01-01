@@ -343,7 +343,7 @@ void TransitionModel::ComputeDerivedOfProbs() {
     if (tid == 0) {                            // no self-loop
       non_self_loop_log_probs_(tstate) = 0.0;  // log(1.0)
     } else {
-      float self_loop_prob = std::expf(GetTransitionLogProb(tid)),
+      float self_loop_prob = std::exp(GetTransitionLogProb(tid)),
             non_self_loop_prob = 1.0 - self_loop_prob;
       if (non_self_loop_prob <= 0.0) {
         KHG_WARN << "ComputeDerivedOfProbs(): non-self-loop prob is "

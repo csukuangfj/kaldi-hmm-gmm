@@ -12,15 +12,8 @@
 
 #include "kaldi-hmm-gmm/csrc/diag-gmm.h"
 
+#include "kaldi-hmm-gmm/csrc/kaldi-math.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
-
-// M_LOG_2PI =  log(2*pi)
-#ifndef M_LOG_2PI
-#define M_LOG_2PI 1.8378770664093454835606594728112
-#endif
-
-#define KALDI_ISINF std::isinf
-#define KALDI_ISNAN std::isnan
 
 namespace khg {
 
@@ -230,6 +223,46 @@ void DiagGmm::LogLikelihoodsPreselect(const torch::Tensor &data,
   loglikes.addmm_(inv_vars_sub, data_sq.unsqueeze(1), /*beta*/ 1.0,
                   /*alpha*/ -0.5);
   *_loglikes = loglikes.squeeze(1);
+}
+
+/// Get gaussian selection information for one frame.
+float DiagGmm::GaussianSelection(const torch::Tensor &data, int32_t num_gselect,
+                                 std::vector<int32_t> *output) const {
+  int32_t num_gauss = NumGauss();
+  output->clear();
+
+  torch::Tensor loglikes;
+  this->LogLikelihoods(data, &loglikes);
+
+  float thresh;
+  if (num_gselect < num_gauss) {
+    torch::Tensor loglikes_copy = loglikes.clone();
+    float *ptr = loglikes_copy.data_ptr<float>();
+    std::nth_element(ptr, ptr + num_gauss - num_gselect, ptr + num_gauss);
+    thresh = ptr[num_gauss - num_gselect];
+  } else {
+    thresh = -std::numeric_limits<float>::infinity();
+  }
+  float tot_loglike = -std::numeric_limits<float>::infinity();
+
+  auto loglikes_acc = loglikes.accessor<float, 1>();
+
+  std::vector<std::pair<float, int32_t>> pairs;
+  for (int32_t p = 0; p < num_gauss; p++) {
+    if (loglikes_acc[p] >= thresh) {
+      pairs.push_back(std::make_pair(loglikes_acc[p], p));
+    }
+  }
+  std::sort(pairs.begin(), pairs.end(),
+            std::greater<std::pair<float, int32_t>>());
+
+  for (int32_t j = 0; j < num_gselect && j < static_cast<int32_t>(pairs.size());
+       j++) {
+    output->push_back(pairs[j].second);
+    tot_loglike = LogAdd(tot_loglike, pairs[j].first);
+  }
+  KHG_ASSERT(!output->empty());
+  return tot_loglike;
 }
 
 }  // namespace khg
