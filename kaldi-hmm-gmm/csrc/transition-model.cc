@@ -20,7 +20,7 @@ TransitionModel::TransitionModel(const ContextDependencyInterface &ctx_dep,
     : topo_(hmm_topo) {
   // First thing is to get all possible tuples.
   ComputeTuples(ctx_dep);
-  // ComputeDerived();
+  ComputeDerived();
   // InitializeProbs();
   // Check();
 }
@@ -159,6 +159,70 @@ void TransitionModel::ComputeTuplesNotHmm(
       }
     }
   }
+}
+
+void TransitionModel::ComputeDerived() {
+  state2id_.resize(tuples_.size() + 2);  // indexed by transition-state, which
+  // is one based, but also an entry for one past end of list.
+
+  int32_t cur_transition_id = 1;
+  num_pdfs_ = 0;
+  for (int32_t tstate = 1;
+       tstate <= static_cast<int32_t>(tuples_.size() + 1);  // not a typo.
+       tstate++) {
+    state2id_[tstate] = cur_transition_id;
+    if (static_cast<size_t>(tstate) <= tuples_.size()) {
+      int32_t phone = tuples_[tstate - 1].phone,
+              hmm_state = tuples_[tstate - 1].hmm_state,
+              forward_pdf = tuples_[tstate - 1].forward_pdf,
+              self_loop_pdf = tuples_[tstate - 1].self_loop_pdf;
+      num_pdfs_ = std::max(num_pdfs_, 1 + forward_pdf);
+      num_pdfs_ = std::max(num_pdfs_, 1 + self_loop_pdf);
+      const HmmTopology::HmmState &state =
+          topo_.TopologyForPhone(phone)[hmm_state];
+      int32_t my_num_ids = static_cast<int32_t>(state.transitions.size());
+      cur_transition_id += my_num_ids;  // # trans out of this state.
+    }
+  }
+
+  id2state_.resize(
+      cur_transition_id);  // cur_transition_id is #transition-ids+1.
+  id2pdf_id_.resize(cur_transition_id);
+
+  for (int32_t tstate = 1; tstate <= static_cast<int32_t>(tuples_.size());
+       tstate++) {
+    for (int32_t tid = state2id_[tstate]; tid < state2id_[tstate + 1]; tid++) {
+      id2state_[tid] = tstate;
+      if (IsSelfLoop(tid)) {
+        id2pdf_id_[tid] = tuples_[tstate - 1].self_loop_pdf;
+      } else {
+        id2pdf_id_[tid] = tuples_[tstate - 1].forward_pdf;
+      }
+    }
+  }
+
+  // The following statements put copies a large number in the region of memory
+  // past the end of the id2pdf_id_ array, while leaving the array as it was
+  // before.  The goal of this is to speed up decoding by disabling a check
+  // inside TransitionIdToPdf() that the transition-id was within the correct
+  // range.
+  int32_t num_big_numbers = std::min<int32_t>(2000, cur_transition_id);
+  id2pdf_id_.resize(cur_transition_id + num_big_numbers,
+                    std::numeric_limits<int32_t>::max());
+  id2pdf_id_.resize(cur_transition_id);
+}
+
+bool TransitionModel::IsSelfLoop(int32_t trans_id) const {
+  KHG_ASSERT(static_cast<size_t>(trans_id) < id2state_.size());
+  int32_t trans_state = id2state_[trans_id];
+  int32_t trans_index = trans_id - state2id_[trans_state];
+  const Tuple &tuple = tuples_[trans_state - 1];
+  int32_t phone = tuple.phone, hmm_state = tuple.hmm_state;
+  const HmmTopology::TopologyEntry &entry = topo_.TopologyForPhone(phone);
+  KHG_ASSERT(static_cast<size_t>(hmm_state) < entry.size());
+  return (static_cast<size_t>(trans_index) <
+              entry[hmm_state].transitions.size() &&
+          entry[hmm_state].transitions[trans_index].first == hmm_state);
 }
 
 }  // namespace khg
