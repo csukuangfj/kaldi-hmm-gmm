@@ -146,4 +146,48 @@ int32_t DiagGmm::ComputeGconsts() {
   return num_bad;
 }
 
+// Gets likelihood of data given this.
+float DiagGmm::LogLikelihood(const torch::Tensor &data) const {
+  if (!valid_gconsts_) {
+    KHG_ERR << "Must call ComputeGconsts() before computing likelihood";
+  }
+
+  torch::Tensor loglikes;
+  LogLikelihoods(data, &loglikes);
+
+  float log_sum = loglikes.logsumexp(0).item().toFloat();
+
+  if (KALDI_ISNAN(log_sum) || KALDI_ISINF(log_sum)) {
+    KHG_ERR << "Invalid answer (overflow or invalid variances/features?)";
+  }
+
+  return log_sum;
+}
+
+void DiagGmm::LogLikelihoods(const torch::Tensor &data,
+                             torch::Tensor *_loglikes) const {
+  torch::Tensor loglikes = gconsts_.clone();
+
+  if (data.numel() != Dim()) {
+    KHG_ERR << "DiagGmm::LogLikelihoods, dimension "
+            << "mismatch " << data.numel() << " vs. " << Dim();
+  }
+  torch::Tensor data_sq = data.pow(2);
+  // means_invvars_: (nmix, dim)
+  // data: (dim,)
+  // loglikes: (nmix,)
+
+  // loglikes +=  means * inv(vars) * data.
+  // loglikes->AddMatVec(1.0, means_invvars_, kNoTrans, data, 1.0);
+  loglikes = loglikes.unsqueeze(1);  // (nmix, 1)
+  loglikes.addmm_(means_invvars_, data.unsqueeze(1));
+
+  // loglikes += -0.5 * inv(vars) * data_sq.
+  // loglikes->AddMatVec(-0.5, inv_vars_, kNoTrans, data_sq, 1.0);
+  loglikes.addmm_(inv_vars_, data_sq.unsqueeze(1), /*beta*/ 1.0,
+                  /*alpha*/ -0.5);
+
+  *_loglikes = loglikes.squeeze(1);
+}
+
 }  // namespace khg

@@ -49,6 +49,15 @@ class DiagGmm {
   /// zero weights or variances.
   int32_t ComputeGconsts();
 
+  /// Returns the log-likelihood of a data point (vector) given the GMM
+  // @param data  A 1-D tensor
+  float LogLikelihood(const torch::Tensor &data) const;
+
+  /// Outputs the per-component log-likelihoods
+  /// @param data  1-D tensor.
+  /// @param loglikes  1-D tensor.
+  void LogLikelihoods(const torch::Tensor &data, torch::Tensor *loglikes) const;
+
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)
