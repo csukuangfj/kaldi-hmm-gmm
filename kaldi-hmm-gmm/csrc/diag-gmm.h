@@ -110,6 +110,14 @@ class DiagGmm {
                                    int32_t num_gselect,
                                    std::vector<int32_t> *output) const;
 
+  /// Computes the posterior probabilities of all Gaussian components given
+  /// a data point. Returns the log-likehood of the data given the GMM.
+  ///
+  /// @param data 1-D tensor of shape (dim,)
+  /// @param posteriors On return, it is a 1-D tensor of shape (nmix,)
+  float ComponentPosteriors(const torch::Tensor &data,
+                            torch::Tensor *posteriors) const;
+
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)

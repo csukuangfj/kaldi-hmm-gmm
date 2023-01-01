@@ -388,4 +388,30 @@ float DiagGmm::GaussianSelectionPreselect(const torch::Tensor &data,
   return tot_loglike;
 }
 
+// Gets likelihood of data given this. Also provides per-Gaussian posteriors.
+float DiagGmm::ComponentPosteriors(const torch::Tensor &data,  // 1-D
+                                   torch::Tensor *posterior    // 1-D
+) const {
+  if (!valid_gconsts_) {
+    KHG_ERR << "Must call ComputeGconsts() before computing likelihood";
+  }
+
+  if (posterior == nullptr) {
+    KHG_ERR << "NULL pointer passed as return argument.";
+  }
+
+  torch::Tensor loglikes;
+  LogLikelihoods(data, &loglikes);
+
+  torch::Tensor likes = loglikes.softmax(0);
+  float log_sum = likes.sum().log().item().toFloat();
+
+  if (KALDI_ISNAN(log_sum) || KALDI_ISINF(log_sum)) {
+    KHG_ERR << "Invalid answer (overflow or invalid variances/features?)";
+  }
+
+  *posterior = likes;
+  return log_sum;
+}
+
 }  // namespace khg
