@@ -158,6 +158,19 @@ void DeletePointers(std::vector<A *> *v) {
   }
 }
 
+/// A hashing function-object for pairs of ints
+template <typename Int1, typename Int2 = Int1>
+struct PairHasher {  // hashing function for pair<int>
+  size_t operator()(const std::pair<Int1, Int2> &x) const noexcept {
+    // 7853 was chosen at random from a list of primes.
+    return x.first + x.second * 7853;
+  }
+  PairHasher() {  // Check we're instantiated with an integer type.
+    static_assert(std::is_integral<Int1>::value, "");
+    static_assert(std::is_integral<Int2>::value, "");
+  }
+};
+
 }  // namespace khg
 
 #endif  // KALDI_HMM_GMM_CSRC_STL_UTILS_H_

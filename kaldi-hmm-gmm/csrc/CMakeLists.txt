@@ -2,6 +2,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 # Please keep the source files alphabetically sorted
 set(srcs
+  context-dep.cc
   event-map.cc
   hmm-topology.cc
 )
