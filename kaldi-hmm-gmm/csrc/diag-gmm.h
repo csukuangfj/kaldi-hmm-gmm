@@ -118,6 +118,13 @@ class DiagGmm {
   float ComponentPosteriors(const torch::Tensor &data,
                             torch::Tensor *posteriors) const;
 
+  /// Computes the log-likelihood of a data point given a single Gaussian
+  /// component. NOTE: Currently we make no guarantees about what happens if
+  /// one of the variances is zero.
+  /// @param data 1-D tensor of shape (dim,)
+  float ComponentLogLikelihood(const torch::Tensor &data,
+                               int32_t comp_id) const;
+
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)

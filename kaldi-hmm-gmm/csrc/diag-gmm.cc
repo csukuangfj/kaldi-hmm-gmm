@@ -414,4 +414,31 @@ float DiagGmm::ComponentPosteriors(const torch::Tensor &data,  // 1-D
   return log_sum;
 }
 
+float DiagGmm::ComponentLogLikelihood(const torch::Tensor &data,  // 1-D
+                                      int32_t comp_id) const {
+  if (!valid_gconsts_) {
+    KHG_ERR << "Must call ComputeGconsts() before computing likelihood";
+  }
+
+  if (static_cast<int32_t>(data.size(0)) != Dim()) {
+    KHG_ERR << "DiagGmm::ComponentLogLikelihood, dimension "
+            << "mismatch " << (data.size(0)) << " vs. " << (Dim());
+  }
+
+  torch::Tensor data_sq = data.pow(2);
+
+  // loglike =  means * inv(vars) * data.
+  // loglike = VecVec(means_invvars_.Row(comp_id), data);
+  float loglike =
+      means_invvars_.slice(0, comp_id, comp_id + 1).dot(data).item().toFloat();
+
+  // loglike += -0.5 * inv(vars) * data_sq.
+  // loglike -= 0.5 * VecVec(inv_vars_.Row(comp_id), data_sq);
+  loglike -=
+      0.5 *
+      inv_vars_.slice(0, comp_id, comp_id + 1).dot(data_sq).item().toFloat();
+
+  return loglike + gconsts_.data_ptr<float>()[comp_id];
+}
+
 }  // namespace khg
