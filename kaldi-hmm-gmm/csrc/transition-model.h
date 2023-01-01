@@ -10,17 +10,28 @@
 #include "kaldi-hmm-gmm/csrc/context-dep-itf.h"
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/csrc/transition-information.h"
+#include "kaldi_native_io/csrc/kaldi-vector.h"
 
 namespace khg {
 
 class TransitionModel : public TransitionInformation {
  public:
-  TransitionModel() = default;
   /// Initialize the object [e.g. at the start of training].
   /// The class keeps a copy of the HmmTopology object, but not
   /// the ContextDependency object.
   TransitionModel(const ContextDependencyInterface &ctx_dep,
                   const HmmTopology &hmm_topo);
+
+  /// Constructor that takes no arguments: typically used prior to calling Read.
+  TransitionModel() : num_pdfs_(0) {}
+
+  // note, no symbol table: topo object always read/written w/o symbols.
+  void Read(std::istream &is, bool binary);
+
+  void Write(std::ostream &os, bool binary) const;
+
+  /// return reference to HMM-topology object.
+  const HmmTopology &GetTopo() const { return topo_; }
 
   const std::vector<int32_t> &TransitionIdToPdfArray() const override;
 
@@ -162,11 +173,11 @@ class TransitionModel : public TransitionInformation {
 
   /// For each transition-id, the corresponding log-prob.  Indexed by
   /// transition-id.
-  std::vector<float> log_probs_;
+  kaldiio::Vector<float> log_probs_;
 
   /// For each transition-state, the log of (1 - self-loop-prob).  Indexed by
   /// transition-state.
-  std::vector<float> non_self_loop_log_probs_;
+  kaldiio::Vector<float> non_self_loop_log_probs_;
 };
 
 }  // namespace khg

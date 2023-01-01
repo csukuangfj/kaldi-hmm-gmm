@@ -13,6 +13,7 @@
 #include "kaldi-hmm-gmm/csrc/context-dep-itf.h"
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
+#include "kaldi_native_io/csrc/io-funcs.h"
 
 namespace khg {
 
@@ -23,6 +24,87 @@ TransitionModel::TransitionModel(const ContextDependencyInterface &ctx_dep,
   ComputeTuples(ctx_dep);
   ComputeDerived();
   InitializeProbs();
+  Check();
+}
+
+void TransitionModel::Write(std::ostream &os, bool binary) const {
+  bool is_hmm = IsHmm();
+  kaldiio::WriteToken(os, binary, "<TransitionModel>");
+  if (!binary) os << "\n";
+
+  topo_.Write(os, binary);
+
+  if (is_hmm) {
+    kaldiio::WriteToken(os, binary, "<Triples>");
+  } else {
+    kaldiio::WriteToken(os, binary, "<Tuples>");
+  }
+
+  kaldiio::WriteBasicType(os, binary, static_cast<int32_t>(tuples_.size()));
+
+  if (!binary) os << "\n";
+
+  for (int32_t i = 0; i < static_cast<int32_t>(tuples_.size()); i++) {
+    kaldiio::WriteBasicType(os, binary, tuples_[i].phone);
+    kaldiio::WriteBasicType(os, binary, tuples_[i].hmm_state);
+    kaldiio::WriteBasicType(os, binary, tuples_[i].forward_pdf);
+
+    if (!is_hmm) kaldiio::WriteBasicType(os, binary, tuples_[i].self_loop_pdf);
+
+    if (!binary) os << "\n";
+  }
+  if (is_hmm) {
+    kaldiio::WriteToken(os, binary, "</Triples>");
+  } else {
+    kaldiio::WriteToken(os, binary, "</Tuples>");
+  }
+  if (!binary) os << "\n";
+
+  kaldiio::WriteToken(os, binary, "<LogProbs>");
+  if (!binary) os << "\n";
+
+  log_probs_.Write(os, binary);
+  kaldiio::WriteToken(os, binary, "</LogProbs>");
+
+  if (!binary) os << "\n";
+
+  kaldiio::WriteToken(os, binary, "</TransitionModel>");
+
+  if (!binary) os << "\n";
+}
+
+void TransitionModel::Read(std::istream &is, bool binary) {
+  kaldiio::ExpectToken(is, binary, "<TransitionModel>");
+  topo_.Read(is, binary);
+
+  std::string token;
+  kaldiio::ReadToken(is, binary, &token);
+
+  int32_t size;
+  kaldiio::ReadBasicType(is, binary, &size);
+  tuples_.resize(size);
+
+  for (int32_t i = 0; i < size; i++) {
+    kaldiio::ReadBasicType(is, binary, &(tuples_[i].phone));
+    kaldiio::ReadBasicType(is, binary, &(tuples_[i].hmm_state));
+    kaldiio::ReadBasicType(is, binary, &(tuples_[i].forward_pdf));
+
+    if (token == "<Tuples>") {
+      kaldiio::ReadBasicType(is, binary, &(tuples_[i].self_loop_pdf));
+    } else if (token == "<Triples>") {
+      tuples_[i].self_loop_pdf = tuples_[i].forward_pdf;
+    }
+  }
+
+  kaldiio::ReadToken(is, binary, &token);
+  KHG_ASSERT(token == "</Triples>" || token == "</Tuples>");
+  ComputeDerived();
+
+  kaldiio::ExpectToken(is, binary, "<LogProbs>");
+  log_probs_.Read(is, binary);
+  kaldiio::ExpectToken(is, binary, "</LogProbs>");
+  kaldiio::ExpectToken(is, binary, "</TransitionModel>");
+  ComputeDerivedOfProbs();
   Check();
 }
 
@@ -227,7 +309,7 @@ bool TransitionModel::IsSelfLoop(int32_t trans_id) const {
 }
 
 void TransitionModel::InitializeProbs() {
-  log_probs_.resize(NumTransitionIds() +
+  log_probs_.Resize(NumTransitionIds() +
                     1);  // one-based array, zeroth element empty.
   for (int32_t trans_id = 1; trans_id <= NumTransitionIds(); trans_id++) {
     int32_t trans_state = id2state_[trans_id];
@@ -242,19 +324,19 @@ void TransitionModel::InitializeProbs() {
                  "probability [should remove that entry in the topology]";
     if (prob > 1.0)
       KHG_WARN << "TransitionModel::InitializeProbs, prob greater than one.";
-    log_probs_[trans_id] = std::logf(prob);
+    log_probs_(trans_id) = std::logf(prob);
   }
   ComputeDerivedOfProbs();
 }
 
 void TransitionModel::ComputeDerivedOfProbs() {
-  non_self_loop_log_probs_.resize(NumTransitionStates() +
+  non_self_loop_log_probs_.Resize(NumTransitionStates() +
                                   1);  // this array indexed
   //  by transition-state with nothing in zeroth element.
   for (int32_t tstate = 1; tstate <= NumTransitionStates(); tstate++) {
     int32_t tid = SelfLoopOf(tstate);
     if (tid == 0) {                            // no self-loop
-      non_self_loop_log_probs_[tstate] = 0.0;  // log(1.0)
+      non_self_loop_log_probs_(tstate) = 0.0;  // log(1.0)
     } else {
       float self_loop_prob = std::expf(GetTransitionLogProb(tid)),
             non_self_loop_prob = 1.0 - self_loop_prob;
@@ -263,7 +345,7 @@ void TransitionModel::ComputeDerivedOfProbs() {
                  << non_self_loop_prob;
         non_self_loop_prob = 1.0e-10;  // just so we can continue...
       }
-      non_self_loop_log_probs_[tstate] =
+      non_self_loop_log_probs_(tstate) =
           std::logf(non_self_loop_prob);  // will be negative.
     }
   }
@@ -297,7 +379,7 @@ int32_t TransitionModel::PairToTransitionId(int32_t trans_state,
 }
 
 float TransitionModel::GetTransitionLogProb(int32_t trans_id) const {
-  return log_probs_[trans_id];
+  return log_probs_(trans_id);
 }
 
 void TransitionModel::Check() const {
@@ -319,8 +401,8 @@ void TransitionModel::Check() const {
             self_loop_pdf = TransitionStateToSelfLoopPdf(tstate);
     KHG_ASSERT(tstate == TupleToTransitionState(phone, hmm_state, forward_pdf,
                                                 self_loop_pdf));
-    KHG_ASSERT(log_probs_[tid] <= 0.0 &&
-               log_probs_[tid] - log_probs_[tid] == 0.0);
+    KHG_ASSERT(log_probs_(tid) <= 0.0 &&
+               log_probs_(tid) - log_probs_(tid) == 0.0);
     // checking finite and non-positive (and not out-of-bounds).
   }
 }
