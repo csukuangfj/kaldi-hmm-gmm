@@ -144,6 +144,24 @@ class ContextDependency : public ContextDependencyInterface {
                                          PairHasher<int32_t>> *pairs) const;
 };
 
+// MonophoneContextDependency() returns a new ContextDependency object that
+// corresponds to a monophone system.
+// The map phone2num_pdf_classes maps from the phone id to the number of
+// pdf-classes we have for that phone (e.g. 3, so the pdf-classes would be
+// 0, 1, 2).
+
+ContextDependency *MonophoneContextDependency(
+    const std::vector<int32_t> &phones,
+    const std::vector<int32_t> &phone2num_pdf_classes);
+
+// MonophoneContextDependencyShared is as MonophoneContextDependency but lets
+// you define classes of phones which share pdfs (e.g. different stress-markers
+// of a single phone.)  Each element of phone_classes is a set of phones that
+// are in that class.
+ContextDependency *MonophoneContextDependencyShared(
+    const std::vector<std::vector<int32_t>> &phone_classes,
+    const std::vector<int32_t> &phone2num_pdf_classes);
+
 }  // namespace khg
 
 #endif  // KALDI_HMM_GMM_CSRC_CONTEXT_DEP_H_

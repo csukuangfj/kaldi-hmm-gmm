@@ -13,6 +13,7 @@
 #include <utility>
 #include <vector>
 
+#include "kaldi-hmm-gmm/csrc/build-tree-utils.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi_native_io/csrc/io-funcs.h"
 
@@ -235,6 +236,35 @@ void ContextDependency::GetPdfInfo(
       std::sort(((*pdf_info)[phone][j]).begin(), ((*pdf_info)[phone][j]).end());
     }
   }
+}
+
+ContextDependency *MonophoneContextDependency(
+    const std::vector<int32_t> &phones,
+    const std::vector<int32_t> &phone2num_pdf_classes) {
+  std::vector<std::vector<int32_t>> phone_sets(phones.size());
+
+  for (size_t i = 0; i < phones.size(); i++) phone_sets[i].push_back(phones[i]);
+
+  std::vector<bool> share_roots(phones.size(), false);  // don't share roots.
+
+  // N is context size, P = position of central phone (must be 0).
+  int32_t num_leaves = 0, P = 0, N = 1;
+  EventMap *pdf_map = GetStubMap(P, phone_sets, phone2num_pdf_classes,
+                                 share_roots, &num_leaves);
+  return new ContextDependency(N, P, pdf_map);
+}
+
+ContextDependency *MonophoneContextDependencyShared(
+    const std::vector<std::vector<int32_t>> &phone_sets,
+    const std::vector<int32_t> &phone2num_pdf_classes) {
+  // don't share roots.
+  std::vector<bool> share_roots(phone_sets.size(), false);
+
+  // N is context size, P = position of central phone (must be 0).
+  int32_t num_leaves = 0, P = 0, N = 1;
+  EventMap *pdf_map = GetStubMap(P, phone_sets, phone2num_pdf_classes,
+                                 share_roots, &num_leaves);
+  return new ContextDependency(N, P, pdf_map);
 }
 
 }  // namespace khg
