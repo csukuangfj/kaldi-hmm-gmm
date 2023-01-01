@@ -1,6 +1,6 @@
 // kaldi-hmm-gmm/csrc/transition-model.h
 //
-// Copyright (c)  2022  Xiaomi Corporation
+// Copyright (c)  2023  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_TRANSITION_MODEL_H_
 #define KALDI_HMM_GMM_CSRC_TRANSITION_MODEL_H_
 
