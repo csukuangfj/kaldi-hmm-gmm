@@ -66,6 +66,18 @@ class DiagGmm {
   void LogLikelihoodsMatrix(const torch::Tensor &data,
                             torch::Tensor *loglikes) const;
 
+  /// Outputs the per-component log-likelihoods of a subset of mixture
+  /// components.  Note: at output, loglikes->Dim() will equal indices.size().
+  /// loglikes[i] will correspond to the log-likelihood of the Gaussian
+  /// indexed indices[i], including the mixture weight.
+  ///
+  /// @param data 1-D tensor of shape (dim,)
+  /// @param indices
+  /// @param loglikes 1-D tensor of shape (indices.size(),)
+  void LogLikelihoodsPreselect(const torch::Tensor &data,
+                               const std::vector<int32_t> &indices,
+                               torch::Tensor *loglikes) const;
+
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)

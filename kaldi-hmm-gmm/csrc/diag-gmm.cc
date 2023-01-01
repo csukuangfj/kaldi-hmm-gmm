@@ -213,4 +213,23 @@ void DiagGmm::LogLikelihoodsMatrix(const torch::Tensor &data,
   *_loglikes = loglikes;
 }
 
+void DiagGmm::LogLikelihoodsPreselect(const torch::Tensor &data,
+                                      const std::vector<int32_t> &indices,
+                                      torch::Tensor *_loglikes) const {
+  KHG_ASSERT(data.size(0) == Dim());
+  torch::Tensor data_sq = data.pow(2);
+
+  torch::Tensor indexes = torch::tensor(indices, torch::kLong);
+  torch::Tensor loglikes =
+      gconsts_.index_select(/*dim*/ 0, indexes).unsqueeze(1);
+
+  torch::Tensor means_invvars_sub = means_invvars_.index_select(0, indexes);
+  torch::Tensor inv_vars_sub = inv_vars_.index_select(0, indexes);
+
+  loglikes.addmm_(means_invvars_sub, data.unsqueeze(1));
+  loglikes.addmm_(inv_vars_sub, data_sq.unsqueeze(1), /*beta*/ 1.0,
+                  /*alpha*/ -0.5);
+  *_loglikes = loglikes.squeeze(1);
+}
+
 }  // namespace khg
