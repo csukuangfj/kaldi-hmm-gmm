@@ -7,6 +7,10 @@
 
 #include "kaldi-hmm-gmm/csrc/context-dep.h"
 
+#include <algorithm>
+#include <string>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/log.h"

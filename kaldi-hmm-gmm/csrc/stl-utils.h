@@ -9,6 +9,7 @@
 #define KALDI_HMM_GMM_CSRC_STL_UTILS_H_
 #include <algorithm>
 #include <istream>
+#include <utility>
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/log.h"

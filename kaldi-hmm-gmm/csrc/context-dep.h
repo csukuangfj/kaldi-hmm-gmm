@@ -7,6 +7,10 @@
 // this file is copied and modified from
 // kaldi/src/tree/context-dep.h
 
+#include <unordered_set>
+#include <utility>
+#include <vector>
+
 #include "kaldi-hmm-gmm/csrc/context-dep-itf.h"
 #include "kaldi-hmm-gmm/csrc/event-map.h"
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"
