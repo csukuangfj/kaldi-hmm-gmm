@@ -57,14 +57,16 @@ jobs:
         run: |
           cd build
           make -j2
-
-          ls -lh lib
+          make test
 
       - name: Build sherpa for windows
         if: startsWith(matrix.os, 'windows')
         shell: bash
         run: |
           cd build
-          cmake --build . --config Release -- -m:2
-
+          cmake --build . --target ALL_BUILD --config Release
           ls -lh ./lib/Release/*
+          ls -lh ./bin/Release/*
+
+          ctest -C Release --output-on-failure
+

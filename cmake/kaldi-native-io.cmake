@@ -6,7 +6,9 @@ function(download_kaldi_native_io)
 
   # If you don't have access to the internet, please download it to your
   # local drive and modify the following line according to your needs.
-  # set(kaldi_native_io_URL  "file:///Users/fangjun/Downloads/kaldi_native_io-1.17.2.tar.gz")
+  if(EXISTS "/Users/fangjun/Downloads/kaldi_native_io-1.17.2.tar.gz")
+    set(kaldi_native_io_URL  "file:///Users/fangjun/Downloads/kaldi_native_io-1.17.2.tar.gz")
+  endif()
 
   set(KALDI_NATIVE_IO_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   set(KALDI_NATIVE_IO_BUILD_PYTHON OFF CACHE BOOL "" FORCE)

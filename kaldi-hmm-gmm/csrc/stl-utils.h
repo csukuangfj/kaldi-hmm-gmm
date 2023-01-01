@@ -1,4 +1,4 @@
-// kaldi_native_io/csrc/stl-utils.h
+// kaldi-hmm-gmm/csrc/stl-utils.h
 //
 // Copyright (c)  2022  Xiaomi Corporation
 
@@ -14,6 +14,20 @@
 #include "kaldi-hmm-gmm/csrc/log.h"
 
 namespace khg {
+
+/// Returns true if the vector is sorted.
+template <typename T>
+inline bool IsSorted(const std::vector<T> &vec) {
+  typename std::vector<T>::const_iterator iter = vec.begin(), end = vec.end();
+  if (iter == end) return true;
+  while (1) {
+    typename std::vector<T>::const_iterator next_iter = iter;
+    ++next_iter;
+    if (next_iter == end) return true;  // end of loop and nothing out of order
+    if (*next_iter < *iter) return false;
+    iter = next_iter;
+  }
+}
 
 /// Sorts and uniq's (removes duplicates) from a vector.
 template <typename T>
@@ -76,7 +90,7 @@ template <class T>
 inline void ReadIntegerVector(std::istream &is, bool binary,
                               std::vector<T> *v) {
   static_assert(std::is_integral<T>::value, "");
-  KHG_ASSERT(v != NULL);
+  KHG_ASSERT(v != nullptr);
   if (binary) {
     int sz = is.peek();
     if (sz == sizeof(T)) {
@@ -128,6 +142,20 @@ inline void ReadIntegerVector(std::istream &is, bool binary,
   if (!is.fail()) return;
 bad:
   KHG_ERR << "ReadIntegerVector: read failure at file position " << is.tellg();
+}
+
+/// Deletes any non-NULL pointers in the vector v, and sets
+/// the corresponding entries of v to NULL
+template <class A>
+void DeletePointers(std::vector<A *> *v) {
+  KHG_ASSERT(v != nullptr);
+  typename std::vector<A *>::iterator iter = v->begin(), end = v->end();
+  for (; iter != end; ++iter) {
+    if (*iter != nullptr) {
+      delete *iter;
+      *iter = nullptr;  // set to NULL for extra safety.
+    }
+  }
 }
 
 }  // namespace khg

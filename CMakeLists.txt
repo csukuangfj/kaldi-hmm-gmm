@@ -33,7 +33,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 option(BUILD_SHARED_LIBS "Whether to build shared libraries" ON)
+option(KHG_ENABLE_TESTS "Whether to build tests" ON)
 
 include(kaldi-native-io)
+if(KHG_ENABLE_TESTS)
+  enable_testing()
+  include(googletest)
+endif()
 
 add_subdirectory(kaldi-hmm-gmm)
