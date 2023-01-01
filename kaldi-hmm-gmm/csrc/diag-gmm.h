@@ -58,6 +58,14 @@ class DiagGmm {
   /// @param loglikes  1-D tensor.
   void LogLikelihoods(const torch::Tensor &data, torch::Tensor *loglikes) const;
 
+  /// This version of the LogLikelihoods function operates on
+  /// a sequence of frames simultaneously; the row index of both "data" and
+  /// "loglikes" is the frame index.
+  /// @param data 2-D matrix of (num-frames, dim)
+  /// @param loglikes On ouput, it contains a  2-D matrix of (num_frames, nmix)
+  void LogLikelihoodsMatrix(const torch::Tensor &data,
+                            torch::Tensor *loglikes) const;
+
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)

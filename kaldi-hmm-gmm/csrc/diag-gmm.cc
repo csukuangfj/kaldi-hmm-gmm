@@ -190,4 +190,27 @@ void DiagGmm::LogLikelihoods(const torch::Tensor &data,
   *_loglikes = loglikes.squeeze(1);
 }
 
+void DiagGmm::LogLikelihoodsMatrix(const torch::Tensor &data,
+                                   torch::Tensor *_loglikes) const {
+  KHG_ASSERT(data.size(0) != 0);
+
+  torch::Tensor loglikes = gconsts_.repeat({data.size(0), 1});
+
+  if (data.size(1) != Dim()) {
+    KHG_ERR << "DiagGmm::LogLikelihoods, dimension "
+            << "mismatch " << data.size(1) << " vs. " << Dim();
+  }
+  torch::Tensor data_sq = data.pow(2);
+
+  // loglikes +=  means * inv(vars) * data.
+  // loglikes->AddMatMat(1.0, data, kNoTrans, means_invvars_, kTrans, 1.0);
+  loglikes.addmm_(data, means_invvars_.t());
+
+  // loglikes += -0.5 * inv(vars) * data_sq.
+  // loglikes->AddMatMat(-0.5, data_sq, kNoTrans, inv_vars_, kTrans, 1.0);
+  loglikes.addmm_(data_sq, inv_vars_.t(), /*beta*/ 1.0, /*alpha*/ -0.5);
+
+  *_loglikes = loglikes;
+}
+
 }  // namespace khg
