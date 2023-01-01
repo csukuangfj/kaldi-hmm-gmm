@@ -226,13 +226,14 @@ void DiagGmm::LogLikelihoodsPreselect(const torch::Tensor &data,
 }
 
 /// Get gaussian selection information for one frame.
-float DiagGmm::GaussianSelection(const torch::Tensor &data, int32_t num_gselect,
+float DiagGmm::GaussianSelection(const torch::Tensor &data,  // 1-D tensor
+                                 int32_t num_gselect,
                                  std::vector<int32_t> *output) const {
   int32_t num_gauss = NumGauss();
   output->clear();
 
   torch::Tensor loglikes;
-  this->LogLikelihoods(data, &loglikes);
+  LogLikelihoods(data, &loglikes);
 
   float thresh;
   if (num_gselect < num_gauss) {
@@ -263,6 +264,82 @@ float DiagGmm::GaussianSelection(const torch::Tensor &data, int32_t num_gselect,
   }
   KHG_ASSERT(!output->empty());
   return tot_loglike;
+}
+
+float DiagGmm::GaussianSelection(
+    const torch::Tensor &data,  // 2-D tensor of shape (num_frames, dim)
+    int32_t num_gselect, std::vector<std::vector<int32_t>> *output) const {
+  double ans = 0.0;
+  int32_t num_frames = data.size(0), num_gauss = NumGauss();
+
+  int32_t max_mem = 10000000;  // Don't devote more than 10Mb to loglikes_mat;
+                               // break up the utterance if needed.
+  int32_t mem_needed = num_frames * num_gauss * sizeof(float);
+  if (mem_needed > max_mem) {
+    // Break into parts and recurse, we don't want to consume too
+    // much memory.
+    int32_t num_parts = (mem_needed + max_mem - 1) / max_mem;
+    int32_t part_frames = (data.size(0) + num_parts - 1) / num_parts;
+    double tot_ans = 0.0;
+    std::vector<std::vector<int32_t>> part_output;
+    output->clear();
+    output->resize(num_frames);
+    for (int32_t p = 0; p < num_parts; p++) {
+      int32_t start_frame = p * part_frames,
+              this_num_frames = std::min(num_frames - start_frame, part_frames);
+
+      torch::Tensor data_part =
+          data.slice(/*dim*/ 0, start_frame, start_frame + this_num_frames);
+      tot_ans += GaussianSelection(data_part, num_gselect, &part_output);
+
+      for (int32_t t = 0; t < this_num_frames; t++)
+        (*output)[start_frame + t].swap(part_output[t]);
+    }
+    KHG_ASSERT(!output->back().empty());
+    return tot_ans;
+  }
+
+  KHG_ASSERT(num_frames != 0);
+  torch::Tensor loglikes_mat;
+  LogLikelihoodsMatrix(data, &loglikes_mat);
+
+  output->clear();
+  output->resize(num_frames);
+
+  for (int32_t i = 0; i < num_frames; i++) {
+    torch::Tensor loglikes = loglikes_mat.slice(0, i, i + 1);
+
+    float thresh;
+    if (num_gselect < num_gauss) {
+      torch::Tensor loglikes_copy = loglikes.clone();
+      float *ptr = loglikes_copy.data_ptr<float>();
+      std::nth_element(ptr, ptr + num_gauss - num_gselect, ptr + num_gauss);
+      thresh = ptr[num_gauss - num_gselect];
+    } else {
+      thresh = -std::numeric_limits<float>::infinity();
+    }
+    float tot_loglike = -std::numeric_limits<float>::infinity();
+
+    auto loglikes_acc = loglikes.accessor<float, 1>();
+
+    std::vector<std::pair<float, int32_t>> pairs;
+    for (int32_t p = 0; p < num_gauss; p++) {
+      if (loglikes_acc[p] >= thresh) {
+        pairs.push_back(std::make_pair(loglikes_acc[p], p));
+      }
+    }
+    std::sort(pairs.begin(), pairs.end(),
+              std::greater<std::pair<float, int32_t>>());
+    std::vector<int32_t> &this_output = (*output)[i];
+    for (int32_t j = 0;
+         j < num_gselect && j < static_cast<int32_t>(pairs.size()); j++) {
+      this_output.push_back(pairs[j].second);
+      tot_loglike = LogAdd(tot_loglike, pairs[j].first);
+    }
+    KHG_ASSERT(!this_output.empty());
+    ans += tot_loglike;
+  }
+  return ans;
 }
 
 }  // namespace khg

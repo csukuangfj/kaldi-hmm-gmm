@@ -85,8 +85,19 @@ class DiagGmm {
   /// @param data 1-D tensor of shape (dim,)
   /// @param num_gselect
   /// @param output
+  /// @return Return the total loglike of the selected gaussian
   float GaussianSelection(const torch::Tensor &data, int32_t num_gselect,
                           std::vector<int32_t> *output) const;
+
+  /// This version of the Gaussian selection function works for a sequence
+  /// of frames rather than just a single frame.  Returns sum of the log-likes
+  /// over all frames.
+  /// @param data 2-D tensor of shape (num_frames, dim)
+  /// @param num_gselect
+  /// @param output
+  ///
+  float GaussianSelection(const torch::Tensor &data, int32_t num_gselect,
+                          std::vector<std::vector<int32_t>> *output) const;
 
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))

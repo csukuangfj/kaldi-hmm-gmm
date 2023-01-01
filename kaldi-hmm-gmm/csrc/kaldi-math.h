@@ -11,6 +11,10 @@
 
 #include <cmath>
 
+#ifndef DBL_EPSILON
+#define DBL_EPSILON 2.2204460492503131e-16
+#endif
+
 #ifndef FLT_EPSILON
 #define FLT_EPSILON 1.19209290e-7f
 #endif
@@ -25,7 +29,8 @@
 
 namespace khg {
 
-static const float kMinLogDiffFloat = std::log(FLT_EPSILON);  // negative!
+static const double kMinLogDiffDouble = std::log(DBL_EPSILON);  // negative!
+static const float kMinLogDiffFloat = std::log(FLT_EPSILON);    // negative!
 
 #if !defined(_MSC_VER) || (_MSC_VER >= 1700)
 inline double Log1p(double x) { return std::log1p(x); }
@@ -62,6 +67,27 @@ inline float LogAdd(float x, float y) {
 
   if (diff >= kMinLogDiffFloat) {
     float res;
+    res = x + Log1p(std::exp(diff));
+    return res;
+  } else {
+    return x;  // return the larger one.
+  }
+}
+
+// returns log(exp(x) + exp(y)).
+inline double LogAdd(double x, double y) {
+  double diff;
+
+  if (x < y) {
+    diff = x - y;
+    x = y;
+  } else {
+    diff = y - x;
+  }
+  // diff is negative.  x is now the larger one.
+
+  if (diff >= kMinLogDiffDouble) {
+    double res;
     res = x + Log1p(std::exp(diff));
     return res;
   } else {

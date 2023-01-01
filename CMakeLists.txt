@@ -36,6 +36,9 @@ option(BUILD_SHARED_LIBS "Whether to build shared libraries" ON)
 option(KHG_ENABLE_TESTS "Whether to build tests" ON)
 option(KHG_BUILD_PYTHON "Whether to build Python" ON)
 
+# Note: Include torch first since it may set the C++ ABI flag
+include(torch)
+
 include(kaldi-native-io)
 include(kaldifst)
 if(KHG_ENABLE_TESTS)
@@ -46,7 +49,5 @@ endif()
 if(KHG_BUILD_PYTHON)
   include(pybind11)
 endif()
-
-include(torch)
 
 add_subdirectory(kaldi-hmm-gmm)
