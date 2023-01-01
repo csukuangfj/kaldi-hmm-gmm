@@ -6,7 +6,9 @@ function(download_googltest)
 
   # If you don't have access to the internet, please download it to your
   # local drive and modify the following line according to your needs.
-  set(googletest_URL  "file:///Users/fangjun/Downloads/googletest-release-1.10.0.tar.gz")
+  if(EXISTS "/Users/fangjun/Downloads/googletest-release-1.10.0.tar.gz")
+    set(googletest_URL  "file:///Users/fangjun/Downloads/googletest-release-1.10.0.tar.gz")
+  endif()
 
   set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
   set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
