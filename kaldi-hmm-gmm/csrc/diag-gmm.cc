@@ -441,4 +441,36 @@ float DiagGmm::ComponentLogLikelihood(const torch::Tensor &data,  // 1-D
   return loglike + gconsts_.data_ptr<float>()[comp_id];
 }
 
+void DiagGmm::Generate(torch::Tensor *output  // 1-D
+) {
+  KHG_ASSERT(static_cast<int32_t>(output->size(0)) == Dim());
+  float tot = weights_.sum().item().toFloat();
+  KHG_ASSERT(tot > 0.0);
+  double r = tot * torch::rand({1}, torch::kFloat).item().toFloat() * 0.99999;
+  int32_t i = 0;
+  double sum = 0.0;
+  auto weights_acc = weights_.accessor<float, 1>();
+  while (sum + weights_acc[i] < r) {
+    sum += weights_acc[i];
+    i++;
+    KHG_ASSERT(i < static_cast<int32_t>(weights_.size(0)));
+  }
+  // now i is the index of the Gaussian we chose.
+  auto inv_vars_acc = inv_vars_.accessor<float, 2>();
+  auto means_invvars_acc = means_invvars_.accessor<float, 2>();
+
+  auto output_acc = output->accessor<float, 1>();
+
+  // TODO(fangjun): Use torch::rand()*mean + stddev to replace the following
+  // for loop
+
+  for (int32_t d = 0; d < inv_vars_.size(1); d++) {
+    float stddev = 1.0 / sqrt(inv_vars_acc[i][d]),
+          mean = means_invvars_acc[i][d] / inv_vars_acc[i][d];
+
+    output_acc[d] =
+        mean + torch::rand({1}, torch::kFloat).item().toFloat() * stddev;
+  }
+}
+
 }  // namespace khg

@@ -125,6 +125,10 @@ class DiagGmm {
   float ComponentLogLikelihood(const torch::Tensor &data,
                                int32_t comp_id) const;
 
+  /// Generates a random data-point from this distribution.
+  /// @param output 1-D tensor of shape (dim,). Must be pre-allocated
+  void Generate(torch::Tensor *output);
+
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)
