@@ -8,10 +8,10 @@ function(kgh_add_py_test source)
       "${CMAKE_CURRENT_SOURCE_DIR}/${source}"
   )
 
-  get_filename_component(kgh_path ${CMAKE_CURRENT_LIST_DIR} DIRECTORY)
+  get_filename_component(khg_path ${CMAKE_CURRENT_LIST_DIR} DIRECTORY)
 
   set_property(TEST ${name}
-    PROPERTY ENVIRONMENT "PYTHONPATH=${kgh_path}:$<TARGET_FILE_DIR:_kaldi_hmm_gmm>:$ENV{PYTHONPATH}"
+    PROPERTY ENVIRONMENT "PYTHONPATH=${khg_path}:$<TARGET_FILE_DIR:_kaldi_hmm_gmm>:$ENV{PYTHONPATH}"
   )
 endfunction()
 
