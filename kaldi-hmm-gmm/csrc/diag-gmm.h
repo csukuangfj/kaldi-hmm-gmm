@@ -28,12 +28,30 @@ class DiagGmm {
   /// Resizes arrays to this dim. Does not initialize data.
   void Resize(int32_t nMix, int32_t dim);
 
+  /// Returns the number of mixture components in the GMM
+  int32_t NumGauss() const { return weights_.size(0); }
+  /// Returns the dimensionality of the Gaussian mean vectors
+  int32_t Dim() const { return means_invvars_.size(1); }
+
   /// Copies from given DiagGmm
   void CopyFromDiagGmm(const DiagGmm &diaggmm);
 
+  DiagGmm(int32_t nMix, int32_t dim) : valid_gconsts_(false) {
+    Resize(nMix, dim);
+  }
+
+  /// Constructor that allows us to merge GMMs with weights.  Weights must sum
+  /// to one, or this GMM will not be properly normalized (we don't check this).
+  /// Weights must be positive (we check this).
+  explicit DiagGmm(const std::vector<std::pair<float, const DiagGmm *>> &gmms);
+
+  /// Sets the gconsts.  Returns the number that are "invalid" e.g. because of
+  /// zero weights or variances.
+  int32_t ComputeGconsts();
+
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
-  torch::Tensor gconsts_;  // 1-d tensor
+  torch::Tensor gconsts_;  // 1-d tensor, (nimx,)
   bool valid_gconsts_;     ///< Recompute gconsts_ if false
 
   /// 1-D, (nmix,) weights (not log).

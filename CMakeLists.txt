@@ -47,4 +47,6 @@ if(KHG_BUILD_PYTHON)
   include(pybind11)
 endif()
 
+include(torch)
+
 add_subdirectory(kaldi-hmm-gmm)
