@@ -34,11 +34,17 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 option(BUILD_SHARED_LIBS "Whether to build shared libraries" ON)
 option(KHG_ENABLE_TESTS "Whether to build tests" ON)
+option(KHG_BUILD_PYTHON "Whether to build Python" ON)
 
 include(kaldi-native-io)
+include(kaldifst)
 if(KHG_ENABLE_TESTS)
   enable_testing()
   include(googletest)
+endif()
+
+if(KHG_BUILD_PYTHON)
+  include(pybind11)
 endif()
 
 add_subdirectory(kaldi-hmm-gmm)

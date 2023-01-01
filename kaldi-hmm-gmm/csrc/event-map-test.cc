@@ -66,12 +66,12 @@ TEST(EventMap, Case1) {
   // Test different initializer  for TableEventMap where input maps ints to
   // ints.
   for (size_t i = 0; i < 100; i++) {
-    size_t nElems = rand() % 10;  // num of value->answer pairs.
+    size_t nElems = rand() % 10;  // num of value->answer pairs. // NOLINT
     std::map<ValueType, AnswerType> init_map;
     for (size_t i = 0; i < nElems; i++) {
-      init_map[rand() % 10] = rand() % 5;
+      init_map[rand() % 10] = rand() % 5;  // NOLINT
     }
-    EventKeyType key = rand() % 10;
+    EventKeyType key = rand() % 10;  // NOLINT
     TableEventMap T3(key, init_map);
     for (size_t i = 0; i < 10; i++) {
       EventType vec;

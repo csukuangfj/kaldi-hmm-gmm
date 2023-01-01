@@ -4,6 +4,8 @@
 
 #include "kaldi-hmm-gmm/csrc/build-tree-utils.h"
 
+#include <algorithm>
+#include <map>
 #include <set>
 #include <vector>
 
@@ -56,9 +58,9 @@ EventMap *GetStubMap(int32_t P,
         KHG_ASSERT(static_cast<size_t>(phone) < phone2num_pdf_classes.size());
         len = phone2num_pdf_classes[phone];
         KHG_ASSERT(len > 0);
-        if (i == 0)
+        if (i == 0) {
           max_len = len;
-        else {
+        } else {
           if (len != max_len) {
             KHG_WARN << "Mismatching lengths within a phone set: " << len
                      << " vs. " << max_len

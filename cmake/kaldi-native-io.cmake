@@ -33,7 +33,7 @@ function(download_kaldi_native_io)
       ${kaldi_native_io_SOURCE_DIR}/
   )
 
-  set_target_properties(kaldi_native_io_core PROPERTIES OUTPUT_NAME "kaldi-hgmm-gmm-kaldi-native-io-core")
+  set_target_properties(kaldi_native_io_core PROPERTIES OUTPUT_NAME "kaldi-hmm-gmm-kaldi-native-io-core")
 
   install(TARGETS kaldi_native_io_core DESTINATION lib)
 endfunction()
