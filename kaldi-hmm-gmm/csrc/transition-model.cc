@@ -7,8 +7,13 @@
 
 #include "kaldi-hmm-gmm/csrc/transition-model.h"
 
+#include <algorithm>
 #include <cmath>
+#include <limits>
 #include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "kaldi-hmm-gmm/csrc/context-dep-itf.h"
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"

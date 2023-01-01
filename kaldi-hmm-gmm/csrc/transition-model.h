@@ -7,6 +7,8 @@
 // this if is copied and modified from
 // kaldi/src/hmm/transition-model.h
 //
+#include <vector>
+
 #include "kaldi-hmm-gmm/csrc/context-dep-itf.h"
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/csrc/transition-information.h"

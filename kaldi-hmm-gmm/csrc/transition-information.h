@@ -7,6 +7,8 @@
 // this if is copied and modified from
 // kaldi/src/itf/transition-information.h
 
+#include <vector>
+
 namespace khg {
 
 /**
