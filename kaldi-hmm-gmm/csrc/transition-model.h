@@ -15,11 +15,34 @@ namespace khg {
 
 class TransitionModel : public TransitionInformation {
  public:
+  TransitionModel() = default;
   /// Initialize the object [e.g. at the start of training].
   /// The class keeps a copy of the HmmTopology object, but not
   /// the ContextDependency object.
   TransitionModel(const ContextDependencyInterface &ctx_dep,
                   const HmmTopology &hmm_topo);
+
+  const std::vector<int32_t> &TransitionIdToPdfArray() const override;
+
+  // return true if this trans_id corresponds to a self-loop.
+  bool IsSelfLoop(int32_t trans_id) const override;
+
+  bool TransitionIdsEquivalent(int32_t trans_id1,
+                               int32_t trans_id2) const override;
+
+  bool TransitionIdIsStartOfPhone(int32_t trans_id) const override;
+
+  int32_t TransitionIdToPhone(int32_t trans_id) const override;
+
+  bool IsFinal(int32_t trans_id)
+      const override;  // returns true if this trans_id goes to the final state
+                       // (which is bound to be nonemitting).
+
+  // NumPdfs() actually returns the highest-numbered pdf we ever saw, plus one.
+  // In normal cases this should equal the number of pdfs in the system, but if
+  // you initialized this object with fewer than all the phones, and it happens
+  // that an unseen phone has the highest-numbered pdf, this might be different.
+  int32_t NumPdfs() const override { return num_pdfs_; }
 
  private:
   // called from constructor.  initializes tuples_.
@@ -32,8 +55,47 @@ class TransitionModel : public TransitionInformation {
   void ComputeDerived();  // called from constructor and Read function: computes
                           // state2id_ and id2state_.
 
-  // return true if this trans_id corresponds to a self-loop.
-  bool IsSelfLoop(int32_t trans_id) const;
+  void InitializeProbs();  // called from constructor.
+
+  // computes quantities derived from log-probs
+  // (currently just non_self_loop_log_probs_; called whenever log-probs change.
+  void ComputeDerivedOfProbs();
+
+  // returns the self-loop transition-id, or zero if
+  // this state doesn't have a self-loop.
+  int32_t SelfLoopOf(int32_t trans_state) const;
+
+  int32_t PairToTransitionId(int32_t trans_state, int32_t trans_index) const;
+
+  /// Returns the total number of transition-states (note, these are one-based).
+  int32_t NumTransitionStates() const { return tuples_.size(); }
+
+  float GetTransitionLogProb(int32_t trans_id) const;
+
+  void Check() const;
+
+  int32_t TransitionIdToTransitionState(int32_t trans_id) const;
+
+  /// Returns the number of transition-indices for a particular
+  /// transition-state. Note: "Indices" is the plural of "index".   Index is not
+  /// the same as "id", here.  A transition-index is a zero-based offset into
+  /// the transitions out of a particular transition state.
+  int32_t NumTransitionIndices(int32_t trans_state) const;
+
+  int32_t TupleToTransitionState(int32_t phone, int32_t hmm_state, int32_t pdf,
+                                 int32_t self_loop_pdf) const;
+
+  int32_t TransitionStateToSelfLoopPdf(int32_t trans_state) const;
+
+  int32_t TransitionStateToForwardPdf(int32_t trans_state) const;
+
+  int32_t TransitionStateToHmmState(int32_t trans_state) const;
+
+  int32_t TransitionStateToPhone(int32_t trans_state) const;
+
+  int32_t TransitionIdToTransitionIndex(int32_t trans_id) const;
+
+  int32_t TransitionIdToHmmState(int32_t trans_id) const;
 
  private:
   struct Tuple {
@@ -97,6 +159,14 @@ class TransitionModel : public TransitionInformation {
   /// the tree (but the tree numbers pdfs contiguously from zero so this is the
   /// number of pdfs).
   int32_t num_pdfs_;
+
+  /// For each transition-id, the corresponding log-prob.  Indexed by
+  /// transition-id.
+  std::vector<float> log_probs_;
+
+  /// For each transition-state, the log of (1 - self-loop-prob).  Indexed by
+  /// transition-state.
+  std::vector<float> non_self_loop_log_probs_;
 };
 
 }  // namespace khg
