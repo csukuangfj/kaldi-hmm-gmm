@@ -342,4 +342,50 @@ float DiagGmm::GaussianSelection(
   return ans;
 }
 
+float DiagGmm::GaussianSelectionPreselect(const torch::Tensor &data,
+                                          const std::vector<int32_t> &preselect,
+                                          int32_t num_gselect,
+                                          std::vector<int32_t> *output) const {
+  static bool warned_size = false;
+  int32_t preselect_sz = preselect.size();
+  int32_t this_num_gselect = std::min(num_gselect, preselect_sz);
+  if (preselect_sz <= num_gselect && !warned_size) {
+    warned_size = true;
+    KHG_WARN << "Preselect size is less or equal to than final size, "
+             << "doing nothing: " << preselect_sz << " < " << num_gselect
+             << " [won't warn again]";
+  }
+  torch::Tensor loglikes;
+  LogLikelihoodsPreselect(data, preselect, &loglikes);
+
+  torch::Tensor loglikes_copy = loglikes.clone();
+  float *ptr = loglikes_copy.data_ptr<float>();
+  std::nth_element(ptr, ptr + preselect_sz - this_num_gselect,
+                   ptr + preselect_sz);
+  float thresh = ptr[preselect_sz - this_num_gselect];
+
+  float tot_loglike = -std::numeric_limits<float>::infinity();
+
+  auto loglikes_acc = loglikes.accessor<float, 1>();
+
+  // we want the output sorted from best likelihood to worse
+  // (so we can prune further without the model)...
+  std::vector<std::pair<float, int32_t>> pairs;
+  for (int32_t p = 0; p < preselect_sz; p++)
+    if (loglikes_acc[p] >= thresh)
+      pairs.push_back(std::make_pair(loglikes_acc[p], preselect[p]));
+
+  std::sort(pairs.begin(), pairs.end(),
+            std::greater<std::pair<float, int32_t>>());
+
+  output->clear();
+  for (int32_t j = 0;
+       j < this_num_gselect && j < static_cast<int32_t>(pairs.size()); j++) {
+    output->push_back(pairs[j].second);
+    tot_loglike = LogAdd(tot_loglike, pairs[j].first);
+  }
+  KHG_ASSERT(!output->empty());
+  return tot_loglike;
+}
+
 }  // namespace khg
