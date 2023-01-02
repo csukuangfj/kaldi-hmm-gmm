@@ -129,6 +129,11 @@ class DiagGmm {
   /// @param output 1-D tensor of shape (dim,). Must be pre-allocated
   void Generate(torch::Tensor *output);
 
+  /// Split the components and remember the order in which the components were
+  /// split
+  void Split(int32_t target_components, float perturb_factor,
+             std::vector<int32_t> *history = nullptr);
+
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)

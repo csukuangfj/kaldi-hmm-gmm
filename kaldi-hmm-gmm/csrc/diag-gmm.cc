@@ -473,4 +473,78 @@ void DiagGmm::Generate(torch::Tensor *output  // 1-D
   }
 }
 
+void DiagGmm::Split(int32_t target_components, float perturb_factor,
+                    std::vector<int32_t> *history /*=nullptr*/) {
+  if (target_components < NumGauss() || NumGauss() == 0) {
+    KHG_ERR << "Cannot split from " << NumGauss() << " to " << target_components
+            << " components";
+  }
+  if (target_components == NumGauss()) {
+    KHG_WARN << "Already have the target # of Gaussians. Doing nothing.";
+    return;
+  }
+
+  int32_t current_components = NumGauss(), dim = Dim();
+  auto tmp = std::make_unique<DiagGmm>();
+  tmp->CopyFromDiagGmm(*this);  // so we have copies of matrices
+
+  // First do the resize:
+  weights_ = torch::empty({target_components}, torch::kFloat);
+  weights_.slice(0, 0, current_components) = tmp->weights_;
+
+  means_invvars_ = torch::empty({target_components, dim}, torch::kFloat);
+  means_invvars_.slice(0, 0, current_components) = tmp->means_invvars_;
+
+  // inv_vars_.Resize(target_components, dim);
+  inv_vars_ = torch::empty({target_components, dim}, torch::kFloat);
+  inv_vars_.slice(0, 0, current_components) = tmp->inv_vars_;
+
+  gconsts_ = torch::empty({target_components}, torch::kFloat);
+
+  auto weights_acc = weights_.accessor<float, 1>();
+  // future work(arnab): Use a priority queue instead?
+  while (current_components < target_components) {
+    float max_weight = weights_acc[0];
+    int32_t max_idx = 0;
+    for (int32_t i = 1; i < current_components; i++) {
+      if (weights_acc[i] > max_weight) {
+        max_weight = weights_acc[i];
+        max_idx = i;
+      }
+    }
+
+    // remember what component was split
+    if (history != nullptr) history->push_back(max_idx);
+
+    weights_acc[max_idx] /= 2;
+    weights_acc[current_components] = weights_acc[max_idx];
+
+    torch::Tensor rand_vec = torch::empty({dim}, torch::kFloat);
+    auto rand_vec_acc = rand_vec.accessor<float, 1>();
+    auto inv_vars_acc = inv_vars_.accessor<float, 2>();
+
+    for (int32_t i = 0; i < dim; i++) {
+      rand_vec_acc[i] = torch::randn({1}, torch::kFloat).item().toFloat() *
+                        std::sqrt(inv_vars_acc[max_idx][i]);
+      // note, this looks wrong but is really right because it's the
+      // means_invvars we're multiplying and they have the dimension
+      // of an inverse standard variance. [dan]
+    }
+    inv_vars_.slice(0, current_components, current_components + 1) =
+        inv_vars_.slice(0, max_idx, max_idx + 1);
+
+    means_invvars_.slice(0, current_components, current_components + 1) =
+        means_invvars_.slice(0, max_idx, max_idx + 1);
+
+    means_invvars_.slice(0, current_components, current_components + 1)
+        .add_(rand_vec, /*alpha*/ perturb_factor);
+
+    means_invvars_.slice(0, max_idx, max_idx + 1)
+        .add_(rand_vec, /*alpha*/ -perturb_factor);
+
+    current_components++;
+  }
+  ComputeGconsts();
+}
+
 }  // namespace khg
