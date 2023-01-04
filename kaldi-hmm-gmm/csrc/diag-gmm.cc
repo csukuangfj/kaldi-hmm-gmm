@@ -547,4 +547,18 @@ void DiagGmm::Split(int32_t target_components, float perturb_factor,
   ComputeGconsts();
 }
 
+void DiagGmm::Perturb(float perturb_factor) {
+  int32_t num_comps = NumGauss(), dim = Dim();
+
+  torch::Tensor rand_mat = torch::randn({num_comps, dim}, torch::kFloat);
+
+  // as in DiagGmm::Split, we perturb the means_invvars using a random
+  // fraction of inv_vars_
+  rand_mat = rand_mat * inv_vars_.sqrt();
+
+  means_invvars_ += perturb_factor * rand_mat;
+
+  ComputeGconsts();
+}
+
 }  // namespace khg

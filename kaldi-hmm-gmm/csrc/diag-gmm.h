@@ -134,6 +134,10 @@ class DiagGmm {
   void Split(int32_t target_components, float perturb_factor,
              std::vector<int32_t> *history = nullptr);
 
+  /// Perturbs the component means with a random vector multiplied by the
+  /// perturb factor.
+  void Perturb(float perturb_factor);
+
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)
