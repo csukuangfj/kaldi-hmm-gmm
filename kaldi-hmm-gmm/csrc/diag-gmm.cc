@@ -17,6 +17,13 @@
 
 namespace khg {
 
+// Return a shallow copy of the i-th row of a 2-D matrix.
+// @param m A 2-D tensor
+// @param i The i-th row to return.
+static torch::Tensor Row(torch::Tensor m, int32_t i) {
+  return m.slice(/*dim*/ 0, i, i + 1);
+}
+
 void DiagGmm::Resize(int32_t nmix, int32_t dim) {
   KHG_ASSERT(nmix > 0 && dim > 0);
 
@@ -556,9 +563,216 @@ void DiagGmm::Perturb(float perturb_factor) {
   // fraction of inv_vars_
   rand_mat = rand_mat * inv_vars_.sqrt();
 
-  means_invvars_ += perturb_factor * rand_mat;
+  means_invvars_.add_(rand_mat, /*alpha*/ perturb_factor);
 
   ComputeGconsts();
+}
+
+void DiagGmm::Merge(int32_t target_components, std::vector<int32_t> *history) {
+  if (target_components <= 0 || NumGauss() < target_components) {
+    KHG_ERR << "Invalid argument for target number of Gaussians (="
+            << target_components << "), #Gauss = " << NumGauss();
+  }
+  if (NumGauss() == target_components) {
+    KHG_LOG << "No components merged, as target (" << target_components
+            << ") = total.";
+    return;  // Nothing to do.
+  }
+
+  int32_t num_comp = NumGauss(), dim = Dim();
+
+  if (target_components == 1) {  // global mean and variance
+    torch::Tensor weights = weights_.clone();
+    // Undo variance inversion and multiplication of mean by inv var.
+    torch::Tensor vars = 1.0f / inv_vars_;
+    torch::Tensor means = means_invvars_ * vars;
+
+    vars.add_(means.square(), /*alpha*/ 1.0);
+
+    // Slightly more efficient than calling this->Resize(1, dim)
+    gconsts_ = torch::empty({1}, torch::kFloat);
+
+    weights_ = weights.sum();
+    means_invvars_ = torch::mm(weights.unsqueeze(0), means);
+    inv_vars_ = torch::mm(weights.unsqueeze(0), vars);
+
+    auto weights_acc = weights_.accessor<float, 1>();
+    if (!ApproxEqual(weights_acc[0], 1.0f, 1e-6)) {
+      KHG_WARN << "Weights sum to " << weights_acc[0] << ": rescaling.";
+      means_invvars_ *= weights_acc[0];
+      inv_vars_ *= weights_acc[0];
+
+      weights_acc[0] = 1.0;
+    }
+    inv_vars_.add_(means_invvars_.square(), /*alpha*/ -1.0);
+    inv_vars_ = 1.0f / inv_vars_;
+
+    means_invvars_.mul_(inv_vars_);
+
+    ComputeGconsts();
+    return;
+  }
+
+  // If more than 1 merged component is required, use the hierarchical
+  // clustering of components that lead to the smallest decrease in likelihood.
+  std::vector<bool> discarded_component(num_comp, false);
+
+  // +0.5 because var is inverted
+  torch::Tensor logdet =
+      0.5 * inv_vars_.log().sum(1 /*dim*/, false /*keepdim*/);
+  auto logdet_acc = logdet.accessor<float, 1>();
+
+  // Undo variance inversion and multiplication of mean by this
+  // Makes copy of means and vars for all components - memory inefficient?
+  torch::Tensor vars = 1.0f / inv_vars_;
+  torch::Tensor means = means_invvars_ * vars;
+
+  // add means square to variances; get second-order stats
+  // (normalized by zero-order stats)
+  vars.add_(means.square(), /*alpha*/ 1.0);
+
+  // TODO(fangjun): We only need a triangular matrix here
+  //
+  // compute change of likelihood for all combinations of components
+  torch::Tensor delta_like = torch::empty({num_comp, num_comp}, torch::kFloat);
+  auto delta_like_acc = delta_like.accessor<float, 2>();
+
+  auto weights_acc = weights_.accessor<float, 1>();
+
+  for (int32_t i = 0; i < num_comp; i++) {
+    for (int32_t j = 0; j < i; j++) {
+      float w1 = weights_acc[i], w2 = weights_acc[j], w_sum = w1 + w2;
+      float merged_logdet = MergedComponentsLogdet(
+          w1, w2, Row(means, i), Row(means, j), Row(vars, i), Row(vars, j));
+
+      delta_like_acc[i][j] =
+          w_sum * merged_logdet - w1 * logdet_acc[i] - w2 * logdet_acc[j];
+    }
+  }
+
+  // Merge components with smallest impact on the loglike
+  for (int32_t removed = 0; removed < num_comp - target_components; removed++) {
+    // Search for the least significant change in likelihood
+    // (maximum of negative delta_likes)
+    float max_delta_like = -std::numeric_limits<float>::max();
+    int32_t max_i = -1, max_j = -1;
+    for (int32_t i = 0; i < NumGauss(); i++) {
+      if (discarded_component[i]) continue;
+      for (int32_t j = 0; j < i; j++) {
+        if (discarded_component[j]) continue;
+        if (delta_like_acc[i][j] > max_delta_like) {
+          max_delta_like = delta_like_acc[i][j];
+          max_i = i;
+          max_j = j;
+        }
+      }
+    }
+
+    // make sure that different components will be merged
+    KHG_ASSERT(max_i != max_j && max_i != -1 && max_j != -1);
+
+    // remember the merge candidates
+    if (history != nullptr) {
+      history->push_back(max_i);
+      history->push_back(max_j);
+    }
+
+    // Merge components
+    float w1 = weights_acc[max_i], w2 = weights_acc[max_j];
+    float w_sum = w1 + w2;
+    // merge means
+    Row(means, max_i) =
+        (Row(means, max_i) + w2 / w1 * Row(means, max_j)) * w1 / w_sum;
+
+    // merge vars
+    Row(vars, max_i) =
+        (Row(vars, max_i) + w2 / w1 * Row(vars, max_j)) * w1 / w_sum;
+
+    // merge weights
+    weights_acc[max_i] = w_sum;
+
+    // Update gmm for merged component
+    // copy second-order stats (normalized by zero-order stats)
+    // and centralize, and invert
+    Row(inv_vars_, max_i) =
+        1.0f / (Row(vars, max_i) - Row(means, max_i).square());
+
+    // copy first-order stats (normalized by zero-order stats)
+    // and multiply by inv_vars
+    Row(means_invvars_, max_i) = Row(means, max_i) * Row(inv_vars_, max_i);
+
+    // Update logdet for merged component
+    // +0.5 because var is inverted
+    logdet_acc[max_i] =
+        0.5 * Row(inv_vars_, max_i).log().sum().item().toFloat();
+
+    // Label the removed component as discarded
+    discarded_component[max_j] = true;
+
+    // Update delta_like for merged component
+    for (int32_t j = 0; j < num_comp; j++) {
+      if ((j == max_i) || (discarded_component[j])) continue;
+      float w1 = weights_acc[max_i], w2 = weights_acc[j], w_sum = w1 + w2;
+      float merged_logdet =
+          MergedComponentsLogdet(w1, w2, Row(means, max_i), Row(means, j),
+                                 Row(vars, max_i), Row(vars, j));
+      float tmp =
+          w_sum * merged_logdet - w1 * logdet_acc[max_i] - w2 * logdet_acc[j];
+      delta_like_acc[max_i][j] = tmp;
+      delta_like_acc[j][max_i] = tmp;  // TODO(fangjun): We only need to set one
+      // doesn't respect lower triangular indices,
+      // relies on implicitly performed swap of coordinates if necessary
+    }
+  }
+
+  int32_t num_kept = 0;
+  for (auto i : discarded_component) {
+    if (i) continue;
+
+    ++num_kept;
+  }
+
+  torch::Tensor tmp_weights = torch::empty({num_kept}, torch::kFloat);
+  torch::Tensor tmp_means_invvars =
+      torch::empty({num_kept, Dim()}, torch::kFloat);
+  torch::Tensor tmp_inv_vars = torch::empty({num_kept, Dim()}, torch::kFloat);
+
+  auto tmp_weights_acc = tmp_weights.accessor<float, 1>();
+
+  // Remove the consumed components
+  int32_t m = 0;
+  for (int32_t i = 0; i < num_comp; i++) {
+    if (discarded_component[i]) continue;
+
+    tmp_weights_acc[m] = weights_acc[i];
+    Row(tmp_means_invvars, m) = Row(means_invvars_, i);
+    Row(tmp_inv_vars, m) = Row(inv_vars_, i);
+    ++m;
+  }
+  std::swap(tmp_weights, weights_);
+  std::swap(tmp_means_invvars, means_invvars_);
+  std::swap(tmp_inv_vars, inv_vars_);
+
+  ComputeGconsts();
+}
+
+float DiagGmm::MergedComponentsLogdet(float w1, float w2,
+                                      torch::Tensor f1,  // 1-D
+                                      torch::Tensor f2,  // 1-D
+                                      torch::Tensor s1,  // 1-D
+                                      torch::Tensor s2   // 1-D
+) const {
+  float w_sum = w1 + w2;
+
+  torch::Tensor tmp_mean = (f1 + f2 * (w2 / w1)) * (w1 / w_sum);
+
+  torch::Tensor tmp_var =
+      (s1 + s2 * (w2 / w1)) * (w1 / w_sum) - tmp_mean.square();
+
+  // -0.5 because var is not inverted
+  float merged_logdet = -0.5 * tmp_var.log().sum().item().toFloat();
+
+  return merged_logdet;
 }
 
 }  // namespace khg

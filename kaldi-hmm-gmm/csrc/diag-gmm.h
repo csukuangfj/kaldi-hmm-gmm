@@ -138,6 +138,22 @@ class DiagGmm {
   /// perturb factor.
   void Perturb(float perturb_factor);
 
+  /// Merge the components and remember the order in which the components were
+  /// merged (flat list of pairs)
+  void Merge(int32_t target_components,
+             std::vector<int32_t> *history = nullptr);
+
+ private:
+  // MergedComponentsLogdet computes logdet for merged components
+  // f1, f2 are first-order stats (normalized by zero-order stats)
+  // s1, s2 are second-order stats (normalized by zero-order stats)
+  float MergedComponentsLogdet(float w1, float w2,
+                               torch::Tensor f1,  // 1-D
+                               torch::Tensor f2,  // 1-D
+                               torch::Tensor s1,  // 1-D
+                               torch::Tensor s2   // 1-D
+  ) const;
+
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)
