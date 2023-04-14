@@ -177,6 +177,8 @@ class DiagGmm {
   /// Removes multiple components from model; "gauss" must not have dups.
   void RemoveComponents(const std::vector<int32_t> &gauss, bool renorm_weights);
 
+  void SetWeights(torch::Tensor w);  ///< Set mixture weights
+
  private:
   // MergedComponentsLogdet computes logdet for merged components
   // f1, f2 are first-order stats (normalized by zero-order stats)

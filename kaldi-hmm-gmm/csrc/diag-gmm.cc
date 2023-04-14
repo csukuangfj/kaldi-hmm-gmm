@@ -926,4 +926,10 @@ void DiagGmm::RemoveComponents(const std::vector<int32_t> &gauss_in,
   }
 }
 
+void DiagGmm::SetWeights(torch::Tensor w) {
+  KHG_ASSERT(weights_.size(0) == w.size(0));
+  weights_ = w.clone().to(torch::kFloat);
+  valid_gconsts_ = false;
+}
+
 }  // namespace khg
