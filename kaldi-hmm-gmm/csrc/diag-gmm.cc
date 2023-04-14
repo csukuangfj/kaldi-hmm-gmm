@@ -963,4 +963,18 @@ void DiagGmm::SetInvVars(torch::Tensor v) {
   valid_gconsts_ = false;
 }
 
+torch::Tensor DiagGmm::GetVars() const { return 1.0 / inv_vars_; }
+
+torch::Tensor DiagGmm::GetMeans() const {
+  return means_invvars_.div(inv_vars_);
+}
+
+void DiagGmm::SetComponentMean(int32_t g, torch::Tensor in) {
+  KHG_ASSERT(g < NumGauss() && Dim() == in.size(0));
+
+  Row(means_invvars_, g) = Row(inv_vars_, g).mul(in.to(torch::kFloat));
+
+  valid_gconsts_ = false;
+}
+
 }  // namespace khg

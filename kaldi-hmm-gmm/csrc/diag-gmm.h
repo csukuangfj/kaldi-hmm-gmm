@@ -190,6 +190,17 @@ class DiagGmm {
   /// Set the (inverse) variances and recompute means_invvars_
   void SetInvVars(torch::Tensor v);  // v is a 2-D matrix
 
+  /// Accessor for covariances.
+  torch::Tensor GetVars() const;
+
+  /// Accessor for means.
+  torch::Tensor GetMeans() const;
+
+  /// Mutators for single component, supports float or double
+  /// Set mean for a single component - internally multiplies with inv(var)
+  /// in is a 1-D tensor
+  void SetComponentMean(int32_t gauss, torch::Tensor in);
+
  private:
   // MergedComponentsLogdet computes logdet for merged components
   // f1, f2 are first-order stats (normalized by zero-order stats)
