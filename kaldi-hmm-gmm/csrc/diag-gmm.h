@@ -187,6 +187,9 @@ class DiagGmm {
   /// Use SetInvVarsAndMeans if updating both means and (inverse) variances
   void SetInvVarsAndMeans(torch::Tensor invvars, torch::Tensor means);
 
+  /// Set the (inverse) variances and recompute means_invvars_
+  void SetInvVars(torch::Tensor v);  // v is a 2-D matrix
+
  private:
   // MergedComponentsLogdet computes logdet for merged components
   // f1, f2 are first-order stats (normalized by zero-order stats)
