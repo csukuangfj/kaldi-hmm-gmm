@@ -988,4 +988,20 @@ void DiagGmm::SetComponentInvVar(int32_t g, torch::Tensor v) {
   valid_gconsts_ = false;
 }
 
+inline void DiagGmm::SetComponentWeight(int32_t g, float w) {
+  KHG_ASSERT(w > 0.0);
+  KHG_ASSERT(g < NumGauss());
+
+  auto weights_acc = weights_.accessor<float, 1>();
+  weights_acc[g] = w;
+
+  valid_gconsts_ = false;
+}
+
+torch::Tensor DiagGmm::GetComponentMean(int32_t gauss) const {
+  KHG_ASSERT(gauss < NumGauss());
+
+  return Row(means_invvars_, gauss).div(Row(inv_vars_, gauss));
+}
+
 }  // namespace khg

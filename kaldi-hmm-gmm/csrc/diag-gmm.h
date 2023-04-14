@@ -206,6 +206,13 @@ class DiagGmm {
   /// in is a 1-D tensor
   void SetComponentInvVar(int32_t gauss, torch::Tensor in);
 
+  /// Set weight for single component.
+  inline void SetComponentWeight(int32_t gauss, float weight);
+
+  /// Accessor for single component mean
+  /// Return a 1-D tensor
+  torch::Tensor GetComponentMean(int32_t gauss) const;
+
  private:
   // MergedComponentsLogdet computes logdet for merged components
   // f1, f2 are first-order stats (normalized by zero-order stats)
