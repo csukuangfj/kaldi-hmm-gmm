@@ -6,6 +6,7 @@ set(srcs
   cluster-utils.cc
   clusterable-classes.cc
   context-dep.cc
+  diag-gmm-normal.cc
   diag-gmm.cc
   event-map.cc
   hmm-topology.cc

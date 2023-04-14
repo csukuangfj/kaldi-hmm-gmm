@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/clusterable-classes.h"
+#include "kaldi-hmm-gmm/csrc/diag-gmm-normal.h"
 #include "kaldi-hmm-gmm/csrc/kaldi-math.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"
@@ -841,6 +842,34 @@ void DiagGmm::MergeKmeans(
     DeletePointers(&clusterable_vec);
     DeletePointers(&clusters);
   }
+}
+
+void DiagGmm::Interpolate(float rho, const DiagGmm &source,
+                          GmmFlagsType flags) {
+  KHG_ASSERT(NumGauss() == source.NumGauss());
+  KHG_ASSERT(Dim() == source.Dim());
+
+  DiagGmmNormal us(*this);
+  DiagGmmNormal them(source);
+
+  if (flags & kGmmWeights) {
+    us.weights_.mul_(1.0 - rho);
+    us.weights_.add_(them.weights_, /*alpha*/ rho);
+    us.weights_.div_(us.weights_.sum());
+  }
+
+  if (flags & kGmmMeans) {
+    us.means_.mul_(1.0 - rho);
+    us.means_.add_(them.means_, /*alpha*/ rho);
+  }
+
+  if (flags & kGmmVariances) {
+    us.vars_.mul_(1.0 - rho);
+    us.vars_.add_(them.vars_, /*alpha*/ rho);
+  }
+
+  us.CopyToDiagGmm(this);
+  ComputeGconsts();
 }
 
 }  // namespace khg

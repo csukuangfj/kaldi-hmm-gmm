@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/cluster-utils.h"
+#include "kaldi-hmm-gmm/csrc/model-common.h"
 #include "torch/script.h"
 
 namespace khg {
@@ -22,6 +23,9 @@ namespace khg {
 /// Definition for Gaussian Mixture Model with diagonal covariances
 class DiagGmm {
  public:
+  /// this makes it a little easier to modify the internals
+  friend class DiagGmmNormal;
+
   /// Empty constructor.
   DiagGmm() : valid_gconsts_(false) {}
 
@@ -152,6 +156,10 @@ class DiagGmm {
   void MergeKmeans(int32_t target_components,
                    const ClusterKMeansOptions &cfg = ClusterKMeansOptions());
 
+  /// this = rho x source + (1-rho) x this
+  void Interpolate(float rho, const DiagGmm &source,
+                   GmmFlagsType flags = kGmmAll);
+
  private:
   // MergedComponentsLogdet computes logdet for merged components
   // f1, f2 are first-order stats (normalized by zero-order stats)
@@ -167,12 +175,12 @@ class DiagGmm {
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)
   bool valid_gconsts_;     ///< Recompute gconsts_ if false
 
-  /// 1-D, (nmix,) weights (not log).
+  /// 1-D, (nmix,) weights (not log)., kFloat
   torch::Tensor weights_;
-  /// 2-D, (nmix, dim), Inverted (diagonal) variances
+  /// 2-D, (nmix, dim), Inverted (diagonal) variances, kFloat
   torch::Tensor inv_vars_;
 
-  /// 2-D, (nmix, dim), Means times inverted variance
+  /// 2-D, (nmix, dim), Means times inverted variance, kFloat
   torch::Tensor means_invvars_;
 };
 
