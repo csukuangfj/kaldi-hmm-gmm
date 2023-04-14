@@ -9,7 +9,7 @@
 #include "kaldi_native_io/csrc/kaldi-io.h"
 namespace khg {
 
-void PybinContextDep(py::module *m) {
+void PybindContextDep(py::module *m) {
   using PyClass = ContextDependency;
   py::class_<PyClass>(*m, "ContextDependency")
       .def(

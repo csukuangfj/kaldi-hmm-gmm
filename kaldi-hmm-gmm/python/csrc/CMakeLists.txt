@@ -1,8 +1,13 @@
 include_directories(${PROJECT_SOURCE_DIR})
+add_definitions(-DTORCH_API_INCLUDE_EXTENSION_H)
 
 set(srcs
+  cluster-utils.cc
+  clusterable-classes.cc
   context-dep.cc
+  diag-gmm.cc
   kaldi-hmm-gmm.cc
+  model-common.cc
   tree-renderer.cc
 )
 

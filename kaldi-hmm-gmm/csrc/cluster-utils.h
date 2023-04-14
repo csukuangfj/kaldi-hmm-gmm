@@ -8,6 +8,8 @@
 
 #include <stdint.h>
 
+#include <vector>
+
 #include "kaldi-hmm-gmm/csrc/clusterable-classes.h"
 
 namespace khg {
@@ -25,6 +27,13 @@ struct ClusterKMeansOptions {
   int32_t num_iters = 20;
   int32_t num_tries = 2;  // if >1, try whole procedure >once and pick best.
   bool verbose = true;
+  ClusterKMeansOptions() = default;
+  ClusterKMeansOptions(const RefineClustersOptions &refine_cfg,
+                       int32_t num_iters, int32_t num_tries, bool verbose)
+      : refine_cfg(refine_cfg),
+        num_iters(num_iters),
+        num_tries(num_tries),
+        verbose(verbose) {}
 };
 
 /** ClusterKMeans is a K-means-like clustering algorithm. It starts with

@@ -9,7 +9,7 @@
 
 namespace khg {
 
-void PybinContextDep(py::module *m);
+void PybindContextDep(py::module *m);
 
 }
 

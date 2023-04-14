@@ -137,7 +137,7 @@ class DiagGmm {
 
   /// Generates a random data-point from this distribution.
   /// @param output 1-D tensor of shape (dim,). Must be pre-allocated
-  void Generate(torch::Tensor *output);
+  void Generate(torch::Tensor *output) const;
 
   /// Split the components and remember the order in which the components were
   /// split

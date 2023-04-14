@@ -453,7 +453,7 @@ float DiagGmm::ComponentLogLikelihood(const torch::Tensor &data,  // 1-D
 }
 
 void DiagGmm::Generate(torch::Tensor *output  // 1-D
-) {
+) const {
   KHG_ASSERT(static_cast<int32_t>(output->size(0)) == Dim());
   float tot = weights_.sum().item().toFloat();
   KHG_ASSERT(tot > 0.0);
