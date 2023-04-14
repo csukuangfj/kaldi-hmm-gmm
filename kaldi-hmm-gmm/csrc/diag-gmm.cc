@@ -932,4 +932,12 @@ void DiagGmm::SetWeights(torch::Tensor w) {
   valid_gconsts_ = false;
 }
 
+void DiagGmm::SetMeans(torch::Tensor m) {
+  KHG_ASSERT(means_invvars_.size(0) == m.size(0) &&
+             means_invvars_.size(1) == m.size(1));
+  means_invvars_ = m.to(torch::kFloat).mul(inv_vars_);
+
+  valid_gconsts_ = false;
+}
+
 }  // namespace khg

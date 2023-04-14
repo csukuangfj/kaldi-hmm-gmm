@@ -177,7 +177,12 @@ class DiagGmm {
   /// Removes multiple components from model; "gauss" must not have dups.
   void RemoveComponents(const std::vector<int32_t> &gauss, bool renorm_weights);
 
+  // w is a 1-D tensor of shape (num_mix,)
   void SetWeights(torch::Tensor w);  ///< Set mixture weights
+                                     ///
+  /// Use SetMeans to update only the Gaussian means (and not variances)
+  /// m is a 2-D tensor of shape (num_mix, dim)
+  void SetMeans(torch::Tensor m);
 
  private:
   // MergedComponentsLogdet computes logdet for merged components
