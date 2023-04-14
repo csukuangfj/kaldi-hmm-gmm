@@ -872,4 +872,58 @@ void DiagGmm::Interpolate(float rho, const DiagGmm &source,
   ComputeGconsts();
 }
 
+void DiagGmm::RemoveComponent(int32_t gauss, bool renorm_weights) {
+  KHG_ASSERT(gauss < NumGauss());
+  if (NumGauss() == 1) {
+    KHG_ERR << "Attempting to remove the only remaining component.";
+  }
+
+  torch::Tensor new_weights = torch::empty({NumGauss() - 1}, torch::kFloat);
+  torch::Tensor new_gconsts = torch::empty({NumGauss() - 1}, torch::kFloat);
+  torch::Tensor new_means_invvars =
+      torch::empty({NumGauss() - 1, Dim()}, torch::kFloat);
+  torch::Tensor new_inv_vars =
+      torch::empty({NumGauss() - 1, Dim()}, torch::kFloat);
+
+  auto weights_acc = weights_.accessor<float, 1>();
+  auto gconsts_acc = gconsts_.accessor<float, 1>();
+
+  auto new_weights_acc = new_weights.accessor<float, 1>();
+  auto new_gconsts_acc = new_gconsts.accessor<float, 1>();
+
+  int32_t n = 0;
+  for (int32_t i = 0; i != NumGauss(); ++i) {
+    if (i == gauss) continue;
+    new_weights_acc[n] = weights_acc[i];
+    new_gconsts_acc[n] = gconsts_acc[i];
+    Row(new_means_invvars, n) = Row(means_invvars_, i);
+    Row(new_inv_vars, n) = Row(inv_vars_, i);
+    ++n;
+  }
+
+  float sum_weights = new_weights.sum().item().toFloat();
+  if (renorm_weights) {
+    new_weights.mul_(1.0 / sum_weights);
+    valid_gconsts_ = false;
+  }
+
+  weights_ = std::move(new_weights);
+  gconsts_ = std::move(new_gconsts);
+  means_invvars_ = std::move(new_means_invvars);
+  inv_vars_ = std::move(new_inv_vars);
+}
+
+void DiagGmm::RemoveComponents(const std::vector<int32_t> &gauss_in,
+                               bool renorm_weights) {
+  std::vector<int32_t> gauss(gauss_in);
+  std::sort(gauss.begin(), gauss.end());
+
+  KHG_ASSERT(IsSortedAndUniq(gauss));
+  // If efficiency is later an issue, will code this specially (unlikely).
+  for (size_t i = 0; i < gauss.size(); i++) {
+    RemoveComponent(gauss[i], renorm_weights);
+    for (size_t j = i + 1; j < gauss.size(); j++) gauss[j]--;
+  }
+}
+
 }  // namespace khg
