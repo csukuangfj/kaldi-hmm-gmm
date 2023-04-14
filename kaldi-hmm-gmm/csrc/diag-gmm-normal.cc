@@ -11,22 +11,6 @@
 
 namespace khg {
 
-void DiagGmmNormal::Resize(int32_t nmix, int32_t dim) {
-  KHG_ASSERT(nmix > 0 && dim > 0);
-
-  if (!weights_.defined() || weights_.size(0) != nmix) {
-    weights_ = torch::empty({nmix}, torch::kDouble);
-  }
-
-  if (!vars_.defined() || vars_.size(0) != nmix || vars_.size(1) != dim) {
-    vars_ = torch::empty({nmix, dim}, torch::kDouble);
-  }
-
-  if (!means_.defined() || means_.size(0) != nmix || means_.size(1) != dim) {
-    means_ = torch::empty({nmix, dim}, torch::kDouble);
-  }
-}
-
 void DiagGmmNormal::CopyFromDiagGmm(const DiagGmm &diaggmm) {
   weights_ = diaggmm.weights_.clone();
 

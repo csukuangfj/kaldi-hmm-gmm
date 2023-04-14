@@ -31,9 +31,6 @@ class DiagGmmNormal {
   DiagGmmNormal(const DiagGmmNormal &) = delete;
   DiagGmmNormal &operator=(const DiagGmmNormal &) = delete;
 
-  /// Resizes arrays to this dim. Does not initialize data.
-  void Resize(int32_t nMix, int32_t dim);
-
   /// Copies from given DiagGmm
   void CopyFromDiagGmm(const DiagGmm &diaggmm);
 
