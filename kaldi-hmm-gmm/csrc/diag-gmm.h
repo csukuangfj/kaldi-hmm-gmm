@@ -33,6 +33,8 @@ class DiagGmm {
     CopyFromDiagGmm(gmm);
   }
 
+  DiagGmm &operator=(const DiagGmm &other) = delete;  // Disallow assignment
+
   /// Resizes arrays to this dim. Does not initialize data.
   void Resize(int32_t nMix, int32_t dim);
 
@@ -212,6 +214,10 @@ class DiagGmm {
   /// Accessor for single component mean
   /// Return a 1-D tensor
   torch::Tensor GetComponentMean(int32_t gauss) const;
+
+  /// Accessor for single component variance.
+  /// Return a 1-D tensor
+  torch::Tensor GetComponentVariance(int32_t gauss) const;
 
  private:
   // MergedComponentsLogdet computes logdet for merged components

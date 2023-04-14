@@ -1004,4 +1004,9 @@ torch::Tensor DiagGmm::GetComponentMean(int32_t gauss) const {
   return Row(means_invvars_, gauss).div(Row(inv_vars_, gauss));
 }
 
+torch::Tensor DiagGmm::GetComponentVariance(int32_t gauss) const {
+  KHG_ASSERT(gauss < NumGauss());
+  return 1.0f / Row(inv_vars_, gauss);
+}
+
 }  // namespace khg
