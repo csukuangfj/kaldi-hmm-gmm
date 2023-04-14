@@ -201,6 +201,11 @@ class DiagGmm {
   /// in is a 1-D tensor
   void SetComponentMean(int32_t gauss, torch::Tensor in);
 
+  /// Set inv-var for single component (recommend to do this before
+  /// setting the mean, if doing both, for numerical reasons).
+  /// in is a 1-D tensor
+  void SetComponentInvVar(int32_t gauss, torch::Tensor in);
+
  private:
   // MergedComponentsLogdet computes logdet for merged components
   // f1, f2 are first-order stats (normalized by zero-order stats)

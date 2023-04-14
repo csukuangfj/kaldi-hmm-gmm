@@ -969,10 +969,21 @@ torch::Tensor DiagGmm::GetMeans() const {
   return means_invvars_.div(inv_vars_);
 }
 
-void DiagGmm::SetComponentMean(int32_t g, torch::Tensor in) {
-  KHG_ASSERT(g < NumGauss() && Dim() == in.size(0));
+void DiagGmm::SetComponentMean(int32_t g, torch::Tensor v) {
+  KHG_ASSERT(g < NumGauss() && Dim() == v.size(0));
 
-  Row(means_invvars_, g) = Row(inv_vars_, g).mul(in.to(torch::kFloat));
+  Row(means_invvars_, g) = Row(inv_vars_, g).mul(v.to(torch::kFloat));
+
+  valid_gconsts_ = false;
+}
+
+void DiagGmm::SetComponentInvVar(int32_t g, torch::Tensor v) {
+  KHG_ASSERT(g < NumGauss() && v.size(0) == Dim());
+
+  v = v.to(torch::kFloat);
+
+  Row(means_invvars_, g) = Row(means_invvars_, g).div(Row(inv_vars_, g)).mul(v);
+  Row(inv_vars_, g) = v;
 
   valid_gconsts_ = false;
 }
