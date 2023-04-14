@@ -13,6 +13,13 @@ set(srcs
 
 pybind11_add_module(_kaldi_hmm_gmm ${srcs})
 target_link_libraries(_kaldi_hmm_gmm PRIVATE kaldi-hmm-gmm-core)
+if(UNIX AND NOT APPLE)
+  target_link_libraries(_kaldi_hmm_gmm PUBLIC ${TORCH_DIR}/lib/libtorch_python.so)
+  target_link_libraries(_kaldi_hmm_gmm PUBLIC ${PYTHON_LIBRARY})
+elseif(WIN32)
+  target_link_libraries(_kaldi_hmm_gmm PUBLIC ${TORCH_DIR}/lib/torch_python.lib)
+  target_link_libraries(_kaldi_hmm_gmm PUBLIC ${PYTHON_LIBRARIES})
+endif()
 
 if(APPLE)
   execute_process(

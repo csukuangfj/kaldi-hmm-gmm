@@ -76,6 +76,17 @@ float ClusterKMeans(const std::vector<Clusterable *> &points,
                     std::vector<int32_t> *assignments_out,     // may be nullptr
                     const ClusterKMeansOptions &cfg = ClusterKMeansOptions());
 
+/// Returns the total objective function after adding up all the
+/// statistics in the vector (pointers may be NULL).
+float SumClusterableObjf(const std::vector<Clusterable *> &vec);
+
+/// Returns the total normalizer (usually count) of the cluster (pointers may be
+/// NULL).
+float SumClusterableNormalizer(const std::vector<Clusterable *> &vec);
+
+/// Sums stats (ptrs may be NULL). Returns NULL if no non-NULL stats present.
+Clusterable *SumClusterable(const std::vector<Clusterable *> &vec);
+
 }  // namespace khg
 
 #endif  // KALDI_HMM_GMM_CSRC_CLUSTER_UTILS_H_

@@ -209,7 +209,7 @@ class DiagGmm {
   void SetComponentInvVar(int32_t gauss, torch::Tensor in);
 
   /// Set weight for single component.
-  inline void SetComponentWeight(int32_t gauss, float weight);
+  void SetComponentWeight(int32_t gauss, float weight);
 
   /// Accessor for single component mean
   /// Return a 1-D tensor

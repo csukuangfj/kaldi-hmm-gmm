@@ -988,7 +988,7 @@ void DiagGmm::SetComponentInvVar(int32_t g, torch::Tensor v) {
   valid_gconsts_ = false;
 }
 
-inline void DiagGmm::SetComponentWeight(int32_t g, float w) {
+void DiagGmm::SetComponentWeight(int32_t g, float w) {
   KHG_ASSERT(w > 0.0);
   KHG_ASSERT(g < NumGauss());
 

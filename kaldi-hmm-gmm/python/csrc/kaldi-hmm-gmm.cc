@@ -10,6 +10,7 @@
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/model-common.h"
 #include "kaldi-hmm-gmm/python/csrc/tree-renderer.h"
+#include "torch/torch.h"
 
 namespace khg {
 

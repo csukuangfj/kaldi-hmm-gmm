@@ -34,7 +34,7 @@ float SumClusterableObjf(const std::vector<Clusterable *> &vec) {
   }
   return ans;
 }
-static float SumClusterableNormalizer(const std::vector<Clusterable *> &vec) {
+float SumClusterableNormalizer(const std::vector<Clusterable *> &vec) {
   float ans = 0.0;
   for (size_t i = 0; i < vec.size(); i++) {
     if (vec[i] != nullptr) {
@@ -49,7 +49,7 @@ static float SumClusterableNormalizer(const std::vector<Clusterable *> &vec) {
   return ans;
 }
 
-static Clusterable *SumClusterable(const std::vector<Clusterable *> &vec) {
+Clusterable *SumClusterable(const std::vector<Clusterable *> &vec) {
   Clusterable *ans = nullptr;
   for (size_t i = 0; i < vec.size(); ++i) {
     if (vec[i] != nullptr) {
@@ -295,10 +295,10 @@ class RefineClusterer {
                                // this member a reference member.
 };
 
-float RefineClusters(const std::vector<Clusterable *> &points,
-                     std::vector<Clusterable *> *clusters,
-                     std::vector<int32_t> *assignments,
-                     const RefineClustersOptions &cfg) {
+static float RefineClusters(const std::vector<Clusterable *> &points,
+                            std::vector<Clusterable *> *clusters,
+                            std::vector<int32_t> *assignments,
+                            const RefineClustersOptions &cfg) {
   if (cfg.num_iters <= 0) {
     return 0.0;
   }  // nothing to do.
