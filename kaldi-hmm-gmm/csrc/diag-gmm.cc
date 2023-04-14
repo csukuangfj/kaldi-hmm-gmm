@@ -22,15 +22,10 @@
 #include "kaldi-hmm-gmm/csrc/clusterable-classes.h"
 #include "kaldi-hmm-gmm/csrc/kaldi-math.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
+#include "kaldi-hmm-gmm/csrc/stl-utils.h"
+#include "kaldi-hmm-gmm/csrc/utils.h"
 
 namespace khg {
-
-// Return a shallow copy of the i-th row of a 2-D matrix.
-// @param m A 2-D tensor
-// @param i The i-th row to return.
-static torch::Tensor Row(torch::Tensor m, int32_t i) {
-  return m.slice(/*dim*/ 0, i, i + 1);
-}
 
 void DiagGmm::Resize(int32_t nmix, int32_t dim) {
   KHG_ASSERT(nmix > 0 && dim > 0);
@@ -797,6 +792,55 @@ void DiagGmm::MergeKmeans(
   }
   double min_var = 1.0e-10;
   std::vector<Clusterable *> clusterable_vec;
+
+  auto weights_acc = weights_.accessor<float, 1>();
+  for (int32_t g = 0; g < NumGauss(); g++) {
+    if (weights_acc[g] == 0) {
+      KHG_WARN << "Not using zero-weight Gaussians in clustering.";
+      continue;
+    }
+    float count = weights_acc[g];
+
+    torch::Tensor var = 1.0f / Row(inv_vars_, g);
+    torch::Tensor mean_invvar = Row(means_invvars_, g);
+
+    torch::Tensor x_stats = mean_invvar * var;
+    torch::Tensor x2_stats = (var + x_stats.square()) * count;
+    x_stats.mul_(count);
+
+    clusterable_vec.push_back(
+        new GaussClusterable(x_stats, x2_stats, min_var, count));
+  }
+
+  if (clusterable_vec.size() <= target_components) {
+    KHG_WARN << "Not doing clustering phase since lost too many Gaussians "
+             << "due to zero weight. Warning: zero-weight Gaussians are "
+             << "still there.";
+    DeletePointers(&clusterable_vec);
+    return;
+  } else {
+    std::vector<Clusterable *> clusters;
+    ClusterKMeans(clusterable_vec, target_components, &clusters, nullptr, cfg);
+
+    Resize(clusters.size(), Dim());
+    for (int32_t g = 0; g < static_cast<int32_t>(clusters.size()); ++g) {
+      GaussClusterable *gc = static_cast<GaussClusterable *>(clusters[g]);
+      weights_acc[g] = gc->count();
+
+      torch::Tensor inv_var = gc->x2_stats() / gc->count();
+      torch::Tensor mean_invvar = gc->x_stats() / gc->count();
+      inv_var.sub_(mean_invvar.square());
+
+      inv_var = 1.0f / inv_var;
+      mean_invvar.mul_(inv_var);
+
+      Row(inv_vars_, g) = inv_var;
+      Row(means_invvars_, g) = mean_invvar;
+    }
+    ComputeGconsts();
+    DeletePointers(&clusterable_vec);
+    DeletePointers(&clusters);
+  }
 }
 
 }  // namespace khg

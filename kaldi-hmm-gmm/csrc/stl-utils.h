@@ -172,6 +172,15 @@ struct PairHasher {  // hashing function for pair<int>
   }
 };
 
+/// Returns true if the vector of pointers contains NULL pointers.
+template <class A>
+bool ContainsNullPointers(const std::vector<A *> &v) {
+  typename std::vector<A *>::const_iterator iter = v.begin(), end = v.end();
+  for (; iter != end; ++iter)
+    if (*iter == static_cast<A *>(nullptr)) return true;
+  return false;
+}
+
 }  // namespace khg
 
 #endif  // KALDI_HMM_GMM_CSRC_STL_UTILS_H_

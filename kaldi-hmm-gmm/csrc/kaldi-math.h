@@ -28,6 +28,8 @@
 #define KALDI_ISINF std::isinf
 #define KALDI_ISNAN std::isnan
 
+#include "kaldi-hmm-gmm/csrc/log.h"
+
 namespace khg {
 
 static const double kMinLogDiffDouble = std::log(DBL_EPSILON);  // negative!
@@ -106,6 +108,36 @@ static inline bool ApproxEqual(float a, float b,
     return false;  // diff is +inf or nan.
   return (diff <= relative_tolerance * (std::abs(a) + std::abs(b)));
 }
+
+// State for thread-safe random number generator
+struct RandomState {
+  RandomState();
+  unsigned seed;
+};
+
+// Returns a random integer between 0 and RAND_MAX, inclusive
+int32_t Rand(struct RandomState *state = nullptr);
+
+template <class I>
+I Gcd(I m, I n) {
+  if (m == 0 || n == 0) {
+    if (m == 0 && n == 0) {  // gcd not defined, as all integers are divisors.
+      KHG_ERR << "Undefined GCD since m = 0, n = 0.";
+    }
+    return (m == 0 ? (n > 0 ? n : -n) : (m > 0 ? m : -m));
+    // return absolute value of whichever is nonzero
+  }
+  // could use compile-time assertion
+  // but involves messing with complex template stuff.
+  KHG_ASSERT(std::numeric_limits<I>::is_integer);
+  while (1) {
+    m %= n;
+    if (m == 0) return (n > 0 ? n : -n);
+    n %= m;
+    if (n == 0) return (m > 0 ? m : -m);
+  }
+}
+
 }  // namespace khg
 
 #endif  // KALDI_HMM_GMM_CSRC_KALDI_MATH_H_

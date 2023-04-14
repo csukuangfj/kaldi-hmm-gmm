@@ -8,6 +8,8 @@
 
 #include <stdint.h>
 
+#include "kaldi-hmm-gmm/csrc/clusterable-classes.h"
+
 namespace khg {
 
 struct RefineClustersOptions {
@@ -24,6 +26,46 @@ struct ClusterKMeansOptions {
   int32_t num_tries = 2;  // if >1, try whole procedure >once and pick best.
   bool verbose = true;
 };
+
+/** ClusterKMeans is a K-means-like clustering algorithm. It starts with
+ *  pseudo-random initialization of points to clusters and uses RefineClusters
+ *  to iteratively improve the cluster assignments.  It does this for
+ *  multiple iterations and picks the result with the best objective function.
+ *
+ *
+ *  ClusterKMeans implicitly uses Rand(). It will not necessarily return
+ *  the same value on different calls.  Use sRand() if you want consistent
+ *  results.
+ *  The algorithm used in ClusterKMeans is a "k-means-like" algorithm that tries
+ *  to be as efficient as possible.  Firstly, since the algorithm it uses
+ *  includes random initialization, it tries the whole thing cfg.num_tries times
+ *  and picks the one with the best objective function.  Each try, it does as
+ *  follows: it randomly initializes points to clusters, and then for
+ *  cfg.num_iters iterations it calls RefineClusters().  The options to
+ *  RefineClusters() are given by cfg.refine_cfg.  Calling RefineClusters once
+ *  will always be at least as good as doing one iteration of reassigning points
+ *  to clusters, but will generally be quite a bit better (without taking too
+ *  much extra time).
+ *
+ *  @param points [in]  points to be clustered (must be all non-NULL).
+ *  @param num_clust [in] number of clusters requested (it will always return
+ * exactly this many, or will fail if num_clust > points.size()).
+ *  @param clusters_out [out] may be NULL; if non-NULL, should be empty when
+ * called. Will be set to a vector of statistics corresponding to the output
+ * clusters.
+ *  @param assignments_out [out] may be NULL; if non-NULL, will be set to a
+ * vector of same size as "points", which says for each point which cluster it
+ * is assigned to.
+ *  @param cfg [in] configuration class specifying options to the algorithm.
+ *  @return Returns the objective function improvement versus everything being
+ *     in the same cluster.
+ *
+ */
+float ClusterKMeans(const std::vector<Clusterable *> &points,
+                    int32_t num_clust,  // exact number of clusters
+                    std::vector<Clusterable *> *clusters_out,  // may be nullptr
+                    std::vector<int32_t> *assignments_out,     // may be nullptr
+                    const ClusterKMeansOptions &cfg = ClusterKMeansOptions());
 
 }  // namespace khg
 
