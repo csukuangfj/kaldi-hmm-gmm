@@ -12,6 +12,14 @@
 
 #include "kaldi-hmm-gmm/csrc/diag-gmm.h"
 
+#include <algorithm>
+#include <functional>
+#include <limits>
+#include <memory>
+#include <utility>
+#include <vector>
+
+#include "kaldi-hmm-gmm/csrc/clusterable-classes.h"
 #include "kaldi-hmm-gmm/csrc/kaldi-math.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
 
@@ -773,6 +781,22 @@ float DiagGmm::MergedComponentsLogdet(float w1, float w2,
   float merged_logdet = -0.5 * tmp_var.log().sum().item().toFloat();
 
   return merged_logdet;
+}
+
+void DiagGmm::MergeKmeans(
+    int32_t target_components,
+    const ClusterKMeansOptions &cfg /*= ClusterKMeansOptions()*/) {
+  if (target_components <= 0 || NumGauss() < target_components) {
+    KHG_ERR << "Invalid argument for target number of Gaussians (="
+            << target_components << "), #Gauss = " << NumGauss();
+  }
+  if (NumGauss() == target_components) {
+    KHG_LOG << "No components merged, as target (" << target_components
+            << ") = total.";
+    return;  // Nothing to do.
+  }
+  double min_var = 1.0e-10;
+  std::vector<Clusterable *> clusterable_vec;
 }
 
 }  // namespace khg

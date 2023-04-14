@@ -10,6 +10,7 @@
 #define KALDI_HMM_GMM_CSRC_KALDI_MATH_H_
 
 #include <cmath>
+#include <limits>
 
 #ifndef DBL_EPSILON
 #define DBL_EPSILON 2.2204460492503131e-16

@@ -11,6 +11,10 @@
 // this if is copied and modified from
 // kaldi/src/gmm/diag-gmm.h
 
+#include <utility>
+#include <vector>
+
+#include "kaldi-hmm-gmm/csrc/cluster-utils.h"
 #include "torch/script.h"
 
 namespace khg {
@@ -143,16 +147,20 @@ class DiagGmm {
   void Merge(int32_t target_components,
              std::vector<int32_t> *history = nullptr);
 
+  // Merge the components to a specified target #components: this
+  // version uses a different approach based on K-means.
+  void MergeKmeans(int32_t target_components,
+                   const ClusterKMeansOptions &cfg = ClusterKMeansOptions());
+
  private:
   // MergedComponentsLogdet computes logdet for merged components
   // f1, f2 are first-order stats (normalized by zero-order stats)
   // s1, s2 are second-order stats (normalized by zero-order stats)
   float MergedComponentsLogdet(float w1, float w2,
-                               torch::Tensor f1,  // 1-D
-                               torch::Tensor f2,  // 1-D
-                               torch::Tensor s1,  // 1-D
-                               torch::Tensor s2   // 1-D
-  ) const;
+                               torch::Tensor f1,         // 1-D
+                               torch::Tensor f2,         // 1-D
+                               torch::Tensor s1,         // 1-D
+                               torch::Tensor s2) const;  // 1-D
 
  private:
   /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
