@@ -184,6 +184,9 @@ class DiagGmm {
   /// m is a 2-D tensor of shape (num_mix, dim)
   void SetMeans(torch::Tensor m);
 
+  /// Use SetInvVarsAndMeans if updating both means and (inverse) variances
+  void SetInvVarsAndMeans(torch::Tensor invvars, torch::Tensor means);
+
  private:
   // MergedComponentsLogdet computes logdet for merged components
   // f1, f2 are first-order stats (normalized by zero-order stats)
