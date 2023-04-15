@@ -57,3 +57,38 @@ For the mean, we use:
 
 where ``rand()`` returns a random number between ``0`` and ``1`` and ``perturb_factor``
 is a user provided argument, e.g., ``0.01``.
+
+logdet
+------
+
+``logdet`` is defined as:
+
+.. math::
+
+   \mathrm{logdet} = \log \left( \frac{1}{\sigma_1^2 \sigma_2^2 ... \sigma_n^2} \right)^{1/2}
+
+merge
+-----
+
+How to select two components to merge?
+
+Suppose we have 3 components ``0``, ``1``, and ``2``; we compute ``delta`` ``logdet``
+between each component. For instance,
+
+.. math::
+
+   \mu_{01} = \frac{w_0 \mu_0 + w_1 \mu_1}{w_0 + w_1}\\
+
+.. math::
+
+   \mathrm{var}_{01} = \frac{w_0 \mathrm{var}_0 + w_1 \mathrm{var}_1}{w_0 + w_1}
+
+The merged weight is ``w_0 + w_1``.
+
+.. math::
+
+   \mathrm{detla}\ \mathrm{loglike}_{01} = (w_0 + w_1) * \mathrm{logdet}_{01} - w_0 \mathrm{logdet}_0 - w_1 \mathrm{logdet}_1
+
+
+We want to maximize the merged ``logdet``, so we choose two components that
+have the largest merged ``logdet`` to merge.

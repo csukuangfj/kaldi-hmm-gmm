@@ -180,6 +180,88 @@ class TestDiagGmm(unittest.TestCase):
         assert torch.allclose(diag_gmm.vars[1], var[1])
         assert torch.allclose(diag_gmm.vars[2], var[1])
 
+    def test_merge(self):
+        nmix = 7
+        dim = 6
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+
+        history = diag_gmm.merge(target_components=1)
+        assert history == []
+        assert diag_gmm.weights[0] == 1
+        assert diag_gmm.num_gauss == 1
+
+        expected_means = torch.matmul(weights.unsqueeze(0), mean)
+        assert torch.allclose(diag_gmm.means, expected_means)
+
+        second_order_stats = torch.matmul(weights.unsqueeze(0), (var + mean.square()))
+        expected_vars = second_order_stats - expected_means.square()
+        assert torch.allclose(diag_gmm.vars, expected_vars)
+
+    def test_merge_case_2(self):
+        nmix = 4
+        dim = 2
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.tensor(
+            [
+                [2, 2],
+                [-10, -10],
+                [1, 1],
+                [-100, 100],
+            ],
+            dtype=torch.float32,
+        )
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+
+        history = diag_gmm.merge(target_components=3)
+        # Only component 2 and 0 have the largest merged logdet
+        # since they are the closes one
+        #
+        # 2 comes first before 0 in history since we are building
+        # a lower triangular matrix in C++
+        assert history == [2, 0]
+        assert diag_gmm.num_gauss == 3
+
+        assert diag_gmm.weights[0] == weights[1]
+        assert diag_gmm.weights[1] == weights[2] + weights[0]
+        assert diag_gmm.weights[2] == weights[3]
+
+        assert torch.allclose(diag_gmm.means[0], mean[1])
+        assert torch.allclose(
+            diag_gmm.means[1],
+            (weights[2] * mean[2] + weights[0] * mean[0]) / (weights[2] + weights[0]),
+        )
+        assert torch.allclose(diag_gmm.means[2], mean[3])
+
+        assert torch.allclose(diag_gmm.vars[0], var[1])
+        second_order_stats = weights[2] * (var[2] + mean[2].square())
+        second_order_stats += weights[0] * (var[0] + mean[0].square())
+        second_order_stats /= weights[2] + weights[0]
+        expected_vars = (
+            second_order_stats
+            - (
+                (weights[2] * mean[2] + weights[0] * mean[0])
+                / (weights[2] + weights[0])
+            ).square()
+        )
+        assert torch.allclose(diag_gmm.vars[1], expected_vars)
+        assert torch.allclose(diag_gmm.vars[2], var[3])
+
 
 if __name__ == "__main__":
     torch.manual_seed(20230414)

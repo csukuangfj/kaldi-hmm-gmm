@@ -590,14 +590,15 @@ void DiagGmm::Merge(int32_t target_components, std::vector<int32_t> *history) {
     torch::Tensor weights = weights_.clone();
     // Undo variance inversion and multiplication of mean by inv var.
     torch::Tensor vars = 1.0f / inv_vars_;
-    torch::Tensor means = means_invvars_ * vars;
+    torch::Tensor means = means_invvars_ * vars;  // elementwise, i.e., mul()
 
-    vars.add_(means.square(), /*alpha*/ 1.0);
+    vars.add_(means.square(), /*alpha*/ 1.0);  // 2-nd order stats
 
     // Slightly more efficient than calling this->Resize(1, dim)
     gconsts_ = torch::empty({1}, torch::kFloat);
 
-    weights_ = weights.sum();
+    // weights.sum() is a scalar, so we need to use unsqueeze() here
+    weights_ = weights.sum().unsqueeze(0);
     means_invvars_ = torch::mm(weights.unsqueeze(0), means);
     inv_vars_ = torch::mm(weights.unsqueeze(0), vars);
 
@@ -656,7 +657,7 @@ void DiagGmm::Merge(int32_t target_components, std::vector<int32_t> *history) {
   }
 
   // Merge components with smallest impact on the loglike
-  for (int32_t removed = 0; removed < num_comp - target_components; removed++) {
+  for (int32_t removed = 0; removed < num_comp - target_components; ++removed) {
     // Search for the least significant change in likelihood
     // (maximum of negative delta_likes)
     float max_delta_like = -std::numeric_limits<float>::max();
@@ -676,7 +677,7 @@ void DiagGmm::Merge(int32_t target_components, std::vector<int32_t> *history) {
     // make sure that different components will be merged
     KHG_ASSERT(max_i != max_j && max_i != -1 && max_j != -1);
 
-    // remember the merge candidates
+    // remember the merged candidates
     if (history != nullptr) {
       history->push_back(max_i);
       history->push_back(max_j);
