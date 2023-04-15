@@ -159,7 +159,7 @@ float DiagGmm::LogLikelihood(const torch::Tensor &data) const {
   torch::Tensor loglikes;
   LogLikelihoods(data, &loglikes);
 
-  float log_sum = loglikes.logsumexp(0).item().toFloat();
+  float log_sum = loglikes.logsumexp(/*dim*/ 0).item().toFloat();
 
   if (KALDI_ISNAN(log_sum) || KALDI_ISINF(log_sum)) {
     KHG_ERR << "Invalid answer (overflow or invalid variances/features?)";
@@ -199,6 +199,7 @@ void DiagGmm::LogLikelihoodsMatrix(const torch::Tensor &data,
   KHG_ASSERT(data.size(0) != 0);
 
   torch::Tensor loglikes = gconsts_.repeat({data.size(0), 1});
+  // now loglikes is of shape (data.size(0), nmix)
 
   if (data.size(1) != Dim()) {
     KHG_ERR << "DiagGmm::LogLikelihoods, dimension "

@@ -227,6 +227,7 @@ class TestDiagGmm(unittest.TestCase):
         diag_gmm.set_weights(weights)
         diag_gmm.set_means(mean)
         diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
 
         if True:
             history = diag_gmm.merge(target_components=3)
@@ -240,7 +241,6 @@ class TestDiagGmm(unittest.TestCase):
             diag_gmm.merge_kmeans(target_components=3)
 
         assert diag_gmm.num_gauss == 3
-        return
 
         assert diag_gmm.weights[0] == weights[1], diag_gmm.weights
         assert diag_gmm.weights[1] == weights[2] + weights[0]
@@ -266,6 +266,84 @@ class TestDiagGmm(unittest.TestCase):
         )
         assert torch.allclose(diag_gmm.vars[1], expected_vars)
         assert torch.allclose(diag_gmm.vars[2], var[3])
+
+    def test_log_likes(self):
+        nmix = 10
+        dim = 8
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        x = torch.rand(dim)
+        log_likes: float = diag_gmm.log_likelihood(x)
+
+        expected = ((x - mean).square() / (-2 * var)).sum(dim=1).exp()
+        expected = expected / (var * math.pi * 2).prod(dim=1).sqrt()
+        expected = weights.mul(expected).sum().log().item()
+
+        assert abs(log_likes - expected) < 1e-6, log_likes - expected
+
+    def test_log_like_per_component(self):
+        nmix = 10
+        dim = 8
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        x = torch.rand(dim)
+        log_likes: torch.Tensor = diag_gmm.log_likelihoods(x)
+
+        expected = ((x - mean).square() / (-2 * var)).sum(dim=1).exp()
+        expected = expected / (var * math.pi * 2).prod(dim=1).sqrt()
+        expected = weights.mul(expected).log()
+
+        assert torch.allclose(log_likes, expected)
+
+    def test_log_like_per_component_2d(self):
+        nmix = 10
+        dim = 5
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        N = 3
+        x = torch.rand(N, dim)
+        log_likes: torch.Tensor = diag_gmm.log_likelihoods_matrix(x)
+        assert log_likes.shape == (N, nmix)
+
+        expected_list = []
+        for i in range(N):
+            expected = ((x[i] - mean).square() / (-2 * var)).sum(dim=1).exp()
+            expected = expected / (var * math.pi * 2).prod(dim=1).sqrt()
+            expected = weights.mul(expected).log()
+            expected_list.append(expected)
+        expected = torch.stack(expected_list)
+
+        assert torch.allclose(log_likes, expected)
 
 
 if __name__ == "__main__":

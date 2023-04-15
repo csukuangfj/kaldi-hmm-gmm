@@ -7,6 +7,7 @@
 #include "kaldi-hmm-gmm/csrc/cluster-utils.h"
 #include "kaldi-hmm-gmm/csrc/clusterable-classes.h"
 #include "kaldi-hmm-gmm/csrc/clusterable-itf.h"
+#include "torch/torch.h"
 
 namespace khg {
 

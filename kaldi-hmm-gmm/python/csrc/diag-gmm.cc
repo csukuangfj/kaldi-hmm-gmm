@@ -23,7 +23,8 @@ void PybindDiagGmm(py::module *m) {
       .def("resize", &PyClass::Resize, py::arg("nmix"), py::arg("dim"))
       .def("copy_from_diag_gmm", &PyClass::CopyFromDiagGmm, py::arg("diaggmm"))
       .def("compute_gconsts", &PyClass::ComputeGconsts)
-      .def("log_likelihood", &PyClass::LogLikelihood, py::arg("data"))
+      .def("log_likelihood", &PyClass::LogLikelihood, py::arg("data"),
+           "Return the total loglikes in a float")
       .def(
           "log_likelihoods",
           [](const PyClass &self, torch::Tensor data) {
@@ -31,7 +32,8 @@ void PybindDiagGmm(py::module *m) {
             self.LogLikelihoods(data, &ans);
             return ans;
           },
-          py::arg("data"))
+          py::arg("data"),
+          "Return the loglike of each component in a 1-D tensor")
       .def(
           "log_likelihoods_matrix",
           [](const PyClass &self, torch::Tensor data) {
@@ -39,7 +41,10 @@ void PybindDiagGmm(py::module *m) {
             self.LogLikelihoodsMatrix(data, &ans);
             return ans;
           },
-          py::arg("data"))
+          py::arg("data"),
+          "data is a 2-D tensor of shape (N, dim);"
+          "it returns a 2-D tensor of shape (N, nmix) containing the "
+          "loglike of each component")
       .def(
           "log_likelihoods_preselect",
           [](const PyClass &self, torch::Tensor data,
