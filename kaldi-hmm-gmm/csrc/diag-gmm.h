@@ -230,7 +230,7 @@ class DiagGmm {
                                torch::Tensor s2) const;  // 1-D
 
  private:
-  /// Equals log(weight) - 0.5 * (log det(var) + mean*mean*inv(var))
+  /// Equals log(weight) - 0.5 * (log(2pi) + log det(var) + mean*mean*inv(var))
   torch::Tensor gconsts_;  // 1-d tensor, (nimx,)
   bool valid_gconsts_;     ///< Recompute gconsts_ if false
 

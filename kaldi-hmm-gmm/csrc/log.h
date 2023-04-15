@@ -45,6 +45,7 @@ class Logger {
     if (level_ == LogLevel::kError) {
       throw std::runtime_error(os_.str());
     }
+    fprintf(stderr, "%s\n", os_.str().c_str());
   }
 
  private:

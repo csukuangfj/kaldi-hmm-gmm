@@ -7,7 +7,8 @@ Welcome to kaldi-hmm-gmm's documentation!
 =========================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 5
    :caption: Contents:
 
+   ./tutorials/index
    ./python-api/index

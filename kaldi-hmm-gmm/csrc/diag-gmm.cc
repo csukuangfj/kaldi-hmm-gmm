@@ -53,7 +53,7 @@ void DiagGmm::Resize(int32_t nmix, int32_t dim) {
 }
 
 void DiagGmm::CopyFromDiagGmm(const DiagGmm &diaggmm) {
-  Resize(diaggmm.weights_.numel(), diaggmm.means_invvars_.size(1));
+  Resize(diaggmm.NumGauss(), diaggmm.Dim());
 
   gconsts_ = diaggmm.gconsts_.clone();
   weights_ = diaggmm.weights_.clone();
@@ -517,7 +517,7 @@ void DiagGmm::Split(int32_t target_components, float perturb_factor,
   while (current_components < target_components) {
     float max_weight = weights_acc[0];
     int32_t max_idx = 0;
-    for (int32_t i = 1; i < current_components; i++) {
+    for (int32_t i = 1; i < current_components; ++i) {
       if (weights_acc[i] > max_weight) {
         max_weight = weights_acc[i];
         max_idx = i;
@@ -534,7 +534,8 @@ void DiagGmm::Split(int32_t target_components, float perturb_factor,
     auto rand_vec_acc = rand_vec.accessor<float, 1>();
     auto inv_vars_acc = inv_vars_.accessor<float, 2>();
 
-    for (int32_t i = 0; i < dim; i++) {
+    // TODO(fangjun): Replace the for loop with tensor operations
+    for (int32_t i = 0; i < dim; ++i) {
       rand_vec_acc[i] = torch::randn({1}, torch::kFloat).item().toFloat() *
                         std::sqrt(inv_vars_acc[max_idx][i]);
       // note, this looks wrong but is really right because it's the
@@ -553,7 +554,7 @@ void DiagGmm::Split(int32_t target_components, float perturb_factor,
     means_invvars_.slice(0, max_idx, max_idx + 1)
         .add_(rand_vec, /*alpha*/ -perturb_factor);
 
-    current_components++;
+    ++current_components;
   }
   ComputeGconsts();
 }
@@ -901,8 +902,8 @@ void DiagGmm::RemoveComponent(int32_t gauss, bool renorm_weights) {
     ++n;
   }
 
-  float sum_weights = new_weights.sum().item().toFloat();
   if (renorm_weights) {
+    float sum_weights = new_weights.sum().item().toFloat();
     new_weights.mul_(1.0 / sum_weights);
     valid_gconsts_ = false;
   }

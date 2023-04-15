@@ -119,13 +119,13 @@ void PybindDiagGmm(py::module *m) {
            py::arg("source"), py::arg("flags") = kGmmAll)
       .def("remove_component", &PyClass::RemoveComponent, py::arg("gauss"),
            py::arg("renorm_weights"))
-      .def("remove_components", &PyClass::RemoveComponent, py::arg("gauss"),
+      .def("remove_components", &PyClass::RemoveComponents, py::arg("gauss"),
            py::arg("renorm_weights"))
       .def("set_weights", &PyClass::SetWeights, py::arg("w"))
       .def("set_means", &PyClass::SetMeans, py::arg("m"))
-      .def("set_inv_vars_and_means", &PyClass::SetInvVarsAndMeans,
+      .def("set_invvars_and_means", &PyClass::SetInvVarsAndMeans,
            py::arg("inv_vars"), py::arg("means"))
-      .def("set_inv_vars", &PyClass::SetInvVars, py::arg("inv_vars"))
+      .def("set_invvars", &PyClass::SetInvVars, py::arg("inv_vars"))
       .def("set_component_mean", &PyClass::SetComponentMean, py::arg("gauss"),
            py::arg("mean"))
       .def("set_component_inv_var", &PyClass::SetComponentInvVar,
