@@ -148,9 +148,9 @@ float GaussClusterable::Objf() const {
   } else {
     int32_t dim = stats_.size(1);
     torch::Tensor vars = torch::empty({dim}, torch::kDouble);
-    auto vars_acc = vars.accessor<float, 1>();
+    auto vars_acc = vars.accessor<double, 1>();
 
-    auto stats_acc = stats_.accessor<float, 2>();
+    auto stats_acc = stats_.accessor<double, 2>();
 
     // TODO(fangjun): Use tensor operations to replace the for loop
     double objf_per_frame = 0.0;
@@ -168,6 +168,7 @@ float GaussClusterable::Objf() const {
       KHG_WARN << "GaussClusterable::Objf(), objf is NaN";
       return 0.0;
     }
+
     return objf_per_frame * count_;
   }
 }

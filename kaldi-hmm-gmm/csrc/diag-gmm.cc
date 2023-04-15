@@ -797,7 +797,7 @@ void DiagGmm::MergeKmeans(
   std::vector<Clusterable *> clusterable_vec;
 
   auto weights_acc = weights_.accessor<float, 1>();
-  for (int32_t g = 0; g < NumGauss(); g++) {
+  for (int32_t g = 0; g < NumGauss(); ++g) {
     if (weights_acc[g] == 0) {
       KHG_WARN << "Not using zero-weight Gaussians in clustering.";
       continue;
@@ -807,12 +807,12 @@ void DiagGmm::MergeKmeans(
     torch::Tensor var = 1.0f / Row(inv_vars_, g);
     torch::Tensor mean_invvar = Row(means_invvars_, g);
 
-    torch::Tensor x_stats = mean_invvar * var;
+    torch::Tensor x_stats = mean_invvar.mul(var);
     torch::Tensor x2_stats = (var + x_stats.square()) * count;
     x_stats.mul_(count);
 
-    clusterable_vec.push_back(
-        new GaussClusterable(x_stats, x2_stats, min_var, count));
+    clusterable_vec.push_back(new GaussClusterable(
+        x_stats.squeeze(0), x2_stats.squeeze(0), min_var, count));
   }
 
   if (clusterable_vec.size() <= target_components) {

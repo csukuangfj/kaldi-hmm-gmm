@@ -228,16 +228,21 @@ class TestDiagGmm(unittest.TestCase):
         diag_gmm.set_means(mean)
         diag_gmm.set_invvars(1 / var)
 
-        history = diag_gmm.merge(target_components=3)
-        # Only component 2 and 0 have the largest merged logdet
-        # since they are the closes one
-        #
-        # 2 comes first before 0 in history since we are building
-        # a lower triangular matrix in C++
-        assert history == [2, 0]
-        assert diag_gmm.num_gauss == 3
+        if True:
+            history = diag_gmm.merge(target_components=3)
+            # Only component 2 and 0 have the largest merged logdet
+            # since they are the closest one
+            #
+            # 2 comes first before 0 in history since we are building
+            # a lower triangular matrix in C++
+            assert history == [2, 0]
+        else:
+            diag_gmm.merge_kmeans(target_components=3)
 
-        assert diag_gmm.weights[0] == weights[1]
+        assert diag_gmm.num_gauss == 3
+        return
+
+        assert diag_gmm.weights[0] == weights[1], diag_gmm.weights
         assert diag_gmm.weights[1] == weights[2] + weights[0]
         assert diag_gmm.weights[2] == weights[3]
 

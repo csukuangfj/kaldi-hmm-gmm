@@ -21,6 +21,7 @@ target_link_libraries(kaldi-hmm-gmm-core PUBLIC ${TORCH_LIBRARIES})
 
 if(KHG_ENABLE_TESTS)
   set(test_srcs
+    diag-gmm-test.cc
     event-map-test.cc
   )
 

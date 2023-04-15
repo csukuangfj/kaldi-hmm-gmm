@@ -308,8 +308,10 @@ static float RefineClusters(const std::vector<Clusterable *> &points,
   KHG_ASSERT(!ContainsNullPointers(points) && !ContainsNullPointers(*clusters));
 
   RefineClusterer rc(points, clusters, assignments, cfg);
+  KHG_LOG << "refine started";
 
   float ans = rc.Refine();
+  KHG_LOG << "refine done";
   KHG_ASSERT(!ContainsNullPointers(*clusters));
 
   return ans;
@@ -393,6 +395,7 @@ float ClusterKMeansOnce(const std::vector<Clusterable *> &points,
     delete all_stats;
   }
   for (int32_t iter = 0; iter < cfg.num_iters; ++iter) {
+    KHG_LOG << "iter: " << iter;
     // Keep refining clusters by reassigning points.
     float objf_before;
     if (cfg.verbose) objf_before = SumClusterableObjf(*clusters_out);

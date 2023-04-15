@@ -66,9 +66,12 @@ class GaussClusterable : public Clusterable {
   void Scale(float f) override;
 
   float count() const { return count_; }
-  // The next two functions are not const-correct, because of SubVector.
-  torch::Tensor x_stats() const { return Row(stats_, 0); }
-  torch::Tensor x2_stats() const { return Row(stats_, 1); }
+
+  // Return a 1-D tensor
+  torch::Tensor x_stats() const { return Row(stats_, 0).squeeze(0); }
+
+  // Return a 1-D tensor
+  torch::Tensor x2_stats() const { return Row(stats_, 1).squeeze(0); }
 
  private:
   double count_;
