@@ -249,7 +249,7 @@ float DiagGmm::GaussianSelection(const torch::Tensor &data,  // 1-D tensor
 
   float thresh;
   if (num_gselect < num_gauss) {
-    torch::Tensor loglikes_copy = loglikes.clone();
+    torch::Tensor loglikes_copy = loglikes.clone().contiguous();
     float *ptr = loglikes_copy.data_ptr<float>();
     std::nth_element(ptr, ptr + num_gauss - num_gselect, ptr + num_gauss);
     thresh = ptr[num_gauss - num_gselect];
@@ -261,7 +261,7 @@ float DiagGmm::GaussianSelection(const torch::Tensor &data,  // 1-D tensor
   auto loglikes_acc = loglikes.accessor<float, 1>();
 
   std::vector<std::pair<float, int32_t>> pairs;
-  for (int32_t p = 0; p < num_gauss; p++) {
+  for (int32_t p = 0; p < num_gauss; ++p) {
     if (loglikes_acc[p] >= thresh) {
       pairs.push_back(std::make_pair(loglikes_acc[p], p));
     }
@@ -270,7 +270,7 @@ float DiagGmm::GaussianSelection(const torch::Tensor &data,  // 1-D tensor
             std::greater<std::pair<float, int32_t>>());
 
   for (int32_t j = 0; j < num_gselect && j < static_cast<int32_t>(pairs.size());
-       j++) {
+       ++j) {
     output->push_back(pairs[j].second);
     tot_loglike = LogAdd(tot_loglike, pairs[j].first);
   }
@@ -319,7 +319,7 @@ float DiagGmm::GaussianSelection(
   output->resize(num_frames);
 
   for (int32_t i = 0; i < num_frames; i++) {
-    torch::Tensor loglikes = loglikes_mat.slice(0, i, i + 1);
+    torch::Tensor loglikes = loglikes_mat.slice(0, i, i + 1).squeeze(0);
 
     float thresh;
     if (num_gselect < num_gauss) {
@@ -344,7 +344,7 @@ float DiagGmm::GaussianSelection(
               std::greater<std::pair<float, int32_t>>());
     std::vector<int32_t> &this_output = (*output)[i];
     for (int32_t j = 0;
-         j < num_gselect && j < static_cast<int32_t>(pairs.size()); j++) {
+         j < num_gselect && j < static_cast<int32_t>(pairs.size()); ++j) {
       this_output.push_back(pairs[j].second);
       tot_loglike = LogAdd(tot_loglike, pairs[j].first);
     }
@@ -363,7 +363,7 @@ float DiagGmm::GaussianSelectionPreselect(const torch::Tensor &data,
   int32_t this_num_gselect = std::min(num_gselect, preselect_sz);
   if (preselect_sz <= num_gselect && !warned_size) {
     warned_size = true;
-    KHG_WARN << "Preselect size is less or equal to than final size, "
+    KHG_WARN << "Preselect size is less than or equal to final size, "
              << "doing nothing: " << preselect_sz << " < " << num_gselect
              << " [won't warn again]";
   }
@@ -416,7 +416,7 @@ float DiagGmm::ComponentPosteriors(const torch::Tensor &data,  // 1-D
   LogLikelihoods(data, &loglikes);
 
   torch::Tensor likes = loglikes.softmax(0);
-  float log_sum = likes.sum().log().item().toFloat();
+  float log_sum = loglikes.logsumexp(/*dim*/ 0).item().toFloat();
 
   if (KALDI_ISNAN(log_sum) || KALDI_ISINF(log_sum)) {
     KHG_ERR << "Invalid answer (overflow or invalid variances/features?)";

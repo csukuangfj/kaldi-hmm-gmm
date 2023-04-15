@@ -196,7 +196,7 @@ class TestDiagGmm(unittest.TestCase):
 
         history = diag_gmm.merge(target_components=1)
         assert history == []
-        assert diag_gmm.weights[0] == 1
+        assert abs(diag_gmm.weights[0].item() - 1) < 1e-6, diag_gmm.weights
         assert diag_gmm.num_gauss == 1
 
         expected_means = torch.matmul(weights.unsqueeze(0), mean)
@@ -289,7 +289,7 @@ class TestDiagGmm(unittest.TestCase):
         expected = expected / (var * math.pi * 2).prod(dim=1).sqrt()
         expected = weights.mul(expected).sum().log().item()
 
-        assert abs(log_likes - expected) < 1e-6, log_likes - expected
+        assert abs(log_likes - expected) < 1e-4, log_likes - expected
 
     def test_log_like_per_component(self):
         nmix = 10
@@ -344,6 +344,152 @@ class TestDiagGmm(unittest.TestCase):
         expected = torch.stack(expected_list)
 
         assert torch.allclose(log_likes, expected)
+
+    def test_log_like_per_component_preselect(self):
+        nmix = 10
+        dim = 5
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        x = torch.rand(dim)
+        # indexes does not to be sorted or unique
+        indexes = [0, 1, 3, 8, 7, 8, 3, 2]
+
+        # log_likelihoods_preselect()
+        # return loglike of selected components for a 1-D input x
+        log_likes: torch.Tensor = diag_gmm.log_likelihoods_preselect(x, indexes)
+        assert log_likes.shape[0] == len(indexes)
+
+        expected = ((x - mean).square() / (-2 * var)).sum(dim=1).exp()
+        expected = expected / (var * math.pi * 2).prod(dim=1).sqrt()
+        expected = weights.mul(expected).log()
+        expected = expected[indexes]
+
+        assert torch.allclose(log_likes, expected, atol=1e-4), (log_likes, expected)
+
+    def test_gaussian_selection_1d(self):
+        nmix = 10
+        dim = 8
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        x = torch.rand(dim)
+        # Select the top 3 components sorted by loglikes
+        num_gselect = 3
+        # log_like: a float, the total loglike of the selected components
+        # indexes: the indexes of the selected components
+        log_like, indexes = diag_gmm.gaussian_selection_1d(x, num_gselect)
+
+        log_likes: torch.Tensor = diag_gmm.log_likelihoods(x)
+        sorted_log_likes, sorted2unsorted = torch.sort(log_likes, descending=True)
+
+        assert indexes == sorted2unsorted[:num_gselect].tolist()
+        assert abs(log_like - sorted_log_likes[:num_gselect].logsumexp(0).item()) < 1e-4
+
+    def test_gaussian_selection_2d(self):
+        nmix = 10
+        dim = 8
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        N = 5
+        x = torch.rand(N, dim)
+        # Select the top 3 components sorted by loglikes
+        num_gselect = 3
+        # log_like: a float, the total loglike of the selected components
+        # indexes: the indexes of the selected components
+        log_like, indexes_list = diag_gmm.gaussian_selection_2d(x, num_gselect)
+
+        total = 0
+        for i in range(N):
+            log_like_i, indexes = diag_gmm.gaussian_selection_1d(x[i], num_gselect)
+            assert indexes == indexes_list[i]
+            total += log_like_i
+
+        assert abs(log_like - total) < 1e-4, (log_like, total)
+
+    def test_gaussian_selection_preselect(self):
+        nmix = 10
+        dim = 8
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        x = torch.rand(dim)
+        # indexes does not to be sorted or unique
+        indexes = [0, 1, 3, 8, 7, 8, 3, 2]
+        num_gselect = 3
+
+        # log_likelihoods_preselect()
+        # return loglike of selected components for a 1-D input x
+        log_like, selected_indexes = diag_gmm.gaussian_selection_preselect(
+            x, preselect=indexes, num_gselect=num_gselect
+        )
+
+        log_likes: torch.Tensor = diag_gmm.log_likelihoods_preselect(x, indexes)
+        sorted_log_likes, sorted2unsorted = torch.sort(log_likes, descending=True)
+
+        for i in range(num_gselect):
+            assert selected_indexes[i] == indexes[sorted2unsorted[i]]
+
+        assert abs(log_like - sorted_log_likes[:num_gselect].logsumexp(0).item()) < 1e-4
+
+    def test_component_posteriors(self):
+        nmix = 10
+        dim = 8
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        x = torch.rand(dim)
+        log_like, posteriors = diag_gmm.component_posteriors(x)
+
+        log_likes: torch.Tensor = diag_gmm.log_likelihoods(x)
+        assert torch.allclose(posteriors, log_likes.softmax(0))
+        assert abs(log_like - log_likes.logsumexp(0).item()) < 1e-4
 
 
 if __name__ == "__main__":

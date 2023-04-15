@@ -88,7 +88,7 @@ class DiagGmm {
                                const std::vector<int32_t> &indices,
                                torch::Tensor *loglikes) const;
 
-  /// Get gaussian selection information for one frame.  Returns log-like
+  /// Get gaussian selection information for one frame.  Returns log-like for
   /// this frame.  Output is the best "num_gselect" indices, sorted from best to
   /// worst likelihood.  If "num_gselect" > NumGauss(), sets it to NumGauss().
   ///
