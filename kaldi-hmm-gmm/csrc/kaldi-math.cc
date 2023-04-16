@@ -10,7 +10,7 @@
 #include "kaldi-hmm-gmm/csrc/kaldi-math.h"
 
 #include <cstdlib>
-#include <mutex>
+#include <mutex>  // NOLINT
 
 namespace khg {
 

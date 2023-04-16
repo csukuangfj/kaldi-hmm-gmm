@@ -7,6 +7,7 @@
 #include "kaldi-hmm-gmm/csrc/cluster-utils.h"
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/kaldi-math.h"
@@ -340,7 +341,7 @@ float ClusterKMeansOnce(const std::vector<Clusterable *> &points,
   // not empty on entry
   KHG_ASSERT(clusters_out->empty());
 
-  clusters_out->resize(num_clust, (Clusterable *)nullptr);
+  clusters_out->resize(num_clust, nullptr);
   assignments_out->resize(num_points);
 
   {  // This block assigns points to clusters.

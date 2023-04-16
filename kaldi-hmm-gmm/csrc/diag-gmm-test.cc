@@ -30,15 +30,7 @@ TEST(DiagGmm, Case1) {
   dgm.SetInvVars(1 / vars);
   dgm.ComputeGconsts();  // essential!!
 
-  dgm.MergeKmeans(3);  // TODO(fangjun): It aborts sometimes
-#if 0
-diag-gmm-test(47279,0x7ff85eb9c8c0) malloc: Incorrect checksum for freed object 0x7fd0318b4ac0: probably modified after being freed.
-Corrupt value: 0x200000003f25532e
-diag-gmm-test(47279,0x7ff85eb9c8c0) malloc: *** set a breakpoint in malloc_error_break to debug
-Abort trap: 6
-#endif
-
-  KHG_LOG << "done\n";
+  dgm.MergeKmeans(3);
 }
 
 }  // namespace khg
