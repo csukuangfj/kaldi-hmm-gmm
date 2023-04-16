@@ -2,13 +2,27 @@ function(download_kaldifst)
   include(FetchContent)
 
   set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.5.2.tar.gz")
+  set(kaldifst_URL2 "https://huggingface.co/csukuangfj/kaldi-hmm-gmm-cmake-deps/resolve/main/kaldifst-1.5.2.tar.gz")
   set(kaldifst_HASH "SHA256=b8036431aa896bdefdba49616db21576bda04f8bc5be74de43a0c3a910828b27")
 
-  # If you don't have access to the internet, please download it to your
-  # local drive and modify the following line according to your needs.
-  if(EXISTS "/Users/fangjun/Downloads/kaldifst-1.5.2.tar.gz")
-    set(kaldifst_URL  "file:///Users/fangjun/Downloads/kaldifst-1.5.2.tar.gz")
-  endif()
+  # If you don't have access to the Internet,
+  # please pre-download kaldi_native_io
+  set(possible_file_locations
+    $ENV{HOME}/Downloads/kaldifst-1.5.2.tar.gz
+    ${PROJECT_SOURCE_DIR}/kaldifst-1.5.2.tar.gz
+    ${PROJECT_BINARY_DIR}/kaldifst-1.5.2.tar.gz
+    /tmp/kaldifst-1.5.2.tar.gz
+    /star-fj/fangjun/download/github/kaldifst-1.5.2.tar.gz
+  )
+
+  foreach(f IN LISTS possible_file_locations)
+    if(EXISTS ${f})
+      set(kaldifst_URL  "${f}")
+      file(TO_CMAKE_PATH "${kaldifst_URL}" kaldifst_URL)
+      set(kaldifst_URL2)
+      break()
+    endif()
+  endforeach()
 
   set(KALDIFST_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   set(KALDIFST_BUILD_PYTHON OFF CACHE BOOL "" FORCE)
