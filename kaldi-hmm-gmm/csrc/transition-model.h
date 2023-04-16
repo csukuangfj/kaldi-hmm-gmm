@@ -35,6 +35,9 @@ class TransitionModel : public TransitionInformation {
   /// return reference to HMM-topology object.
   const HmmTopology &GetTopo() const { return topo_; }
 
+  /// Returns a sorted, unique list of phones.
+  const std::vector<int32_t> &GetPhones() const { return topo_.GetPhones(); }
+
   const std::vector<int32_t> &TransitionIdToPdfArray() const override;
 
   // return true if this trans_id corresponds to a self-loop.

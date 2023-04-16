@@ -13,12 +13,14 @@ set(srcs
   hmm-topology.cc
   kaldi-math.cc
   model-common.cc
+  training-graph-compiler.cc
   transition-model.cc
   tree-renderer.cc
 )
 add_library(kaldi-hmm-gmm-core ${srcs})
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldi_native_io_core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC fst)
+target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldifst_core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC ${TORCH_LIBRARIES})
 
 if(KHG_ENABLE_TESTS)

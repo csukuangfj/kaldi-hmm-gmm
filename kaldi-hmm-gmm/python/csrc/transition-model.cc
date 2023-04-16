@@ -14,7 +14,8 @@ void PybindTransitionModel(py::module *m) {
       .def(py::init<>())
       .def(py::init<const ContextDependencyInterface &, const HmmTopology &>(),
            py::arg("ctx_dep"), py::arg("hmm_topo"))
-      .def_property_readonly("topo", &PyClass::GetTopo);
+      .def_property_readonly("topo", &PyClass::GetTopo)
+      .def_property_readonly("phones", &PyClass::GetPhones);
 }
 
 }  // namespace khg
