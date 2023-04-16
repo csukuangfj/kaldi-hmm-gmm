@@ -53,9 +53,15 @@ class AmDiagGmm {
   // @param power  It is used to compute state_occs.pow(power)
   // @param min_count If the average of occupancy of gaussians in a pdf is less
   //                  than this number, then we won't split this pdf any more
-  void SplitByCount(torch::Tensor state_occs,  // 1-D tensor, torch::kFloat
-                    int32_t target_components, float perturb_factor,
-                    float power, float min_count);
+  void SplitByCount(torch::Tensor state_occs, int32_t target_components,
+                    float perturb_factor, float power, float min_count);
+
+  // In MergeByCount we use the "target_components" and "power"
+  // to work out targets for each state (according to power-of-occupancy rule),
+  // and any state over its target gets mixed down.  If some states
+  // were under their target, this may take the #Gauss below the target.
+  void MergeByCount(torch::Tensor state_occs,  // 1-D float tensor
+                    int32_t target_components, float power, float min_count);
 
  private:
   std::vector<DiagGmm *> densities_;

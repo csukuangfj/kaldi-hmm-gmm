@@ -87,4 +87,23 @@ void AmDiagGmm::SplitByCount(torch::Tensor state_occs,  // 1-D float tensor
           << gauss_at_start << " to " << NumGauss();
 }
 
+void AmDiagGmm::MergeByCount(torch::Tensor state_occs,
+                             int32_t target_components, float power,
+                             float min_count) {
+  int32_t gauss_at_start = NumGauss();
+  std::vector<int32_t> targets;
+  GetSplitTargets(state_occs, target_components, power, min_count, &targets);
+
+  for (int32_t i = 0; i < NumPdfs(); i++) {
+    if (targets[i] == 0) targets[i] = 1;  // can't merge below 1.
+    if (densities_[i]->NumGauss() > targets[i])
+      densities_[i]->Merge(targets[i]);
+  }
+
+  KHG_LOG << "Merged " << NumPdfs()
+          << " states with target = " << target_components
+          << ", power = " << power << " and min_count = " << min_count
+          << ", merged from " << gauss_at_start << " to " << NumGauss();
+}
+
 }  // namespace khg
