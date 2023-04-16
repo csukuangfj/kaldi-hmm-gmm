@@ -7,6 +7,7 @@ from _kaldi_hmm_gmm import (
     GmmUpdateFlags,
     HmmTopology,
     ScalarClusterable,
+    TransitionModel,
     draw_tree,
     monophone_context_dependency,
     monophone_context_dependency_shared,

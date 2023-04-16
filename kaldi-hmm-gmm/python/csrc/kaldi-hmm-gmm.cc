@@ -11,6 +11,8 @@
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/python/csrc/model-common.h"
+#include "kaldi-hmm-gmm/python/csrc/transition-information.h"
+#include "kaldi-hmm-gmm/python/csrc/transition-model.h"
 #include "kaldi-hmm-gmm/python/csrc/tree-renderer.h"
 #include "torch/torch.h"
 
@@ -29,6 +31,8 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindAmDiagGmm(&m);
 
   PybindHmmTopology(&m);
+  PybindTransitionInformation(&m);
+  PybindTransitionModel(&m);
 }
 
 }  // namespace khg
