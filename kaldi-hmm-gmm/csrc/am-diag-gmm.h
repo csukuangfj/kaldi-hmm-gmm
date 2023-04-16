@@ -67,6 +67,11 @@ class AmDiagGmm {
   /// over all PDFs that are "invalid" e.g. due to zero weights or variances.
   int32_t ComputeGconsts() const;
 
+  // @param pdf_index
+  // @param data 1-D float tensor
+  // @return Return the total loglike of the specified pdf
+  float LogLikelihood(int32_t pdf_index, torch::Tensor data) const;
+
  private:
   std::vector<DiagGmm *> densities_;
 

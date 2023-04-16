@@ -117,4 +117,8 @@ int32_t AmDiagGmm::ComputeGconsts() const {
   return num_bad;
 }
 
+float AmDiagGmm::LogLikelihood(int32_t pdf_index, torch::Tensor data) const {
+  return densities_[pdf_index]->LogLikelihood(data);
+}
+
 }  // namespace khg
