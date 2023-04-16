@@ -31,21 +31,23 @@ namespace khg {
 void DiagGmm::Resize(int32_t nmix, int32_t dim) {
   KHG_ASSERT(nmix > 0 && dim > 0);
 
-  if (gconsts_.size(0) != nmix) {
+  if (!gconsts_.defined() || gconsts_.size(0) != nmix) {
     gconsts_ = torch::empty({nmix}, torch::kFloat);
   }
 
-  if (weights_.size(0) != nmix) {
+  if (!weights_.defined() || weights_.size(0) != nmix) {
     weights_ = torch::empty({nmix}, torch::kFloat);
   }
 
-  if (inv_vars_.size(0) != nmix || inv_vars_.size(1) != dim) {
+  if (!inv_vars_.defined() || inv_vars_.size(0) != nmix ||
+      inv_vars_.size(1) != dim) {
     inv_vars_ = torch::full({nmix, dim}, 1.0f, torch::kFloat);
     // must be initialized to unit for case of calling SetMeans while having
     // covars/invcovars that are not set yet (i.e. zero)
   }
 
-  if (means_invvars_.size(0) != nmix || means_invvars_.size(1) != dim) {
+  if (!means_invvars_.defined() || means_invvars_.size(0) != nmix ||
+      means_invvars_.size(1) != dim) {
     means_invvars_ = torch::empty({nmix, dim}, torch::kFloat);
   }
 
@@ -53,8 +55,6 @@ void DiagGmm::Resize(int32_t nmix, int32_t dim) {
 }
 
 void DiagGmm::CopyFromDiagGmm(const DiagGmm &diaggmm) {
-  Resize(diaggmm.NumGauss(), diaggmm.Dim());
-
   gconsts_ = diaggmm.gconsts_.clone();
   weights_ = diaggmm.weights_.clone();
   inv_vars_ = diaggmm.inv_vars_.clone();
@@ -441,14 +441,19 @@ float DiagGmm::ComponentLogLikelihood(const torch::Tensor &data,  // 1-D
 
   // loglike =  means * inv(vars) * data.
   // loglike = VecVec(means_invvars_.Row(comp_id), data);
-  float loglike =
-      means_invvars_.slice(0, comp_id, comp_id + 1).dot(data).item().toFloat();
+  float loglike = means_invvars_.slice(0, comp_id, comp_id + 1)
+                      .squeeze(0)
+                      .dot(data)
+                      .item()
+                      .toFloat();
 
   // loglike += -0.5 * inv(vars) * data_sq.
   // loglike -= 0.5 * VecVec(inv_vars_.Row(comp_id), data_sq);
-  loglike -=
-      0.5 *
-      inv_vars_.slice(0, comp_id, comp_id + 1).dot(data_sq).item().toFloat();
+  loglike -= 0.5 * inv_vars_.slice(0, comp_id, comp_id + 1)
+                       .squeeze(0)
+                       .dot(data_sq)
+                       .item()
+                       .toFloat();
 
   return loglike + gconsts_.data_ptr<float>()[comp_id];
 }
@@ -473,15 +478,15 @@ void DiagGmm::Generate(torch::Tensor *output  // 1-D
 
   auto output_acc = output->accessor<float, 1>();
 
-  // TODO(fangjun): Use torch::rand()*mean + stddev to replace the following
+  // TODO(fangjun): Use torch::randn()*mean + stddev to replace the following
   // for loop
 
-  for (int32_t d = 0; d < inv_vars_.size(1); d++) {
+  for (int32_t d = 0; d < inv_vars_.size(1); ++d) {
     float stddev = 1.0 / sqrt(inv_vars_acc[i][d]),
           mean = means_invvars_acc[i][d] / inv_vars_acc[i][d];
 
     output_acc[d] =
-        mean + torch::rand({1}, torch::kFloat).item().toFloat() * stddev;
+        mean + torch::randn({1}, torch::kFloat).item().toFloat() * stddev;
   }
 }
 

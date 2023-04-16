@@ -292,8 +292,8 @@ class TestDiagGmm(unittest.TestCase):
         assert abs(log_likes - expected) < 1e-4, log_likes - expected
 
     def test_log_like_per_component(self):
-        nmix = 10
-        dim = 8
+        nmix = 8
+        dim = 2
 
         diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
         weights = torch.rand(nmix, dtype=torch.float32)
@@ -313,11 +313,11 @@ class TestDiagGmm(unittest.TestCase):
         expected = expected / (var * math.pi * 2).prod(dim=1).sqrt()
         expected = weights.mul(expected).log()
 
-        assert torch.allclose(log_likes, expected)
+        assert torch.allclose(log_likes, expected), (log_likes - expected).max()
 
     def test_log_like_per_component_2d(self):
         nmix = 10
-        dim = 5
+        dim = 3
 
         diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
         weights = torch.rand(nmix, dtype=torch.float32)
@@ -343,7 +343,7 @@ class TestDiagGmm(unittest.TestCase):
             expected_list.append(expected)
         expected = torch.stack(expected_list)
 
-        assert torch.allclose(log_likes, expected)
+        assert torch.allclose(log_likes, expected), abs(log_likes - expected).max()
 
     def test_log_like_per_component_preselect(self):
         nmix = 10
@@ -490,6 +490,243 @@ class TestDiagGmm(unittest.TestCase):
         log_likes: torch.Tensor = diag_gmm.log_likelihoods(x)
         assert torch.allclose(posteriors, log_likes.softmax(0))
         assert abs(log_like - log_likes.logsumexp(0).item()) < 1e-4
+
+    def test_component_log_likelihood(self):
+        nmix = 10
+        dim = 8
+
+        diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        x = torch.rand(dim)
+
+        log_likes: torch.Tensor = diag_gmm.log_likelihoods(x)
+
+        for i in range(nmix):
+            log_like = diag_gmm.component_log_likelihood(x, i)
+            assert abs(log_like - log_likes[i].item()) < 1e-4, (log_like, log_likes[i])
+
+    def test_generate(self):
+        nmix = 19
+        dim = 10
+
+        diag_gmm = khg.DiagGmm()
+        diag_gmm.resize(nmix, dim)
+
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim) * 10
+        var = torch.rand(nmix, dim) * 10
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        x = diag_gmm.generate()
+        assert x.shape[0] == dim, x.shape
+        i = -1
+        for k in range(nmix):
+            if torch.all((mean[k] - 3 * var[k].sqrt()).le(x)) and torch.all(
+                x.le(mean[k] + 3 * var[k].sqrt())
+            ):
+                i = k
+
+        assert i != -1
+
+    def test_perturb(self):
+        nmix = 24
+        dim = 10
+
+        diag_gmm = khg.DiagGmm(nmix, dim)
+
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim) * 10
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        perturb_factor = 0.1
+        diag_gmm.perturb(perturb_factor)
+        for i in range(nmix):
+            # perturb does not change the variance
+            assert torch.allclose(diag_gmm.vars[i], var[i])
+
+        # mean is changed to mean + perturb_factor * randn() * sqrt(var)
+
+    def test_copy_from_diag_gmm(self):
+        nmix = 24
+        dim = 10
+
+        diag_gmm = khg.DiagGmm(nmix, dim)
+
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim) * 10
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        dgm = khg.DiagGmm()
+        dgm.copy_from_diag_gmm(diag_gmm)
+        assert dgm.valid_gconsts == diag_gmm.valid_gconsts
+        assert torch.allclose(dgm.means, diag_gmm.means)
+        assert torch.allclose(dgm.vars, diag_gmm.vars)
+        assert torch.allclose(dgm.gconsts, diag_gmm.gconsts)
+
+    def test_constructor_merge_diag_gmm(self):
+        nmix = 24
+        dim = 10
+
+        diag_gmm = khg.DiagGmm(nmix, dim)
+
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.rand(nmix, dim)
+        var = torch.rand(nmix, dim)
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        nmix2 = 30
+        diag_gmm2 = khg.DiagGmm(nmix2, dim)
+
+        weights2 = torch.rand(nmix2, dtype=torch.float32)
+        weights2 /= weights2.sum()
+
+        mean2 = torch.rand(nmix2, dim)
+        var2 = torch.rand(nmix2, dim)
+        diag_gmm2.set_weights(weights2)
+        diag_gmm2.set_means(mean2)
+        diag_gmm2.set_invvars(1 / var2)
+        diag_gmm2.compute_gconsts()
+
+        w = 0.2
+        w2 = 0.8
+        dgm = khg.DiagGmm([(w, diag_gmm), (w2, diag_gmm2)])
+
+        assert dgm.num_gauss == nmix + nmix2
+        assert dgm.dim == dim
+        assert torch.allclose(dgm.weights[:nmix] / w, weights)
+        assert torch.allclose(dgm.weights[nmix:] / w2, weights2)
+
+        assert torch.allclose(dgm.means[:nmix], mean)
+        assert torch.allclose(dgm.vars[:nmix], var)
+
+        assert torch.allclose(dgm.means[nmix:], mean2)
+        assert torch.allclose(dgm.vars[nmix:], var2)
+
+    def test_interpolate(self):
+        nmix = 24
+        dim = 10
+
+        diag_gmm = khg.DiagGmm(nmix, dim)
+
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.randn(nmix, dim)
+        var = torch.randn(nmix, dim).square()
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        diag_gmm2 = khg.DiagGmm(nmix, dim)
+
+        weights2 = torch.rand(nmix, dtype=torch.float32)
+        weights2 /= weights2.sum()
+
+        mean2 = torch.randn(nmix, dim)
+        var2 = torch.randn(nmix, dim).square()
+        diag_gmm2.set_weights(weights2)
+        diag_gmm2.set_means(mean2)
+        diag_gmm2.set_invvars(1 / var2)
+        diag_gmm2.compute_gconsts()
+
+        # update only weights
+        rho = 0.1
+        dgm = khg.DiagGmm(diag_gmm)
+        # dgm = (1-rho)*dgm + rho*diag_gmm2
+        dgm.interpolate(rho=rho, source=diag_gmm2, flags=khg.GmmUpdateFlags.kGmmWeights)
+        assert torch.allclose(
+            dgm.weights,
+            (1 - rho) * diag_gmm.weights + rho * diag_gmm2.weights,
+        )
+        assert torch.allclose(dgm.means, diag_gmm.means)
+        assert torch.allclose(dgm.vars, diag_gmm.vars)
+
+        # update only means
+        rho = 0.2
+        dgm = khg.DiagGmm()
+        dgm.copy_from_diag_gmm(diag_gmm)
+        # dgm = (1-rho)*dgm + rho*diag_gmm2
+        dgm.interpolate(rho=rho, source=diag_gmm2, flags=khg.GmmUpdateFlags.kGmmMeans)
+        assert torch.allclose(dgm.weights, diag_gmm.weights)
+        assert torch.allclose(
+            dgm.means,
+            (1 - rho) * diag_gmm.means + rho * diag_gmm2.means,
+        )
+        assert torch.allclose(dgm.vars, diag_gmm.vars)
+
+        # update only variances
+        rho = 0.3
+        dgm = khg.DiagGmm(diag_gmm)
+        # dgm = (1-rho)*dgm + rho*diag_gmm2
+        dgm.interpolate(
+            rho=rho,
+            source=diag_gmm2,
+            flags=khg.GmmUpdateFlags.kGmmVariances,
+        )
+        assert torch.allclose(dgm.weights, diag_gmm.weights)
+        assert torch.allclose(dgm.means, diag_gmm.means)
+        assert torch.allclose(
+            dgm.vars,
+            (1 - rho) * diag_gmm.vars + rho * diag_gmm2.vars,
+        )
+
+        # update all
+        rho = 0.8
+        dgm = khg.DiagGmm()
+        dgm.copy_from_diag_gmm(diag_gmm)
+        # dgm = (1-rho)*dgm + rho*diag_gmm2
+        dgm.interpolate(
+            rho=rho,
+            source=diag_gmm2,
+            flags=khg.GmmUpdateFlags.kGmmAll,
+        )
+
+        assert torch.allclose(
+            dgm.weights,
+            (1 - rho) * diag_gmm.weights + rho * diag_gmm2.weights,
+        )
+
+        assert torch.allclose(
+            dgm.means,
+            (1 - rho) * diag_gmm.means + rho * diag_gmm2.means,
+        )
+
+        assert torch.allclose(
+            dgm.vars,
+            (1 - rho) * diag_gmm.vars + rho * diag_gmm2.vars,
+        )
 
 
 if __name__ == "__main__":

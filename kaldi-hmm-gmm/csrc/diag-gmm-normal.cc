@@ -26,21 +26,21 @@ void DiagGmmNormal::CopyToDiagGmm(DiagGmm *diaggmm, GmmFlagsType flags) const {
 
   DiagGmmNormal oldg(*diaggmm);
 
-  // weights_ is torch::kFloat; Converting it to kDouble will copy it
-  if (flags & kGmmWeights) diaggmm->weights_ = weights_.to(torch::kDouble);
+  // weights_ is torch::kDouble; Converting it to kFloat will copy it
+  if (flags & kGmmWeights) diaggmm->weights_ = weights_.to(torch::kFloat);
 
   if (flags & kGmmVariances) {
-    diaggmm->inv_vars_ = (1.0 / vars_).to(torch::kDouble);
+    diaggmm->inv_vars_ = (1.0 / vars_).to(torch::kFloat);
 
     // update the mean related natural part with the old mean, if necessary
     if (!(flags & kGmmMeans)) {
-      diaggmm->means_invvars_ = oldg.means_.to(torch::kDouble);
+      diaggmm->means_invvars_ = oldg.means_.to(torch::kFloat);
       diaggmm->means_invvars_.mul_(diaggmm->inv_vars_);
     }
   }
 
   if (flags & kGmmMeans) {
-    diaggmm->means_invvars_ = means_.to(torch::kDouble).mul(diaggmm->inv_vars_);
+    diaggmm->means_invvars_ = means_.to(torch::kFloat).mul(diaggmm->inv_vars_);
   }
 
   diaggmm->valid_gconsts_ = false;

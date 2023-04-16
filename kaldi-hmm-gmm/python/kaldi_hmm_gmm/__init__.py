@@ -10,4 +10,5 @@ from _kaldi_hmm_gmm import (
     sum_clusterable_normalizer,
     sum_clusterable,
     DiagGmm,
+    GmmUpdateFlags,
 )
