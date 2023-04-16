@@ -8,6 +8,7 @@
 #include "kaldi-hmm-gmm/csrc/am-diag-gmm.h"
 
 #include "kaldi-hmm-gmm/csrc/log.h"
+#include "kaldi-hmm-gmm/csrc/model-common.h"
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"
 namespace khg {
 
@@ -58,6 +59,32 @@ void AmDiagGmm::SplitPdf(int32_t pdf_index, int32_t target_components,
   KHG_ASSERT((static_cast<size_t>(pdf_index) < densities_.size()) &&
              (densities_[pdf_index] != nullptr));
   densities_[pdf_index]->Split(target_components, perturb_factor);
+}
+
+int32_t AmDiagGmm::NumGauss() const {
+  int32_t ans = 0;
+  for (size_t i = 0; i < densities_.size(); i++)
+    ans += densities_[i]->NumGauss();
+  return ans;
+}
+
+void AmDiagGmm::SplitByCount(torch::Tensor state_occs,  // 1-D float tensor
+                             int32_t target_components, float perturb_factor,
+                             float power, float min_count) {
+  int32_t gauss_at_start = NumGauss();
+  std::vector<int32_t> targets;
+  GetSplitTargets(state_occs, target_components, power, min_count, &targets);
+
+  for (int32_t i = 0; i < NumPdfs(); ++i) {
+    if (densities_[i]->NumGauss() < targets[i])
+      densities_[i]->Split(targets[i], perturb_factor);
+  }
+
+  KHG_LOG << "Split " << NumPdfs()
+          << " states with target = " << target_components
+          << ", power = " << power << ", perturb_factor = " << perturb_factor
+          << " and min_count = " << min_count << ", split #Gauss from "
+          << gauss_at_start << " to " << NumGauss();
 }
 
 }  // namespace khg
