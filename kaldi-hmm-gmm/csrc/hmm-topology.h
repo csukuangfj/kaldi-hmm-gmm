@@ -43,7 +43,6 @@ namespace khg {
  <State> 2 <PdfClass> 2
  <Transition> 2 0.5
  <Transition> 3 0.5
- <Final> 0.5
  </State>
  <State> 3
  </State>

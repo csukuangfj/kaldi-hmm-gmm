@@ -20,7 +20,7 @@ void PybindAmDiagGmm(py::module *m) {
       .def("add_pdf", &PyClass::AddPdf, py::arg("gmm"))
       .def("copy_from_am_diag_gmm", &PyClass::CopyFromAmDiagGmm,
            py::arg("other"))
-      .def("split_pdf", &PyClass::SplitPdf, py::arg("idx"),
+      .def("split_pdf", &PyClass::SplitPdf, py::arg("pdf_idx"),
            py::arg("target_components"), py::arg("perturb_factor"))
       .def("split_by_count", &PyClass::SplitByCount, py::arg("state_occs"),
            py::arg("target_components"), py::arg("perturb_factor"),

@@ -9,6 +9,7 @@
 #include "kaldi-hmm-gmm/python/csrc/clusterable-classes.h"
 #include "kaldi-hmm-gmm/python/csrc/context-dep.h"
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
+#include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/python/csrc/model-common.h"
 #include "kaldi-hmm-gmm/python/csrc/tree-renderer.h"
 #include "torch/torch.h"
@@ -26,6 +27,8 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindDiagGmm(&m);
 
   PybindAmDiagGmm(&m);
+
+  PybindHmmTopology(&m);
 }
 
 }  // namespace khg
