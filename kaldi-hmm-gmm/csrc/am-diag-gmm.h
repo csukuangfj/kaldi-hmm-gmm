@@ -74,6 +74,23 @@ class AmDiagGmm {
   // @return Return the total loglike of the specified pdf
   float LogLikelihood(int32_t pdf_index, torch::Tensor data) const;
 
+  DiagGmm &GetPdf(int32_t pdf_index);
+  const DiagGmm &GetPdf(int32_t pdf_index) const;
+
+  // @param pdf_index
+  // @param gauss
+  // @return Return a 1-D float tensor
+  torch::Tensor GetGaussianMean(int32_t pdf_index, int32_t gauss) const;
+
+  // @param pdf_index
+  // @param gauss
+  // @return Return a 1-D float tensor
+  torch::Tensor GetGaussianVariance(int32_t pdf_index, int32_t gauss) const;
+
+  /// Mutators
+  void SetGaussianMean(int32_t pdf_index, int32_t gauss_index,
+                       torch::Tensor in);  // 1-D float tensor
+
  private:
   std::vector<DiagGmm *> densities_;
 
