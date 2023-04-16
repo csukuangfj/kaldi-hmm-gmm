@@ -107,7 +107,8 @@ int32_t DiagGmm::ComputeGconsts() {
   int32_t num_bad = 0;
 
   // Resize if Gaussians have been removed during Update()
-  if (num_mix != static_cast<int32_t>(gconsts_.size(0))) {
+  if (!gconsts_.defined() ||
+      num_mix != static_cast<int32_t>(gconsts_.size(0))) {
     gconsts_ = torch::empty({num_mix}, torch::kFloat);
   }
 
@@ -832,6 +833,9 @@ void DiagGmm::MergeKmeans(
     ClusterKMeans(clusterable_vec, target_components, &clusters, nullptr, cfg);
 
     Resize(clusters.size(), Dim());
+
+    // need to re-init weights_acc since Resize() may change weights_
+    weights_acc = weights_.accessor<float, 1>();
     for (int32_t g = 0; g < static_cast<int32_t>(clusters.size()); ++g) {
       GaussClusterable *gc = static_cast<GaussClusterable *>(clusters[g]);
       weights_acc[g] = gc->count();

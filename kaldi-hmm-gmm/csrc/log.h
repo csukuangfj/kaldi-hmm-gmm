@@ -43,7 +43,8 @@ class Logger {
 
   ~Logger() noexcept(false) {
     if (level_ == LogLevel::kError) {
-      throw std::runtime_error(os_.str());
+      // throw std::runtime_error(os_.str());
+      abort();
     }
     fprintf(stderr, "%s\n", os_.str().c_str());
   }
@@ -55,7 +56,7 @@ class Logger {
 
 class Voidifier {
  public:
-  void operator&(const Logger &) const {}
+  void operator&(const Logger &)const {}
 };
 
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__) || \
