@@ -63,6 +63,10 @@ class AmDiagGmm {
   void MergeByCount(torch::Tensor state_occs,  // 1-D float tensor
                     int32_t target_components, float power, float min_count);
 
+  /// Sets the gconsts for all the PDFs. Returns the total number of Gaussians
+  /// over all PDFs that are "invalid" e.g. due to zero weights or variances.
+  int32_t ComputeGconsts() const;
+
  private:
   std::vector<DiagGmm *> densities_;
 

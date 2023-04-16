@@ -106,4 +106,15 @@ void AmDiagGmm::MergeByCount(torch::Tensor state_occs,
           << ", merged from " << gauss_at_start << " to " << NumGauss();
 }
 
+int32_t AmDiagGmm::ComputeGconsts() const {
+  int32_t num_bad = 0;
+  for (auto itr = densities_.begin(), end = densities_.end(); itr != end;
+       ++itr) {
+    num_bad += (*itr)->ComputeGconsts();
+  }
+  if (num_bad > 0) KHG_WARN << "Found " << num_bad << " Gaussian components.";
+
+  return num_bad;
+}
+
 }  // namespace khg
