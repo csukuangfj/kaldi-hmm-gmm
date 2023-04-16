@@ -4,6 +4,7 @@
 
 #include "kaldi-hmm-gmm/python/csrc/kaldi-hmm-gmm.h"
 
+#include "kaldi-hmm-gmm/python/csrc/am-diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/cluster-utils.h"
 #include "kaldi-hmm-gmm/python/csrc/clusterable-classes.h"
 #include "kaldi-hmm-gmm/python/csrc/context-dep.h"
@@ -23,6 +24,8 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindClusterUtils(&m);
   PybindClusterableClass(&m);
   PybindDiagGmm(&m);
+
+  PybindAmDiagGmm(&m);
 }
 
 }  // namespace khg

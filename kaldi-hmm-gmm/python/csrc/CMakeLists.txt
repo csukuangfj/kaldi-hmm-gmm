@@ -2,6 +2,7 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_definitions(-DTORCH_API_INCLUDE_EXTENSION_H)
 
 set(srcs
+  am-diag-gmm.cc
   cluster-utils.cc
   clusterable-classes.cc
   context-dep.cc
