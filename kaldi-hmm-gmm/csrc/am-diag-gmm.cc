@@ -53,4 +53,11 @@ void AmDiagGmm::CopyFromAmDiagGmm(const AmDiagGmm &other) {
   }
 }
 
+void AmDiagGmm::SplitPdf(int32_t pdf_index, int32_t target_components,
+                         float perturb_factor) {
+  KHG_ASSERT((static_cast<size_t>(pdf_index) < densities_.size()) &&
+             (densities_[pdf_index] != nullptr));
+  densities_[pdf_index]->Split(target_components, perturb_factor);
+}
+
 }  // namespace khg

@@ -36,6 +36,8 @@ class AmDiagGmm {
   /// Copies the parameters from another model. Allocates necessary memory.
   void CopyFromAmDiagGmm(const AmDiagGmm &other);
 
+  void SplitPdf(int32_t idx, int32_t target_components, float perturb_factor);
+
  private:
   std::vector<DiagGmm *> densities_;
 
