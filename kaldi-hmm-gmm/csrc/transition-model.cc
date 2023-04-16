@@ -1,6 +1,6 @@
 // kaldi-hmm-gmm/csrc/transition-model.cc
 //
-// Copyright (c)  2022  Xiaomi Corporation
+// Copyright (c)  2023  Xiaomi Corporation
 
 // this if is copied and modified from
 // kaldi/src/hmm/transition-model.cc
@@ -329,7 +329,7 @@ void TransitionModel::InitializeProbs() {
                  "probability [should remove that entry in the topology]";
     if (prob > 1.0)
       KHG_WARN << "TransitionModel::InitializeProbs, prob greater than one.";
-    log_probs_(trans_id) = std::logf(prob);
+    log_probs_(trans_id) = std::log(prob);
   }
   ComputeDerivedOfProbs();
 }
@@ -343,7 +343,7 @@ void TransitionModel::ComputeDerivedOfProbs() {
     if (tid == 0) {                            // no self-loop
       non_self_loop_log_probs_(tstate) = 0.0;  // log(1.0)
     } else {
-      float self_loop_prob = std::expf(GetTransitionLogProb(tid)),
+      float self_loop_prob = std::exp(GetTransitionLogProb(tid)),
             non_self_loop_prob = 1.0 - self_loop_prob;
       if (non_self_loop_prob <= 0.0) {
         KHG_WARN << "ComputeDerivedOfProbs(): non-self-loop prob is "
@@ -351,7 +351,7 @@ void TransitionModel::ComputeDerivedOfProbs() {
         non_self_loop_prob = 1.0e-10;  // just so we can continue...
       }
       non_self_loop_log_probs_(tstate) =
-          std::logf(non_self_loop_prob);  // will be negative.
+          std::log(non_self_loop_prob);  // will be negative.
     }
   }
 }

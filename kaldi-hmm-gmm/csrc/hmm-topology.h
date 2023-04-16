@@ -1,6 +1,6 @@
 // kaldi-hmm-gmm/csrc/hmm-topology.h
 //
-// Copyright (c)  2022  Xiaomi Corporation
+// Copyright (c)  2023  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_HMM_TOPOLOGY_H_
 #define KALDI_HMM_GMM_CSRC_HMM_TOPOLOGY_H_
 

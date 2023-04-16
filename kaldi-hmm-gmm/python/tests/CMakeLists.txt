@@ -17,7 +17,10 @@ endfunction()
 
 # please sort the files in alphabetic order
 set(py_test_files
+  test_diag_gmm.py
   test_draw_tree.py
+  test_gauss_clusterable.py
+  test_scalar_clusterable.py
 )
 
 foreach(source IN LISTS py_test_files)

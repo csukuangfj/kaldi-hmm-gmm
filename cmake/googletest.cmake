@@ -1,14 +1,28 @@
 function(download_googltest)
   include(FetchContent)
 
-  set(googletest_URL  "https://github.com/google/googletest/archive/release-1.12.1.tar.gz")
-  set(googletest_HASH "SHA256=81964fe578e9bd7c94dfdb09c8e4d6e6759e19967e397dbea48d1c10e45d0df2")
+  set(googletest_URL  "https://github.com/google/googletest/archive/refs/tags/v1.13.0.tar.gz")
+  set(googletest_URL2 "https://huggingface.co/csukuangfj/sherpa-cmake-deps/resolve/main/googletest-1.13.0.tar.gz")
+  set(googletest_HASH "SHA256=ad7fdba11ea011c1d925b3289cf4af2c66a352e18d4c7264392fead75e919363")
 
-  # If you don't have access to the internet, please download it to your
-  # local drive and modify the following line according to your needs.
-  if(EXISTS "/Users/fangjun/Downloads/googletest-release-1.12.1.tar.gz")
-    set(googletest_URL  "file:///Users/fangjun/Downloads/googletest-release-1.12.1.tar.gz")
-  endif()
+  # If you don't have access to the Internet,
+  # please pre-download googletest
+  set(possible_file_locations
+    $ENV{HOME}/Downloads/googletest-1.13.0.tar.gz
+    ${PROJECT_SOURCE_DIR}/googletest-1.13.0.tar.gz
+    ${PROJECT_BINARY_DIR}/googletest-1.13.0.tar.gz
+    /tmp/googletest-1.13.0.tar.gz
+    /star-fj/fangjun/download/github/googletest-1.13.0.tar.gz
+  )
+
+  foreach(f IN LISTS possible_file_locations)
+    if(EXISTS ${f})
+      set(googletest_URL  "${f}")
+      file(TO_CMAKE_PATH "${googletest_URL}" googletest_URL)
+      set(googletest_URL2)
+      break()
+    endif()
+  endforeach()
 
   set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
   set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
@@ -16,13 +30,15 @@ function(download_googltest)
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
   FetchContent_Declare(googletest
-    URL               ${googletest_URL}
+    URL
+      ${googletest_URL}
+      ${googletest_URL2}
     URL_HASH          ${googletest_HASH}
   )
 
   FetchContent_GetProperties(googletest)
   if(NOT googletest_POPULATED)
-    message(STATUS "Downloading googletest")
+    message(STATUS "Downloading googletest from ${googletest_URL}")
     FetchContent_Populate(googletest)
   endif()
   message(STATUS "googletest is downloaded to ${googletest_SOURCE_DIR}")
