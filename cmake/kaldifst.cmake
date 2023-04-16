@@ -5,15 +5,16 @@ function(download_kaldifst)
   set(kaldifst_URL2 "https://huggingface.co/csukuangfj/kaldi-hmm-gmm-cmake-deps/resolve/main/kaldifst-1.5.2.tar.gz")
   set(kaldifst_HASH "SHA256=b8036431aa896bdefdba49616db21576bda04f8bc5be74de43a0c3a910828b27")
 
-  # We will remove this branch "for-khg" to master later
-  set(kaldifst_URL "https://github.com/csukuangfj/kaldifst/archive/5dfcb2614d812f92074e5c712327e75d952cfaf4.zip")
-  set(kaldifst_HASH "SHA256=dbdec72a9c008c8b31a55ddd95dc4c6013a9af321bd6bc0328e0d3eca53dc893")
+  # We will merge the branch "for-khg" into master later
+  set(kaldifst_URL "https://github.com/csukuangfj/kaldifst/archive/33c8432047dfb538bf8ade7205cab88dba7f6049.zip")
+  set(kaldifst_URL2 "")
+  set(kaldifst_HASH "")
 
 
   # If you don't have access to the Internet,
   # please pre-download kaldi_native_io
   set(possible_file_locations
-    $ENV{HOME}/Downloads/kaldifst-5dfcb2614d812f92074e5c712327e75d952cfaf4.zip
+    $ENV{HOME}/Downloads/kaldifst-33c8432047dfb538bf8ade7205cab88dba7f6049.zip
 
     $ENV{HOME}/Downloads/kaldifst-1.5.2.tar.gz
     ${PROJECT_SOURCE_DIR}/kaldifst-1.5.2.tar.gz
