@@ -41,4 +41,16 @@ void AmDiagGmm::AddPdf(const DiagGmm &gmm) {
   densities_.push_back(gmm_ptr);
 }
 
+void AmDiagGmm::CopyFromAmDiagGmm(const AmDiagGmm &other) {
+  if (densities_.size() != 0) {
+    DeletePointers(&densities_);
+  }
+
+  densities_.resize(other.NumPdfs(), nullptr);
+  for (int32_t i = 0, end = densities_.size(); i < end; ++i) {
+    densities_[i] = new DiagGmm();
+    densities_[i]->CopyFromDiagGmm(*other.densities_[i]);
+  }
+}
+
 }  // namespace khg

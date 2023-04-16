@@ -25,11 +25,16 @@ class AmDiagGmm {
     return (densities_.size() > 0) ? densities_[0]->Dim() : 0;
   }
 
+  int32_t NumPdfs() const { return densities_.size(); }
+
   /// Initializes with a single "prototype" GMM.
   void Init(const DiagGmm &proto, int32_t num_pdfs);
 
   /// Adds a GMM to the model, and increments the total number of PDFs.
   void AddPdf(const DiagGmm &gmm);
+
+  /// Copies the parameters from another model. Allocates necessary memory.
+  void CopyFromAmDiagGmm(const AmDiagGmm &other);
 
  private:
   std::vector<DiagGmm *> densities_;
