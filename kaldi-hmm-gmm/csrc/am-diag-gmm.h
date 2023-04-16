@@ -29,6 +29,8 @@ class AmDiagGmm {
 
   int32_t NumGauss() const;
 
+  int32_t NumGaussInPdf(int32_t pdf_index) const;
+
   /// Initializes with a single "prototype" GMM.
   void Init(const DiagGmm &proto, int32_t num_pdfs);
 
