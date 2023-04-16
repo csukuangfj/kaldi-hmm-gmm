@@ -11,6 +11,7 @@ set(srcs
   diag-gmm.cc
   event-map.cc
   hmm-topology.cc
+  hmm-utils.cc
   kaldi-math.cc
   model-common.cc
   training-graph-compiler.cc

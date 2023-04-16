@@ -506,4 +506,17 @@ bool TransitionModel::IsFinal(int32_t trans_id) const {
           static_cast<int32_t>(entry.size()));
 }
 
+float TransitionModel::GetNonSelfLoopLogProb(int32_t trans_state) const {
+  KHG_ASSERT(trans_state != 0);
+  return non_self_loop_log_probs_(trans_state);
+}
+
+float TransitionModel::GetTransitionLogProbIgnoringSelfLoops(
+    int32_t trans_id) const {
+  KHG_ASSERT(trans_id != 0);
+  KHG_ASSERT(!IsSelfLoop(trans_id));
+  return log_probs_(trans_id) -
+         GetNonSelfLoopLogProb(TransitionIdToTransitionState(trans_id));
+}
+
 }  // namespace khg

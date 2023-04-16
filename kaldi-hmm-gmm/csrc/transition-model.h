@@ -60,6 +60,35 @@ class TransitionModel : public TransitionInformation {
   // that an unseen phone has the highest-numbered pdf, this might be different.
   int32_t NumPdfs() const override { return num_pdfs_; }
 
+  int32_t TupleToTransitionState(int32_t phone, int32_t hmm_state, int32_t pdf,
+                                 int32_t self_loop_pdf) const;
+
+  int32_t PairToTransitionId(int32_t trans_state, int32_t trans_index) const;
+
+  float GetTransitionLogProb(int32_t trans_id) const;
+
+  // The following functions are more specialized functions for getting
+  // transition probabilities, that are provided for convenience.
+
+  /// Returns the log-probability of a particular non-self-loop transition
+  /// after subtracting the probability mass of the self-loop and renormalizing;
+  /// will crash if called on a self-loop.  Specifically:
+  /// for non-self-loops it returns the log of (that prob divided by (1 minus
+  /// self-loop-prob-for-that-state)).
+  float GetTransitionLogProbIgnoringSelfLoops(int32_t trans_id) const;
+
+  /// Returns the log-prob of the non-self-loop probability
+  /// mass for this transition state. (you can get the self-loop prob, if a
+  /// self-loop exists, by calling
+  /// GetTransitionLogProb(SelfLoopOf(trans_state)).
+  float GetNonSelfLoopLogProb(int32_t trans_state) const;
+
+  // returns the self-loop transition-id, or zero if
+  // this state doesn't have a self-loop.
+  int32_t SelfLoopOf(int32_t trans_state) const;
+
+  int32_t TransitionIdToTransitionState(int32_t trans_id) const;
+
  private:
   // called from constructor.  initializes tuples_.
   void ComputeTuples(const ContextDependencyInterface &ctx_dep);
@@ -77,29 +106,16 @@ class TransitionModel : public TransitionInformation {
   // (currently just non_self_loop_log_probs_; called whenever log-probs change.
   void ComputeDerivedOfProbs();
 
-  // returns the self-loop transition-id, or zero if
-  // this state doesn't have a self-loop.
-  int32_t SelfLoopOf(int32_t trans_state) const;
-
-  int32_t PairToTransitionId(int32_t trans_state, int32_t trans_index) const;
-
   /// Returns the total number of transition-states (note, these are one-based).
   int32_t NumTransitionStates() const { return tuples_.size(); }
 
-  float GetTransitionLogProb(int32_t trans_id) const;
-
   void Check() const;
-
-  int32_t TransitionIdToTransitionState(int32_t trans_id) const;
 
   /// Returns the number of transition-indices for a particular
   /// transition-state. Note: "Indices" is the plural of "index".   Index is not
   /// the same as "id", here.  A transition-index is a zero-based offset into
   /// the transitions out of a particular transition state.
   int32_t NumTransitionIndices(int32_t trans_state) const;
-
-  int32_t TupleToTransitionState(int32_t phone, int32_t hmm_state, int32_t pdf,
-                                 int32_t self_loop_pdf) const;
 
   int32_t TransitionStateToSelfLoopPdf(int32_t trans_state) const;
 

@@ -52,6 +52,33 @@ class TrainingGraphCompiler {
 
   ~TrainingGraphCompiler() { delete lex_fst_; }
 
+  // This version creates an FST from the text and calls CompileGraph.
+  bool CompileGraphFromText(const std::vector<int32_t> &transcript,
+                            fst::VectorFst<fst::StdArc> *out_fst);
+
+  // CompileGraph compiles a single training graph its input is a
+  // weighted acceptor (G) at the word level, its output is HCLG.
+  // Note: G could actually be a transducer, it would also work.
+  // This function is not const for technical reasons involving the cache.
+  // if not for "table_compose" we could make it const.
+  bool CompileGraph(const fst::VectorFst<fst::StdArc> &word_grammar,
+                    fst::VectorFst<fst::StdArc> *out_fst);
+
+  // Same as `CompileGraph`, but uses an external LG fst.
+  bool CompileGraphFromLG(const fst::VectorFst<fst::StdArc> &phone2word_fst,
+                          fst::VectorFst<fst::StdArc> *out_fst);
+
+  // CompileGraphs allows you to compile a number of graphs at the same
+  // time.  This consumes more memory but is faster.
+  bool CompileGraphs(
+      const std::vector<const fst::VectorFst<fst::StdArc> *> &word_fsts,
+      std::vector<fst::VectorFst<fst::StdArc> *> *out_fsts);
+
+  // This function creates FSTs from the text and calls CompileGraphs.
+  bool CompileGraphsFromText(
+      const std::vector<std::vector<int32_t>> &word_grammar,
+      std::vector<fst::VectorFst<fst::StdArc> *> *out_fsts);
+
  private:
   const TransitionModel &trans_model_;
   const ContextDependency &ctx_dep_;
