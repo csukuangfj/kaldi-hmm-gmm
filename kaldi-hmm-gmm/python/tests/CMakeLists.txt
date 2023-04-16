@@ -17,9 +17,11 @@ endfunction()
 
 # please sort the files in alphabetic order
 set(py_test_files
+  test_am_diag_gmm.py
   test_diag_gmm.py
   test_draw_tree.py
   test_gauss_clusterable.py
+  test_hmm_topology.py
   test_scalar_clusterable.py
 )
 

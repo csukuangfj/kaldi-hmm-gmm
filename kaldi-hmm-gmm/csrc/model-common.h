@@ -7,6 +7,9 @@
 #ifndef KALDI_HMM_GMM_CSRC_MODEL_COMMON_H_
 #define KALDI_HMM_GMM_CSRC_MODEL_COMMON_H_
 #include <cstdint>
+#include <vector>
+
+#include "torch/script.h"
 
 namespace khg {
 
@@ -20,6 +23,20 @@ enum GmmUpdateFlags {
 
 typedef uint16_t GmmFlagsType;  ///< Bitwise OR of the above flags.
 
+/// Get Gaussian-mixture or substate-mixture splitting targets,
+/// according to a power rule (e.g. typically power = 0.2).
+/// Returns targets for number of mixture components (Gaussians,
+/// or sub-states), allocating the Gaussians or whatever according
+/// to a power of occupancy in order to achieve the total supplied
+/// "target".  During splitting we ensure that
+/// each Gaussian [or sub-state] would get a count of at least
+/// "min-count", assuming counts were evenly distributed between
+/// Gaussians in a state.
+/// The vector "targets" will be resized to the appropriate dimension;
+/// its value at input is ignored.
+void GetSplitTargets(torch::Tensor state_occs,  // 1-D float tensor
+                     int32_t target_components, float power, float min_count,
+                     std::vector<int32_t> *targets);
 }  // namespace khg
 
 #endif  // KALDI_HMM_GMM_CSRC_MODEL_COMMON_H_

@@ -2,6 +2,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 # Please keep the source files alphabetically sorted
 set(srcs
+  am-diag-gmm.cc
   build-tree-utils.cc
   cluster-utils.cc
   clusterable-classes.cc
@@ -11,6 +12,7 @@ set(srcs
   event-map.cc
   hmm-topology.cc
   kaldi-math.cc
+  model-common.cc
   transition-model.cc
   tree-renderer.cc
 )

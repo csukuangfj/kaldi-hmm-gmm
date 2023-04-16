@@ -9,9 +9,18 @@
 #include "kaldi_native_io/csrc/kaldi-io.h"
 namespace khg {
 
+static void PybindContextDependencyInterface(py::module *m) {
+  using PyClass = ContextDependencyInterface;
+  py::class_<PyClass>(*m, "ContextDependencyInterface")
+      .def_property_readonly("context_width", &PyClass::ContextWidth)
+      .def_property_readonly("central_position", &PyClass::CentralPosition)
+      .def_property_readonly("num_pdfs", &PyClass::NumPdfs);
+}
+
 void PybindContextDep(py::module *m) {
+  PybindContextDependencyInterface(m);
   using PyClass = ContextDependency;
-  py::class_<PyClass>(*m, "ContextDependency")
+  py::class_<PyClass, ContextDependencyInterface>(*m, "ContextDependency")
       .def(
           "write",
           [](const PyClass &self, bool binary, const std::string &filename) {
