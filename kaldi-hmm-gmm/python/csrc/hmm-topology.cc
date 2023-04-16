@@ -5,6 +5,8 @@
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
 
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"
 
