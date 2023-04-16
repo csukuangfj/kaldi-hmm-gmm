@@ -21,8 +21,15 @@ class AmDiagGmm {
   AmDiagGmm(const AmDiagGmm &) = delete;
   AmDiagGmm &operator=(const AmDiagGmm &) = delete;
 
+  int32_t Dim() const {
+    return (densities_.size() > 0) ? densities_[0]->Dim() : 0;
+  }
+
   /// Initializes with a single "prototype" GMM.
   void Init(const DiagGmm &proto, int32_t num_pdfs);
+
+  /// Adds a GMM to the model, and increments the total number of PDFs.
+  void AddPdf(const DiagGmm &gmm);
 
  private:
   std::vector<DiagGmm *> densities_;
