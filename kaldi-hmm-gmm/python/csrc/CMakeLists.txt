@@ -7,6 +7,7 @@ set(srcs
   clusterable-classes.cc
   context-dep.cc
   diag-gmm.cc
+  event-map.cc
   hmm-topology.cc
   kaldi-hmm-gmm.cc
   model-common.cc

@@ -9,6 +9,7 @@
 #include "kaldi-hmm-gmm/python/csrc/clusterable-classes.h"
 #include "kaldi-hmm-gmm/python/csrc/context-dep.h"
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
+#include "kaldi-hmm-gmm/python/csrc/event-map.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/python/csrc/model-common.h"
 #include "kaldi-hmm-gmm/python/csrc/transition-information.h"
@@ -22,6 +23,7 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   m.doc() = "pybind11 binding of kaldi-hmm-gmm";
   PybinTreeRenderer(&m);
   PybindContextDep(&m);
+  PybindEventMap(&m);
 
   PybindModelCommon(&m);
   PybindClusterUtils(&m);

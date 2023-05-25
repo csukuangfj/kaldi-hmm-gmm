@@ -18,6 +18,7 @@ endfunction()
 # please sort the files in alphabetic order
 set(py_test_files
   test_am_diag_gmm.py
+  test_const_event_map.py
   test_diag_gmm.py
   test_draw_tree.py
   test_gauss_clusterable.py

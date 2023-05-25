@@ -27,8 +27,38 @@ class TestHmmTopology(unittest.TestCase):
  <State> 3
  </State>
  </TopologyEntry>
+ <TopologyEntry>
+ <ForPhones> 10 </ForPhones>
+ <State> 0 <ForwardPdfClass> 0 <SelfLoopPdfClass> 1
+ <Transition> 0 0.5
+ <Transition> 1 0.25
+ <Transition> 2 0.25
+ </State>
+ <State> 1 <ForwardPdfClass> 2 <SelfLoopPdfClass> 3
+ <Transition> 1 0.5
+ <Transition> 2 0.25
+ <Transition> 3 0.25
+ </State>
+ <State> 2 <ForwardPdfClass> 4 <SelfLoopPdfClass> 5
+ <Transition> 2 0.5
+ <Transition> 3 0.25
+ <Transition> 4 0.25
+ </State>
+ <State> 3 <ForwardPdfClass> 6 <SelfLoopPdfClass> 7
+ <Transition> 3 0.5
+ <Transition> 4 0.25
+ <Transition> 5 0.25
+ </State>
+ <State> 4 <ForwardPdfClass> 8 <SelfLoopPdfClass> 9
+ <Transition> 4 0.5
+ <Transition> 5 0.5
+ </State>
+ <State> 5
+ </State>
+ </TopologyEntry>
  </Topology>
         """
+        # state3 has no pdf classes so it is a non-emitting state
         topo = khg.HmmTopology()
         topo.read(s)
         print(topo)
@@ -36,11 +66,24 @@ class TestHmmTopology(unittest.TestCase):
         t = topo.topology_for_phone(1)
         for i in t:
             print(i)
-        print(topo.num_pdf_classes(phone=1))
-        print(topo.get_phone_to_num_pdf_classes())
-        print(topo.min_length(phone=1))
-        print(topo.phones)
-        print(topo.is_hmm)
+        assert topo.num_pdf_classes(phone=1) == 3, topo.num_pdf_classes(phone=1)
+        assert topo.num_pdf_classes(phone=10) == 10, topo.num_pdf_classes(phone=10)
+        phone2num_pdf_classes = topo.get_phone_to_num_pdf_classes()
+        assert phone2num_pdf_classes[0] == -1  # 0 is reserved
+        assert phone2num_pdf_classes[9] == -1  # not exist
+        assert phone2num_pdf_classes[1:9] == [3] * 8
+        assert phone2num_pdf_classes[10] == 10
+
+        assert topo.min_length(phone=1) == 3, topo.min_length(phones=1)
+        assert topo.min_length(phone=10) == 3, topo.min_length(phones=10)
+        assert topo.phones == [1, 2, 3, 4, 5, 6, 7, 8, 10], topo.phone
+        assert topo.is_hmm is False  # topo for 10 is not HMM
+        dot = khg.draw_hmm_topology(topo, phone=1)
+        print(dot)
+        print("--------------------")
+
+        dot = khg.draw_hmm_topology(topo, phone=10)
+        print(dot)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 // kaldi-hmm-gmm/csrc/transition-information.h
 //
+// Copyright (c)  2021  NVIDIA (author: Daniel Galvez)
 // Copyright (c)  2022  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_TRANSITION_INFORMATION_H_
 #define KALDI_HMM_GMM_CSRC_TRANSITION_INFORMATION_H_
