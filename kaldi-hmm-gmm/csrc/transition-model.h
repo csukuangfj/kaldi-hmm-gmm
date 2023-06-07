@@ -46,8 +46,11 @@ class TransitionModel : public TransitionInformation {
   bool TransitionIdsEquivalent(int32_t trans_id1,
                                int32_t trans_id2) const override;
 
+  // return true if the hmm state corresponding to the given transition ID
+  // is the 0th state of the topology
   bool TransitionIdIsStartOfPhone(int32_t trans_id) const override;
 
+  // return the phone corresponding to the given transition id
   int32_t TransitionIdToPhone(int32_t trans_id) const override;
 
   bool IsFinal(int32_t trans_id)
@@ -60,9 +63,12 @@ class TransitionModel : public TransitionInformation {
   // that an unseen phone has the highest-numbered pdf, this might be different.
   int32_t NumPdfs() const override { return num_pdfs_; }
 
+  // will crash if no transition state matches the given four tuple
   int32_t TupleToTransitionState(int32_t phone, int32_t hmm_state, int32_t pdf,
                                  int32_t self_loop_pdf) const;
 
+  // Return the transition id given the transition state and the transition
+  // index.
   int32_t PairToTransitionId(int32_t trans_state, int32_t trans_index) const;
 
   float GetTransitionLogProb(int32_t trans_id) const;
@@ -133,8 +139,8 @@ class TransitionModel : public TransitionInformation {
   struct Tuple {
     int32_t phone;
     int32_t hmm_state;
-    int32_t forward_pdf;
-    int32_t self_loop_pdf;
+    int32_t forward_pdf;    // it is pdf id, not pdf class
+    int32_t self_loop_pdf;  // it is pdf id, not pdf class
     Tuple() = default;
 
     Tuple(int32_t phone, int32_t hmm_state, int32_t forward_pdf,
@@ -172,6 +178,10 @@ class TransitionModel : public TransitionInformation {
   /// the tuples are in sorted order which allows us to do the reverse mapping
   /// from tuple to transition state
   std::vector<Tuple> tuples_;
+  // Index of tuple_s plus 1 is called transition state
+  // transition state starts from 1
+  // transition id also starts from 1
+  // pdf id starts from 0
 
   HmmTopology topo_;
 
@@ -183,8 +193,11 @@ class TransitionModel : public TransitionInformation {
 
   /// For each transition-id, the corresponding transition
   /// state (indexed by transition-id).
+  /// Valid transition id starts from 1
   std::vector<int32_t> id2state_;
 
+  /// transition id to pdf id.
+  /// valid transition id starts from 1
   std::vector<int32_t> id2pdf_id_;
 
   /// This is actually one plus the highest-numbered pdf we ever got back from

@@ -257,7 +257,7 @@ void TransitionModel::ComputeDerived() {
   num_pdfs_ = 0;
   for (int32_t tstate = 1;
        tstate <= static_cast<int32_t>(tuples_.size() + 1);  // not a typo.
-       tstate++) {
+       ++tstate) {
     state2id_[tstate] = cur_transition_id;
     if (static_cast<size_t>(tstate) <= tuples_.size()) {
       int32_t phone = tuples_[tstate - 1].phone,

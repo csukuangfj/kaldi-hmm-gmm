@@ -26,6 +26,7 @@ set(py_test_files
   test_hmm_topology.py
   test_init_gmm_mono.py
   test_scalar_clusterable.py
+  test_transition_model.py
 )
 
 foreach(source IN LISTS py_test_files)
