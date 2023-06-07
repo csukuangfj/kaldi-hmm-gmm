@@ -23,13 +23,13 @@ EventMap *GetStubMap(int32_t P,
   {  // Checking inputs.
     KHG_ASSERT(!phone_sets.empty() && share_roots.size() == phone_sets.size());
     std::set<int32_t> all_phones;
-    for (size_t i = 0; i < phone_sets.size(); i++) {
+    for (size_t i = 0; i < phone_sets.size(); ++i) {
       KHG_ASSERT(IsSortedAndUniq(phone_sets[i]));
       KHG_ASSERT(!phone_sets[i].empty());
-      for (size_t j = 0; j < phone_sets[i].size(); j++) {
-        KHG_ASSERT(all_phones.count(phone_sets[i][j]) ==
-                   0);  // check not present.
-        all_phones.insert(phone_sets[i][j]);
+
+      for (auto p : phone_sets[i]) {
+        KHG_ASSERT(all_phones.count(p) == 0);  // check not present.
+        all_phones.insert(p);
       }
     }
   }
@@ -38,7 +38,7 @@ EventMap *GetStubMap(int32_t P,
 
   size_t max_set_size = 0;
   int32_t highest_numbered_phone = 0;
-  for (size_t i = 0; i < phone_sets.size(); i++) {
+  for (size_t i = 0; i < phone_sets.size(); ++i) {
     max_set_size = std::max(max_set_size, phone_sets[i].size());
     highest_numbered_phone =
         std::max(highest_numbered_phone,
@@ -52,7 +52,7 @@ EventMap *GetStubMap(int32_t P,
     } else {  // not sharing roots -> work out the length and return a
               // TableEventMap splitting on length.
       EventAnswerType max_len = 0;
-      for (size_t i = 0; i < phone_sets[0].size(); i++) {
+      for (size_t i = 0; i < phone_sets[0].size(); ++i) {
         EventAnswerType len;
         EventValueType phone = phone_sets[0][i];
         KHG_ASSERT(static_cast<size_t>(phone) < phone2num_pdf_classes.size());
@@ -80,7 +80,7 @@ EventMap *GetStubMap(int32_t P,
     // the part after the && checks that this would not contain a very sparse
     // vector.
     std::map<EventValueType, EventMap *> m;
-    for (size_t i = 0; i < phone_sets.size(); i++) {
+    for (size_t i = 0; i < phone_sets.size(); ++i) {
       std::vector<std::vector<int32_t>> phone_sets_tmp;
       phone_sets_tmp.push_back(phone_sets[i]);
       std::vector<bool> share_roots_tmp;

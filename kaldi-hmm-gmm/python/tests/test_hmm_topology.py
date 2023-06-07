@@ -7,7 +7,78 @@ import kaldi_hmm_gmm as khg
 
 
 class TestHmmTopology(unittest.TestCase):
-    def test(self):
+    def test_simple(self):
+        s = """
+ <Topology>
+ <TopologyEntry>
+ <ForPhones> 1 3 </ForPhones>
+ <State> 0 <PdfClass> 0
+ <Transition> 0 0.5
+ <Transition> 1 0.5
+ </State>
+ <State> 1 <PdfClass> 1
+ <Transition> 1 0.5
+ <Transition> 2 0.5
+ </State>
+ <State> 2 <PdfClass> 2
+ <Transition> 2 0.5
+ <Transition> 3 0.5
+ </State>
+ <State> 3
+ </State>
+ </TopologyEntry>
+ </Topology>
+        """
+        # state3 has no pdf classes so it is a non-emitting state
+        topo = khg.HmmTopology()
+        topo.read(s)
+
+        # We specified only PdfClass, so ForwardPdfClass = SelfLoopPdfClass = PdfClass,
+        # which means topo.is_hmm returns True
+        assert topo.is_hmm is True
+
+        topo.check()  # will crash if the given topo is invalid
+        # Actually, it is called in topo.read(s)
+
+        assert topo.phones == [1, 3], topo.phones
+
+        phone2num_pdf_classes: List[int] = topo.get_phone_to_num_pdf_classes()
+        # phone2num_pdf_classes is indexed by phones
+        assert phone2num_pdf_classes[0] == -1, phone2num_pdf_classes
+        assert phone2num_pdf_classes[1] == 3, phone2num_pdf_classes
+        assert phone2num_pdf_classes[2] == -1, phone2num_pdf_classes
+        assert phone2num_pdf_classes[3] == 3, phone2num_pdf_classes
+        assert len(phone2num_pdf_classes) == 4, phone2num_pdf_classes
+
+        phone_topo: List[khg.HmmState] = topo.topology_for_phone(1)
+
+        # phone_topo[0] is for state 0
+        assert phone_topo[0].forward_pdf_class == 0, phone_topo[0].forward_pdf_class
+        assert phone_topo[0].self_loop_pdf_class == 0, phone_topo[0].self_loop_pdf_class
+        phone_topo[0].transitions[0][0] == 0  # dst state, self loop
+        phone_topo[0].transitions[0][1] == 0.5  # transitions prob
+
+        phone_topo[0].transitions[1][0] == 1  # dst state, foward
+        phone_topo[0].transitions[1][1] == 0.5  # transtions prob
+
+        phone_topo[1].transitions[0][0] == 1  # dst state, self loop
+        phone_topo[1].transitions[0][1] == 0.5  # transtions prob
+
+        phone_topo[1].transitions[1][0] == 2  # dst state, forward
+        phone_topo[1].transitions[1][1] == 0.5  # transtions prob
+
+        phone_topo[2].transitions[0][0] == 3  # dst state, self loop
+        phone_topo[2].transitions[0][1] == 0.5  # transtions prob
+
+        phone_topo[2].transitions[0][0] == 4  # dst state, forward
+        phone_topo[2].transitions[0][1] == 0.5  # transtions prob
+
+        assert topo.num_pdf_classes(phone=1) == 3, topo.num_pdf_classes(phone=1)
+
+        # 0->1->2->3, the path length is 3
+        assert topo.min_length(phone=1) == 3
+
+    def test_non_hmm(self):
         s = """
  <Topology>
  <TopologyEntry>
@@ -61,11 +132,9 @@ class TestHmmTopology(unittest.TestCase):
         # state3 has no pdf classes so it is a non-emitting state
         topo = khg.HmmTopology()
         topo.read(s)
-        print(topo)
+        #  print(topo)
         topo.check()
-        t = topo.topology_for_phone(1)
-        for i in t:
-            print(i)
+
         assert topo.num_pdf_classes(phone=1) == 3, topo.num_pdf_classes(phone=1)
         assert topo.num_pdf_classes(phone=10) == 10, topo.num_pdf_classes(phone=10)
         phone2num_pdf_classes = topo.get_phone_to_num_pdf_classes()

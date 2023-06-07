@@ -54,7 +54,7 @@ static void MakeEvent(const std::string &qry, fst::SymbolTable *phone_syms,
 static std::string DrawTree(const std::string &phones_txt,
                             const std::string &tree, bool use_tooltips = false,
                             const std::string &qry = "") {
-  fst::SymbolTable *phones_symtab = NULL;
+  fst::SymbolTable *phones_symtab = nullptr;
   {
     std::ifstream is(phones_txt.c_str());
     phones_symtab = ::fst::SymbolTable::ReadText(is, phones_txt);
@@ -85,6 +85,8 @@ static std::string DrawTree(const std::string &phones_txt,
 void PybinTreeRenderer(py::module *m) {
   m->def("draw_tree", &DrawTree, py::arg("phones_txt"), py::arg("tree"),
          py::arg("use_tooltips") = false, py::arg("query") = "");
+  // query is of the form:
+  // pdf_class/context-phone-sym-1/context-phone-sym-2/context-phone-sym-N
 }
 
 }  // namespace khg

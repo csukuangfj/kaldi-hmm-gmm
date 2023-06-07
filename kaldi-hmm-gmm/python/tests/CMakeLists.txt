@@ -19,10 +19,12 @@ endfunction()
 set(py_test_files
   test_am_diag_gmm.py
   test_const_event_map.py
+  test_context_dep.py
   test_diag_gmm.py
   test_draw_tree.py
   test_gauss_clusterable.py
   test_hmm_topology.py
+  test_init_gmm_mono.py
   test_scalar_clusterable.py
 )
 
