@@ -1,1 +1,5 @@
 data
+*.pdf
+L_with_silence
+topo_non_silence
+topo_silence

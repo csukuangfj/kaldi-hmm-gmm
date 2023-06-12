@@ -15,8 +15,7 @@ are a r e
 <sil> SIL
 EOF
 
-cat > $lang_dir/phones.txt <<EOF
-SIL
+cat > $lang_dir/nonsilence_phones.txt <<EOF
 a
 e
 h
@@ -25,8 +24,6 @@ l
 o
 r
 EOF
-
-cat $lang_dir/phones.txt | grep -v SIL > $lang_dir/nonsilence_phones.txt
 
 echo SIL > $lang_dir/silence_phones.txt
 echo SIL > $lang_dir/optional_silence.txt
