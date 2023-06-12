@@ -33,7 +33,17 @@ def test_lexicon_from_word_phones():
     fst = make_lexicon_fst_with_silence(lexiconp=lexiconp_disambig, sil_phone="SIL")
     fst_dot = kaldifst.draw(fst, acceptor=False, portrait=True)
     source = graphviz.Source(fst_dot)
-    source.render("L_with_silence")
+    source.render(outfile="L_with_silence.svg")
+
+    kaldifst.add_self_loops(
+        fst,
+        isyms=[lexiconp_disambig.phone2id["#0"]],
+        osyms=[lexiconp_disambig.word2id["#0"]],
+    )
+    kaldifst.arcsort(fst, sort_type="olabel")
+    fst_dot = kaldifst.draw(fst, acceptor=False, portrait=True)
+    source = graphviz.Source(fst_dot)
+    source.render(outfile="L_with_silence_with_self_loops.svg")
 
     topo = generate_hmm_topo(
         non_sil_phones=lexiconp_disambig.get_non_sil_phone_ids(),
@@ -42,12 +52,10 @@ def test_lexicon_from_word_phones():
     topo_dot = khg.draw_hmm_topology(
         topo, phone=lexiconp_disambig.get_non_sil_phone_ids()[0]
     )
-    source = graphviz.Source(topo_dot)
-    source.render("topo_non_silence")
+    topo_dot.render(filename="topo_non_silence", format="pdf", cleanup=True)
 
     topo_dot = khg.draw_hmm_topology(topo, phone=lexiconp_disambig.get_sil_phone_id())
-    source = graphviz.Source(topo_dot)
-    source.render("topo_silence")
+    topo_dot.render(filename="topo_silence", format="pdf", cleanup=True)
 
 
 def main():
