@@ -30,10 +30,15 @@ def test_lexicon_from_word_phones():
     print(lexiconp_disambig.get_non_sil_phone_ids())
     print(lexiconp_disambig.get_sil_phone_id())
 
-    fst = make_lexicon_fst_with_silence(lexiconp=lexiconp_disambig, sil_phone="SIL")
-    fst_dot = kaldifst.draw(fst, acceptor=False, portrait=True)
-    source = graphviz.Source(fst_dot)
-    source.render(outfile="L_with_silence.svg")
+    # L_disambig.fst
+    fst = make_lexicon_fst_with_silence(
+        lexiconp=lexiconp_disambig,
+        sil_prob=0.5,
+        sil_phone="SIL",
+        sil_disambig=lexiconp_disambig.phone2id[
+            f"#{lexiconp_disambig._max_disambig + 1}"
+        ],
+    )
 
     kaldifst.add_self_loops(
         fst,
@@ -43,7 +48,20 @@ def test_lexicon_from_word_phones():
     kaldifst.arcsort(fst, sort_type="olabel")
     fst_dot = kaldifst.draw(fst, acceptor=False, portrait=True)
     source = graphviz.Source(fst_dot)
-    source.render(outfile="L_with_silence_with_self_loops.svg")
+    source.render(outfile="L_disambig.pdf")
+
+    # Now for fst without disambig symbols (used for training)
+    # L.fst
+    # Note: It does not invoke add_self_loops()
+    fst = make_lexicon_fst_with_silence(
+        lexiconp=lexiconp,
+        sil_prob=0.5,
+        sil_phone="SIL",
+    )
+    kaldifst.arcsort(fst, sort_type="olabel")
+    fst_dot = kaldifst.draw(fst, acceptor=False, portrait=True)
+    source = graphviz.Source(fst_dot)
+    source.render(outfile="L.pdf")
 
     topo = generate_hmm_topo(
         non_sil_phones=lexiconp_disambig.get_non_sil_phone_ids(),

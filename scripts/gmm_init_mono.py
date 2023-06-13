@@ -18,8 +18,7 @@ def gmm_init_mono(
       topo:
         The HMM topology.
       cuts:
-        The cutset used to compute the mean and variance for initializing
-        the Gaussians.
+        It's used to compute the mean and variance for initializing Gaussians.
       shared_phones:
         Optional. If not none, phones in the same sublist share the same pdfs
       perturb_factor:

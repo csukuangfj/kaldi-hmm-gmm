@@ -229,9 +229,7 @@ class Lexiconp:
             return self._phone2id
 
         if not hasattr(self, "_max_disambig"):
-            raise ValueError(
-                "Please call this property on the return value of add_lex_disambig"
-            )
+            self._max_disambig = 0
 
         phone_set = set()
         for _, _, phones in self:
@@ -246,7 +244,7 @@ class Lexiconp:
 
         kept_phone_list.sort()
         kept_phone_list.insert(0, "<eps>")
-        for i in range(self._max_disambig + 1):
+        for i in range(self._max_disambig + 2):
             kept_phone_list.append(f"#{i}")
 
         self._phone2id = {p: i for i, p in enumerate(kept_phone_list)}
@@ -314,6 +312,7 @@ def make_lexicon_fst_with_silence(
     lexiconp: Lexiconp,
     sil_prob: float = 0.5,
     sil_phone: str = "SIL",
+    sil_disambig: Optional[int] = None,
 ) -> kaldifst.StdVectorFst:
     phone2id = lexiconp.phone2id
     word2id = lexiconp.word2id
@@ -352,15 +351,37 @@ def make_lexicon_fst_with_silence(
         ),
     )
 
-    fst.add_arc(
-        state=sil_state,
-        arc=kaldifst.StdArc(
-            ilabel=phone2id[sil_phone],
-            olabel=0,
-            weight=0,
-            nextstate=loop_state,
-        ),
-    )
+    if sil_disambig is None:
+        fst.add_arc(
+            state=sil_state,
+            arc=kaldifst.StdArc(
+                ilabel=phone2id[sil_phone],
+                olabel=0,
+                weight=0,
+                nextstate=loop_state,
+            ),
+        )
+    else:
+        sil_disambig_state = fst.add_state()
+        fst.add_arc(
+            state=sil_state,
+            arc=kaldifst.StdArc(
+                ilabel=phone2id[sil_phone],
+                olabel=0,
+                weight=0,
+                nextstate=sil_disambig_state,
+            ),
+        )
+
+        fst.add_arc(
+            state=sil_disambig_state,
+            arc=kaldifst.StdArc(
+                ilabel=sil_disambig,
+                olabel=0,
+                weight=0,
+                nextstate=loop_state,
+            ),
+        )
 
     for word, prob, phones in lexiconp:
         phoneseq = phones.split()

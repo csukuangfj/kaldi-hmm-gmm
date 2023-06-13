@@ -40,6 +40,7 @@ def test_gmm_init_mono():
     print(transition_model)
     print(tree)
     print(am)
+    print("number of gaussians", am.num_gauss)
 
     with open("phones.txt", "w") as f:
         for p, i in lexiconp_disambig.phone2id.items():
