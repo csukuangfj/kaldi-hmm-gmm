@@ -39,6 +39,11 @@ class TestAmDiagGmm(unittest.TestCase):
         assert am.num_gauss_in_pdf(1) == nmix * 5
         assert am.num_gauss == nmix + nmix * 5
 
+        w = am.get_pdf(0).weights[0].item()
+        am.get_pdf(0).weights[0] += 0.25
+        w2 = am.get_pdf(0).weights[0].item()
+        assert abs(w2 - w - 0.25) < 1e-3, (w2, w, w2 - w)
+
 
 if __name__ == "__main__":
     torch.manual_seed(20230416)

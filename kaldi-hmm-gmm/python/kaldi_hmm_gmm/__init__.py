@@ -3,6 +3,7 @@ from _kaldi_hmm_gmm import (
     AmDiagGmm,
     Clusterable,
     ConstantEventMap,
+    ContextDependency,
     DiagGmm,
     EventMap,
     GaussClusterable,
@@ -17,4 +18,5 @@ from _kaldi_hmm_gmm import (
     sum_clusterable_normalizer,
     sum_clusterable_objf,
 )
+
 from .hmm_topo_utils import draw_hmm_topology
