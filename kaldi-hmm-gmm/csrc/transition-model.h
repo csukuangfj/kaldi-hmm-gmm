@@ -13,6 +13,7 @@
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/csrc/transition-information.h"
 #include "kaldi_native_io/csrc/kaldi-vector.h"
+#include "torch/script.h"
 
 namespace khg {
 
@@ -134,6 +135,11 @@ class TransitionModel : public TransitionInformation {
   int32_t TransitionIdToTransitionIndex(int32_t trans_id) const;
 
   int32_t TransitionIdToHmmState(int32_t trans_id) const;
+
+  // stats is a 1-D torch.kDouble tensor
+  void InitStats(torch::Tensor *stats) const {
+    *stats = torch::zeros({NumTransitionIds() + 1}, torch::kDouble);
+  }
 
  private:
   struct Tuple {

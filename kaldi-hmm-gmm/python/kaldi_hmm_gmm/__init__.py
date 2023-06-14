@@ -10,6 +10,8 @@ from _kaldi_hmm_gmm import (
     GmmUpdateFlags,
     HmmTopology,
     ScalarClusterable,
+    TrainingGraphCompiler,
+    TrainingGraphCompilerOptions,
     TransitionModel,
     draw_tree,
     monophone_context_dependency,

@@ -30,11 +30,21 @@ struct TrainingGraphCompilerOptions {
                         //
   explicit TrainingGraphCompilerOptions(float transition_scale = 1.0,
                                         float self_loop_scale = 1.0,
-                                        bool b = true)
+                                        bool reorder = true)
       : transition_scale(transition_scale),
         self_loop_scale(self_loop_scale),
         rm_eps(false),
-        reorder(b) {}
+        reorder(reorder) {}
+
+  std::string ToString() const {
+    std::ostringstream os;
+    os << "TrainingGraphCompilerOptions(";
+    os << "transition_scale=" << transition_scale << ", ";
+    os << "self_loop_scale=" << self_loop_scale << ", ";
+    os << "reorder=" << (reorder ? "True" : "False");
+    os << ")";
+    return os.str();
+  }
 };
 
 class TrainingGraphCompiler {

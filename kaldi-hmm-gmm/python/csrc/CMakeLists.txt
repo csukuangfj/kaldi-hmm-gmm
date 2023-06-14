@@ -11,6 +11,7 @@ set(srcs
   hmm-topology.cc
   kaldi-hmm-gmm.cc
   model-common.cc
+  training-graph-compiler.cc
   transition-information.cc
   transition-model.cc
   tree-renderer.cc
