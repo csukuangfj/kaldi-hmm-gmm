@@ -13,7 +13,7 @@ set(srcs
   hmm-topology.cc
   hmm-utils.cc
   kaldi-math.cc
-  # mle-am-diag-gmm.cc
+  mle-am-diag-gmm.cc
   mle-diag-gmm.cc
   model-common.cc
   training-graph-compiler.cc

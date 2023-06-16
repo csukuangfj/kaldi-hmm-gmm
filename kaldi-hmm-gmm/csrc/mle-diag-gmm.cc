@@ -155,7 +155,7 @@ void AccumDiagGmm::AddStatsForComponent(int32_t g, double occ,
   }
 }
 
-void AccumDiagGmm::Add(double scale, const AccumDiagGmm &acc) {
+void AccumDiagGmm::Add(float scale, const AccumDiagGmm &acc) {
   // The functions called here will crash if the dimensions etc.
   // or the flags don't match.
   occupancy_.add_(acc.occupancy_, /*alpha*/ scale);

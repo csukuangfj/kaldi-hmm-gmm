@@ -108,7 +108,7 @@ class AccumDiagGmm {
   /// @param data 1-D float tensor of shape (dim,)
   /// @param gauss_posteriors  1-D float tensor of shape (num_comp,)
   ///
-  /// occupancy_ += data
+  /// occupancy_ += posteriors
   /// mean_accumulator_ += gauss_posteriors.unsqueeze(1) * data
   /// variance_accumulator_ += gauss_posteriors.unsqueeze(1) * data.square()
   void AccumulateFromPosteriors(torch::Tensor data,
@@ -134,7 +134,7 @@ class AccumDiagGmm {
                             torch::Tensor x2_stats);
 
   /// Increment with stats from this other accumulator (times scale)
-  void Add(double scale, const AccumDiagGmm &acc);
+  void Add(float scale, const AccumDiagGmm &acc);
 
   /// Smooths the accumulated counts by adding 'tau' extra frames. An example
   /// use for this is I-smoothing for MMIE.   Calls SmoothWithAccum.
