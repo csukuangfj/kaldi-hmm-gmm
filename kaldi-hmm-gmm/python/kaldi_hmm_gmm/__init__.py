@@ -1,5 +1,6 @@
 import torch
 from _kaldi_hmm_gmm import (
+    AccumDiagGmm,
     AmDiagGmm,
     Clusterable,
     ConstantEventMap,
@@ -9,6 +10,8 @@ from _kaldi_hmm_gmm import (
     GaussClusterable,
     GmmUpdateFlags,
     HmmTopology,
+    MapDiagGmmOptions,
+    MleDiagGmmOptions,
     ScalarClusterable,
     TrainingGraphCompiler,
     TrainingGraphCompilerOptions,

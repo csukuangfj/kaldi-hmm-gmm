@@ -37,6 +37,11 @@ typedef uint16_t GmmFlagsType;  ///< Bitwise OR of the above flags.
 void GetSplitTargets(torch::Tensor state_occs,  // 1-D float tensor
                      int32_t target_components, float power, float min_count,
                      std::vector<int32_t> *targets);
+
+// Make sure that the flags make sense, i.e. if there is variance
+// accumulation that there is also mean accumulation
+GmmFlagsType AugmentGmmFlags(GmmFlagsType flags);
+
 }  // namespace khg
 
 #endif  // KALDI_HMM_GMM_CSRC_MODEL_COMMON_H_

@@ -70,4 +70,18 @@ void GetSplitTargets(torch::Tensor state_occs,  // 1-D float tensor
   }
 }
 
+GmmFlagsType AugmentGmmFlags(GmmFlagsType flags) {
+  KHG_ASSERT((flags & ~kGmmAll) ==
+             0);  // make sure only valid flags are present.
+  if (flags & kGmmVariances) flags |= kGmmMeans;
+  if (flags & kGmmMeans) flags |= kGmmWeights;
+  if (!(flags & kGmmWeights)) {
+    KHG_WARN << "Adding in kGmmWeights (\"w\") to empty flags.";
+    flags |= kGmmWeights;  // Just add this in regardless:
+    // if user wants no stats, this will stop programs from crashing due to dim
+    // mismatches.
+  }
+  return flags;
+}
+
 }  // namespace khg

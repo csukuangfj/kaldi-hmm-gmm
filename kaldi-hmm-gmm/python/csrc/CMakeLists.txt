@@ -10,6 +10,7 @@ set(srcs
   event-map.cc
   hmm-topology.cc
   kaldi-hmm-gmm.cc
+  mle-diag-gmm.cc
   model-common.cc
   training-graph-compiler.cc
   transition-information.cc

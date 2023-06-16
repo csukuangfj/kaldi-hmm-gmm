@@ -11,6 +11,7 @@
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/event-map.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
+#include "kaldi-hmm-gmm/python/csrc/mle-diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/model-common.h"
 #include "kaldi-hmm-gmm/python/csrc/training-graph-compiler.h"
 #include "kaldi-hmm-gmm/python/csrc/transition-information.h"
@@ -38,6 +39,7 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindTransitionModel(&m);
 
   PybindTrainingGraphCompiler(&m);
+  PybindMleDiagGmm(&m);
 }
 
 }  // namespace khg

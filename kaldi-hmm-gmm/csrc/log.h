@@ -5,6 +5,7 @@
 #ifndef KALDI_HMM_GMM_CSRC_LOG_H_
 #define KALDI_HMM_GMM_CSRC_LOG_H_
 
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
