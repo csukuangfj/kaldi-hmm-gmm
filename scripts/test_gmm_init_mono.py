@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 
+from pathlib import Path
+
+import graphviz
+import kaldi_hmm_gmm as khg
+import lhotse
+
 from gmm_init_mono import gmm_init_mono
 from prepare_lang import (
     Lexicon,
@@ -7,10 +13,6 @@ from prepare_lang import (
     generate_hmm_topo,
     make_lexicon_fst_with_silence,
 )
-from pathlib import Path
-import lhotse
-import kaldi_hmm_gmm as khg
-import graphviz
 
 
 def test_gmm_init_mono():

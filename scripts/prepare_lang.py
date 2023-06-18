@@ -521,7 +521,6 @@ def generate_hmm_topo(
         s += "</TopologyEntry>"
 
     topo = khg.HmmTopology()
-    print(s)
     topo.read(s)
 
     return topo
@@ -530,6 +529,9 @@ def generate_hmm_topo(
 def main():
     args = get_args()
     logging.info(vars(args))
+    assert (args.lang_dir / "lexicon.txt").is_file()
+
+    lexicon = Lexicon(lexicon_txt=args.lang_dir / "lexicon.txt")
 
 
 if __name__ == "__main__":

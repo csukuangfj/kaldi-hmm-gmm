@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+from pathlib import Path
+
+import graphviz
+import kaldi_hmm_gmm as khg
+import kaldifst
+import lhotse
+import torch
+
+from gmm_acc_stats_ali import gmm_acc_stats_ali
 from gmm_init_mono import gmm_init_mono
 from prepare_lang import (
     Lexicon,
@@ -6,14 +15,9 @@ from prepare_lang import (
     generate_hmm_topo,
     make_lexicon_fst_with_silence,
 )
-from pathlib import Path
-import lhotse
-import kaldi_hmm_gmm as khg
-import kaldifst
-import graphviz
 
 
-def test_training_graph_compiler():
+def test_gmm_acc_stats_ali():
     word2phones = {
         "foo": ["f o o", "f o o2"],
         "bar": ["b a r"],
@@ -58,40 +62,20 @@ def test_training_graph_compiler():
         disambig_syms=disambig_syms_ids,
         opts=opts,
     )
+
+    gmm_accs = khg.AccumAmDiagGmm()
+    gmm_accs.init(model=am, flags=khg.GmmUpdateFlags.kGmmAll)
+
     s = ["bar", "foo", "bark"]
     words = [lexiconp_disambig.word2id[w] for w in s]
     fst = gc.compile_graph_from_text(words)
 
-    phone2id = lexiconp_disambig.phone2id
-    id2phone = lexiconp_disambig.id2phone
-    isym = kaldifst.SymbolTable()
-    isym.add_symbol("<eps>", 0)
-    for i in range(1, transition_model.num_transition_ids + 1):
-        phone_id = transition_model.transition_id_to_phone(i)
-        isym.add_symbol(f"{id2phone[phone_id]}_{i-1}", i)
-    fst.input_symbols = isym
-
-    osym = kaldifst.SymbolTable()
-    for w, i in lexiconp_disambig.word2id.items():
-        osym.add_symbol(w, i)
-    fst.output_symbols = osym
-
-    fst_dot = kaldifst.draw(fst, acceptor=False, portrait=True)
-    source = graphviz.Source(fst_dot)
-    source.render(outfile="transcript.pdf", cleanup=True)
-
     # for align-equal-compiled
-    num_feature_frames = 100
+    num_feature_frames = cuts[0].load_features().shape[0]
     succeeded, aligned_fst = kaldifst.equal_align(
         ifst=fst, length=num_feature_frames, rand_seed=3, num_retries=10
     )
     assert succeeded is True
-    aligned_fst.input_symbols = isym
-    aligned_fst.output_symbols = osym
-
-    aligned_fst_dot = kaldifst.draw(aligned_fst, acceptor=False, portrait=True)
-    source = graphviz.Source(aligned_fst_dot)
-    source.render(outfile="aligned.pdf", cleanup=True)
 
     (
         succeeded,
@@ -105,9 +89,66 @@ def test_training_graph_compiler():
     assert [lexiconp_disambig.id2word[i] for i in osymbols_out] == s
     print(aligned_seq)
 
+    feats = torch.from_numpy(cuts[0].load_features())
+
+    # For the first call, transition_accs is set to None
+    log_like, transition_accs = gmm_acc_stats_ali(
+        am_gmm=am,
+        gmm_accs=gmm_accs,
+        transition_model=transition_model,
+        feats=feats,
+        ali=aligned_seq,
+        transition_accs=None,
+    )
+    assert transition_accs.sum() == feats.shape[0]
+    print(log_like, log_like / len(aligned_seq))
+
+    # for the second one
+
+    s = ["foo", "bar"]
+    words = [lexiconp_disambig.word2id[w] for w in s]
+    fst = gc.compile_graph_from_text(words)
+
+    # for align-equal-compiled
+    num_feature_frames = cuts[1].load_features().shape[0]
+    succeeded, aligned_fst = kaldifst.equal_align(
+        ifst=fst, length=num_feature_frames, rand_seed=3, num_retries=10
+    )
+    assert succeeded is True
+
+    (
+        succeeded,
+        aligned_seq,
+        osymbols_out,
+        total_weight,
+    ) = kaldifst.get_linear_symbol_sequence(aligned_fst)
+    assert succeeded is True
+    assert len(aligned_seq) == num_feature_frames
+    id2word = lexiconp_disambig.id2word
+    assert [lexiconp_disambig.id2word[i] for i in osymbols_out] == s
+    print(aligned_seq)
+
+    feats = torch.from_numpy(cuts[1].load_features())
+
+    # For the first call, transition_accs is set to None
+    log_like_2, transition_accs = gmm_acc_stats_ali(
+        am_gmm=am,
+        gmm_accs=gmm_accs,
+        transition_model=transition_model,
+        feats=feats,
+        ali=aligned_seq,
+        transition_accs=transition_accs,
+    )
+    assert (
+        transition_accs.sum()
+        == cuts[0].load_features().shape[0] + cuts[1].load_features().shape[0]
+    )
+    log_like += log_like_2
+    print(log_like, log_like / transition_accs.sum())
+
 
 def main():
-    test_training_graph_compiler()
+    test_gmm_acc_stats_ali()
 
 
 if __name__ == "__main__":
