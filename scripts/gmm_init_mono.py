@@ -25,11 +25,16 @@ def gmm_init_mono(
         If not zero, we perturb and mean of the resulting gaussians.
     """
     stats = cuts.compute_global_feature_stats()
+
+    # means is a 1-d tensor of (feature_dim,)
     means = stats["norm_means"]
+
+    # stddev is a 1-d tensor of (feat_dim,)
     stddev = stats["norm_stds"]
 
-    means = torch.from_numpy(means).reshape(1, -1)
-    variances = torch.from_numpy(stddev).square().reshape(1, -1)
+    means = torch.from_numpy(means).unsqueeze(0)
+    variances = torch.from_numpy(stddev).square().unsqueeze(0)
+
     feat_dim = means.shape[1]
 
     if shared_phones is None:

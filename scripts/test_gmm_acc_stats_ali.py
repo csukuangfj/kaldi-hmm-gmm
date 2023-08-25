@@ -123,14 +123,20 @@ def test_gmm_acc_stats_ali():
         total_weight,
     ) = kaldifst.get_linear_symbol_sequence(aligned_fst)
     assert succeeded is True
-    assert len(aligned_seq) == num_feature_frames
+
+    assert len(aligned_seq) == num_feature_frames, (
+        len(aligned_seq),
+        num_feature_frames,
+    )
+
     id2word = lexiconp_disambig.id2word
     assert [lexiconp_disambig.id2word[i] for i in osymbols_out] == s
+
     print(aligned_seq)
 
     feats = torch.from_numpy(cuts[1].load_features())
 
-    # For the first call, transition_accs is set to None
+    # For the second and further call, transition_accs is reused
     log_like_2, transition_accs = gmm_acc_stats_ali(
         am_gmm=am,
         gmm_accs=gmm_accs,

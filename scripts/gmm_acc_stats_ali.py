@@ -31,8 +31,12 @@ def gmm_acc_stats_ali(
         (num_transition_ids+1,). It is changed in place if not None.
 
     Returns:
+      Return a tuple containing:
+        - loglike, the total loglike of the input feature frames
+        - transition_accs. If the input transition_accs is None,
+          we will create a new one
     """
-    assert feats.ndim == 2, feats
+    assert feats.ndim == 2, feats.shape
     assert len(ali) == feats.shape[0], (len(ali), feats.shape[0])
 
     if transition_accs is None:

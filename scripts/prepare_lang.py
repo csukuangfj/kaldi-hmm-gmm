@@ -22,7 +22,7 @@ import logging
 import math
 from collections import defaultdict
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import kaldi_hmm_gmm as khg
 import kaldifst
@@ -69,7 +69,7 @@ class Lexicon:
     def __init__(
         self,
         lexicon_txt: Optional[str] = None,
-        word2phones: Optional[dict] = None,
+        word2phones: Optional[Dict[str, List[str]]] = None,
     ):
         """
         Args:
@@ -78,10 +78,12 @@ class Lexicon:
             format:
 
                 word phone1 phone2 ... phoneN
+
             That is, the first field is the word, the remaining fields are
             pronunciations of this word. Fields are separated by space(s).
           word2phones:
-            If provided, lexicon_txt is ignored.
+            If provided, lexicon_txt is ignored. it maps a word to a list
+            of phones. It is a list since a word may have multiple pronunciations
         """
         if word2phones is not None:
             self.word2phones = copy.deepcopy(word2phones)
@@ -98,10 +100,13 @@ class Lexicon:
 
         self.word2phones = word2phones
 
-    def __iter__(self):
+    def __iter__(self) -> Tuple[str, List[str]]:
         for word, phones_list in self.word2phones.items():
             for phones in phones_list:
                 yield word, phones
+
+    def __str__(self):
+        return str(self.word2phones)
 
     @staticmethod
     def from_lexiconp(lexiconp: "Lexiconp"):
@@ -156,6 +161,9 @@ class Lexiconp:
         for word, prob_phones_list in self.word2prob_phones.items():
             for prob, phones in prob_phones_list:
                 yield word, prob, phones
+
+    def __str__(self):
+        return str(self.word2prob_phones)
 
     @staticmethod
     def from_lexicon(lexicon: Lexicon):
