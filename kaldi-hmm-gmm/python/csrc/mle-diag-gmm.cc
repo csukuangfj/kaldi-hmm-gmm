@@ -82,7 +82,7 @@ void PybindMleDiagGmm(py::module *m) {
       .def("accumulate_from_posteriors", &PyClass::AccumulateFromPosteriors,
            py::arg("data"), py::arg("gauss_posteriors"))
       .def("accumulate_from_diag", &PyClass::AccumulateFromDiag, py::arg("gmm"),
-           py::arg("data"), py::arg("frame_posterior"))
+           py::arg("data"), py::arg("weight"))
       .def("add_stats_for_component", &PyClass::AddStatsForComponent,
            py::arg("g"), py::arg("occ"), py::arg("x_stats"),
            py::arg("x2_stats"))

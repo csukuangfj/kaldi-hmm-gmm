@@ -59,6 +59,7 @@ def get_hmm_topo():
 
     return topo
 
+
 class TestTransitionModel(unittest.TestCase):
     def test_mono(self):
         topo = get_hmm_topo()
@@ -95,9 +96,9 @@ class TestTransitionModel(unittest.TestCase):
         # transition id 1 and 2 corresponds to the hmm state 0 for phone 1
         # transition id 3 corresponds to state 1 for phone 1, which is not the
         # start state.
-        assert transition_model.transition_ids_is_start_of_phone(1)  is True
-        assert transition_model.transition_ids_is_start_of_phone(2)  is True
-        assert transition_model.transition_ids_is_start_of_phone(3)  is False
+        assert transition_model.transition_ids_is_start_of_phone(1) is True
+        assert transition_model.transition_ids_is_start_of_phone(2) is True
+        assert transition_model.transition_ids_is_start_of_phone(3) is False
 
         assert transition_model.transition_id_to_phone(1) == 1
         assert transition_model.transition_id_to_phone(2) == 1
@@ -115,7 +116,30 @@ class TestTransitionModel(unittest.TestCase):
         # 5: phone 1 has 5 pdf ids
         # 3: phone 1 to phone 3, each has 3 pdf ids
         assert transition_model.num_pdfs == 5 + 3 * 3, transition_model.num_pdfs
-'''
+
+        # test stats
+        stats = transition_model.init_stats()
+        assert stats.ndim == 1, stats.ndim
+        assert stats.dtype == torch.double, stats.dtype
+
+        # transition_id starts from 1, so stats[0] is never used
+        assert stats.shape[0] == transition_model.num_transition_ids + 1, (
+            stats.shape[0],
+            transition_model.num_transition_ids + 1,
+        )
+        assert stats.abs().sum().item() == 0, stats
+
+        transition_model.accumulate(prob=0.25, trans_id=1, stats=stats)
+        assert stats[1].item() == 0.25, stats[1]
+
+        transition_model.accumulate(prob=0.25, trans_id=1, stats=stats)
+        assert stats[1].item() == 0.50, stats[1]
+
+        transition_model.accumulate(prob=1.0, trans_id=10, stats=stats)
+        assert stats[10].item() == 1.0, stats[10]
+
+
+"""
 <TransitionModel>
 <Topology>
 <TopologyEntry>
@@ -160,7 +184,7 @@ class TestTransitionModel(unittest.TestCase):
 93147 -0.693147 -0.693147 -0.693147 -0.693147 -0.693147 -0.693147 -0.693147 -0.693147 -0.693147 -0.693147 -0.693147 -0.693147 -0.693147 ]
 </LogProbs>
 </TransitionModel>
-'''
+"""
 
 
 if __name__ == "__main__":

@@ -25,6 +25,7 @@ set(py_test_files
   test_gauss_clusterable.py
   test_hmm_topology.py
   test_init_gmm_mono.py
+  test_mle_am_diag_gmm.py
   test_mle_diag_gmm.py
   test_scalar_clusterable.py
   test_transition_model.py

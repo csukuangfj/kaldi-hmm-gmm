@@ -100,9 +100,9 @@ void MleAmDiagGmmUpdate(const MleDiagGmmOptions &config,
 
 /// Maximum A Posteriori update.
 void MapAmDiagGmmUpdate(const MapDiagGmmOptions &config,
-                        const AccumAmDiagGmm &diag_gmm_acc, GmmFlagsType flags,
-                        AmDiagGmm *gmm, float *obj_change_out,
-                        float *count_out);
+                        const AccumAmDiagGmm &amdiag_gmm_acc,
+                        GmmFlagsType flags, AmDiagGmm *am_gmm,
+                        float *obj_change_out, float *count_out);
 
 }  // namespace khg
 #endif  // KALDI_HMM_GMM_CSRC_MLE_AM_DIAG_GMM_H_

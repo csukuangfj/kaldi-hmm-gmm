@@ -124,14 +124,14 @@ void AccumDiagGmm::AccumulateFromPosteriors(torch::Tensor data,
 }
 
 float AccumDiagGmm::AccumulateFromDiag(const DiagGmm &gmm, torch::Tensor data,
-                                       float frame_posterior) {
+                                       float weight) {
   KHG_ASSERT(gmm.NumGauss() == NumGauss());
   KHG_ASSERT(gmm.Dim() == Dim());
   KHG_ASSERT(static_cast<int32_t>(data.size(0)) == Dim());
 
   torch::Tensor posteriors;
   float log_like = gmm.ComponentPosteriors(data, &posteriors);
-  posteriors.mul_(frame_posterior);
+  posteriors.mul_(weight);
 
   AccumulateFromPosteriors(data, posteriors);
   return log_like;

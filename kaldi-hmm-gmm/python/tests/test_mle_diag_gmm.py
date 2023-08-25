@@ -206,17 +206,15 @@ class TestAccumDiagGmm(unittest.TestCase):
         diag_gmm.set_invvars(1 / var)
         diag_gmm.compute_gconsts()
 
-        frame_posterior = 0.2
-        log_like = acc.accumulate_from_diag(
-            gmm=diag_gmm, data=data, frame_posterior=frame_posterior
-        )
+        w = 0.2
+        log_like = acc.accumulate_from_diag(gmm=diag_gmm, data=data, weight=w)
 
         expected_log_like, posteriors = diag_gmm.component_posteriors(data)
         assert abs(log_like - expected_log_like) < 1e-5
 
         # similar to accumulate_from_posteriors()
 
-        posteriors *= frame_posterior  # scale it!
+        posteriors *= w  # scale it!
         expected_occupancy = occupancy + posteriors
         assert torch.allclose(acc.occupancy, expected_occupancy)
 

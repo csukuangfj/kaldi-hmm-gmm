@@ -1,5 +1,6 @@
 import torch
 from _kaldi_hmm_gmm import (
+    AccumAmDiagGmm,
     AccumDiagGmm,
     AmDiagGmm,
     Clusterable,

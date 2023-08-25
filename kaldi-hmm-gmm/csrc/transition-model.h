@@ -1,5 +1,7 @@
 // kaldi-hmm-gmm/csrc/transition-model.h
 //
+// Copyright 2009-2012  Microsoft Corporation
+//                      Johns Hopkins University (author: Guoguo Chen)
 // Copyright (c)  2023  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_TRANSITION_MODEL_H_
 #define KALDI_HMM_GMM_CSRC_TRANSITION_MODEL_H_
@@ -11,11 +13,82 @@
 
 #include "kaldi-hmm-gmm/csrc/context-dep-itf.h"
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"
+#include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi-hmm-gmm/csrc/transition-information.h"
 #include "kaldi_native_io/csrc/kaldi-vector.h"
 #include "torch/script.h"
 
 namespace khg {
+
+// The class TransitionModel is a repository for the transition probabilities.
+// It also handles certain integer mappings.
+// The basic model is as follows.  Each phone has a HMM topology defined in
+// hmm-topology.h.  Each HMM-state of each of these phones has a number of
+// transitions (and final-probs) out of it.  Each HMM-state defined in the
+// HmmTopology class has an associated "pdf_class".  This gets replaced with
+// an actual pdf-id via the tree.  The transition model associates the
+// transition probs with the (phone, HMM-state, pdf-id).  We associate with
+// each such triple a transition-state.  Each
+// transition-state has a number of associated probabilities to estimate;
+// this depends on the number of transitions/final-probs in the topology for
+// that (phone, HMM-state).  Each probability has an associated
+// transition-index. We associate with each (transition-state, transition-index)
+// a unique transition-id. Each individual probability estimated by the
+// transition-model is associated with a transition-id.
+//
+// List of the various types of quantity referred to here and what they mean:
+//           phone:  a phone index (1, 2, 3 ...)
+//       HMM-state:  a number (0, 1, 2...) that indexes TopologyEntry (see
+//       hmm-topology.h)
+//          pdf-id:  a number output by the Compute function of
+//          ContextDependency (it
+//                   indexes pdf's, either forward or self-loop).  Zero-based.
+// transition-state:  the states for which we estimate transition probabilities
+// for transitions
+//                    out of them.  In some topologies, will map one-to-one with
+//                    pdf-ids. One-based, since it appears on FSTs.
+// transition-index:  identifier of a transition (or final-prob) in the HMM.
+// Indexes the
+//                    "transitions" vector in HmmTopology::HmmState.  [if it is
+//                    out of range, equal to transitions.size(), it refers to
+//                    the final-prob.] Zero-based.
+//   transition-id:   identifier of a unique parameter of the TransitionModel.
+//                    Associated with a (transition-state, transition-index)
+//                    pair. One-based, since it appears on FSTs.
+//
+// List of the possible mappings TransitionModel can do:
+//   (phone, HMM-state, forward-pdf-id, self-loop-pdf-id) -> transition-state
+//                   (transition-state, transition-index) -> transition-id
+//  Reverse mappings:
+//                        transition-id -> transition-state
+//                        transition-id -> transition-index
+//                     transition-state -> phone
+//                     transition-state -> HMM-state
+//                     transition-state -> forward-pdf-id
+//                     transition-state -> self-loop-pdf-id
+//
+// The main things the TransitionModel object can do are:
+//    Get initialized (need ContextDependency and HmmTopology objects).
+//    Read/write.
+//    Update [given a vector of counts indexed by transition-id].
+//    Do the various integer mappings mentioned above.
+//    Get the probability (or log-probability) associated with a particular
+//    transition-id.
+
+// Note: this was previously called TransitionUpdateConfig.
+struct MleTransitionUpdateConfig {
+  // floor for transition probabilities
+  float floor;
+
+  // Minimum count required to update transitions from a state
+  float mincount;
+
+  bool share_for_pdfs;  // If true, share all transition parameters that have
+                        // the same pdf.
+  MleTransitionUpdateConfig(float floor = 0.01, float mincount = 5.0,
+                            bool share_for_pdfs = false)
+      : floor(floor), mincount(mincount), share_for_pdfs(share_for_pdfs) {}
+};
 
 class TransitionModel : public TransitionInformation {
  public:
@@ -38,6 +111,9 @@ class TransitionModel : public TransitionInformation {
 
   /// Returns a sorted, unique list of phones.
   const std::vector<int32_t> &GetPhones() const { return topo_.GetPhones(); }
+
+  // Transition-parameter-getting functions:
+  float GetTransitionProb(int32_t trans_id) const;
 
   const std::vector<int32_t> &TransitionIdToPdfArray() const override;
 
@@ -96,6 +172,31 @@ class TransitionModel : public TransitionInformation {
 
   int32_t TransitionIdToTransitionState(int32_t trans_id) const;
 
+  // stats is a 1-D torch.kDouble tensor
+  void InitStats(torch::Tensor *stats) const {
+    // transition id starts from 1
+    // stats[0] is never used
+    *stats = torch::zeros({NumTransitionIds() + 1}, torch::kDouble);
+  }
+
+  // @param stats 1-d double tensor
+  void Accumulate(float prob, int32_t trans_id, torch::Tensor *stats) const {
+    KHG_ASSERT(trans_id <= NumTransitionIds());
+
+    auto stats_acc = stats->accessor<double, 1>();
+
+    stats_acc[trans_id] += prob;
+    // This is trivial and doesn't require class members, but leaves us more
+    // open to design changes than doing it manually.
+  }
+
+  /// Does Maximum Likelihood estimation.  The stats are counts/weights, indexed
+  /// by transition-id.  This was previously called Update().
+  ///
+  /// @param stats 1-D double tensor of shape (num_transiation_ids + 1,)
+  void MleUpdate(torch::Tensor stats, const MleTransitionUpdateConfig &cfg,
+                 float *objf_impr_out, float *count_out);
+
  private:
   // called from constructor.  initializes tuples_.
   void ComputeTuples(const ContextDependencyInterface &ctx_dep);
@@ -136,10 +237,9 @@ class TransitionModel : public TransitionInformation {
 
   int32_t TransitionIdToHmmState(int32_t trans_id) const;
 
-  // stats is a 1-D torch.kDouble tensor
-  void InitStats(torch::Tensor *stats) const {
-    *stats = torch::zeros({NumTransitionIds() + 1}, torch::kDouble);
-  }
+  void MleUpdateShared(torch::Tensor stats,
+                       const MleTransitionUpdateConfig &cfg,
+                       float *objf_impr_out, float *count_out);
 
  private:
   struct Tuple {

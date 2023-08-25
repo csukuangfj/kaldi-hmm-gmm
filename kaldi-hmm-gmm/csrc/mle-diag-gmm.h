@@ -120,7 +120,7 @@ class AccumDiagGmm {
   /// @param gmm
   /// @param data 1-D float tensor of shape (dim,)
   float AccumulateFromDiag(const DiagGmm &gmm, torch::Tensor data,
-                           float frame_posterior);
+                           float weight);
 
   /// Increment the stats for this component by the specified amount
   /// (not all parts may be taken, depending on flags).
