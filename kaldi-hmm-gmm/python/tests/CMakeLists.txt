@@ -23,6 +23,7 @@ set(py_test_files
   test_diag_gmm.py
   test_draw_tree.py
   test_gauss_clusterable.py
+  test_gmm_update_flags.py
   test_hmm_topology.py
   test_init_gmm_mono.py
   test_mle_am_diag_gmm.py

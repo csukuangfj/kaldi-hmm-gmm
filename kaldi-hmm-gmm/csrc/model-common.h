@@ -42,6 +42,13 @@ void GetSplitTargets(torch::Tensor state_occs,  // 1-D float tensor
 // accumulation that there is also mean accumulation
 GmmFlagsType AugmentGmmFlags(GmmFlagsType flags);
 
+/// Convert string which is some subset of "mvwt" to
+/// flags.
+GmmFlagsType StringToGmmFlags(const std::string &str);
+
+/// Convert GMM flags to string
+std::string GmmFlagsToString(GmmFlagsType gmm_flags);
+
 }  // namespace khg
 
 #endif  // KALDI_HMM_GMM_CSRC_MODEL_COMMON_H_
