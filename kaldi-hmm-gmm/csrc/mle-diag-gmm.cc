@@ -83,7 +83,9 @@ void AccumDiagGmm::Scale(float f, GmmFlagsType flags) {
 
 void AccumDiagGmm::AccumulateForComponent(torch::Tensor data,
                                           int32_t comp_index, float weight) {
-  if (flags_ & kGmmMeans) KHG_ASSERT(data.size(0) == Dim());
+  if (flags_ & kGmmMeans) {
+    KHG_ASSERT(data.size(0) == Dim());
+  }
 
   double wt = weight;
 
@@ -105,8 +107,9 @@ void AccumDiagGmm::AccumulateForComponent(torch::Tensor data,
 
 void AccumDiagGmm::AccumulateFromPosteriors(torch::Tensor data,
                                             torch::Tensor posteriors) {
-  if (flags_ & kGmmMeans)
+  if (flags_ & kGmmMeans) {
     KHG_ASSERT(static_cast<int32_t>(data.size(0)) == Dim());
+  }
 
   KHG_ASSERT(static_cast<int32_t>(posteriors.size(0)) == NumGauss());
 

@@ -34,8 +34,9 @@ void AmDiagGmm::Init(const DiagGmm &proto, int32_t num_pdfs) {
 }
 
 void AmDiagGmm::AddPdf(const DiagGmm &gmm) {
-  if (densities_.size() != 0)  // not the first gmm
+  if (densities_.size() != 0) {  // not the first gmm
     KHG_ASSERT(gmm.Dim() == this->Dim());
+  }
 
   DiagGmm *gmm_ptr = new DiagGmm();
   gmm_ptr->CopyFromDiagGmm(gmm);

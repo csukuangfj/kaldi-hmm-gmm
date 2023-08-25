@@ -83,6 +83,9 @@ def test_gmm_acc_stats_ali():
         osymbols_out,
         total_weight,
     ) = kaldifst.get_linear_symbol_sequence(aligned_fst)
+
+    # aligned_seq is a list of transition ids
+
     assert succeeded is True
     assert len(aligned_seq) == num_feature_frames
     id2word = lexiconp_disambig.id2word
