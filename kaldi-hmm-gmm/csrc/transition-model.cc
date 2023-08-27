@@ -18,6 +18,7 @@
 #include "kaldi-hmm-gmm/csrc/context-dep-itf.h"
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
+#include "kaldi-hmm-gmm/csrc/stl-utils.h"
 #include "kaldi_native_io/csrc/io-funcs.h"
 
 namespace khg {
@@ -751,6 +752,41 @@ void TransitionModel::MleUpdate(torch::Tensor stats,
   }
 
   ComputeDerivedOfProbs();
+}
+
+bool GetPdfsForPhones(const TransitionModel &trans_model,
+                      const std::vector<int32_t> &phones,
+                      std::vector<int32_t> *pdfs) {
+  KHG_ASSERT(IsSortedAndUniq(phones));
+  KHG_ASSERT(pdfs != nullptr);
+
+  pdfs->clear();
+
+  for (int32_t tstate = 1; tstate <= trans_model.NumTransitionStates();
+       ++tstate) {
+    if (std::binary_search(phones.begin(), phones.end(),
+                           trans_model.TransitionStateToPhone(tstate))) {
+      pdfs->push_back(trans_model.TransitionStateToForwardPdf(tstate));
+      pdfs->push_back(trans_model.TransitionStateToSelfLoopPdf(tstate));
+    }
+  }
+
+  SortAndUniq(pdfs);
+
+  for (int32_t tstate = 1; tstate <= trans_model.NumTransitionStates();
+       ++tstate) {
+    if ((std::binary_search(pdfs->begin(), pdfs->end(),
+                            trans_model.TransitionStateToForwardPdf(tstate)) ||
+         std::binary_search(
+             pdfs->begin(), pdfs->end(),
+             trans_model.TransitionStateToSelfLoopPdf(tstate))) &&
+        !std::binary_search(phones.begin(), phones.end(),
+                            trans_model.TransitionStateToPhone(tstate))) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 }  // namespace khg

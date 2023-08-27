@@ -19,6 +19,7 @@ from _kaldi_hmm_gmm import (
     TrainingGraphCompilerOptions,
     TransitionModel,
     draw_tree,
+    get_pdfs_for_phones,
     gmm_flags_to_str,
     map_am_diag_gmm_update,
     mle_am_diag_gmm_update,
