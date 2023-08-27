@@ -1,5 +1,6 @@
 // kaldi-hmm-gmm/csrc/hmm-topology.h
 //
+// Copyright 2009-2011  Microsoft Corporation
 // Copyright (c)  2023  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_HMM_TOPOLOGY_H_
 #define KALDI_HMM_GMM_CSRC_HMM_TOPOLOGY_H_
@@ -98,8 +99,8 @@ class HmmTopology {
     HmmState(int32_t forward_pdf_class, int32_t self_loop_pdf_class) {
       assert((forward_pdf_class != kNoPdf && self_loop_pdf_class != kNoPdf) ||
              (forward_pdf_class == kNoPdf && self_loop_pdf_class == kNoPdf));
-      forward_pdf_class = forward_pdf_class;
-      self_loop_pdf_class = self_loop_pdf_class;
+      this->forward_pdf_class = forward_pdf_class;
+      this->self_loop_pdf_class = self_loop_pdf_class;
     }
 
     bool operator==(const HmmState &other) const {

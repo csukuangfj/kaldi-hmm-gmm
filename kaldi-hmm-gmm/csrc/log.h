@@ -5,8 +5,10 @@
 #ifndef KALDI_HMM_GMM_CSRC_LOG_H_
 #define KALDI_HMM_GMM_CSRC_LOG_H_
 
+#include <cstdint>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 namespace khg {
 
@@ -42,10 +44,10 @@ class Logger {
   }
 
   ~Logger() noexcept(false) {
-    fprintf(stderr, "%s\n", os_.str().c_str());
     if (level_ == LogLevel::kError) {
       // throw std::runtime_error(os_.str());
-      abort();
+      // abort();
+      throw std::runtime_error(os_.str());
     }
     fprintf(stderr, "%s\n", os_.str().c_str());
   }

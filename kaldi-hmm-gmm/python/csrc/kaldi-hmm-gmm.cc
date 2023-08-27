@@ -9,8 +9,12 @@
 #include "kaldi-hmm-gmm/python/csrc/clusterable-classes.h"
 #include "kaldi-hmm-gmm/python/csrc/context-dep.h"
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
+#include "kaldi-hmm-gmm/python/csrc/event-map.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
+#include "kaldi-hmm-gmm/python/csrc/mle-am-diag-gmm.h"
+#include "kaldi-hmm-gmm/python/csrc/mle-diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/model-common.h"
+#include "kaldi-hmm-gmm/python/csrc/training-graph-compiler.h"
 #include "kaldi-hmm-gmm/python/csrc/transition-information.h"
 #include "kaldi-hmm-gmm/python/csrc/transition-model.h"
 #include "kaldi-hmm-gmm/python/csrc/tree-renderer.h"
@@ -22,6 +26,7 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   m.doc() = "pybind11 binding of kaldi-hmm-gmm";
   PybinTreeRenderer(&m);
   PybindContextDep(&m);
+  PybindEventMap(&m);
 
   PybindModelCommon(&m);
   PybindClusterUtils(&m);
@@ -33,6 +38,10 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindHmmTopology(&m);
   PybindTransitionInformation(&m);
   PybindTransitionModel(&m);
+
+  PybindTrainingGraphCompiler(&m);
+  PybindMleDiagGmm(&m);
+  PybindMleAmDiagGmm(&m);
 }
 
 }  // namespace khg

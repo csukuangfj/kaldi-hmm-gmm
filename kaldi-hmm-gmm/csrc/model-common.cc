@@ -70,4 +70,79 @@ void GetSplitTargets(torch::Tensor state_occs,  // 1-D float tensor
   }
 }
 
+GmmFlagsType AugmentGmmFlags(GmmFlagsType flags) {
+  KHG_ASSERT((flags & ~kGmmAll) ==
+             0);  // make sure only valid flags are present.
+  if (flags & kGmmVariances) flags |= kGmmMeans;
+  if (flags & kGmmMeans) flags |= kGmmWeights;
+  if (!(flags & kGmmWeights)) {
+    KHG_WARN << "Adding in kGmmWeights (\"w\") to empty flags.";
+    flags |= kGmmWeights;  // Just add this in regardless:
+    // if user wants no stats, this will stop programs from crashing due to dim
+    // mismatches.
+  }
+  return flags;
+}
+
+// CharToString prints the character in a human-readable form, for debugging.
+std::string CharToString(const char &c) {
+  char buf[20];
+
+  if (std::isprint(c)) {
+    std::snprintf(buf, sizeof(buf), "\'%c\'", c);
+  } else {
+    std::snprintf(buf, sizeof(buf), "[character %d]", static_cast<int32_t>(c));
+  }
+
+  return buf;
+}
+
+GmmFlagsType StringToGmmFlags(const std::string &str) {
+  GmmFlagsType flags = 0;
+  for (const auto c : str) {
+    switch (c) {
+      case 'm':
+        flags |= kGmmMeans;
+        break;
+      case 'v':
+        flags |= kGmmVariances;
+        break;
+      case 'w':
+        flags |= kGmmWeights;
+        break;
+      case 't':
+        flags |= kGmmTransitions;
+        break;
+      case 'a':
+        flags |= kGmmAll;
+        break;
+      default:
+        KHG_ERR << "Invalid element " << CharToString(c)
+                << " of GmmFlagsType option string " << str;
+    }
+  }
+  return flags;
+}
+
+std::string GmmFlagsToString(GmmFlagsType flags) {
+  std::string ans;
+  if (flags & kGmmMeans) {
+    ans += "m";
+  }
+
+  if (flags & kGmmVariances) {
+    ans += "v";
+  }
+
+  if (flags & kGmmWeights) {
+    ans += "w";
+  }
+
+  if (flags & kGmmTransitions) {
+    ans += "t";
+  }
+
+  return ans;
+}
+
 }  // namespace khg

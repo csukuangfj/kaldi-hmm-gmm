@@ -1,0 +1,15 @@
+[flake8]
+show-source=true
+statistics=true
+max-line-length = 88
+
+exclude =
+  .git,
+
+ignore =
+  # E203 white space before ":"
+  E203,
+  # W503 line break before binary operator
+  W503,
+  # E226 missing whitespace around arithmetic operator
+  E226,

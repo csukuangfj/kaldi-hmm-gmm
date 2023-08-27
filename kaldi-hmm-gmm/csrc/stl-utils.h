@@ -9,6 +9,7 @@
 #define KALDI_HMM_GMM_CSRC_STL_UTILS_H_
 #include <algorithm>
 #include <istream>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -180,6 +181,26 @@ bool ContainsNullPointers(const std::vector<A *> &v) {
     if (*iter == static_cast<A *>(nullptr)) return true;
   return false;
 }
+
+/// A hashing function-object for vectors.
+template <typename Int>
+struct VectorHasher {  // hashing function for vector<Int>.
+  size_t operator()(const std::vector<Int> &x) const noexcept {
+    size_t ans = 0;
+    auto iter = x.begin(), end = x.end();
+    for (; iter != end; ++iter) {
+      ans *= kPrime;
+      ans += *iter;
+    }
+    return ans;
+  }
+  VectorHasher() {  // Check we're instantiated with an integer type.
+    static_assert(std::is_integral<Int>::value, "");
+  }
+
+ private:
+  static const int kPrime = 7853;
+};
 
 }  // namespace khg
 

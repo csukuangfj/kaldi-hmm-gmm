@@ -12,11 +12,11 @@
 namespace khg {
 
 void DiagGmmNormal::CopyFromDiagGmm(const DiagGmm &diaggmm) {
-  weights_ = diaggmm.weights_.clone();
+  weights_ = diaggmm.weights_.to(torch::kDouble);
 
-  vars_ = 1.0f / diaggmm.inv_vars_;
+  vars_ = 1.0 / diaggmm.inv_vars_.to(torch::kDouble);
 
-  means_ = diaggmm.means_invvars_.mul(vars_);
+  means_ = diaggmm.means_invvars_.to(torch::kDouble).mul(vars_);
 }
 
 void DiagGmmNormal::CopyToDiagGmm(DiagGmm *diaggmm, GmmFlagsType flags) const {

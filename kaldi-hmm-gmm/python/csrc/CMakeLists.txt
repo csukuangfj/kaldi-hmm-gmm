@@ -7,9 +7,13 @@ set(srcs
   clusterable-classes.cc
   context-dep.cc
   diag-gmm.cc
+  event-map.cc
   hmm-topology.cc
   kaldi-hmm-gmm.cc
+  mle-am-diag-gmm.cc
+  mle-diag-gmm.cc
   model-common.cc
+  training-graph-compiler.cc
   transition-information.cc
   transition-model.cc
   tree-renderer.cc

@@ -257,7 +257,7 @@ void TransitionModel::ComputeDerived() {
   num_pdfs_ = 0;
   for (int32_t tstate = 1;
        tstate <= static_cast<int32_t>(tuples_.size() + 1);  // not a typo.
-       tstate++) {
+       ++tstate) {
     state2id_[tstate] = cur_transition_id;
     if (static_cast<size_t>(tstate) <= tuples_.size()) {
       int32_t phone = tuples_[tstate - 1].phone,
@@ -354,6 +354,10 @@ void TransitionModel::ComputeDerivedOfProbs() {
           std::log(non_self_loop_prob);  // will be negative.
     }
   }
+}
+
+float TransitionModel::GetTransitionProb(int32_t trans_id) const {
+  return std::exp(log_probs_(trans_id));
 }
 
 const std::vector<int32_t> &TransitionModel::TransitionIdToPdfArray() const {
@@ -504,6 +508,249 @@ bool TransitionModel::IsFinal(int32_t trans_id) const {
   // topology entry.
   return (entry[tuple.hmm_state].transitions[trans_index].first + 1 ==
           static_cast<int32_t>(entry.size()));
+}
+
+float TransitionModel::GetNonSelfLoopLogProb(int32_t trans_state) const {
+  KHG_ASSERT(trans_state != 0);
+  return non_self_loop_log_probs_(trans_state);
+}
+
+float TransitionModel::GetTransitionLogProbIgnoringSelfLoops(
+    int32_t trans_id) const {
+  KHG_ASSERT(trans_id != 0);
+  KHG_ASSERT(!IsSelfLoop(trans_id));
+  return log_probs_(trans_id) -
+         GetNonSelfLoopLogProb(TransitionIdToTransitionState(trans_id));
+}
+
+/// This version of the Update() function is for if the user specifies
+/// --share-for-pdfs=true.  We share the transitions for all states that
+/// share the same pdf.
+void TransitionModel::MleUpdateShared(torch::Tensor stats,
+                                      const MleTransitionUpdateConfig &cfg,
+                                      float *objf_impr_out, float *count_out) {
+  KHG_ASSERT(cfg.share_for_pdfs);
+
+  float count_sum = 0.0, objf_impr_sum = 0.0;
+  int32_t num_skipped = 0, num_floored = 0;
+  KHG_ASSERT(stats.size(0) == NumTransitionIds() + 1);
+  std::map<int32_t, std::set<int32_t>> pdf_to_tstate;
+
+  auto stats_acc = stats.accessor<double, 1>();
+
+  for (int32_t tstate = 1; tstate <= NumTransitionStates(); ++tstate) {
+    int32_t pdf = TransitionStateToForwardPdf(tstate);
+    pdf_to_tstate[pdf].insert(tstate);
+    if (!IsHmm()) {
+      pdf = TransitionStateToSelfLoopPdf(tstate);
+      pdf_to_tstate[pdf].insert(tstate);
+    }
+  }
+
+  for (auto map_iter = pdf_to_tstate.begin(); map_iter != pdf_to_tstate.end();
+       ++map_iter) {
+    // map_iter->first is pdf-id... not needed.
+    const auto &tstates = map_iter->second;
+
+    KHG_ASSERT(!tstates.empty());
+
+    int32_t one_tstate = *(tstates.begin());
+    int32_t n = NumTransitionIndices(one_tstate);
+    KHG_ASSERT(n >= 1);
+
+    if (n > 1) {  // Only update if >1 transition...
+      std::vector<double> counts(n, 0);
+      double pdf_tot = 0;
+
+      for (auto iter = tstates.begin(); iter != tstates.end(); ++iter) {
+        int32_t tstate = *iter;
+
+        if (NumTransitionIndices(tstate) != n) {
+          KHG_ERR << "Mismatch in #transition indices: you cannot "
+                     "use the --share-for-pdfs option with this topology "
+                     "and sharing scheme.";
+        }
+
+        for (int32_t tidx = 0; tidx < n; ++tidx) {
+          int32_t tid = PairToTransitionId(tstate, tidx);
+          auto acc = stats_acc[tid];
+          counts[tidx] += acc;
+          pdf_tot += acc;
+        }
+      }
+
+      count_sum += pdf_tot;
+
+      if (pdf_tot < cfg.mincount) {
+        ++num_skipped;
+      } else {
+        // Note: when calculating objf improvement, we
+        // assume we previously had the same tying scheme so
+        // we can get the params from one_tstate and they're valid
+        // for all.
+        std::vector<float> old_probs(n, 0);
+
+        torch::Tensor new_probs = torch::empty({n}, torch::kFloat);
+        auto new_probs_acc = new_probs.accessor<float, 1>();
+
+        for (int32_t tidx = 0; tidx < n; ++tidx) {
+          int32_t tid = PairToTransitionId(one_tstate, tidx);
+          old_probs[tidx] = GetTransitionProb(tid);
+        }
+
+        for (int32_t tidx = 0; tidx < n; ++tidx) {
+          new_probs_acc[tidx] = counts[tidx] / pdf_tot;
+        }
+
+        for (int32_t i = 0; i < 3; i++) {
+          // keep flooring+renormalizing for 3 times..
+          new_probs.mul_(1.0 / new_probs.sum().item().toFloat());
+
+          for (int32_t tidx = 0; tidx < n; ++tidx) {
+            new_probs_acc[tidx] = std::max(new_probs_acc[tidx], cfg.floor);
+          }
+        }
+
+        // Compute objf change
+        for (int32_t tidx = 0; tidx < n; ++tidx) {
+          if (new_probs_acc[tidx] == cfg.floor) {
+            num_floored++;
+          }
+
+          double objf_change = counts[tidx] * (std::log(new_probs_acc[tidx]) -
+                                               std::log(old_probs[tidx]));
+
+          objf_impr_sum += objf_change;
+        }
+
+        // Commit updated values.
+        for (auto iter = tstates.begin(); iter != tstates.end(); ++iter) {
+          int32_t tstate = *iter;
+          for (int32_t tidx = 0; tidx < n; ++tidx) {
+            int32_t tid = PairToTransitionId(tstate, tidx);
+            log_probs_(tid) = std::log(new_probs_acc[tidx]);
+            if (log_probs_(tid) - log_probs_(tid) != 0.0)
+              KHG_ERR
+                  << "Log probs is inf or NaN: error in update or bad stats?";
+          }
+        }
+      }
+    }
+  }
+
+  KHG_LOG << "Objf change is " << (objf_impr_sum / count_sum)
+          << " per frame over " << count_sum << " frames; " << num_floored
+          << " probabilities floored, " << num_skipped
+          << " pdf-ids skipped due to insufficient data.";
+
+  if (objf_impr_out) {
+    *objf_impr_out = objf_impr_sum;
+  }
+
+  if (count_out) {
+    *count_out = count_sum;
+  }
+
+  ComputeDerivedOfProbs();
+}
+
+// stats are counts/weights, indexed by transition-id.
+void TransitionModel::MleUpdate(torch::Tensor stats,
+                                const MleTransitionUpdateConfig &cfg,
+                                float *objf_impr_out, float *count_out) {
+  if (cfg.share_for_pdfs) {
+    MleUpdateShared(stats, cfg, objf_impr_out, count_out);
+    return;
+  }
+
+  float count_sum = 0.0, objf_impr_sum = 0.0;
+  int32_t num_skipped = 0, num_floored = 0;
+
+  KHG_ASSERT(stats.size(0) == NumTransitionIds() + 1);
+
+  auto stats_acc = stats.accessor<double, 1>();
+
+  for (int32_t tstate = 1; tstate <= NumTransitionStates(); ++tstate) {
+    int32_t n = NumTransitionIndices(tstate);
+    KHG_ASSERT(n >= 1);
+    if (n > 1) {  // no point updating if only one transition...
+      std::vector<double> counts(n, 0);
+      double tstate_tot = 0;
+
+      for (int32_t tidx = 0; tidx < n; ++tidx) {
+        int32_t tid = PairToTransitionId(tstate, tidx);
+        auto acc = stats_acc[tid];
+        counts[tidx] = acc;
+        tstate_tot += acc;
+      }
+
+      count_sum += tstate_tot;
+      if (tstate_tot < cfg.mincount) {
+        num_skipped++;
+      } else {
+        std::vector<float> old_probs(n, 0);
+
+        torch::Tensor new_probs = torch::empty({n}, torch::kFloat);
+        auto new_probs_acc = new_probs.accessor<float, 1>();
+
+        for (int32_t tidx = 0; tidx < n; ++tidx) {
+          int32_t tid = PairToTransitionId(tstate, tidx);
+          old_probs[tidx] = GetTransitionProb(tid);
+        }
+
+        for (int32_t tidx = 0; tidx < n; tidx++) {
+          new_probs_acc[tidx] = counts[tidx] / tstate_tot;
+        }
+
+        for (int32_t i = 0; i < 3; i++) {
+          // keep flooring+renormalizing for 3 times..
+          new_probs.mul_(1.0 / new_probs.sum().item().toFloat());
+
+          for (int32_t tidx = 0; tidx < n; tidx++)
+            new_probs_acc[tidx] = std::max(new_probs_acc[tidx], cfg.floor);
+        }
+
+        // Compute objf change
+        for (int32_t tidx = 0; tidx < n; ++tidx) {
+          if (new_probs_acc[tidx] == cfg.floor) {
+            ++num_floored;
+          }
+
+          double objf_change = counts[tidx] * (std::log(new_probs_acc[tidx]) -
+                                               std::log(old_probs[tidx]));
+          objf_impr_sum += objf_change;
+        }
+
+        // Commit updated values.
+        for (int32_t tidx = 0; tidx < n; ++tidx) {
+          int32_t tid = PairToTransitionId(tstate, tidx);
+          log_probs_(tid) = std::log(new_probs_acc[tidx]);
+
+          if (log_probs_(tid) - log_probs_(tid) != 0.0)
+            KHG_ERR << "Log probs is inf or NaN: error in update or bad stats?";
+        }
+      }
+    }
+  }
+
+  KHG_LOG << "TransitionModel::Update, objf change is "
+          << (objf_impr_sum / count_sum) << " per frame over " << count_sum
+          << " frames. ";
+  KHG_LOG
+      << num_floored << " probabilities floored, " << num_skipped << " out of "
+      << NumTransitionStates()
+      << " transition-states "
+         "skipped due to insuffient data (it is normal to have some skipped.)";
+
+  if (objf_impr_out) {
+    *objf_impr_out = objf_impr_sum;
+  }
+
+  if (count_out) {
+    *count_out = count_sum;
+  }
+
+  ComputeDerivedOfProbs();
 }
 
 }  // namespace khg

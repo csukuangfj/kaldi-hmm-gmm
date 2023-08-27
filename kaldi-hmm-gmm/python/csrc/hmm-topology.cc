@@ -44,7 +44,7 @@ void PybindHmmTopology(py::module *m) {
       .def("topology_for_phone", &PyClass::TopologyForPhone, py::arg("phone"))
       .def("num_pdf_classes", &PyClass::NumPdfClasses, py::arg("phone"))
       .def("get_phone_to_num_pdf_classes",
-           [](const PyClass &self) {
+           [](const PyClass &self) -> std::vector<int32_t> {
              std::vector<int32_t> phone2num_pdf_classes;
              self.GetPhoneToNumPdfClasses(&phone2num_pdf_classes);
              return phone2num_pdf_classes;

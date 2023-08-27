@@ -121,7 +121,7 @@ void TreeRenderer::RenderTable(const EventType *query, int32_t id) {
     if (key == kPdfClass) {
       label << t;
     } else if (key >= 0 && key < N_) {
-      if (t == 0) {
+      if (t == 0 || kaldiio::PeekToken(is_, binary_) == 'N') {
         kaldiio::ExpectToken(is_, binary_,
                              "NULL");  // consume the invalid/NULL entry
         continue;

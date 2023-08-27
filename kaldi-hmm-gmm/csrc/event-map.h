@@ -102,6 +102,8 @@ class EventMap {
   // GetChildren() returns the EventMaps that are immediate children of this
   // EventMap (if they exist), by putting them in *out.  Useful for
   // determining the structure of the event map.
+  //
+  // The returned pointer in out are borrowed
   virtual void GetChildren(std::vector<EventMap *> *out) const = 0;
 
   // This Copy() does a deep copy of the event map.

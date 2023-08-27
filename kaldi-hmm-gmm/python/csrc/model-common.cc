@@ -18,6 +18,11 @@ static void PybindGmmUpdateFlags(py::module *m) {
       .export_values();
 }
 
-void PybindModelCommon(py::module *m) { PybindGmmUpdateFlags(m); }
+void PybindModelCommon(py::module *m) {
+  PybindGmmUpdateFlags(m);
+
+  m->def("str_to_gmm_flags", &StringToGmmFlags);
+  m->def("gmm_flags_to_str", &GmmFlagsToString);
+}
 
 }  // namespace khg

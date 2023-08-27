@@ -59,6 +59,9 @@ class ContextDependencyInterface {
   /// This is the old, simpler interface of GetPdfInfo(), and that this one can
   /// only be called if the HmmTopology object's IsHmm() function call returns
   /// true.
+  ///
+  /// pdf_info is indexed by pdf_id
+  /// pdf_info[i_th_pdf_id][k] is a pair: (phone_id, pdf_class)
   virtual void GetPdfInfo(
       const std::vector<int32_t> &phones,           // list of phones
       const std::vector<int32_t> &num_pdf_classes,  // indexed by phone,
