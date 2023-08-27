@@ -29,6 +29,8 @@ void PybindTransitionModel(py::module *m) {
            py::arg("ctx_dep"), py::arg("hmm_topo"))
       .def_property_readonly("topo", &PyClass::GetTopo)
       .def_property_readonly("phones", &PyClass::GetPhones)
+      .def_property_readonly("num_transition_states",
+                             &PyClass::NumTransitionStates)
       .def("__str__",
            [](const PyClass &self) -> std::string {
              std::ostringstream os;
@@ -43,7 +45,15 @@ void PybindTransitionModel(py::module *m) {
              return stats;
            })
       .def("accumulate", &PyClass::Accumulate, py::arg("prob"),
-           py::arg("trans_id"), py::arg("stats"));
+           py::arg("trans_id"), py::arg("stats"))
+      .def("mle_update",
+           [](PyClass &self, torch::Tensor stats,
+              const MleTransitionUpdateConfig &cfg) -> std::pair<float, float> {
+             float objf_impr_out = 0;
+             float count_out = 0;
+             self.MleUpdate(stats, cfg, &objf_impr_out, &count_out);
+             return std::make_pair(objf_impr_out, count_out);
+           });
 }
 
 }  // namespace khg

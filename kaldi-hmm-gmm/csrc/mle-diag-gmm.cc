@@ -231,8 +231,9 @@ void MleDiagGmmUpdate(const MleDiagGmmOptions &config,
                       int32_t *removed_gaussians_out) {
   KHG_ASSERT(gmm != nullptr);
 
-  if (flags & ~diag_gmm_acc.Flags())
+  if (flags & ~diag_gmm_acc.Flags()) {
     KHG_ERR << "Flags in argument do not match the active accumulators";
+  }
 
   KHG_ASSERT(diag_gmm_acc.NumGauss() == gmm->NumGauss() &&
              diag_gmm_acc.Dim() == gmm->Dim());
@@ -454,7 +455,10 @@ void MapDiagGmmUpdate(const MapDiagGmmOptions &config,
 float MlObjective(const DiagGmm &gmm, const AccumDiagGmm &diag_gmm_acc) {
   GmmFlagsType acc_flags = diag_gmm_acc.Flags();
 
-  float obj = diag_gmm_acc.occupancy().vdot(gmm.gconsts()).item().toFloat();
+  float obj = diag_gmm_acc.occupancy()
+                  .vdot(gmm.gconsts().to(torch::kDouble))
+                  .item()
+                  .toDouble();
 
   if (acc_flags & kGmmMeans) {
     // obj += TraceMatMat(mean_accs_bf, gmm.means_invvars(), kTrans);

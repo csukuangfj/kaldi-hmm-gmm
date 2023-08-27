@@ -5,6 +5,7 @@
 #include "kaldi-hmm-gmm/python/csrc/am-diag-gmm.h"
 
 #include "kaldi-hmm-gmm/csrc/am-diag-gmm.h"
+#include "torch/torch.h"
 
 namespace khg {
 

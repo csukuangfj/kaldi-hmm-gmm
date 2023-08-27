@@ -10,7 +10,7 @@
 // @param m A 2-D tensor
 // @param i The i-th row to return.
 inline torch::Tensor Row(torch::Tensor m, int32_t i) {
-  return m.slice(/*dim*/ 0, i, i + 1);
+  return m.slice(/*dim*/ 0, i, i + 1)[0];
 }
 
 #endif  // KALDI_HMM_GMM_CSRC_UTILS_H_

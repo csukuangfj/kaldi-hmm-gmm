@@ -197,6 +197,9 @@ class TransitionModel : public TransitionInformation {
   void MleUpdate(torch::Tensor stats, const MleTransitionUpdateConfig &cfg,
                  float *objf_impr_out, float *count_out);
 
+  /// Returns the total number of transition-states (note, these are one-based).
+  int32_t NumTransitionStates() const { return tuples_.size(); }
+
  private:
   // called from constructor.  initializes tuples_.
   void ComputeTuples(const ContextDependencyInterface &ctx_dep);
@@ -213,9 +216,6 @@ class TransitionModel : public TransitionInformation {
   // computes quantities derived from log-probs
   // (currently just non_self_loop_log_probs_; called whenever log-probs change.
   void ComputeDerivedOfProbs();
-
-  /// Returns the total number of transition-states (note, these are one-based).
-  int32_t NumTransitionStates() const { return tuples_.size(); }
 
   void Check() const;
 
