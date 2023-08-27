@@ -9,6 +9,7 @@ set(srcs
   diag-gmm.cc
   event-map.cc
   hmm-topology.cc
+  hmm-utils.cc
   kaldi-hmm-gmm.cc
   mle-am-diag-gmm.cc
   mle-diag-gmm.cc

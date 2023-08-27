@@ -11,6 +11,7 @@
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/event-map.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
+#include "kaldi-hmm-gmm/python/csrc/hmm-utils.h"
 #include "kaldi-hmm-gmm/python/csrc/mle-am-diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/mle-diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/model-common.h"
@@ -34,7 +35,7 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindDiagGmm(&m);
 
   PybindAmDiagGmm(&m);
-
+  PybindHmmUtils(&m);
   PybindHmmTopology(&m);
   PybindTransitionInformation(&m);
   PybindTransitionModel(&m);
