@@ -200,6 +200,12 @@ class TransitionModel : public TransitionInformation {
   /// Returns the total number of transition-states (note, these are one-based).
   int32_t NumTransitionStates() const { return tuples_.size(); }
 
+  int32_t TransitionStateToPhone(int32_t trans_state) const;
+
+  int32_t TransitionStateToSelfLoopPdf(int32_t trans_state) const;
+
+  int32_t TransitionStateToForwardPdf(int32_t trans_state) const;
+
  private:
   // called from constructor.  initializes tuples_.
   void ComputeTuples(const ContextDependencyInterface &ctx_dep);
@@ -225,13 +231,7 @@ class TransitionModel : public TransitionInformation {
   /// the transitions out of a particular transition state.
   int32_t NumTransitionIndices(int32_t trans_state) const;
 
-  int32_t TransitionStateToSelfLoopPdf(int32_t trans_state) const;
-
-  int32_t TransitionStateToForwardPdf(int32_t trans_state) const;
-
   int32_t TransitionStateToHmmState(int32_t trans_state) const;
-
-  int32_t TransitionStateToPhone(int32_t trans_state) const;
 
   int32_t TransitionIdToTransitionIndex(int32_t trans_id) const;
 
@@ -319,6 +319,20 @@ class TransitionModel : public TransitionInformation {
   /// transition-state.
   kaldiio::Vector<float> non_self_loop_log_probs_;
 };
+
+/// Works out which pdfs might correspond to the given phones.  Will return true
+/// if these pdfs correspond *just* to these phones, false if these pdfs are
+/// also used by other phones.
+/// @param trans_model [in] Transition-model used to work out this information
+/// @param phones [in] A sorted, uniq vector that represents a set of phones
+/// @param pdfs [out] Will be set to a sorted, uniq list of pdf-ids that
+/// correspond to one of this set of phones.
+/// @return  Returns true if all of the pdfs output to "pdfs" correspond to
+/// phones from this set (false if they may be shared with phones outside this
+/// set).
+bool GetPdfsForPhones(const TransitionModel &trans_model,
+                      const std::vector<int32_t> &phones,
+                      std::vector<int32_t> *pdfs);
 
 }  // namespace khg
 

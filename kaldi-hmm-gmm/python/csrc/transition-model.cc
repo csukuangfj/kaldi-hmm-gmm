@@ -54,6 +54,15 @@ void PybindTransitionModel(py::module *m) {
              self.MleUpdate(stats, cfg, &objf_impr_out, &count_out);
              return std::make_pair(objf_impr_out, count_out);
            });
+
+  m->def(
+      "get_pdfs_for_phones",
+      [](const TransitionModel &trans_model, const std::vector<int32_t> &phones)
+          -> std::pair<bool, std::vector<int32_t>> {
+        std::vector<int32_t> pdfs;
+        bool is_unique = GetPdfsForPhones(trans_model, phones, &pdfs);
+        return std::make_pair(is_unique, pdfs);
+      });
 }
 
 }  // namespace khg
