@@ -9,6 +9,7 @@
 #define KALDI_HMM_GMM_CSRC_HMM_UTILS_H_
 
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "fst/fstlib.h"

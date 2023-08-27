@@ -4,6 +4,8 @@
 
 #include "kaldi-hmm-gmm/python/csrc/mle-diag-gmm.h"
 
+#include <memory>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -92,9 +94,7 @@ void PybindMleDiagGmm(py::module *m) {
       .def("smooth_with_accum", &PyClass::SmoothWithAccum, py::arg("tau"),
            py::arg("src_acc"))
       .def("smooth_with_model", &PyClass::SmoothWithModel, py::arg("tau"),
-           py::arg("src_gmm"))
-      //
-      ;
+           py::arg("src_gmm"));
   m->def(
       "mle_diag_gmm_update",
       [](const MleDiagGmmOptions &config, const AccumDiagGmm &diag_gmm_acc,

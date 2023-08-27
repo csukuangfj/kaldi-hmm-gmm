@@ -28,7 +28,7 @@ TrainingGraphCompiler::TrainingGraphCompiler(
       lex_fst_(lex_fst),
       disambig_syms_(disambig_syms),
       opts_(opts) {
-  using namespace fst;
+  using namespace fst;  // NOLINT
   const std::vector<int32_t> &phone_syms =
       trans_model_.GetPhones();  // needed to create context fst.
 
@@ -65,7 +65,7 @@ TrainingGraphCompiler::TrainingGraphCompiler(
 bool TrainingGraphCompiler::CompileGraphFromText(
     const std::vector<int32_t> &transcript,
     fst::VectorFst<fst::StdArc> *out_fst) {
-  using namespace fst;
+  using namespace fst;  // NOLINT
   VectorFst<StdArc> word_fst;
   MakeLinearAcceptor(transcript, &word_fst);
   return CompileGraph(word_fst, out_fst);
@@ -74,7 +74,7 @@ bool TrainingGraphCompiler::CompileGraphFromText(
 bool TrainingGraphCompiler::CompileGraph(
     const fst::VectorFst<fst::StdArc> &word_fst,
     fst::VectorFst<fst::StdArc> *out_fst) {
-  using namespace fst;
+  using namespace fst;  // NOLINT
   KHG_ASSERT(lex_fst_ != nullptr);
   KHG_ASSERT(out_fst != nullptr);
 
@@ -87,7 +87,7 @@ bool TrainingGraphCompiler::CompileGraph(
 bool TrainingGraphCompiler::CompileGraphFromLG(
     const fst::VectorFst<fst::StdArc> &phone2word_fst,
     fst::VectorFst<fst::StdArc> *out_fst) {
-  using namespace fst;
+  using namespace fst;  // NOLINT
 
   KHG_ASSERT(phone2word_fst.Start() != kNoStateId);
 
@@ -155,7 +155,7 @@ bool TrainingGraphCompiler::CompileGraphs(
 bool TrainingGraphCompiler::CompileGraphsFromText(
     const std::vector<std::vector<int32_t>> &transcripts,
     std::vector<fst::VectorFst<fst::StdArc> *> *out_fsts) {
-  using namespace fst;
+  using namespace fst;  // NOLINT
   std::vector<const VectorFst<StdArc> *> word_fsts(transcripts.size());
   for (size_t i = 0; i < transcripts.size(); i++) {
     VectorFst<StdArc> *word_fst = new VectorFst<StdArc>();

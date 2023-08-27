@@ -6,10 +6,12 @@
 
 // this file is copied and modified from
 // kaldi/src/hmm/hmm-utils.cc
+
 #include "kaldi-hmm-gmm/csrc/hmm-utils.h"
 
 #include <cmath>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 #include "fst/fstlib.h"
@@ -40,7 +42,7 @@ static fst::VectorFst<fst::StdArc> *GetHmmAsFsa(
     const ContextDependencyInterface &ctx_dep,
     const TransitionModel &trans_model, const HTransducerConfig &config,
     HmmCacheType *cache) {
-  using namespace fst;
+  using namespace fst;  // NOLINT
 
   if (static_cast<int32_t>(phone_window.size()) != ctx_dep.ContextWidth())
     KHG_ERR << "Context size mismatch, ilabel-info [from context FST is "
@@ -167,7 +169,7 @@ fst::VectorFst<fst::StdArc> *GetHTransducer(
   HmmCacheType cache;
   // "cache" is an optimization that prevents GetHmmAsFsa repeating work
   // unnecessarily.
-  using namespace fst;
+  using namespace fst;  // NOLINT
   typedef StdArc Arc;
   typedef Arc::Weight Weight;
   typedef Arc::StateId StateId;
@@ -262,11 +264,12 @@ class TidToTstateMapper {
         check_no_self_loops_(check_no_self_loops) {}
   typedef int32_t Result;
   int32_t operator()(int32_t label) const {
-    if (label == static_cast<int32_t>(fst::kNoLabel))
+    if (label == static_cast<int32_t>(fst::kNoLabel)) {
       return -1;  // -1 -> -1
-    else if (label >= 1 && label <= trans_model_.NumTransitionIds()) {
-      if (check_no_self_loops_ && trans_model_.IsSelfLoop(label))
+    } else if (label >= 1 && label <= trans_model_.NumTransitionIds()) {
+      if (check_no_self_loops_ && trans_model_.IsSelfLoop(label)) {
         KHG_ERR << "AddSelfLoops: graph already has self-loops.";
+      }
       return trans_model_.TransitionIdToTransitionState(label);
     } else {  // 0 or (presumably) disambiguation symbol.  Map to zero
       int32_t big_number = fst::kNontermBigNumber;  // 1000000
@@ -291,7 +294,7 @@ static void AddSelfLoopsReorder(const TransitionModel &trans_model,
                                 const std::vector<int32_t> &disambig_syms,
                                 float self_loop_scale, bool check_no_self_loops,
                                 fst::VectorFst<fst::StdArc> *fst) {
-  using namespace fst;
+  using namespace fst;  // NOLINT
   typedef StdArc Arc;
   typedef Arc::Label Label;
   typedef Arc::StateId StateId;
@@ -320,9 +323,9 @@ static void AddSelfLoopsReorder(const TransitionModel &trans_model,
          aiter.Next()) {
       Arc arc = aiter.Value();
       int32_t trans_state = f(arc.ilabel);
-      if (state_in[arc.nextstate] == kNoTransState)
+      if (state_in[arc.nextstate] == kNoTransState) {
         state_in[arc.nextstate] = trans_state;
-      else {
+      } else {
         KHG_ASSERT(state_in[arc.nextstate] == trans_state);
         // or probably an error in MakePrecedingInputSymbolsSame.
       }
@@ -373,7 +376,7 @@ static void AddSelfLoopsNoReorder(const TransitionModel &trans_model,
                                   float self_loop_scale,
                                   bool check_no_self_loops,
                                   fst::VectorFst<fst::StdArc> *fst) {
-  using namespace fst;
+  using namespace fst;  // NOLINT
   typedef StdArc Arc;
   typedef Arc::Label Label;
   typedef Arc::StateId StateId;
@@ -463,7 +466,7 @@ void AddTransitionProbs(
     const std::vector<int32_t> &disambig_syms,  // may be empty
     float transition_scale, float self_loop_scale,
     fst::VectorFst<fst::StdArc> *fst) {
-  using namespace fst;
+  using namespace fst;  // NOLINT
   KHG_ASSERT(IsSortedAndUniq(disambig_syms));
 
   int num_tids = trans_model.NumTransitionIds();

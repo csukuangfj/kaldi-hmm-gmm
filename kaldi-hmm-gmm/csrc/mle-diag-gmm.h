@@ -8,6 +8,8 @@
 #ifndef KALDI_HMM_GMM_CSRC_MLE_DIAG_GMM_H_
 #define KALDI_HMM_GMM_CSRC_MLE_DIAG_GMM_H_
 
+#include <string>
+
 #include "kaldi-hmm-gmm/csrc/diag-gmm.h"
 #include "kaldi-hmm-gmm/csrc/model-common.h"
 #include "torch/script.h"

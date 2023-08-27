@@ -4,6 +4,8 @@
 #include "kaldi-hmm-gmm/python/csrc/context-dep.h"
 
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "kaldi-hmm-gmm/csrc/context-dep.h"
 #include "kaldi_native_io/csrc/kaldi-io.h"

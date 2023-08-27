@@ -3,6 +3,10 @@
 // Copyright (c)  2023  Xiaomi Corporation
 #include "kaldi-hmm-gmm/python/csrc/event-map.h"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "kaldi-hmm-gmm/csrc/event-map.h"
 
 namespace khg {

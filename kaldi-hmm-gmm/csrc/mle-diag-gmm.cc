@@ -7,7 +7,10 @@
 
 #include "kaldi-hmm-gmm/csrc/mle-diag-gmm.h"
 
+#include <algorithm>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "kaldi-hmm-gmm/csrc/diag-gmm-normal.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
@@ -205,8 +208,9 @@ void AccumDiagGmm::SmoothWithAccum(float tau, const AccumDiagGmm &src_acc) {
           .add_(Row(src_acc.variance_accumulator_, i),
                 tau / src_occupancy_acc[i]);
 
-    } else
+    } else {
       KHG_WARN << "Could not smooth since source acc had zero occupancy.";
+    }
   }
 }
 
