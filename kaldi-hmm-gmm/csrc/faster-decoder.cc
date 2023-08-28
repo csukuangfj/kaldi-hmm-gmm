@@ -9,6 +9,7 @@
 
 #include "kaldi-hmm-gmm/csrc/faster-decoder.h"
 
+#include <algorithm>
 #include <limits>
 
 #include "kaldi-hmm-gmm/csrc/log.h"

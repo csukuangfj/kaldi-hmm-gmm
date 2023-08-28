@@ -9,6 +9,7 @@
 #define KALDI_HMM_GMM_CSRC_DECODER_WRAPPERS_H_
 
 #include <string>
+#include <vector>
 
 #include "fst/fst.h"
 #include "fst/fstlib.h"
@@ -26,7 +27,9 @@ struct AlignConfig {
   // alignment failure (involves loop to start of decoding graph).
   bool careful;
 
-  AlignConfig(float beam = 200.0, float retry_beam = 0.0, bool careful = false)
+  /*implicit*/ AlignConfig(float beam = 200.0,      // NOLINT
+                           float retry_beam = 0.0,  // NOLINT
+                           bool careful = false)    // NOLINT
       : beam(beam), retry_beam(retry_beam), careful(careful) {}
 };
 

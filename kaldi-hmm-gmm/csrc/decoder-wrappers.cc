@@ -5,6 +5,8 @@
 
 #include "kaldi-hmm-gmm/csrc/decoder-wrappers.h"
 
+#include <vector>
+
 #include "kaldi-hmm-gmm/csrc/faster-decoder.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldifst/csrc/fstext-utils.h"

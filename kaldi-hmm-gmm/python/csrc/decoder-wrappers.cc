@@ -4,6 +4,7 @@
 
 #include "kaldi-hmm-gmm/python/csrc/decoder-wrappers.h"
 
+#include <string>
 #include <tuple>
 #include <vector>
 
