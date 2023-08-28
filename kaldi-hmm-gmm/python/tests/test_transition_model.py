@@ -2,9 +2,11 @@
 # To run this single test, use
 #
 #  ctest --verbose -R  test_trnasition_model_py
+import pickle
 import unittest
-import torch
+
 import kaldi_hmm_gmm as khg
+import torch
 
 
 def get_hmm_topo():
@@ -137,6 +139,46 @@ class TestTransitionModel(unittest.TestCase):
 
         transition_model.accumulate(prob=1.0, trans_id=10, stats=stats)
         assert stats[10].item() == 1.0, stats[10]
+
+        # test pickle
+        data = pickle.dumps(transition_model, 2)  # Must use pickle protocol >= 2
+        transition_model2 = pickle.loads(data)
+        assert isinstance(transition_model2, khg.TransitionModel)
+
+        assert str(transition_model.topo) == str(transition_model2.topo)
+
+        for i in range(len(transition_model.tuples)):
+            assert str(transition_model.tuples[i]) == str(transition_model2.tuples[i])
+
+        assert transition_model.state2id == transition_model2.state2id
+        assert transition_model.id2state == transition_model2.id2state
+        assert transition_model.id2pdf_id == transition_model2.id2pdf_id
+        assert transition_model.log_probs == transition_model2.log_probs
+        assert (
+            transition_model.non_self_loop_log_probs
+            == transition_model2.non_self_loop_log_probs
+        )
+        assert transition_model.num_pdfs == transition_model2.num_pdfs
+
+        torch.save(transition_model, "transition_model.pt")
+        transition_model3 = torch.load("transition_model.pt")
+
+        assert isinstance(transition_model3, khg.TransitionModel)
+
+        assert str(transition_model.topo) == str(transition_model3.topo)
+
+        for i in range(len(transition_model.tuples)):
+            assert str(transition_model.tuples[i]) == str(transition_model3.tuples[i])
+
+        assert transition_model.state2id == transition_model3.state2id
+        assert transition_model.id2state == transition_model3.id2state
+        assert transition_model.id2pdf_id == transition_model3.id2pdf_id
+        assert transition_model.log_probs == transition_model3.log_probs
+        assert (
+            transition_model.non_self_loop_log_probs
+            == transition_model3.non_self_loop_log_probs
+        )
+        assert transition_model.num_pdfs == transition_model3.num_pdfs
 
 
 """
