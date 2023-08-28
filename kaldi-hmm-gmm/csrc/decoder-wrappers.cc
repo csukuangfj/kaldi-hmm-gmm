@@ -7,6 +7,7 @@
 
 #include "kaldi-hmm-gmm/csrc/faster-decoder.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
+#include "kaldifst/csrc/fstext-utils.h"
 
 namespace khg {
 
@@ -17,10 +18,12 @@ void AlignUtteranceWrapper(
     fst::VectorFst<fst::StdArc> *fst,  // non-const in case config.careful ==
                                        // true, we add loop.
     DecodableInterface *decodable,     // not const but is really an input.
-    Int32VectorWriter *alignment_writer, BaseFloatWriter *scores_writer,
     int32_t *num_done, int32_t *num_error, int32_t *num_retried,
-    double *tot_like, int64_t *frame_count,
-    BaseFloatVectorWriter *per_frame_acwt_writer = nullptr) {
+    double *tot_like, int64_t *frame_count, std::vector<int32_t> *alignment,
+    std::vector<int32_t> *words) {
+  alignment->clear();
+  words->clear();
+
   if ((config.retry_beam != 0 && config.retry_beam <= config.beam) ||
       config.beam <= 0.0) {
     KHG_ERR << "Beams do not make sense: beam " << config.beam
@@ -44,6 +47,62 @@ void AlignUtteranceWrapper(
 
   FasterDecoder decoder(*fst, decode_opts);
   decoder.Decode(decodable);
+
+  bool ans = decoder.ReachedFinal();  // consider only final states.
+
+  if (!ans && config.retry_beam != 0.0) {
+    if (num_retried != nullptr) {
+      (*num_retried)++;
+    }
+
+    KHG_WARN << "Retrying utterance " << utt << " with beam "
+             << config.retry_beam;
+
+    decode_opts.beam = config.retry_beam;
+    decoder.SetOptions(decode_opts);
+    decoder.Decode(decodable);
+    ans = decoder.ReachedFinal();
+  }
+
+  if (!ans) {  // Still did not reach final state.
+    KHG_WARN << "Did not successfully decode file " << utt
+             << ", len = " << decodable->NumFramesReady();
+    if (num_error != nullptr) {
+      (*num_error)++;
+    }
+
+    return;
+  }
+
+  fst::VectorFst<fst::LatticeArc> decoded;  // linear FST.
+  decoder.GetBestPath(&decoded);
+
+  if (decoded.NumStates() == 0) {
+    KHG_WARN << "Error getting best path from decoder (likely a bug)";
+    if (num_error != NULL) {
+      (*num_error)++;
+    }
+
+    return;
+  }
+
+  fst::LatticeWeight weight;
+
+  fst::GetLinearSymbolSequence(decoded, alignment, words, &weight);
+
+  float like = -(weight.Value1() + weight.Value2()) / acoustic_scale;
+
+  if (num_done != nullptr) {
+    (*num_done)++;
+  }
+
+  if (tot_like != nullptr) {
+    (*tot_like) += like;
+  }
+
+  if (frame_count != nullptr) {
+    (*frame_count) += decodable->NumFramesReady();
+  }
 }
 
 // see comment in header.

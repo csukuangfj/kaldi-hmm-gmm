@@ -7,8 +7,9 @@
 // this file is copied and modified from
 // kaldi/src/utils/hash-list.h
 
-#ifndef KALDI_HMM_GMM_CSRC_HAST_LIST_H_
-#define KALDI_HMM_GMM_CSRC_HAST_LIST_H_
+#ifndef KALDI_HMM_GMM_CSRC_HASH_LIST_H_
+#define KALDI_HMM_GMM_CSRC_HASH_LIST_H_
+
 #include <algorithm>
 #include <cassert>
 #include <limits>
@@ -129,4 +130,4 @@ class HashList {
 
 #include "kaldi-hmm-gmm/csrc/hash-list-inl.h"
 
-#endif  // KALDI_HMM_GMM_CSRC_HAST_LIST_H_
+#endif  // KALDI_HMM_GMM_CSRC_HASH_LIST_H_

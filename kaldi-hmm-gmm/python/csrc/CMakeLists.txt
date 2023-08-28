@@ -6,7 +6,10 @@ set(srcs
   cluster-utils.cc
   clusterable-classes.cc
   context-dep.cc
+  decodable-itf.cc
+  decoder-wrappers.cc
   diag-gmm.cc
+  decodable-am-diag-gmm.cc
   event-map.cc
   hmm-topology.cc
   hmm-utils.cc

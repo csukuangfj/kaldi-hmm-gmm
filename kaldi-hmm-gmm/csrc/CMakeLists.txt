@@ -8,10 +8,11 @@ set(srcs
   clusterable-classes.cc
   context-dep.cc
   decodable-am-diag-gmm.cc
-  # decoder-wrappers.cc
+  decoder-wrappers.cc
   diag-gmm-normal.cc
   diag-gmm.cc
   event-map.cc
+  faster-decoder.cc
   hmm-topology.cc
   hmm-utils.cc
   kaldi-math.cc

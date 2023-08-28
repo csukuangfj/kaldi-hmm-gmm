@@ -8,6 +8,9 @@
 #include "kaldi-hmm-gmm/python/csrc/cluster-utils.h"
 #include "kaldi-hmm-gmm/python/csrc/clusterable-classes.h"
 #include "kaldi-hmm-gmm/python/csrc/context-dep.h"
+#include "kaldi-hmm-gmm/python/csrc/decodable-am-diag-gmm.h"
+#include "kaldi-hmm-gmm/python/csrc/decodable-itf.h"
+#include "kaldi-hmm-gmm/python/csrc/decoder-wrappers.h"
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/event-map.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
@@ -43,6 +46,10 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindTrainingGraphCompiler(&m);
   PybindMleDiagGmm(&m);
   PybindMleAmDiagGmm(&m);
+
+  PybindDecodableItf(&m);
+  PybindDecodableAmDiagGmm(&m);
+  PybindDecoderWrappers(&m);
 }
 
 }  // namespace khg

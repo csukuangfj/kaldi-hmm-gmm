@@ -11,6 +11,7 @@
 #include <string>
 
 #include "fst/fst.h"
+#include "fst/fstlib.h"
 #include "kaldi-hmm-gmm/csrc/decodable-itf.h"
 
 namespace khg {
@@ -25,7 +26,8 @@ struct AlignConfig {
   // alignment failure (involves loop to start of decoding graph).
   bool careful;
 
-  AlignConfig() : beam(200.0), retry_beam(0.0), careful(false) {}
+  AlignConfig(float beam = 200.0, float retry_beam = 0.0, bool careful = false)
+      : beam(beam), retry_beam(retry_beam), careful(careful) {}
 };
 
 /// AlignUtteranceWapper is a wrapper for alignment code used in training, that
@@ -41,10 +43,9 @@ void AlignUtteranceWrapper(
     fst::VectorFst<fst::StdArc> *fst,  // non-const in case config.careful ==
                                        // true, we add loop.
     DecodableInterface *decodable,     // not const but is really an input.
-    Int32VectorWriter *alignment_writer, BaseFloatWriter *scores_writer,
     int32_t *num_done, int32_t *num_error, int32_t *num_retried,
-    double *tot_like, int64_t *frame_count,
-    BaseFloatVectorWriter *per_frame_acwt_writer = nullptr);
+    double *tot_like, int64_t *frame_count, std::vector<int32_t> *alignment,
+    std::vector<int32_t> *words);
 
 /// This function modifies the decoding graph for what we call "careful
 /// alignment".  The problem we are trying to solve is that if the decoding eats

@@ -7,8 +7,8 @@
 // this file is copied and modified from
 // kaldi/src/utils/hash-list-inl.h
 
-#ifndef KALDI_HMM_GMM_CSRC_HAST_LIST_INL_H_
-#define KALDI_HMM_GMM_CSRC_HAST_LIST_INL_H_
+#ifndef KALDI_HMM_GMM_CSRC_HASH_LIST_INL_H_
+#define KALDI_HMM_GMM_CSRC_HASH_LIST_INL_H_
 
 // kaldi-hmm-gmm/csrc/hash-list-inl.h
 
@@ -205,4 +205,4 @@ void HashList<I, T>::InsertMore(I key, T val) {
 
 }  // namespace khg
 
-#endif  // KALDI_HMM_GMM_CSRC_HAST_LIST_INL_H_
+#endif  // KALDI_HMM_GMM_CSRC_HASH_LIST_INL_H_

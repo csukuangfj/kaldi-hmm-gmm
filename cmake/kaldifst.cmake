@@ -6,7 +6,7 @@ function(download_kaldifst)
   set(kaldifst_HASH "SHA256=b8036431aa896bdefdba49616db21576bda04f8bc5be74de43a0c3a910828b27")
 
   # We will merge the branch "for-khg" into master later
-  set(kaldifst_URL "https://github.com/csukuangfj/kaldifst/archive/33c8432047dfb538bf8ade7205cab88dba7f6049.zip")
+  set(kaldifst_URL "https://github.com/csukuangfj/kaldifst/archive/9386ef6910e7b30093a6f711cee484421a308f8b.zip")
   set(kaldifst_URL2 "")
   set(kaldifst_HASH "")
 
@@ -14,7 +14,7 @@ function(download_kaldifst)
   # If you don't have access to the Internet,
   # please pre-download kaldi_native_io
   set(possible_file_locations
-    $ENV{HOME}/Downloads/kaldifst-33c8432047dfb538bf8ade7205cab88dba7f6049.zip
+    $ENV{HOME}/Downloads/kaldifst-9386ef6910e7b30093a6f711cee484421a308f8b.zip
 
     $ENV{HOME}/Downloads/kaldifst-1.5.2.tar.gz
     ${PROJECT_SOURCE_DIR}/kaldifst-1.5.2.tar.gz

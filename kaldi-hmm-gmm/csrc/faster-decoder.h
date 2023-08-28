@@ -10,8 +10,13 @@
 #define KALDI_HMM_GMM_CSRC_FASTER_DECODER_H_
 
 #include <limits>
+#include <vector>
 
+#include "fst/fst.h"
+#include "fst/fstlib.h"
 #include "kaldi-hmm-gmm/csrc/decodable-itf.h"
+#include "kaldi-hmm-gmm/csrc/hash-list.h"
+#include "kaldifst/csrc/lattice-weight.h"
 
 namespace khg {
 
@@ -68,7 +73,7 @@ class FasterDecoder {
   /// final-probs. Returns true if the output best path was not the empty
   /// FST (will only return false in unusual circumstances where
   /// no tokens survived).
-  bool GetBestPath(fst::MutableFst<LatticeArc> *fst_out,
+  bool GetBestPath(fst::MutableFst<fst::LatticeArc> *fst_out,
                    bool use_final_probs = true);
 
   /// As a new alternative to Decode(), you can call InitDecoding
@@ -105,6 +110,7 @@ class FasterDecoder {
       }
     }
 
+    // for epsilon transitions, i.e., non-emitting arcs
     inline Token(const Arc &arc, Token *prev)
         : arc_(arc), prev_(prev), ref_count_(1) {
       if (prev) {
@@ -131,7 +137,8 @@ class FasterDecoder {
       }
     }
   };
-  typedef HashList<StateId, Token *>::Elem Elem;
+
+  using Elem = HashList<StateId, Token *>::Elem;
 
   /// Gets the weight cutoff.  Also counts the active tokens.
   double GetCutoff(Elem *list_head, size_t *tok_count, float *adaptive_beam,
@@ -144,14 +151,16 @@ class FasterDecoder {
   // and then increments num_frames_decoded_
   double ProcessEmitting(DecodableInterface *decodable);
 
-  // TODO: first time we go through this, could avoid using the queue.
+  // TODO(dan): first time we go through this, could avoid using the queue.
   void ProcessNonemitting(double cutoff);
 
-  // HashList defined in ../util/hash-list.h.  It actually allows us to maintain
+  // HashList defined in ../hash-list.h.  It actually allows us to maintain
   // more than one list (e.g. for current and previous frames), but only one of
   // them at a time can be indexed by StateId.
   HashList<StateId, Token *> toks_;
+
   const fst::Fst<fst::StdArc> &fst_;
+
   FasterDecoderOptions config_;
 
   // temp variable used in ProcessNonemitting,
@@ -175,4 +184,4 @@ class FasterDecoder {
 
 }  // namespace khg
 
-#endif  // KALDI_HMM_GMM_CSRC_FAST_DECODER_H_
+#endif  // KALDI_HMM_GMM_CSRC_FASTER_DECODER_H_

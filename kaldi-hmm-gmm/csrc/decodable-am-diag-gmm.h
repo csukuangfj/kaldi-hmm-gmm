@@ -50,16 +50,16 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
 
   // Note, frames are numbered from zero.  But state_index is numbered
   // from one (this routine is called by FSTs).
-  virtual float LogLikelihood(int32_t frame, int32_t state_index) {
+  float LogLikelihood(int32_t frame, int32_t state_index) override {
     return LogLikelihoodZeroBased(frame, state_index - 1);
   }
 
-  virtual int32_t NumFramesReady() const { return feature_matrix_.size(0); }
+  int32_t NumFramesReady() const override { return feature_matrix_.size(0); }
 
   // Indices are one-based!  This is for compatibility with OpenFst.
-  virtual int32_t NumIndices() const { return acoustic_model_.NumPdfs(); }
+  int32_t NumIndices() const override { return acoustic_model_.NumPdfs(); }
 
-  virtual bool IsLastFrame(int32_t frame) const {
+  bool IsLastFrame(int32_t frame) const override {
     KHG_ASSERT(frame < NumFramesReady());
     return (frame == NumFramesReady() - 1);
   }
@@ -99,12 +99,14 @@ class DecodableAmDiagGmmScaled : public DecodableAmDiagGmmUnmapped {
       delete;
 
   // Note, frames are numbered from zero but transition-ids from one.
-  virtual float LogLikelihood(int32_t frame, int32_t tid) {
+  float LogLikelihood(int32_t frame, int32_t tid) override {
     return scale_ *
            LogLikelihoodZeroBased(frame, trans_model_.TransitionIdToPdf(tid));
   }
   // Indices are one-based!  This is for compatibility with OpenFst.
-  virtual int32_t NumIndices() const { return trans_model_.NumTransitionIds(); }
+  int32_t NumIndices() const override {
+    return trans_model_.NumTransitionIds();
+  }
 
   const TransitionModel *TransModel() { return &trans_model_; }
 
