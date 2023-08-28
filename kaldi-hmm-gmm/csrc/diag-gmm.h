@@ -33,6 +33,15 @@ class DiagGmm {
     CopyFromDiagGmm(gmm);
   }
 
+  DiagGmm(torch::Tensor weights, torch::Tensor inv_vars,
+          torch::Tensor means_invvars)
+      : valid_gconsts_(false),
+        weights_(weights),
+        inv_vars_(inv_vars),
+        means_invvars_(means_invvars) {
+    ComputeGconsts();
+  }
+
   DiagGmm &operator=(const DiagGmm &other) = delete;  // Disallow assignment
 
   /// Resizes arrays to this dim. Does not initialize data.

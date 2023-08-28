@@ -148,7 +148,18 @@ void PybindDiagGmm(py::module *m) {
       .def_property_readonly("inv_vars", &PyClass::inv_vars)
       .def_property_readonly("valid_gconsts", &PyClass::valid_gconsts)
       .def_property_readonly("vars", &PyClass::GetVars)
-      .def_property_readonly("means", &PyClass::GetMeans);
+      .def_property_readonly("means", &PyClass::GetMeans)
+      .def(py::pickle(
+          [](const PyClass &self) -> py::tuple {
+            return py::make_tuple(self.weights(), self.inv_vars(),
+                                  self.means_invvars());
+          },
+          [](const py::tuple &t) -> PyClass {
+            torch::Tensor weights = t[0].cast<torch::Tensor>();
+            torch::Tensor inv_vars = t[1].cast<torch::Tensor>();
+            torch::Tensor means_invvars = t[2].cast<torch::Tensor>();
+            return {weights, inv_vars, means_invvars};
+          }));
 }
 
 }  // namespace khg

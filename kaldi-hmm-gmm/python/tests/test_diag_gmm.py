@@ -5,11 +5,11 @@
 
 
 import math
+import pickle
 import unittest
 
-import torch
-
 import kaldi_hmm_gmm as khg
+import torch
 
 
 class TestDiagGmm(unittest.TestCase):
@@ -727,6 +727,30 @@ class TestDiagGmm(unittest.TestCase):
             dgm.vars,
             (1 - rho) * diag_gmm.vars + rho * diag_gmm2.vars,
         )
+
+    def test_pickle(self):
+        nmix = 24
+        dim = 10
+
+        diag_gmm = khg.DiagGmm(nmix, dim)
+
+        weights = torch.rand(nmix, dtype=torch.float32)
+        weights /= weights.sum()
+
+        mean = torch.randn(nmix, dim)
+        var = torch.randn(nmix, dim).square()
+        diag_gmm.set_weights(weights)
+        diag_gmm.set_means(mean)
+        diag_gmm.set_invvars(1 / var)
+        diag_gmm.compute_gconsts()
+
+        data = pickle.dumps(diag_gmm, 2)  # Must use pickle protocol >= 2
+        diag_gmm2 = pickle.loads(data)
+
+        assert diag_gmm2.valid_gconsts is True
+        assert torch.allclose(diag_gmm2.weights, diag_gmm2.weights)
+        assert torch.allclose(diag_gmm2.means_invvars, diag_gmm2.means_invvars)
+        assert torch.allclose(diag_gmm2.inv_vars, diag_gmm2.inv_vars)
 
 
 if __name__ == "__main__":

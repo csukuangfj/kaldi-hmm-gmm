@@ -10,12 +10,12 @@ def gmm_info(
     am_gmm: khg.AmDiagGmm,
     transition_model: khg.TransitionModel,
 ) -> Dict[str, int]:
-    print("number of phones", len(transition_model.phones))
-    print("number of pdfs", transition_model.num_pdfs)
-    print("number of transition ids", transition_model.num_transition_ids)
-    print("number of transition states", transition_model.num_transition_states)
-    print("feature dimension", am_gmm.dim)
-    print("number of gaussians", am_gmm.num_gauss)
+    #  print("number of phones", len(transition_model.phones))
+    #  print("number of pdfs", transition_model.num_pdfs)
+    #  print("number of transition ids", transition_model.num_transition_ids)
+    #  print("number of transition states", transition_model.num_transition_states)
+    #  print("feature dimension", am_gmm.dim)
+    #  print("number of gaussians", am_gmm.num_gauss)
 
     ans = {}
     ans["number_of_phones"] = len(transition_model.phones)
