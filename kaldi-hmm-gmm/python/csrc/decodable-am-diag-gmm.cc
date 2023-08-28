@@ -21,8 +21,8 @@ static void PybindDecodableAmDiagGmmScaled(py::module *m) {
   py::class_<PyClass, DecodableAmDiagGmmUnmapped>(*m,
                                                   "DecodableAmDiagGmmScaled")
       .def(py::init<const AmDiagGmm &, const TransitionModel &, torch::Tensor,
-                    float>(),
-           py::arg("am"), py::arg("tm"), py::arg("feats"),
+                    float, float>(),
+           py::arg("am"), py::arg("tm"), py::arg("feats"), py::arg("scale"),
            py::arg("log_sum_exp_prune") = -1.0)
       .def_property_readonly("transition_model", &PyClass::TransModel);
 }

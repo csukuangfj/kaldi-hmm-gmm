@@ -154,7 +154,7 @@ double FasterDecoder::ProcessEmitting(DecodableInterface *decodable) {
   double weight_cutoff =
       GetCutoff(last_toks, &tok_cnt, &adaptive_beam, &best_elem);
 
-  KHG_LOG << tok_cnt << " tokens active.";
+  // KHG_LOG << tok_cnt << " tokens active.";
 
   // This makes sure the hash is always big enough.
   PossiblyResizeHash(tok_cnt);
