@@ -73,8 +73,12 @@ inline typename HashList<I, T>::Elem *HashList<I, T>::Find(I key) {
                       ? list_head_
                       : buckets_[bucket.prev_bucket].last_elem->tail),
          *tail = bucket.last_elem->tail;
-    for (Elem *e = head; e != tail; e = e->tail)
-      if (e->key == key) return e;
+    for (Elem *e = head; e != tail; e = e->tail) {
+      if (e->key == key) {
+        return e;
+      }
+    }
+
     return nullptr;  // Not found.
   }
 }
@@ -87,8 +91,10 @@ inline typename HashList<I, T>::Elem *HashList<I, T>::New() {
     return ans;
   } else {
     Elem *tmp = new Elem[allocate_block_size_];
-    for (size_t i = 0; i + 1 < allocate_block_size_; i++)
+    for (size_t i = 0; i + 1 < allocate_block_size_; i++) {
       tmp[i].tail = tmp + i + 1;
+    }
+
     tmp[allocate_block_size_ - 1].tail = nullptr;
     freed_head_ = tmp;
     allocated_.push_back(tmp);
@@ -101,16 +107,21 @@ HashList<I, T>::~HashList() {
   // First test whether we had any memory leak within the
   // HashList, i.e. things for which the user did not call Delete().
   size_t num_in_list = 0, num_allocated = 0;
-  for (Elem *e = freed_head_; e != nullptr; e = e->tail) num_in_list++;
+
+  for (Elem *e = freed_head_; e != nullptr; e = e->tail) {
+    num_in_list++;
+  }
+
   for (size_t i = 0; i < allocated_.size(); i++) {
     num_allocated += allocate_block_size_;
     delete[] allocated_[i];
   }
+
   if (num_in_list != num_allocated) {
-    KALDI_WARN << "Possible memory leak: " << num_in_list
-               << " != " << num_allocated
-               << ": you might have forgotten to call Delete on "
-               << "some Elems";
+    KHG_WARN << "Possible memory leak: " << num_in_list
+             << " != " << num_allocated
+             << ": you might have forgotten to call Delete on "
+             << "some Elems";
   }
 }
 
@@ -124,14 +135,19 @@ inline typename HashList<I, T>::Elem *HashList<I, T>::Insert(I key, T val) {
                       ? list_head_
                       : buckets_[bucket.prev_bucket].last_elem->tail),
          *tail = bucket.last_elem->tail;
-    for (Elem *e = head; e != tail; e = e->tail)
-      if (e->key == key) return e;
+
+    for (Elem *e = head; e != tail; e = e->tail) {
+      if (e->key == key) {
+        return e;
+      }
+    }
   }
 
   // This is a new element. Insert it.
   Elem *elem = New();
   elem->key = key;
   elem->val = val;
+
   if (bucket.last_elem == nullptr) {  // Unoccupied bucket.  Insert at
     // head of bucket list (which is tail of regular list, they go in
     // opposite directions).
@@ -165,8 +181,9 @@ void HashList<I, T>::InsertMore(I key, T val) {
   elem->key = key;
   elem->val = val;
 
-  KHG_ASSERT(bucket.last_elem !=
-             nullptr);                 // assume one element is already here
+  // assume one element is already here
+  KHG_ASSERT(bucket.last_elem != nullptr);
+
   if (bucket.last_elem->key == key) {  // standard behavior: add as last element
     elem->tail = bucket.last_elem->tail;
     bucket.last_elem->tail = elem;
@@ -177,7 +194,10 @@ void HashList<I, T>::InsertMore(I key, T val) {
                  ? list_head_
                  : buckets_[bucket.prev_bucket].last_elem->tail);
   // find place to insert in linked list
-  while (e != bucket.last_elem->tail && e->key != key) e = e->tail;
+  while (e != bucket.last_elem->tail && e->key != key) {
+    e = e->tail;
+  }
+
   KHG_ASSERT(e->key == key);  // not found? - should not happen
   elem->tail = e->tail;
   e->tail = elem;
