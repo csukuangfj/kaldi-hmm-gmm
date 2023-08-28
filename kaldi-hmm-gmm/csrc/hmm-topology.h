@@ -96,6 +96,12 @@ class HmmTopology {
       self_loop_pdf_class = pdf_class;
     }
 
+    HmmState(int32_t forward_pdf_class, int32_t self_loop_pdf_class,
+             const std::vector<std::pair<int32_t, float>> &transitions)
+        : forward_pdf_class(forward_pdf_class),
+          self_loop_pdf_class(self_loop_pdf_class),
+          transitions(transitions) {}
+
     HmmState(int32_t forward_pdf_class, int32_t self_loop_pdf_class) {
       assert((forward_pdf_class != kNoPdf && self_loop_pdf_class != kNoPdf) ||
              (forward_pdf_class == kNoPdf && self_loop_pdf_class == kNoPdf));
@@ -117,6 +123,11 @@ class HmmTopology {
   using TopologyEntry = std::vector<HmmState>;
 
   HmmTopology() = default;
+
+  HmmTopology(const std::vector<int32_t> &phones,
+              const std::vector<int32_t> &phone2idx,
+              const std::vector<TopologyEntry> &entries)
+      : phones_(phones), phone2idx_(phone2idx), entries_(entries) {}
 
   void Read(std::istream &is, bool binary);
   void Write(std::ostream &os, bool binary) const;
@@ -140,6 +151,8 @@ class HmmTopology {
   /// contiguous and starting from one but the toolkit doesn't assume
   /// they are contiguous).
   const std::vector<int32_t> &GetPhones() const { return phones_; }
+  const std::vector<int32_t> &GetPhone2Idx() const { return phone2idx_; }
+  const std::vector<TopologyEntry> &GetEntries() const { return entries_; }
 
   /// Returns the topology entry (i.e. vector of HmmState) for this phone;
   /// will throw exception if phone not covered by the topology.

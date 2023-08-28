@@ -2,7 +2,9 @@
 # To run this single test, use
 #
 #  ctest --verbose -R  test_hmm_topology_py
+import pickle
 import unittest
+
 import kaldi_hmm_gmm as khg
 
 
@@ -78,6 +80,13 @@ class TestHmmTopology(unittest.TestCase):
         # 0->1->2->3, the path length is 3
         assert topo.min_length(phone=1) == 3
 
+        # test pickle
+        data = pickle.dumps(topo, 2)  # Must use pickle protocol >= 2
+        topo2 = pickle.loads(data)
+        assert isinstance(topo2, khg.HmmTopology)
+
+        assert str(topo) == str(topo2)
+
     def test_non_hmm(self):
         s = """
  <Topology>
@@ -147,6 +156,14 @@ class TestHmmTopology(unittest.TestCase):
         assert topo.min_length(phone=10) == 3, topo.min_length(phones=10)
         assert topo.phones == [1, 2, 3, 4, 5, 6, 7, 8, 10], topo.phone
         assert topo.is_hmm is False  # topo for 10 is not HMM
+
+        # test pickle
+        data = pickle.dumps(topo, 2)  # Must use pickle protocol >= 2
+        topo2 = pickle.loads(data)
+        assert isinstance(topo2, khg.HmmTopology)
+
+        assert str(topo) == str(topo2)
+
         dot = khg.draw_hmm_topology(topo, phone=1)
         print(dot)
         print("--------------------")
