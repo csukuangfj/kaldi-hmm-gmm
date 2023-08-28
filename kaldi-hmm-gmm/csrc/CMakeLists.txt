@@ -7,9 +7,12 @@ set(srcs
   cluster-utils.cc
   clusterable-classes.cc
   context-dep.cc
+  decodable-am-diag-gmm.cc
+  decoder-wrappers.cc
   diag-gmm-normal.cc
   diag-gmm.cc
   event-map.cc
+  faster-decoder.cc
   hmm-topology.cc
   hmm-utils.cc
   kaldi-math.cc
@@ -30,6 +33,7 @@ if(KHG_ENABLE_TESTS)
   set(test_srcs
     diag-gmm-test.cc
     event-map-test.cc
+    hash-list-test.cc
   )
 
   function(khg_add_test source)

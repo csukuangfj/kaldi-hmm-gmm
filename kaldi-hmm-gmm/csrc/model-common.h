@@ -6,7 +6,9 @@
 //                2023  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_MODEL_COMMON_H_
 #define KALDI_HMM_GMM_CSRC_MODEL_COMMON_H_
+
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include "torch/script.h"

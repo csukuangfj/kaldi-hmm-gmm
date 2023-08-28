@@ -9,6 +9,7 @@
 #define KALDI_HMM_GMM_CSRC_HMM_UTILS_H_
 
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "fst/fstlib.h"
@@ -104,6 +105,28 @@ void AddSelfLoops(
     const std::vector<int32_t> &disambig_syms,  // used as a check only.
     float self_loop_scale, bool reorder, bool check_no_self_loops,
     fst::VectorFst<fst::StdArc> *fst);
+
+/**
+ * Adds transition-probs, with the supplied
+ * scales (see \ref hmm_scale), to the graph.
+ * Useful if you want to create a graph without transition probs, then possibly
+ * train the model (including the transition probs) but keep the graph fixed,
+ * and add back in the transition probs.  It assumes the fst has transition-ids
+ * on it.  It is not an error if the FST has no states (nothing will be done).
+ * @param trans_model [in] The transition model
+ * @param disambig_syms [in] A list of disambiguation symbols, required if the
+ *                       graph has disambiguation symbols on its input but only
+ *                       used for checks.
+ * @param transition_scale [in] A scale on transition-probabilities apart from
+ *                      those involving self-loops; see \ref hmm_scale.
+ * @param self_loop_scale [in] A scale on self-loop transition probabilities;
+ *                      see \ref hmm_scale.
+ * @param  fst [in, out] The FST to be modified.
+ */
+void AddTransitionProbs(const TransitionModel &trans_model,
+                        const std::vector<int32_t> &disambig_syms,
+                        float transition_scale, float self_loop_scale,
+                        fst::VectorFst<fst::StdArc> *fst);
 
 }  // namespace khg
 

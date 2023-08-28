@@ -7,8 +7,11 @@
 #ifndef KALDI_HMM_GMM_CSRC_MLE_AM_DIAG_GMM_H_
 #define KALDI_HMM_GMM_CSRC_MLE_AM_DIAG_GMM_H_
 
+#include <vector>
+
 #include "kaldi-hmm-gmm/csrc/am-diag-gmm.h"
 #include "kaldi-hmm-gmm/csrc/mle-diag-gmm.h"
+
 namespace khg {
 
 class AccumAmDiagGmm {

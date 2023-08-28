@@ -7,6 +7,9 @@
 #ifndef KALDI_HMM_GMM_CSRC_TRAINING_GRAPH_COMPILER_H_
 #define KALDI_HMM_GMM_CSRC_TRAINING_GRAPH_COMPILER_H_
 
+#include <string>
+#include <vector>
+
 #include "fst/fstlib.h"
 #include "kaldi-hmm-gmm/csrc/context-dep.h"
 #include "kaldi-hmm-gmm/csrc/transition-model.h"

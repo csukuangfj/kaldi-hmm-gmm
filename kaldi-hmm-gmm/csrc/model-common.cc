@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <queue>
+#include <string>
 
 #include "kaldi-hmm-gmm/csrc/log.h"
 

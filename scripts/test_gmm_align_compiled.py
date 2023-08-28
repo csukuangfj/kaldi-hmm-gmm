@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+from pathlib import Path
+
+import kaldi_hmm_gmm as khg
+import kaldifst
+import lhotse
+import torch
+
+from gmm_acc_stats_ali import gmm_acc_stats_ali
+from gmm_align_compiled import gmm_align_compiled
+from gmm_est import gmm_est
+from gmm_info import gmm_info
+from gmm_init_mono import gmm_init_mono
+from prepare_lang import (
+    Lexicon,
+    Lexiconp,
+    generate_hmm_topo,
+    make_lexicon_fst_with_silence,
+)
+
+
+def test_gmm_acc_stats_ali():
+    word2phones = {
+        "foo": ["f o o", "f o o2"],
+        "bar": ["b a r"],
+        "foobar": ["f o o b a r"],
+        "bark": ["b a r k"],
+        "<sil>": ["SIL"],
+    }
+    lexicon = Lexicon(word2phones=word2phones)
+    lexiconp = Lexiconp.from_lexicon(lexicon)
+    lexiconp_disambig = lexiconp.add_lex_disambig()
+
+    lex_fst = make_lexicon_fst_with_silence(
+        lexiconp=lexiconp,
+        sil_prob=0.5,
+        sil_phone="SIL",
+    )
+    kaldifst.arcsort(lex_fst, sort_type="olabel")
+
+    topo = generate_hmm_topo(
+        non_sil_phones=lexiconp_disambig.get_non_sil_phone_ids(),
+        sil_phone=lexiconp_disambig.get_sil_phone_id(),
+    )
+
+    cuts_filename = "./data/fbank/audio_mnist_cuts.jsonl.gz"
+    if not Path(cuts_filename).is_file():
+        print(f"{cuts_filename} does not exist - skipping testing")
+        return
+    cuts = lhotse.CutSet.from_file(cuts_filename).subset(first=10)
+
+    transition_model, tree, am = gmm_init_mono(topo=topo, cuts=cuts)
+
+    opts = khg.TrainingGraphCompilerOptions()
+    #  opts.reorder = True # default is True
+
+    disambig_syms = [f"#{i}" for i in range(lexiconp_disambig._max_disambig + 1)]
+    disambig_syms_ids = [lexiconp_disambig.phone2id[p] for p in disambig_syms]
+
+    gc = khg.TrainingGraphCompiler(
+        trans_model=transition_model,
+        ctx_dep=tree,
+        lex_fst=lex_fst,
+        disambig_syms=disambig_syms_ids,
+        opts=opts,
+    )
+
+    gmm_accs = khg.AccumAmDiagGmm()
+    gmm_accs.init(model=am, flags=khg.GmmUpdateFlags.kGmmAll)
+
+    s = ["bar", "foo", "bark"]
+    words = [lexiconp_disambig.word2id[w] for w in s]
+    fst = gc.compile_graph_from_text(words)
+
+    # for align-equal-compiled
+    num_feature_frames = cuts[0].load_features().shape[0]
+    succeeded, aligned_fst = kaldifst.equal_align(
+        ifst=fst, length=num_feature_frames, rand_seed=3, num_retries=10
+    )
+    assert succeeded is True
+
+    (
+        succeeded,
+        aligned_seq,
+        osymbols_out,
+        total_weight,
+    ) = kaldifst.get_linear_symbol_sequence(aligned_fst)
+
+    # aligned_seq is a list of transition ids
+
+    assert succeeded is True
+    assert len(aligned_seq) == num_feature_frames
+    assert [lexiconp_disambig.id2word[i] for i in osymbols_out] == s
+    print(aligned_seq)
+
+    feats = torch.from_numpy(cuts[0].load_features())
+
+    # For the first call, transition_accs is set to None
+    log_like, transition_accs = gmm_acc_stats_ali(
+        am_gmm=am,
+        gmm_accs=gmm_accs,
+        transition_model=transition_model,
+        feats=feats,
+        ali=aligned_seq,
+        transition_accs=None,
+    )
+    assert transition_accs.sum() == feats.shape[0]
+    print(log_like, log_like / len(aligned_seq))
+
+    # for the second one
+
+    s = ["foo", "bar"]
+    words = [lexiconp_disambig.word2id[w] for w in s]
+    fst = gc.compile_graph_from_text(words)
+
+    # for align-equal-compiled
+    num_feature_frames = cuts[1].load_features().shape[0]
+    succeeded, aligned_fst = kaldifst.equal_align(
+        ifst=fst, length=num_feature_frames, rand_seed=3, num_retries=10
+    )
+    assert succeeded is True
+
+    (
+        succeeded,
+        aligned_seq,
+        osymbols_out,
+        total_weight,
+    ) = kaldifst.get_linear_symbol_sequence(aligned_fst)
+    assert succeeded is True
+
+    assert len(aligned_seq) == num_feature_frames, (
+        len(aligned_seq),
+        num_feature_frames,
+    )
+
+    assert [lexiconp_disambig.id2word[i] for i in osymbols_out] == s
+
+    print(aligned_seq)
+
+    feats = torch.from_numpy(cuts[1].load_features())
+
+    # For the second and further call, transition_accs is reused
+    log_like_2, transition_accs = gmm_acc_stats_ali(
+        am_gmm=am,
+        gmm_accs=gmm_accs,
+        transition_model=transition_model,
+        feats=feats,
+        ali=aligned_seq,
+        transition_accs=transition_accs,
+    )
+    assert (
+        transition_accs.sum()
+        == cuts[0].load_features().shape[0] + cuts[1].load_features().shape[0]
+    )
+    log_like += log_like_2
+    print(log_like, log_like / transition_accs.sum())
+
+    # for gmm_est
+
+    tcfg = khg.MleTransitionUpdateConfig()
+    gmm_opts = khg.MleDiagGmmOptions()
+    gmm_opts.min_gaussian_occupancy = 3
+
+    info = gmm_info(am_gmm=am, transition_model=transition_model)
+    print(info)
+
+    gmm_est(
+        am_gmm=am,
+        gmm_accs=gmm_accs,
+        transition_model=transition_model,
+        transition_accs=transition_accs,
+        tcfg=tcfg,
+        gmm_opts=gmm_opts,
+        mixup=info["number_of_gaussians"],
+        mixdown=0,
+        perturb_factor=0.01,
+        power=0.2,
+        min_count=20.0,
+        update_flags="mvwt",
+    )
+    info = gmm_info(am_gmm=am, transition_model=transition_model)
+    print(info)
+
+    align_config = khg.AlignConfig()
+    align_config.beam = 6.0
+    align_config.retry_beam = 40.0
+    align_config.careful = False
+
+    # now for gmm_align_compiled
+    s = ["bar", "foo", "bark"]
+    words = [lexiconp_disambig.word2id[w] for w in s]
+    fst = gc.compile_graph_from_text(words)
+
+    feats = cuts[0].load_features()
+    feats = torch.from_numpy(feats)
+    ans = gmm_align_compiled(
+        am_gmm=am,
+        transition_model=transition_model,
+        utt="utt0",
+        fst=fst,
+        feats=feats,
+        align_config=align_config,
+        acoustic_scale=0.1,
+        transition_scale=1.0,
+        self_loop_scale=0.1,
+    )
+    print(ans)
+    print([lexiconp_disambig.id2word[i] for i in ans["words"]])
+
+    # for the second one
+    s = ["foo", "bar"]
+    words = [lexiconp_disambig.word2id[w] for w in s]
+    fst = gc.compile_graph_from_text(words)
+
+    feats = cuts[1].load_features()
+    feats = torch.from_numpy(feats)
+
+    ans = gmm_align_compiled(
+        am_gmm=am,
+        transition_model=transition_model,
+        utt="utt1",
+        fst=fst,
+        feats=feats,
+        align_config=align_config,
+        acoustic_scale=0.1,
+        transition_scale=1.0,
+        self_loop_scale=0.1,
+        num_done=ans["num_done"],
+        num_error=ans["num_error"],
+        num_retried=ans["num_retried"],
+        tot_like=ans["tot_like"],
+        frame_count=ans["frame_count"],
+    )
+    print(ans)
+    print([lexiconp_disambig.id2word[i] for i in ans["words"]])
+
+
+def main():
+    test_gmm_acc_stats_ali()
+
+
+if __name__ == "__main__":
+    main()

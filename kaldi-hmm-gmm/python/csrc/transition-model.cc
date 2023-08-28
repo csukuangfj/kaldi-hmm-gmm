@@ -4,6 +4,10 @@
 
 #include "kaldi-hmm-gmm/python/csrc/transition-model.h"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "kaldi-hmm-gmm/csrc/transition-model.h"
 #include "torch/torch.h"
 

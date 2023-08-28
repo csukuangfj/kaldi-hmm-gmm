@@ -4,6 +4,9 @@
 
 #include "kaldi-hmm-gmm/python/csrc/training-graph-compiler.h"
 
+#include <memory>
+#include <vector>
+
 #include "kaldi-hmm-gmm/csrc/training-graph-compiler.h"
 
 namespace khg {
