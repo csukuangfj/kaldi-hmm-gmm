@@ -9,6 +9,7 @@
 // this if is copied and modified from
 // kaldi/src/hmm/transition-model.h
 //
+#include <algorithm>
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/context-dep-itf.h"

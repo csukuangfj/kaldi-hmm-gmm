@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"

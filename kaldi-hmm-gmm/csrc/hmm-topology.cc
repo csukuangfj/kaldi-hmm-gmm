@@ -11,6 +11,7 @@
 #include <limits>
 #include <set>
 #include <string>
+#include <utility>
 
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"
