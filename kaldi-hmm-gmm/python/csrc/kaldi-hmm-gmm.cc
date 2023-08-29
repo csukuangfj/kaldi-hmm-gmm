@@ -4,6 +4,7 @@
 
 #include "kaldi-hmm-gmm/python/csrc/kaldi-hmm-gmm.h"
 
+#include "kaldi-hmm-gmm/python/csrc/add-self-loops.h"
 #include "kaldi-hmm-gmm/python/csrc/am-diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/cluster-utils.h"
 #include "kaldi-hmm-gmm/python/csrc/clusterable-classes.h"
@@ -50,6 +51,7 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindDecodableItf(&m);
   PybindDecodableAmDiagGmm(&m);
   PybindDecoderWrappers(&m);
+  PybindAddSelfLoops(&m);
 }
 
 }  // namespace khg
