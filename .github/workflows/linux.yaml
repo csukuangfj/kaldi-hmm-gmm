@@ -61,6 +61,7 @@ jobs:
       - name: Install Python dependencies
         shell: bash
         run: |
+          python3 -m pip install -U pip graphviz
           python3 -m pip install torch==${{ matrix.torch }} numpy -f https://download.pytorch.org/whl/cpu/torch_stable.html
 
           python3 -m torch.utils.collect_env
