@@ -1,0 +1,92 @@
+name: windows
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/windows.yaml'
+      - '.github/scripts/run-test.sh'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'kaldi-hmm-gmm/csrc/*'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/windows.yaml'
+      - '.github/scripts/run-test.sh'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'kaldi-hmm-gmm/csrc/*'
+
+  workflow_dispatch:
+
+concurrency:
+  group: linux-macos-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    if: false
+    name: ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        torch: ["1.13.0"]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # see https://github.com/microsoft/setup-msbuild
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python3 -m pip install -U pip graphviz
+
+          python3 -m pip install torch==${{ matrix.torch }} numpy -f https://download.pytorch.org/whl/cpu/torch_stable.html
+
+          python3 -m torch.utils.collect_env
+
+      - name: Configure CMake
+        shell: bash
+        run: |
+          mkdir build
+          cd build
+          cmake -D CMAKE_BUILD_TYPE=Release ..
+
+      - name: Build
+        shell: bash
+        run: |
+          cd build
+          cmake --build . --target ALL_BUILD --config Release
+          ls -lh ./lib/Release/*
+          ls -lh ./bin/Release/*
+
+      - name: Test
+        shell: bash
+        run: |
+          cd build
+          export PYTHONPATH=$PWD/lib/Release:$PYTHONPATH
+          export PYTHONPATH=$PWD/../kaldi-hmm-gmm/python:$PYTHONPATH
+
+          ctest -C Release --output-on-failure

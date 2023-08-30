@@ -44,6 +44,22 @@ option(BUILD_SHARED_LIBS "Whether to build shared libraries" ON)
 option(KHG_ENABLE_TESTS "Whether to build tests" ON)
 option(KHG_BUILD_PYTHON "Whether to build Python" ON)
 
+if(BUILD_SHARED_LIBS AND MSVC)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
+if(NOT BUILD_SHARED_LIBS AND MSVC)
+  # see https://cmake.org/cmake/help/latest/prop_tgt/MSVC_RUNTIME_LIBRARY.html
+  # https://stackoverflow.com/questions/14172856/compile-with-mt-instead-of-md-using-cmake
+  if(MSVC)
+      add_compile_options(
+          $<$<CONFIG:>:/MT> #---------|
+          $<$<CONFIG:Debug>:/MTd> #---|-- Statically link the runtime libraries
+          $<$<CONFIG:Release>:/MT> #--|
+      )
+  endif()
+endif()
+
 if(KHG_BUILD_PYTHON)
   include(pybind11)
 endif()
