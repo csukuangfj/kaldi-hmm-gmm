@@ -154,11 +154,11 @@ void PybindDiagGmm(py::module *m) {
             return py::make_tuple(self.weights(), self.inv_vars(),
                                   self.means_invvars());
           },
-          [](const py::tuple &t) -> PyClass {
+          [](const py::tuple &t) -> std::unique_ptr<PyClass> {
             torch::Tensor weights = t[0].cast<torch::Tensor>();
             torch::Tensor inv_vars = t[1].cast<torch::Tensor>();
             torch::Tensor means_invvars = t[2].cast<torch::Tensor>();
-            return {weights, inv_vars, means_invvars};
+            return std::make_unique<PyClass>(weights, inv_vars, means_invvars);
           }));
 }
 
