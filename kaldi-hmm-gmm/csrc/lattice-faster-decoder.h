@@ -12,6 +12,8 @@
 #ifndef KALDI_HMM_GMM_CSRC_LATTICE_FASTER_DECODER_H_
 #define KALDI_HMM_GMM_CSRC_LATTICE_FASTER_DECODER_H_
 
+#include <limits>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -57,7 +59,8 @@ struct LatticeFasterDecoderConfig {
       int32_t prune_interval = 25, bool determinize_lattice = true,
       float beam_delta = 0.5, float hash_ratio = 2.0, float prune_scale = 0.1,
       int32_t memory_pool_tokens_block_size = (1 << 8),
-      int32_t memory_pool_links_block_size = (1 << 8))
+      int32_t memory_pool_links_block_size = (1 << 8),
+      const DeterminizeLatticePhonePrunedOptions &det_opts = {})
       : beam(beam),
         max_active(max_active),
         min_active(min_active),
@@ -68,7 +71,8 @@ struct LatticeFasterDecoderConfig {
         hash_ratio(hash_ratio),
         prune_scale(prune_scale),
         memory_pool_tokens_block_size(memory_pool_tokens_block_size),
-        memory_pool_links_block_size(memory_pool_links_block_size) {}
+        memory_pool_links_block_size(memory_pool_links_block_size),
+        det_opts(det_opts) {}
 
   std::string ToString() const {
     std::ostringstream os;
@@ -154,7 +158,7 @@ struct StdToken {
   // use for lattice generation.
   ForwardLinkT *links;
 
-  //'next' is the next in the singly-linked list of tokens for this frame.
+  // 'next' is the next in the singly-linked list of tokens for this frame.
   Token *next;
 
   // This function does nothing and should be optimized out; it's needed
@@ -196,7 +200,7 @@ struct BackpointerToken {
   // use for lattice generation.
   ForwardLinkT *links;
 
-  //'next' is the next in the singly-linked list of tokens for this frame.
+  // 'next' is the next in the singly-linked list of tokens for this frame.
   BackpointerToken *next;
 
   // Best preceding BackpointerToken (could be a on this frame, connected to

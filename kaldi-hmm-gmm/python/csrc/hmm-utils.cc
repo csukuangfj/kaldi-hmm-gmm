@@ -4,6 +4,7 @@
 
 #include "kaldi-hmm-gmm/python/csrc/hmm-utils.h"
 
+#include <utility>
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/hmm-utils.h"

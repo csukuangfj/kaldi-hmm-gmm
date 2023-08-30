@@ -8,6 +8,7 @@
 #ifndef KALDI_HMM_GMM_CSRC_HMM_UTILS_H_
 #define KALDI_HMM_GMM_CSRC_HMM_UTILS_H_
 
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>

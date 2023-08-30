@@ -14,6 +14,7 @@
 #include "fst/fst.h"
 #include "fst/fstlib.h"
 #include "kaldi-hmm-gmm/csrc/decodable-itf.h"
+#include "kaldi-hmm-gmm/csrc/lattice-faster-decoder.h"
 #include "kaldi-hmm-gmm/csrc/lattice-simple-decoder.h"
 #include "kaldi-hmm-gmm/csrc/transition-information.h"
 
@@ -72,8 +73,28 @@ void ModifyGraphForCarefulAlignment(fst::VectorFst<fst::StdArc> *fst);
 // lattice_writer, else to compact_lattice_writer.  The writers for
 // alignments and words will only be written to if they are open.
 bool DecodeUtteranceLatticeSimple(
-    LatticeSimpleDecoder &decoder,  // not const but is really an input.
-    DecodableInterface &decodable,  // not const but is really an input.
+    LatticeSimpleDecoder &decoder,  // NOLINT not const but is really an input.
+    DecodableInterface &decodable,  // NOLINT not const but is really an input.
+    const TransitionInformation &trans_model, const std::string &utt,
+    bool allow_partial, std::vector<int32_t> *alignments,
+    std::vector<int32_t> *words,
+    double *like_ptr);  // puts utterance's likelihood in like_ptr on success.
+
+/// This function DecodeUtteranceLatticeFaster is used in several decoders, and
+/// we have moved it here.  Note: this is really "binary-level" code as it
+/// involves table readers and writers; we've just put it here as there is no
+/// other obvious place to put it.  If determinize == false, it writes to
+/// lattice_writer, else to compact_lattice_writer.  The writers for
+/// alignments and words will only be written to if they are open.
+///
+/// Caution: this will only link correctly if FST is either
+/// fst::Fst<fst::StdArc>, or fst::GrammarFst, as the template function is
+/// defined in the .cc file and only instantiated for those two types.
+template <typename FST>
+bool DecodeUtteranceLatticeFaster(
+    LatticeFasterDecoderTpl<FST>
+        &decoder,                   // NOLINT not const but is really an input.
+    DecodableInterface &decodable,  // NOLINT not const but is really an input.
     const TransitionInformation &trans_model, const std::string &utt,
     bool allow_partial, std::vector<int32_t> *alignments,
     std::vector<int32_t> *words,

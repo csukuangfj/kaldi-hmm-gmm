@@ -11,6 +11,8 @@
 
 #include "kaldi-hmm-gmm/csrc/lattice-faster-decoder.h"
 
+#include <algorithm>
+#include <limits>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -702,9 +704,9 @@ float LatticeFasterDecoderTpl<FST, Token>::GetCutoff(Elem *list_head,
       return max_active_cutoff;
     }
     if (tmp_array_.size() > static_cast<size_t>(config_.min_active)) {
-      if (config_.min_active == 0)
+      if (config_.min_active == 0) {
         min_active_cutoff = best_weight;
-      else {
+      } else {
         std::nth_element(
             tmp_array_.begin(), tmp_array_.begin() + config_.min_active,
             tmp_array_.size() > static_cast<size_t>(config_.max_active)

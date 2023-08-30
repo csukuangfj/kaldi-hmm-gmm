@@ -11,7 +11,10 @@
 #ifndef KALDI_HMM_GMM_CSRC_LATTICE_SIMPLE_DECODER_H_
 #define KALDI_HMM_GMM_CSRC_LATTICE_SIMPLE_DECODER_H_
 
+#include <limits>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "kaldi-hmm-gmm/csrc/decodable-itf.h"
 #include "kaldi-hmm-gmm/csrc/determinize-lattice-pruned.h"

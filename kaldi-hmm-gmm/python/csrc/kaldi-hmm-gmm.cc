@@ -17,6 +17,7 @@
 #include "kaldi-hmm-gmm/python/csrc/event-map.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-utils.h"
+#include "kaldi-hmm-gmm/python/csrc/lattice-faster-decoder.h"
 #include "kaldi-hmm-gmm/python/csrc/lattice-simple-decoder.h"
 #include "kaldi-hmm-gmm/python/csrc/mle-am-diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/mle-diag-gmm.h"
@@ -52,11 +53,13 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
 
   PybindDecodableItf(&m);
   PybindDecodableAmDiagGmm(&m);
-  PybindDecoderWrappers(&m);
   PybindAddSelfLoops(&m);
 
   PybindDeterminizeLatticePruned(&m);
+  PybindLatticeFasterDecoder(&m);
   PybindLatticeSimpleDecoder(&m);
+
+  PybindDecoderWrappers(&m);
 }
 
 }  // namespace khg

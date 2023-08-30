@@ -149,8 +149,8 @@ def main():
         update_flags="mvwt",
     )
 
-    num_iters = 40
-    realign_iters = "1 2 3 4 5 6 7 8 9 10 12 14 16 18 20 23 26 29 32 35 38"
+    num_iters = 80
+    realign_iters = "1 2 3 4 5 6 7 8 9 10 12 14 16 18 20 23 26 29 32 35 38 40 42 44 46 49 52 55 58 60 65 70 75 78 79"
     for i in range(num_iters):
         print(f"Pass {i}")
         if str(i) in realign_iters:

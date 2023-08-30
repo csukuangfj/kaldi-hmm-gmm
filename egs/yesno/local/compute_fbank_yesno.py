@@ -29,7 +29,7 @@ def compute_fbank_yesno():
 
     # This dataset is rather small, so we use only one job
     num_jobs = min(1, os.cpu_count())
-    num_mel_bins = 23
+    num_mel_bins = 80
 
     dataset_parts = (
         "train",

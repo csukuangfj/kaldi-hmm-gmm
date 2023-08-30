@@ -16,6 +16,7 @@ set(srcs
   hmm-topology.cc
   hmm-utils.cc
   kaldi-hmm-gmm.cc
+  lattice-faster-decoder.cc
   lattice-simple-decoder.cc
   mle-am-diag-gmm.cc
   mle-diag-gmm.cc

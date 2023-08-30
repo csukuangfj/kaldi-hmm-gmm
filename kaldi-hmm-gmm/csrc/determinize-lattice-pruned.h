@@ -8,8 +8,10 @@
 // this file is copied and modified from
 // kaldi/src/lat/determinize-lattice-pruned.h
 
-#ifndef KALDI_HMM_GMM_CSRC_LATTICE_DETERMINIZE_LATTICE_PRUNED_H_
-#define KALDI_HMM_GMM_CSRC_LATTICE_DETERMINIZE_LATTICE_PRUNED_H_
+#ifndef KALDI_HMM_GMM_CSRC_DETERMINIZE_LATTICE_PRUNED_H_
+#define KALDI_HMM_GMM_CSRC_DETERMINIZE_LATTICE_PRUNED_H_
+
+#include <string>
 
 #include "fst/fst.h"
 #include "fst/fstlib.h"
@@ -98,4 +100,4 @@ struct DeterminizeLatticePhonePrunedOptions {
 
 }  // namespace khg
 
-#endif  // KALDI_HMM_GMM_CSRC_LATTICE_DETERMINIZE_LATTICE_PRUNED_H_
+#endif  // KALDI_HMM_GMM_CSRC_DETERMINIZE_LATTICE_PRUNED_H_

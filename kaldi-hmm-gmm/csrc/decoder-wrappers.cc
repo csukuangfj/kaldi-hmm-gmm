@@ -140,8 +140,8 @@ void ModifyGraphForCarefulAlignment(fst::VectorFst<fst::StdArc> *fst) {
 }
 
 bool DecodeUtteranceLatticeSimple(
-    LatticeSimpleDecoder &decoder,  // not const but is really an input.
-    DecodableInterface &decodable,  // not const but is really an input.
+    LatticeSimpleDecoder &decoder,  // NOLINT not const but is really an input.
+    DecodableInterface &decodable,  // NOLINT not const but is really an input.
     const TransitionInformation &trans_model, const std::string &utt,
     bool allow_partial, std::vector<int32_t> *alignments,
     std::vector<int32_t> *words, double *like_ptr) {
@@ -180,5 +180,68 @@ bool DecodeUtteranceLatticeSimple(
   *like_ptr = likelihood;
   return true;
 }
+
+// Takes care of output.  Returns true on success.
+template <typename FST>
+bool DecodeUtteranceLatticeFaster(
+    LatticeFasterDecoderTpl<FST>
+        &decoder,                   // NOLINT not const but is really an input.
+    DecodableInterface &decodable,  // NOLINT not const but is really an input.
+    const TransitionInformation &trans_model, const std::string &utt,
+    bool allow_partial, std::vector<int32_t> *alignments,
+    std::vector<int32_t> *words, double *like_ptr) {
+  using fst::VectorFst;
+
+  if (!decoder.Decode(&decodable)) {
+    KHG_WARN << "Failed to decode utterance with id " << utt;
+    return false;
+  }
+  if (!decoder.ReachedFinal()) {
+    if (allow_partial) {
+      KHG_WARN << "Outputting partial output for utterance " << utt
+               << " since no final-state reached\n";
+    } else {
+      KHG_WARN << "Not producing output for utterance " << utt
+               << " since no final-state reached and "
+               << "--allow-partial=false.\n";
+      return false;
+    }
+  }
+
+  double likelihood;
+  fst::LatticeWeight weight;
+  // First do some stuff with word-level traceback...
+  fst::VectorFst<fst::LatticeArc> decoded;
+  if (!decoder.GetBestPath(&decoded))
+    // Shouldn't really reach this point as already checked success.
+    KHG_ERR << "Failed to get traceback for utterance " << utt;
+
+  fst::GetLinearSymbolSequence(decoded, alignments, words, &weight);
+  likelihood = -(weight.Value1() + weight.Value2());
+  *like_ptr = likelihood;
+
+  return true;
+}
+
+template bool DecodeUtteranceLatticeFaster(
+    LatticeFasterDecoderTpl<fst::Fst<fst::StdArc>> &decoder,  // NOLINT
+    DecodableInterface &decodable,                            // NOLINT
+    const TransitionInformation &trans_model, const std::string &utt,
+    bool allow_partial, std::vector<int32_t> *alignments,
+    std::vector<int32_t> *words, double *like_ptr);
+
+template bool DecodeUtteranceLatticeFaster(
+    LatticeFasterDecoderTpl<fst::ConstFst<fst::StdArc>> &decoder,  // NOLINT
+    DecodableInterface &decodable,                                 // NOLINT
+    const TransitionInformation &trans_model, const std::string &utt,
+    bool allow_partial, std::vector<int32_t> *alignments,
+    std::vector<int32_t> *words, double *like_ptr);
+
+template bool DecodeUtteranceLatticeFaster(
+    LatticeFasterDecoderTpl<fst::VectorFst<fst::StdArc>> &decoder,  // NOLINT
+    DecodableInterface &decodable,                                  // NOLINT
+    const TransitionInformation &trans_model, const std::string &utt,
+    bool allow_partial, std::vector<int32_t> *alignments,
+    std::vector<int32_t> *words, double *like_ptr);
 
 }  // namespace khg

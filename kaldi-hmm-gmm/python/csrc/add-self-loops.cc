@@ -9,6 +9,8 @@
 
 #include "kaldi-hmm-gmm/python/csrc/add-self-loops.h"
 
+#include <vector>
+
 #include "kaldi-hmm-gmm/csrc/hmm-utils.h"
 
 namespace khg {

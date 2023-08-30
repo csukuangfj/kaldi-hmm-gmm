@@ -10,7 +10,9 @@
 
 #include "kaldi-hmm-gmm/csrc/lattice-simple-decoder.h"
 
+#include <algorithm>
 #include <limits>
+#include <vector>
 
 #include "kaldi-hmm-gmm/csrc/kaldi-math.h"
 
