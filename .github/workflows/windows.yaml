@@ -81,11 +81,11 @@ jobs:
           ls -lh ./lib/Release/*
           ls -lh ./bin/Release/*
 
-          ctest -C Release --output-on-failure
-
       - name: Test
         shell: bash
         run: |
           cd build
+          export PYTHONPATH=$PWD/lib/Release:$PYTHONPATH
+          export PYTHONPATH=$PWD/../kaldi-hmm-gmm/python:$PYTHONPATH
 
           ctest -C Release --output-on-failure
