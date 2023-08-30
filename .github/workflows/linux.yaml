@@ -1,4 +1,4 @@
-name: linux-macos-windows
+name: linux
 
 on:
   push:
@@ -19,6 +19,8 @@ on:
       - 'CMakeLists.txt'
       - 'cmake/**'
       - 'kaldi-hmm-gmm/csrc/*'
+
+  workflow_dispatch:
 
 concurrency:
   group: linux-${{ github.ref }}
