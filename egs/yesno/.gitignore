@@ -1,0 +1,10 @@
+data
+download
+*.pt
+*.svg
+*.gv
+words.txt
+phones.txt
+*.fst
+test-err.txt
+train-err.txt

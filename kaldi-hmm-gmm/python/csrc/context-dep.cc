@@ -3,6 +3,7 @@
 // Copyright (c)  2022  Xiaomi Corporation
 #include "kaldi-hmm-gmm/python/csrc/context-dep.h"
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -53,7 +54,30 @@ void PybindContextDep(py::module *m) {
           [](const PyClass &self, bool binary, const std::string &filename) {
             self.Write(kaldiio::Output(filename, binary).Stream(), binary);
           },
-          py::arg("binary"), py::arg("filename"));
+          py::arg("binary"), py::arg("filename"))
+      .def("__str__",
+           [](const PyClass &self) -> std::string {
+             std::ostringstream os;
+             self.Write(os, false);
+             return os.str();
+           })
+      .def(py::pickle(
+          [](const PyClass &self) -> py::tuple {
+            std::ostringstream os;
+            self.Write(os, true);
+            std::string s = os.str();
+            std::vector<int8_t> data(s.begin(), s.end());
+            return py::make_tuple(data);
+          },
+          [](const py::tuple &t) -> std::unique_ptr<PyClass> {
+            auto data = t[0].cast<std::vector<int8_t>>();
+            std::string s(data.begin(), data.end());
+
+            std::istringstream is(s);
+            auto ans = std::make_unique<PyClass>();
+            ans->Read(is, true);
+            return ans;
+          }));
 
   m->def("monophone_context_dependency", &MonophoneContextDependency,
          py::arg("phones"), py::arg("phone2num_pdf_classes"),

@@ -8,6 +8,7 @@
 #ifndef KALDI_HMM_GMM_CSRC_HMM_UTILS_H_
 #define KALDI_HMM_GMM_CSRC_HMM_UTILS_H_
 
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -32,7 +33,17 @@ struct HTransducerConfig {
   // see doc/grammar.dox.
   int32_t nonterm_phones_offset = -1;
 
-  HTransducerConfig() = default;
+  HTransducerConfig(float transition_scale = 1.0,
+                    int32_t nonterm_phones_offset = -1)
+      : transition_scale(transition_scale),
+        nonterm_phones_offset(nonterm_phones_offset) {}
+  std::string ToString() const {
+    std::ostringstream os;
+    os << "HTransducerConfig(";
+    os << "transition_scale=" << transition_scale << ", ";
+    os << "nonterm_phones_offset=" << nonterm_phones_offset << ")";
+    return os.str();
+  }
 };
 
 /**

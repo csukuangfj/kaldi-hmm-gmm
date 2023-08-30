@@ -2,9 +2,11 @@
 # To run this single test, use
 #
 #  ctest --verbose -R  test_am_diag_gmm_py
+import pickle
 import unittest
-import torch
+
 import kaldi_hmm_gmm as khg
+import torch
 
 
 class TestAmDiagGmm(unittest.TestCase):
@@ -43,6 +45,22 @@ class TestAmDiagGmm(unittest.TestCase):
         am.get_pdf(0).weights[0] += 0.25
         w2 = am.get_pdf(0).weights[0].item()
         assert abs(w2 - w - 0.25) < 1e-3, (w2, w, w2 - w)
+
+        # now test pickle
+        data = pickle.dumps(am, 2)  # Must use pickle protocol >= 2
+        am2 = pickle.loads(data)
+        assert isinstance(am2, khg.AmDiagGmm), type(am2)
+        assert am.num_pdfs == am2.num_pdfs, (am.num_pdfs, am2.num_pdfs)
+        for i in range(am.num_pdfs):
+            pdf = am.get_pdf(i)
+            pdf2 = am2.get_pdf(i)
+
+            assert pdf.valid_gconsts is True
+            assert pdf2.valid_gconsts is True
+
+            assert torch.allclose(pdf.weights, pdf2.weights)
+            assert torch.allclose(pdf.means_invvars, pdf2.means_invvars)
+            assert torch.allclose(pdf.inv_vars, pdf2.inv_vars)
 
 
 if __name__ == "__main__":

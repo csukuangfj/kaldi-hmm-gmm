@@ -428,12 +428,13 @@ void AddSelfLoops(const TransitionModel &trans_model,
                   float self_loop_scale, bool reorder, bool check_no_self_loops,
                   fst::VectorFst<fst::StdArc> *fst) {
   KHG_ASSERT(fst->Start() != fst::kNoStateId);
-  if (reorder)
+  if (reorder) {
     AddSelfLoopsReorder(trans_model, disambig_syms, self_loop_scale,
                         check_no_self_loops, fst);
-  else
+  } else {
     AddSelfLoopsNoReorder(trans_model, disambig_syms, self_loop_scale,
                           check_no_self_loops, fst);
+  }
 }
 
 // Returns the scaled, but not negated, log-prob, with the given scaling

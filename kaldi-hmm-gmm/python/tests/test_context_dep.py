@@ -3,6 +3,7 @@
 #
 #  ctest --verbose -R  test_context_dep_py
 
+import pickle
 import unittest
 from typing import List, Tuple
 
@@ -130,6 +131,13 @@ class TestContextDep(unittest.TestCase):
         source = graphviz.Source(dot)
         source.render("tree", format="pdf")  # It will generate ./tree.pdf
 
+        # test pickle
+        data = pickle.dumps(tree, 2)  # Must use pickle protocol >= 2
+        tree2 = pickle.loads(data)
+        assert isinstance(tree, khg.ContextDependency)
+
+        assert str(tree) == str(tree2)
+
     def test_monophone_context_dependency_2(self):
         topo = get_hmm_topo()
         phones = topo.phones
@@ -156,6 +164,13 @@ class TestContextDep(unittest.TestCase):
         dot = khg.draw_tree(phones_txt="phones.txt", tree="./tree-shared", query="0/h")
         source = graphviz.Source(dot)
         source.render("tree-shared", format="pdf")  # It will generate ./tree.pdf
+
+        # test pickle
+        data = pickle.dumps(tree, 2)  # Must use pickle protocol >= 2
+        tree2 = pickle.loads(data)
+        assert isinstance(tree, khg.ContextDependency)
+
+        assert str(tree) == str(tree2)
 
 
 # tree-shared

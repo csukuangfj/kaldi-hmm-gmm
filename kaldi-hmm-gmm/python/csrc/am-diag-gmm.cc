@@ -4,6 +4,8 @@
 
 #include "kaldi-hmm-gmm/python/csrc/am-diag-gmm.h"
 
+#include <memory>
+
 #include "kaldi-hmm-gmm/csrc/am-diag-gmm.h"
 #include "torch/torch.h"
 
@@ -42,7 +44,32 @@ void PybindAmDiagGmm(py::module *m) {
       .def("get_gaussian_variance", &PyClass::GetGaussianVariance,
            py::arg("pdf_index"), py::arg("gauss"))
       .def("set_gaussian_mean", &PyClass::SetGaussianMean, py::arg("pdf_index"),
-           py::arg("gauss_index"), py::arg("in"));
+           py::arg("gauss_index"), py::arg("in"))
+      .def(py::pickle(
+          [](const PyClass &self) -> py::tuple {
+            int32_t num_pdfs = self.NumPdfs();
+            py::tuple tuple(num_pdfs * 3);
+            for (int32_t i = 0; i != num_pdfs; ++i) {
+              const auto &gmm = self.GetPdf(i);
+              tuple[3 * i + 0] = gmm.weights();
+              tuple[3 * i + 1] = gmm.inv_vars();
+              tuple[3 * i + 2] = gmm.means_invvars();
+            }
+
+            return tuple;
+          },
+          [](const py::tuple &t) -> std::unique_ptr<PyClass> {
+            int32_t num_pdfs = t.size() / 3;
+            auto ans = std::make_unique<PyClass>();
+
+            for (int32_t i = 0; i != num_pdfs; ++i) {
+              torch::Tensor weights = t[3 * i + 0].cast<torch::Tensor>();
+              torch::Tensor inv_vars = t[3 * i + 1].cast<torch::Tensor>();
+              torch::Tensor means_invvars = t[3 * i + 2].cast<torch::Tensor>();
+              ans->AddPdf({weights, inv_vars, means_invvars});
+            }
+            return ans;
+          }));
 }
 
 }  // namespace khg

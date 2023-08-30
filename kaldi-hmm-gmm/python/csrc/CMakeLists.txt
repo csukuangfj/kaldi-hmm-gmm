@@ -2,18 +2,22 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_definitions(-DTORCH_API_INCLUDE_EXTENSION_H)
 
 set(srcs
+  add-self-loops.cc
   am-diag-gmm.cc
   cluster-utils.cc
   clusterable-classes.cc
   context-dep.cc
+  decodable-am-diag-gmm.cc
   decodable-itf.cc
   decoder-wrappers.cc
+  determinize-lattice-pruned.cc
   diag-gmm.cc
-  decodable-am-diag-gmm.cc
   event-map.cc
   hmm-topology.cc
   hmm-utils.cc
   kaldi-hmm-gmm.cc
+  lattice-faster-decoder.cc
+  lattice-simple-decoder.cc
   mle-am-diag-gmm.cc
   mle-diag-gmm.cc
   model-common.cc

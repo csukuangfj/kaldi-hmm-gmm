@@ -9,6 +9,7 @@
 // this if is copied and modified from
 // kaldi/src/hmm/transition-model.h
 //
+#include <algorithm>
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/context-dep-itf.h"
@@ -241,7 +242,7 @@ class TransitionModel : public TransitionInformation {
                        const MleTransitionUpdateConfig &cfg,
                        float *objf_impr_out, float *count_out);
 
- private:
+ public:
   struct Tuple {
     int32_t phone;
     int32_t hmm_state;
@@ -279,7 +280,35 @@ class TransitionModel : public TransitionInformation {
               self_loop_pdf == other.self_loop_pdf);
     }
   };
+  TransitionModel(const std::vector<Tuple> &tuples, const HmmTopology &topo,
+                  const std::vector<int32_t> state2id,
+                  const std::vector<int32_t> id2state,
+                  const std::vector<int32_t> id2pdf_id, int32_t num_pdfs,
+                  const std::vector<float> log_probs,
+                  const std::vector<float> non_self_loop_log_probs)
+      : tuples_(tuples),
+        topo_(topo),
+        state2id_(state2id),
+        id2state_(id2state),
+        id2pdf_id_(id2pdf_id),
+        num_pdfs_(num_pdfs) {
+    log_probs_.Resize(log_probs.size());
+    std::copy(log_probs.begin(), log_probs.end(), log_probs_.Data());
 
+    non_self_loop_log_probs_.Resize(non_self_loop_log_probs.size());
+    std::copy(non_self_loop_log_probs.begin(), non_self_loop_log_probs.end(),
+              non_self_loop_log_probs_.Data());
+  }
+  const std::vector<Tuple> &GetTuples() const { return tuples_; }
+  const std::vector<int32_t> &GetState2Id() const { return state2id_; }
+  const std::vector<int32_t> &GetId2State() const { return id2state_; }
+  const std::vector<int32_t> &GetId2PdfId() const { return id2pdf_id_; }
+  const kaldiio::Vector<float> &GetLogProbs() const { return log_probs_; }
+  const kaldiio::Vector<float> &GetNonSelfLoopLogProbs() const {
+    return non_self_loop_log_probs_;
+  }
+
+ private:
   /// Tuples indexed by transition state minus one;
   /// the tuples are in sorted order which allows us to do the reverse mapping
   /// from tuple to transition state
