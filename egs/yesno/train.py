@@ -221,7 +221,11 @@ def main():
         if i < max_iter_inc:
             num_gauss += inc_gauss
     info = gmm_info(am, transition_model)
-    state_dict = {"acoustic_model": am, "transition_model": transition_model}
+    state_dict = {
+        "acoustic_model": am,
+        "transition_model": transition_model,
+        "tree": tree,
+    }
     torch.save(state_dict, "checkpoint.pt")
     print(info)
 

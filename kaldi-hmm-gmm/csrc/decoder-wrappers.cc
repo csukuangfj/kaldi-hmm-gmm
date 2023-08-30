@@ -139,4 +139,46 @@ void ModifyGraphForCarefulAlignment(fst::VectorFst<fst::StdArc> *fst) {
   fst::Concat(fst, fst_rhs);
 }
 
+bool DecodeUtteranceLatticeSimple(
+    LatticeSimpleDecoder &decoder,  // not const but is really an input.
+    DecodableInterface &decodable,  // not const but is really an input.
+    const TransitionInformation &trans_model, const std::string &utt,
+    bool allow_partial, std::vector<int32_t> *alignments,
+    std::vector<int32_t> *words, double *like_ptr) {
+  if (!decoder.Decode(&decodable)) {
+    KHG_WARN << "Failed to decode utterance with id " << utt;
+    return false;
+  }
+  alignments->clear();
+  words->clear();
+
+  if (!decoder.ReachedFinal()) {
+    if (allow_partial) {
+      KHG_WARN << "Outputting partial output for utterance " << utt
+               << " since no final-state reached\n";
+    } else {
+      KHG_WARN << "Not producing output for utterance " << utt
+               << " since no final-state reached and "
+               << "--allow-partial=false.\n";
+      return false;
+    }
+  }
+
+  double likelihood;
+  fst::LatticeWeight weight = fst::LatticeWeight::Zero();
+  int32_t num_frames;
+
+  // First do some stuff with word-level traceback...
+  fst::VectorFst<fst::LatticeArc> decoded;
+  if (!decoder.GetBestPath(&decoded))
+    // Shouldn't really reach this point as already checked success.
+    KHG_ERR << "Failed to get traceback for utterance " << utt;
+
+  fst::GetLinearSymbolSequence(decoded, alignments, words, &weight);
+
+  likelihood = -(weight.Value1() + weight.Value2());
+  *like_ptr = likelihood;
+  return true;
+}
+
 }  // namespace khg

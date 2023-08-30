@@ -3,3 +3,5 @@ download
 *.pt
 *.svg
 *.gv
+words.txt
+phones.txt

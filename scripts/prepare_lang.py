@@ -251,7 +251,9 @@ class Lexiconp:
             kept_phone_list.append(p)
 
         kept_phone_list.sort()
+        kept_phone_list.remove("SIL")
         kept_phone_list.insert(0, "<eps>")
+        kept_phone_list.insert(1, "SIL")
         for i in range(self._max_disambig + 2):
             kept_phone_list.append(f"#{i}")
 
@@ -276,9 +278,9 @@ class Lexiconp:
         word_list = list(self.word2prob_phones.keys())
         word_list.sort()
         word_list.insert(0, "<eps>")
+        word_list.append("#0")
         word_list.append("<s>")
         word_list.append("</s>")
-        word_list.append("#0")
 
         self._word2id = {w: i for i, w in enumerate(word_list)}
         self._id2word = {i: w for i, w in enumerate(word_list)}

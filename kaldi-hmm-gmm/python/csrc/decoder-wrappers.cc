@@ -46,9 +46,31 @@ static void PybindAlignUtteranceWrapper(py::module *m) {
       py::arg("frame_count"));
 }
 
+static void PybindDecodeUtteranceLatticeSimple(py::module *m) {
+  m->def(
+      "decode_utterance_lattice_simple",
+      [](LatticeSimpleDecoder &decoder,  // not const but is really an input.
+         DecodableInterface &decodable,  // not const but is really an input.
+         const TransitionInformation &trans_model, const std::string &utt,
+         bool allow_partial) -> std::tuple<bool, std::vector<int32_t>,
+                                           std::vector<int32_t>, double> {
+        std::vector<int32_t> alignments;
+        std::vector<int32_t> words;
+        double log_like = 0;
+        bool succeeded = DecodeUtteranceLatticeSimple(
+            decoder, decodable, trans_model, utt, allow_partial, &alignments,
+            &words, &log_like);
+
+        return std::make_tuple(succeeded, alignments, words, log_like);
+      },
+      py::arg("decoder"), py::arg("decodable"), py::arg("trans_model"),
+      py::arg("utt"), py::arg("allow_partial"));
+}
+
 void PybindDecoderWrappers(py::module *m) {
   PybindAlignConfig(m);
   PybindAlignUtteranceWrapper(m);
+  PybindDecodeUtteranceLatticeSimple(m);
 }
 
 }  // namespace khg

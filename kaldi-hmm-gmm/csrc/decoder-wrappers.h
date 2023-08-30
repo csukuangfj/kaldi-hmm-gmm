@@ -14,6 +14,8 @@
 #include "fst/fst.h"
 #include "fst/fstlib.h"
 #include "kaldi-hmm-gmm/csrc/decodable-itf.h"
+#include "kaldi-hmm-gmm/csrc/lattice-simple-decoder.h"
+#include "kaldi-hmm-gmm/csrc/transition-information.h"
 
 namespace khg {
 
@@ -62,6 +64,20 @@ void AlignUtteranceWrapper(
 /// argument to the Concat operation so that it has none of the original
 /// final-probs, and add a "pre-initial" state that is final.
 void ModifyGraphForCarefulAlignment(fst::VectorFst<fst::StdArc> *fst);
+
+// This function DecodeUtteranceLatticeSimple is used in several decoders, and
+// we have moved it here.  Note: this is really "binary-level" code as it
+// involves table readers and writers; we've just put it here as there is no
+// other obvious place to put it.  If determinize == false, it writes to
+// lattice_writer, else to compact_lattice_writer.  The writers for
+// alignments and words will only be written to if they are open.
+bool DecodeUtteranceLatticeSimple(
+    LatticeSimpleDecoder &decoder,  // not const but is really an input.
+    DecodableInterface &decodable,  // not const but is really an input.
+    const TransitionInformation &trans_model, const std::string &utt,
+    bool allow_partial, std::vector<int32_t> *alignments,
+    std::vector<int32_t> *words,
+    double *like_ptr);  // puts utterance's likelihood in like_ptr on success.
 
 }  // namespace khg
 
