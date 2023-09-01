@@ -36,7 +36,11 @@ with open("kaldi-hmm-gmm/python/kaldi_hmm_gmm/__init__.py", "a") as f:
     f.write(f"__version__ = '{get_package_version()}'\n")
 
 install_requires = [
+    "graphviz",
+    "kaldialign",
+    "kaldifst",
     "numpy",
+    "kaldilm",
 ]
 
 setuptools.setup(

@@ -1,26 +1,18 @@
 function(download_kaldifst)
   include(FetchContent)
 
-  set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.5.2.tar.gz")
-  set(kaldifst_URL2 "https://huggingface.co/csukuangfj/kaldi-hmm-gmm-cmake-deps/resolve/main/kaldifst-1.5.2.tar.gz")
-  set(kaldifst_HASH "SHA256=b8036431aa896bdefdba49616db21576bda04f8bc5be74de43a0c3a910828b27")
-
-  # We will merge the branch "for-khg" into master later
-  set(kaldifst_URL "https://github.com/csukuangfj/kaldifst/archive/da75ea87e9cbcaebecc138b84d389e964b6c6849.zip")
-  set(kaldifst_URL2 "")
-  set(kaldifst_HASH "")
-
+  set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.7.0.tar.gz")
+  set(kaldifst_URL2 "https://huggingface.co/csukuangfj/kaldi-hmm-gmm-cmake-deps/resolve/main/kaldifst-1.7.0.tar.gz")
+  set(kaldifst_HASH "SHA256=d5f4adbf7634e8cea57da00981e9f6424e777ad0396ab8f6f52baac0ceffb11b")
 
   # If you don't have access to the Internet,
   # please pre-download kaldi_native_io
   set(possible_file_locations
-    $ENV{HOME}/Downloads/kaldifst-da75ea87e9cbcaebecc138b84d389e964b6c6849.zip
-
-    $ENV{HOME}/Downloads/kaldifst-1.5.2.tar.gz
-    ${PROJECT_SOURCE_DIR}/kaldifst-1.5.2.tar.gz
-    ${PROJECT_BINARY_DIR}/kaldifst-1.5.2.tar.gz
-    /tmp/kaldifst-1.5.2.tar.gz
-    /star-fj/fangjun/download/github/kaldifst-1.5.2.tar.gz
+    $ENV{HOME}/Downloads/kaldifst-1.7.0.tar.gz
+    ${PROJECT_SOURCE_DIR}/kaldifst-1.7.0.tar.gz
+    ${PROJECT_BINARY_DIR}/kaldifst-1.7.0.tar.gz
+    /tmp/kaldifst-1.7.0.tar.gz
+    /star-fj/fangjun/download/github/kaldifst-1.7.0.tar.gz
   )
 
   foreach(f IN LISTS possible_file_locations)
