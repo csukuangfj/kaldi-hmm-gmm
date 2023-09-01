@@ -31,12 +31,14 @@ target_link_libraries(kaldi-hmm-gmm-core PUBLIC fst)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC fstscript)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldifst_core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC ${TORCH_LIBRARIES})
+target_link_libraries(kaldi-hmm-gmm-core PUBLIC Eigen3::Eigen)
 
 if(KHG_ENABLE_TESTS)
   set(test_srcs
     diag-gmm-test.cc
     event-map-test.cc
     hash-list-test.cc
+    eigen-test.cc
   )
 
   function(khg_add_test source)

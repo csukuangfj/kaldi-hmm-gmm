@@ -1,0 +1,25 @@
+// kaldi-hmm-gmm/csrc/eigen.h
+
+// Copyright (c)  2023  Xiaomi Corporation
+#ifndef KALDI_HMM_GMM_CSRC_EIGEN_H_
+#define KALDI_HMM_GMM_CSRC_EIGEN_H_
+
+#include "Eigen/Dense"
+
+namespace khg {
+using FloatMatrix =
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
+using DoubleMatrix =
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
+using FloatVector = Eigen::Matrix<float, Eigen::Dynamic, 1>;
+
+using DoubleVector = Eigen::Matrix<double, Eigen::Dynamic, 1>;
+
+using FloatRowVector = Eigen::Matrix<float, 1, Eigen::Dynamic>;
+
+using DoubleRowVector = Eigen::Matrix<double, 1, Eigen::Dynamic>;
+}  // namespace khg
+
+#endif  // KALDI_HMM_GMM_CSRC_EIGEN_H_
