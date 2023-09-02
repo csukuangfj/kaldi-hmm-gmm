@@ -30,6 +30,8 @@ set(py_test_files
   test_mle_diag_gmm.py
   test_scalar_clusterable.py
   test_transition_model.py
+
+  test_eigen.py
 )
 
 foreach(source IN LISTS py_test_files)

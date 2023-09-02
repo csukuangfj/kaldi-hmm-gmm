@@ -36,6 +36,11 @@ TEST(Eigen, Hello) {
   m2(0, 0) = 10;
   EXPECT_EQ(m(0, 0), 3);
 
+  Eigen::MatrixXd m3 = std::move(m2);
+  // now m2 is empty
+  EXPECT_EQ(m2.size(), 0);
+  EXPECT_EQ(m3(0, 0), 10);
+
   double *d = &m(0, 0);
   d[0] = 11;
   d[1] = 20;
@@ -96,16 +101,16 @@ TEST(Eigen, Random) {
   // Random: Uniform distribution in the range [-1, 1]
   auto m = Eigen::MatrixXd::Random(2, 3);
 #if 0
- -0.999984   0.511211  0.0655345
- -0.736924 -0.0826997  -0.562082
+  -0.999984   0.511211  0.0655345
+  -0.736924 -0.0826997  -0.562082
 #endif
 
   // Note: We don't need to specify the shape for Random() in this case
   auto m2 = Eigen::Matrix3d::Random();
 #if 0
- -0.999984 -0.0826997  -0.905911
- -0.736924  0.0655345   0.357729
-  0.511211  -0.562082   0.358593
+    -0.999984 -0.0826997  -0.905911
+    -0.736924  0.0655345   0.357729
+    0.511211  -0.562082   0.358593
 #endif
 }
 

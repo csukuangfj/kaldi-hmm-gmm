@@ -12,6 +12,7 @@ set(srcs
   decoder-wrappers.cc
   determinize-lattice-pruned.cc
   diag-gmm.cc
+  eigen-test.cc
   event-map.cc
   hmm-topology.cc
   hmm-utils.cc
