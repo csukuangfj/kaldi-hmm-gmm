@@ -5,8 +5,8 @@
 #ifndef KALDI_HMM_GMM_CSRC_DIAG_GMM_NORMAL_H_
 #define KALDI_HMM_GMM_CSRC_DIAG_GMM_NORMAL_H_
 
+#include "kaldi-hmm-gmm/csrc/eigen.h"
 #include "kaldi-hmm-gmm/csrc/model-common.h"
-#include "torch/script.h"
 
 namespace khg {
 
@@ -37,12 +37,12 @@ class DiagGmmNormal {
   /// Copies to DiagGmm the requested parameters
   void CopyToDiagGmm(DiagGmm *diaggmm, GmmFlagsType flags = kGmmAll) const;
 
-  int32_t NumGauss() const { return weights_.size(0); }
-  int32_t Dim() const { return means_.size(1); }
+  int32_t NumGauss() const { return weights_.size(); }
+  int32_t Dim() const { return means_.cols(); }
 
-  torch::Tensor weights_;  // not log, 1-D tensor, kDouble
-  torch::Tensor means_;    // 2-D tensor, kDouble
-  torch::Tensor vars_;     // diagonal variance, 2-D tensor, kDouble
+  DoubleVector weights_;  // not log
+  DoubleMatrix means_;
+  DoubleMatrix vars_;  // diagonal variance
 };
 
 }  // namespace khg

@@ -20,6 +20,19 @@ using DoubleVector = Eigen::Matrix<double, Eigen::Dynamic, 1>;
 using FloatRowVector = Eigen::Matrix<float, 1, Eigen::Dynamic>;
 
 using DoubleRowVector = Eigen::Matrix<double, 1, Eigen::Dynamic>;
+
+float LogSumExp(const FloatVector &v);
+
+FloatVector Softmax(const FloatVector &v, float *log_sum_exp = nullptr);
+
+// A vector of normal distribution
+FloatVector RandnVector(int32_t n, float mean = 0, float stddev = 1);
+
+FloatMatrix RandnMatrix(int32_t rows, int32_t cols, float mean = 0,
+                        float stddev = 1);
+
+float Randn(float mean = 0, float stddev = 1);
+
 }  // namespace khg
 
 #endif  // KALDI_HMM_GMM_CSRC_EIGEN_H_

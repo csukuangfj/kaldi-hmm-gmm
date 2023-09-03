@@ -2,30 +2,30 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_definitions(-DTORCH_API_INCLUDE_EXTENSION_H)
 
 set(srcs
-  add-self-loops.cc
+  # add-self-loops.cc
   am-diag-gmm.cc
   cluster-utils.cc
   clusterable-classes.cc
-  context-dep.cc
-  decodable-am-diag-gmm.cc
-  decodable-itf.cc
-  decoder-wrappers.cc
-  determinize-lattice-pruned.cc
+  # context-dep.cc
+  # decodable-am-diag-gmm.cc
+  # decodable-itf.cc
+  # decoder-wrappers.cc
+  # determinize-lattice-pruned.cc
   diag-gmm.cc
-  eigen-test.cc
-  event-map.cc
+  # eigen-test.cc
+  # event-map.cc
   hmm-topology.cc
   hmm-utils.cc
   kaldi-hmm-gmm.cc
-  lattice-faster-decoder.cc
-  lattice-simple-decoder.cc
-  mle-am-diag-gmm.cc
-  mle-diag-gmm.cc
+  # lattice-faster-decoder.cc
+  # lattice-simple-decoder.cc
+  # mle-am-diag-gmm.cc
+  # mle-diag-gmm.cc
   model-common.cc
-  training-graph-compiler.cc
-  transition-information.cc
-  transition-model.cc
-  tree-renderer.cc
+  # training-graph-compiler.cc
+  # transition-information.cc
+  # transition-model.cc
+  # tree-renderer.cc
 )
 
 pybind11_add_module(_kaldi_hmm_gmm ${srcs})

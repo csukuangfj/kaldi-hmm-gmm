@@ -69,7 +69,7 @@ int32_t AmDiagGmm::NumGauss() const {
   return ans;
 }
 
-void AmDiagGmm::SplitByCount(torch::Tensor state_occs,  // 1-D float tensor
+void AmDiagGmm::SplitByCount(const FloatVector &state_occs,  // 1-D float tensor
                              int32_t target_components, float perturb_factor,
                              float power, float min_count) {
   int32_t gauss_at_start = NumGauss();
@@ -88,7 +88,7 @@ void AmDiagGmm::SplitByCount(torch::Tensor state_occs,  // 1-D float tensor
           << gauss_at_start << " to " << NumGauss();
 }
 
-void AmDiagGmm::MergeByCount(torch::Tensor state_occs,
+void AmDiagGmm::MergeByCount(const FloatVector &state_occs,
                              int32_t target_components, float power,
                              float min_count) {
   int32_t gauss_at_start = NumGauss();
@@ -118,7 +118,8 @@ int32_t AmDiagGmm::ComputeGconsts() const {
   return num_bad;
 }
 
-float AmDiagGmm::LogLikelihood(int32_t pdf_index, torch::Tensor data) const {
+float AmDiagGmm::LogLikelihood(int32_t pdf_index,
+                               const FloatVector &data) const {
   return densities_[pdf_index]->LogLikelihood(data);
 }
 
@@ -140,22 +141,21 @@ const DiagGmm &AmDiagGmm::GetPdf(int32_t pdf_index) const {
   return *(densities_[pdf_index]);
 }
 
-torch::Tensor AmDiagGmm::GetGaussianMean(int32_t pdf_index,
-                                         int32_t gauss) const {
+FloatVector AmDiagGmm::GetGaussianMean(int32_t pdf_index, int32_t gauss) const {
   KHG_ASSERT((static_cast<size_t>(pdf_index) < densities_.size()) &&
              (densities_[pdf_index] != nullptr));
   return densities_[pdf_index]->GetComponentMean(gauss);
 }
 
-torch::Tensor AmDiagGmm::GetGaussianVariance(int32_t pdf_index,
-                                             int32_t gauss) const {
+FloatVector AmDiagGmm::GetGaussianVariance(int32_t pdf_index,
+                                           int32_t gauss) const {
   KHG_ASSERT((static_cast<size_t>(pdf_index) < densities_.size()) &&
              (densities_[pdf_index] != nullptr));
   return densities_[pdf_index]->GetComponentVariance(gauss);
 }
 
 void AmDiagGmm::SetGaussianMean(int32_t pdf_index, int32_t gauss_index,
-                                torch::Tensor in) {
+                                const FloatVector &in) {
   KHG_ASSERT((static_cast<size_t>(pdf_index) < densities_.size()) &&
              (densities_[pdf_index] != nullptr));
   densities_[pdf_index]->SetComponentMean(gauss_index, in);

@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "kaldi-hmm-gmm/csrc/am-diag-gmm.h"
-#include "torch/torch.h"
 
 namespace khg {
 
@@ -63,9 +62,9 @@ void PybindAmDiagGmm(py::module *m) {
             auto ans = std::make_unique<PyClass>();
 
             for (int32_t i = 0; i != num_pdfs; ++i) {
-              torch::Tensor weights = t[3 * i + 0].cast<torch::Tensor>();
-              torch::Tensor inv_vars = t[3 * i + 1].cast<torch::Tensor>();
-              torch::Tensor means_invvars = t[3 * i + 2].cast<torch::Tensor>();
+              FloatVector weights = t[3 * i + 0].cast<FloatVector>();
+              FloatMatrix inv_vars = t[3 * i + 1].cast<FloatMatrix>();
+              FloatMatrix means_invvars = t[3 * i + 2].cast<FloatMatrix>();
               ans->AddPdf({weights, inv_vars, means_invvars});
             }
             return ans;

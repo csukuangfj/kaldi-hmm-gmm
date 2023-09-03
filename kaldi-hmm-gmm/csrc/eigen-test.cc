@@ -2,9 +2,11 @@
 
 // Copyright (c)  2023     Xiaomi Corporation
 
+#include "kaldi-hmm-gmm/csrc/eigen.h"
+
+#include <cmath>
 #include <type_traits>
 
-#include "Eigen/Dense"
 #include "gtest/gtest.h"
 
 // See
@@ -20,6 +22,8 @@
 //
 // Using Eigen in CMake Projects
 // https://eigen.tuxfamily.org/dox/TopicCMakeGuide.html
+
+namespace khg {
 
 TEST(Eigen, Hello) {
   Eigen::MatrixXd m(2, 2);  // uninitialized; contains garbage data
@@ -377,6 +381,69 @@ TEST(Eigen, Row) {
   // std::cout << typeid(c).name() << "\n";
 }
 
+TEST(Eigen, Sequence) {
+  // (start, end)
+  // Note that 5 is included here
+  auto seq = Eigen::seq(2, 5);  //[2, 3, 4, 5]
+  EXPECT_EQ(seq.size(), 4);
+  for (int32_t i = 0; i != seq.size(); ++i) {
+    EXPECT_EQ(seq[i], i + 2);
+  }
+
+  // start 2, end 5, increment 2,
+  // (start, end, increment), note that 5 is not included here
+  auto seq2 = Eigen::seq(2, 5, 2);  //[2, 4]
+  EXPECT_EQ(seq2.size(), 2);
+  EXPECT_EQ(seq2[0], 2);
+  EXPECT_EQ(seq2[1], 4);
+
+  // (start, sequence_length)
+  auto seq3 = Eigen::seqN(2, 5);  //[2, 3, 4, 5, 6]
+  EXPECT_EQ(seq3.size(), 5);
+  for (int32_t i = 0; i != seq3.size(); ++i) {
+    EXPECT_EQ(seq3[i], i + 2);
+  }
+
+  Eigen::VectorXf v(5);
+  v << 0, 1, 2, 3, 4;
+
+  Eigen::VectorXf a = v(Eigen::seq(2, Eigen::last));
+  EXPECT_EQ(a.size(), 3);
+  EXPECT_EQ(a[0], 2);
+  EXPECT_EQ(a[1], 3);
+  EXPECT_EQ(a[2], 4);
+
+  a = v(Eigen::seq(2, Eigen::last - 1));
+  EXPECT_EQ(a.size(), 2);
+  EXPECT_EQ(a[0], 2);
+  EXPECT_EQ(a[1], 3);
+}
+
+TEST(Eigen, CopyRow) {
+  Eigen::MatrixXf a = Eigen::MatrixXf::Random(2, 3);
+  Eigen::MatrixXf b(2, 3);
+  b.row(0) = a.row(0);
+  b.row(1) = a.row(1);
+  for (int32_t i = 0; i != a.size(); ++i) {
+    EXPECT_EQ(a(i), b(i));
+  }
+
+  a = Eigen::MatrixXf::Random(5, 3);
+  b.resize(5, 3);
+
+  b(Eigen::seqN(0, 3), Eigen::all) = a(Eigen::seqN(0, 3), Eigen::all);
+  b(Eigen::seqN(3, 2), Eigen::all) = a(Eigen::seqN(3, 2), Eigen::all);
+  for (int32_t i = 0; i != a.size(); ++i) {
+    EXPECT_EQ(a(i), b(i));
+  }
+
+  Eigen::MatrixXf c(5, 3);
+  c(Eigen::seqN(0, 5), Eigen::all) = a;
+  for (int32_t i = 0; i != a.size(); ++i) {
+    EXPECT_EQ(a(i), c(i));
+  }
+}
+
 TEST(Eigen, SpecialFunctions) {
   Eigen::MatrixXf a(2, 3);
   a.setOnes();
@@ -389,3 +456,199 @@ TEST(Eigen, SpecialFunctions) {
     EXPECT_EQ(a(i), 0);
   }
 }
+
+TEST(Eigen, LogSumExp) {
+  Eigen::VectorXf v(5);
+  v << 0.1, 0.3, 0.2, 0.15, 0.25;
+  auto f = LogSumExp(v);
+  EXPECT_NEAR(f, 1.8119, 1e-4);
+
+  v.resize(10);
+  v << -0.028933119028806686, -0.8265501260757446, 0.31104734539985657,
+      0.25977903604507446, 0.18070533871650696, 0.02222185768187046,
+      -1.4124598503112793, -0.5896500945091248, -0.17299121618270874,
+      -0.6516317129135132;
+
+  f = LogSumExp(v);
+  EXPECT_NEAR(f, 2.1343, 1e-4);
+}
+
+TEST(Eigen, Addmm) {
+  // means_invvars_: (nmix, dim)
+  // data: (dim,)
+  // loglikes: (nmix,)
+  // loglikes +=  means * inv(vars) * data.
+  // loglikes->AddMatVec(1.0, means_invvars_, kNoTrans, data, 1.0);
+  // loglikes = loglikes.unsqueeze(1);  // (nmix, 1)
+  // loglikes.addmm_(means_invvars_, data.unsqueeze(1));
+
+  int32_t nmix = 3;
+  int32_t dim = 5;
+
+  Eigen::MatrixXf means_invvars = Eigen::MatrixXf::Random(nmix, dim);
+  Eigen::VectorXf data = Eigen::VectorXf::Random(dim);
+
+  Eigen::VectorXf loglikes = Eigen::VectorXf::Random(nmix);
+
+  loglikes += means_invvars * data;
+}
+
+TEST(Eigen, VectorOp) {
+  Eigen::VectorXf a(2);
+  a << 1, 2;
+  Eigen::RowVectorXf b(2);
+  b << 10, 20;
+
+  {
+    // Don't do this!
+    Eigen::VectorXf c = a.array() + b.array();
+    EXPECT_EQ(c.size(), 1);
+    EXPECT_EQ(c[0], a[0] + b[0]);
+  }
+
+  {
+    Eigen::VectorXf c = a.array() + b.transpose().array();
+    EXPECT_EQ(c.size(), 2);
+    EXPECT_EQ(c[0], a[0] + b[0]);
+    EXPECT_EQ(c[1], a[1] + b[1]);
+  }
+
+  {
+    // Don't do this!
+    Eigen::RowVectorXf c(2);
+    c << 100, 200;
+    c.row(0) = a.array() + b.array();
+    EXPECT_EQ(c.size(), 2);
+    EXPECT_EQ(c[0], a[0] + b[0]);
+    EXPECT_EQ(c[1], a[1] + b[0]);
+  }
+
+  {
+    // Don't do this!
+    Eigen::RowVectorXf c(2);
+    c << 100, 200;
+    c.row(0) = b.array() + a.array();
+    EXPECT_EQ(c.size(), 2);
+    EXPECT_EQ(c[0], b[0] + a[0]);
+    EXPECT_EQ(c[1], b[1] + a[0]);
+  }
+}
+
+TEST(Eigen, VectorOp2) {
+  Eigen::MatrixXf m(2, 3);
+  m << 1, 4, 8, 16, 9, 25;
+
+  Eigen::VectorXf v(3);
+  v << 10, 20, 30;
+
+  v = v.transpose().array() * m.row(1).array().sqrt();
+  EXPECT_EQ(v.size(), 3);
+
+  EXPECT_EQ(v[0], 10 * std::sqrt(16));
+  EXPECT_EQ(v[1], 20 * std::sqrt(9));
+  EXPECT_EQ(v[2], 30 * std::sqrt(25));
+}
+
+TEST(Eigen, RowwiseSum) {
+  Eigen::MatrixXf m(2, 3);
+  m << 1, 2, 3, 4, 5, 6;
+
+  Eigen::MatrixXf a = m.rowwise().sum();
+  EXPECT_EQ(a.rows(), m.rows());
+  EXPECT_EQ(a.cols(), 1);
+
+  EXPECT_EQ(a(0), 1 + 2 + 3);
+  EXPECT_EQ(a(1), 4 + 5 + 6);
+
+  Eigen::MatrixXf b = m.colwise().sum();
+  EXPECT_EQ(b.rows(), 1);
+  EXPECT_EQ(b.cols(), m.cols());
+
+  EXPECT_EQ(b(0), 1 + 4);
+  EXPECT_EQ(b(1), 2 + 5);
+  EXPECT_EQ(b(2), 3 + 6);
+
+  // assign a row vector to a vector
+  Eigen::VectorXf c = m.colwise().sum();
+  EXPECT_EQ(c.rows(), b.cols());
+  EXPECT_EQ(c.cols(), 1);
+
+  EXPECT_EQ(c(0), 1 + 4);
+  EXPECT_EQ(c(1), 2 + 5);
+  EXPECT_EQ(c(2), 3 + 6);
+
+  // assign a vector to a row vector
+  Eigen::RowVectorXf d = m.rowwise().sum();
+  EXPECT_EQ(d(0), 1 + 2 + 3);
+  EXPECT_EQ(d(1), 4 + 5 + 6);
+
+  // now for array
+  Eigen::MatrixXf a2 = m.array().rowwise().sum();
+  EXPECT_EQ(a2.rows(), m.rows());
+  EXPECT_EQ(a2.cols(), 1);
+}
+
+TEST(Eigen, Replicate) {
+  Eigen::VectorXf v(2);
+  v << 1, 2;
+  Eigen::VectorXf a = v.replicate(3, 1);
+  EXPECT_EQ(a.size(), v.size() * 3);
+  EXPECT_EQ(a[0], v[0]);
+  EXPECT_EQ(a[1], v[1]);
+  EXPECT_EQ(a[2], v[0]);
+  EXPECT_EQ(a[3], v[1]);
+  EXPECT_EQ(a[4], v[0]);
+  EXPECT_EQ(a[5], v[1]);
+
+  Eigen::MatrixXf m = v.transpose().replicate(3, 1);
+  // repeat the rows 3 times
+  EXPECT_EQ(m.rows(), 3);
+  EXPECT_EQ(m.cols(), v.size());
+
+  Eigen::MatrixXf expected_m(3, 2);
+  expected_m << 1, 2, 1, 2, 1, 2;
+  for (int32_t i = 0; i != m.size(); ++i) {
+    EXPECT_EQ(m(i), expected_m(i));
+  }
+}
+
+TEST(Eigen, Indexes) {
+  Eigen::VectorXf v(5);
+  v << 0, 10, 20, 30, 40;
+
+  std::vector<int32_t> indexes = {1, 4, 0, 2, 1};
+  Eigen::VectorXf a = v(indexes);
+  EXPECT_EQ(a.size(), indexes.size());
+  for (int32_t i = 0; i != a.size(); ++i) {
+    EXPECT_EQ(a[i], v[indexes[i]]);
+  }
+
+  Eigen::MatrixXf m(3, 2);
+  m << 0, 1, 2, 3, 4, 5;
+
+  indexes = {1, 0, 2, 1};
+  Eigen::MatrixXf b = m(indexes, Eigen::all);
+#if 0
+    2 3
+    0 1
+    4 5
+    2 3
+#endif
+}
+
+TEST(Eigen, TestSoftmax) {
+  Eigen::VectorXf v(5);
+  v << 0.46589261293411255, 0.5329158902168274, 0.45468050241470337,
+      0.509181022644043, 0.4529399275779724;
+
+  Eigen::VectorXf expected(5);
+  expected << 0.1964813768863678, 0.21010152995586395, 0.19429071247577667,
+      0.205173522233963, 0.19395282864570618;
+
+  Eigen::VectorXf actual = Softmax(v);
+  for (int32_t i = 0; i != 5; ++i) {
+    EXPECT_NEAR(expected[i], actual[i], 1e-4);
+  }
+}
+
+}  // namespace khg

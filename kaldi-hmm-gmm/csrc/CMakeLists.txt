@@ -7,19 +7,20 @@ set(srcs
   cluster-utils.cc
   clusterable-classes.cc
   context-dep.cc
-  decodable-am-diag-gmm.cc
-  decoder-wrappers.cc
+  # decodable-am-diag-gmm.cc
+  # decoder-wrappers.cc
   diag-gmm-normal.cc
   diag-gmm.cc
+  eigen.cc
   event-map.cc
-  faster-decoder.cc
+  # faster-decoder.cc
   hmm-topology.cc
   hmm-utils.cc
   kaldi-math.cc
-  lattice-simple-decoder.cc
-  lattice-faster-decoder.cc
-  mle-am-diag-gmm.cc
-  mle-diag-gmm.cc
+  # lattice-simple-decoder.cc
+  # lattice-faster-decoder.cc
+  # mle-am-diag-gmm.cc
+  # mle-diag-gmm.cc
   model-common.cc
   training-graph-compiler.cc
   transition-model.cc

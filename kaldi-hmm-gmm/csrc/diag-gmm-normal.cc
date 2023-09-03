@@ -12,35 +12,36 @@
 namespace khg {
 
 void DiagGmmNormal::CopyFromDiagGmm(const DiagGmm &diaggmm) {
-  weights_ = diaggmm.weights_.to(torch::kDouble);
+  weights_ = diaggmm.weights_.cast<double>();
 
-  vars_ = 1.0 / diaggmm.inv_vars_.to(torch::kDouble);
+  vars_ = 1.0f / diaggmm.inv_vars_.cast<double>().array();
 
-  means_ = diaggmm.means_invvars_.to(torch::kDouble).mul(vars_);
+  means_ = diaggmm.means_invvars_.cast<double>().array() * vars_.array();
 }
 
 void DiagGmmNormal::CopyToDiagGmm(DiagGmm *diaggmm, GmmFlagsType flags) const {
   KHG_ASSERT(
-      (static_cast<int32_t>(diaggmm->Dim()) == means_.size(1)) &&
-      (static_cast<int32_t>(diaggmm->weights_.size(0)) == weights_.size(0)));
+      (static_cast<int32_t>(diaggmm->Dim()) == means_.cols()) &&
+      (static_cast<int32_t>(diaggmm->weights_.size()) == weights_.size()));
 
   DiagGmmNormal oldg(*diaggmm);
 
   // weights_ is torch::kDouble; Converting it to kFloat will copy it
-  if (flags & kGmmWeights) diaggmm->weights_ = weights_.to(torch::kFloat);
+  if (flags & kGmmWeights) diaggmm->weights_ = weights_.cast<float>();
 
   if (flags & kGmmVariances) {
-    diaggmm->inv_vars_ = (1.0 / vars_).to(torch::kFloat);
+    diaggmm->inv_vars_ = (1.0 / vars_.array()).cast<float>();
 
     // update the mean related natural part with the old mean, if necessary
     if (!(flags & kGmmMeans)) {
-      diaggmm->means_invvars_ = oldg.means_.to(torch::kFloat);
-      diaggmm->means_invvars_.mul_(diaggmm->inv_vars_);
+      diaggmm->means_invvars_ =
+          oldg.means_.cast<float>().array() * diaggmm->inv_vars_.array();
     }
   }
 
   if (flags & kGmmMeans) {
-    diaggmm->means_invvars_ = means_.to(torch::kFloat).mul(diaggmm->inv_vars_);
+    diaggmm->means_invvars_ =
+        means_.cast<float>().array() * diaggmm->inv_vars_.array();
   }
 
   diaggmm->valid_gconsts_ = false;
