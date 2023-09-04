@@ -384,7 +384,7 @@ TEST(Eigen, Row) {
 TEST(Eigen, Sequence) {
   // (start, end)
   // Note that 5 is included here
-  auto seq = Eigen::seq(2, 5);  //[2, 3, 4, 5]
+  auto seq = Eigen::seq(2, 5);  // [2, 3, 4, 5]
   EXPECT_EQ(seq.size(), 4);
   for (int32_t i = 0; i != seq.size(); ++i) {
     EXPECT_EQ(seq[i], i + 2);
@@ -392,13 +392,13 @@ TEST(Eigen, Sequence) {
 
   // start 2, end 5, increment 2,
   // (start, end, increment), note that 5 is not included here
-  auto seq2 = Eigen::seq(2, 5, 2);  //[2, 4]
+  auto seq2 = Eigen::seq(2, 5, 2);  // [2, 4]
   EXPECT_EQ(seq2.size(), 2);
   EXPECT_EQ(seq2[0], 2);
   EXPECT_EQ(seq2[1], 4);
 
   // (start, sequence_length)
-  auto seq3 = Eigen::seqN(2, 5);  //[2, 3, 4, 5, 6]
+  auto seq3 = Eigen::seqN(2, 5);  // [2, 3, 4, 5, 6]
   EXPECT_EQ(seq3.size(), 5);
   for (int32_t i = 0; i != seq3.size(); ++i) {
     EXPECT_EQ(seq3[i], i + 2);

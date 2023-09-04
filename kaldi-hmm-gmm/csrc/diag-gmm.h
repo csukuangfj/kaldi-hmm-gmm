@@ -239,6 +239,7 @@ class DiagGmm {
                                const FloatVector &f2,         // 1-D
                                const FloatVector &s1,         // 1-D
                                const FloatVector &s2) const;  // 1-D
+
  private:
   /// Equals log(weight) - 0.5 * (log(2pi) + log det(var) + mean*mean*inv(var))
   FloatVector gconsts_;  // 1-d tensor, (nimx,)
