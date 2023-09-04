@@ -31,18 +31,17 @@ namespace khg {
 void DiagGmm::Resize(int32_t nmix, int32_t dim) {
   KHG_ASSERT(nmix > 0 && dim > 0);
 
-  if (!gconsts_.size() || gconsts_.rows() != nmix) {
+  if (!gconsts_.size() || gconsts_.size() != nmix) {
     gconsts_.resize(nmix);
   }
 
-  if (!weights_.size() || weights_.rows() != nmix) {
+  if (!weights_.size() || weights_.size() != nmix) {
     weights_.resize(nmix);
   }
 
   if (!inv_vars_.size() || inv_vars_.rows() != nmix ||
       inv_vars_.cols() != dim) {
-    inv_vars_.resize(nmix, dim);
-    inv_vars_.setOnes();
+    inv_vars_ = FloatMatrix::Ones(nmix, dim);
     // must be initialized to unit for case of calling SetMeans while having
     // covars/invcovars that are not set yet (i.e. zero)
   }
@@ -108,11 +107,11 @@ int32_t DiagGmm::ComputeGconsts() {
   int32_t num_bad = 0;
 
   // Resize if Gaussians have been removed during Update()
-  if (!gconsts_.size() || num_mix != static_cast<int32_t>(gconsts_.rows())) {
+  if (!gconsts_.size() || num_mix != gconsts_.size()) {
     gconsts_.resize(num_mix);
   }
 
-  for (int32_t mix = 0; mix < num_mix; mix++) {
+  for (int32_t mix = 0; mix < num_mix; ++mix) {
     KHG_ASSERT(weights_[mix] >= 0);  // Cannot have negative weights.
 
     // May be -inf if weights == 0
@@ -167,32 +166,10 @@ float DiagGmm::LogLikelihood(const FloatVector &data) const {
 
 void DiagGmm::LogLikelihoods(const FloatVector &data,
                              FloatVector *loglikes) const {
-  // TODO(fangjun): optimize this method
-
   if (data.size() != Dim()) {
     KHG_ERR << "DiagGmm::LogLikelihoods, dimension "
             << "mismatch " << data.size() << " vs. " << Dim();
   }
-#if 0
-  FloatVector loglikes = gconsts_;  // copy
-  // TODO(fangjun): optimize out data_sq
-  FloatVector data_sq = data.array().square();
-  // means_invvars_: (nmix, dim)
-  // data: (dim,)
-  // loglikes: (nmix,)
-
-  // loglikes +=  means * inv(vars) * data.
-  // loglikes->AddMatVec(1.0, means_invvars_, kNoTrans, data, 1.0);
-  loglikes = loglikes.unsqueeze(1);  // (nmix, 1)
-  loglikes.addmm_(means_invvars_, data.unsqueeze(1));
-
-  // loglikes += -0.5 * inv(vars) * data_sq.
-  // loglikes->AddMatVec(-0.5, inv_vars_, kNoTrans, data_sq, 1.0);
-  loglikes.addmm_(inv_vars_, data_sq.unsqueeze(1), /*beta*/ 1.0,
-                  /*alpha*/ -0.5);
-
-  *_loglikes = loglikes.squeeze(1);
-#endif
 
   *loglikes = gconsts_ + means_invvars_ * data -
               0.5 * inv_vars_ * data.array().square().matrix();
@@ -420,7 +397,7 @@ float DiagGmm::ComponentLogLikelihood(const FloatVector &data,  // 1-D
     KHG_ERR << "Must call ComputeGconsts() before computing likelihood";
   }
 
-  if (static_cast<int32_t>(data.size()) != Dim()) {
+  if (data.size() != Dim()) {
     KHG_ERR << "DiagGmm::ComponentLogLikelihood, dimension "
             << "mismatch " << data.size() << " vs. " << Dim();
   }
@@ -442,10 +419,13 @@ void DiagGmm::Generate(FloatVector *output) const {
   int32_t i = 0;
   double sum = 0.0;
 
-  while (sum + weights_[i] < r) {
+  while (sum + weights_[i] < r && i < weights_.size()) {
     sum += weights_[i];
-    i++;
-    KHG_ASSERT(i < static_cast<int32_t>(weights_.size()));
+    ++i;
+  }
+
+  if (i >= weights_.size()) {
+    i = weights_.size() - 1;
   }
 
   // now i is the index of the Gaussian we chose.
@@ -486,19 +466,17 @@ void DiagGmm::Interpolate(float rho, const DiagGmm &source,
   DiagGmmNormal them(source);
 
   if (flags & kGmmWeights) {
-    us.weights_ *= 1.0 - rho;
-    us.weights_ += them.weights_ * rho;
-    us.weights_ = us.weights_ / us.weights_.sum();
+    us.weights_ = us.weights_ * (1.0 - rho) + them.weights_ * rho;
+
+    us.weights_ /= us.weights_.sum();
   }
 
   if (flags & kGmmMeans) {
-    us.means_ *= 1.0 - rho;
-    us.means_ += them.means_ * rho;
+    us.means_ = us.means_ * (1.0 - rho) + them.means_ * rho;
   }
 
   if (flags & kGmmVariances) {
-    us.vars_ *= 1.0 - rho;
-    us.vars_ += them.vars_ * rho;
+    us.vars_ = us.vars_ * (1.0 - rho) + them.vars_ * rho;
   }
 
   us.CopyToDiagGmm(this);

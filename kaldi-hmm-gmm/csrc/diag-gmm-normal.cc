@@ -20,9 +20,8 @@ void DiagGmmNormal::CopyFromDiagGmm(const DiagGmm &diaggmm) {
 }
 
 void DiagGmmNormal::CopyToDiagGmm(DiagGmm *diaggmm, GmmFlagsType flags) const {
-  KHG_ASSERT(
-      (static_cast<int32_t>(diaggmm->Dim()) == means_.cols()) &&
-      (static_cast<int32_t>(diaggmm->weights_.size()) == weights_.size()));
+  KHG_ASSERT((diaggmm->Dim() == means_.cols()) &&
+             (diaggmm->weights_.size() == weights_.size()));
 
   DiagGmmNormal oldg(*diaggmm);
 

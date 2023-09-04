@@ -38,11 +38,6 @@ float DecodableAmDiagGmmUnmapped::LogLikelihoodZeroBased(int32_t frame,
     return log_like_cache_[state].log_like;  // return cached value, if found
   }
 
-  if (frame != previous_frame_) {  // cache the squared stats.
-    data_squared_ = feature_matrix_.row(frame).array().square();
-    previous_frame_ = frame;
-  }
-
   const DiagGmm &pdf = acoustic_model_.GetPdf(state);
 
   // check if everything is in order

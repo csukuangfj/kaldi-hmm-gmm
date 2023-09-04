@@ -35,12 +35,12 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybinTreeRenderer(&m);
   PybindContextDep(&m);
   PybindEventMap(&m);
-  //
+
   PybindModelCommon(&m);
   PybindClusterUtils(&m);
   PybindClusterableClass(&m);
   PybindDiagGmm(&m);
-  //
+
   PybindAmDiagGmm(&m);
   PybindHmmUtils(&m);
   PybindHmmTopology(&m);

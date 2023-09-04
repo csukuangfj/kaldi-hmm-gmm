@@ -38,7 +38,6 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
                              float log_sum_exp_prune = -1.0)
       : acoustic_model_(am),
         feature_matrix_(feats),
-        previous_frame_(-1),
         log_sum_exp_prune_(log_sum_exp_prune) {
     ResetLogLikeCache();
   }
@@ -69,8 +68,7 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
 
   const AmDiagGmm &acoustic_model_;
   const FloatMatrix feature_matrix_;  // (num_frames, feature_dim)
-  int32_t previous_frame_;
-  float log_sum_exp_prune_;  // never used
+  float log_sum_exp_prune_;           // never used
 
   /// Defines a cache record for a state
   struct LikelihoodCacheRecord {
@@ -78,10 +76,6 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
     int32_t hit_time;  ///< Frame for which this value is relevant
   };
   std::vector<LikelihoodCacheRecord> log_like_cache_;
-
- private:
-  FloatVector data_squared_;  ///< Cache for fast likelihood calculation
-                              ///< 1-D float tensor of shape (feature_dim,)
 };
 
 class DecodableAmDiagGmmScaled : public DecodableAmDiagGmmUnmapped {

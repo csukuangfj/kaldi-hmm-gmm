@@ -36,9 +36,9 @@ target_link_libraries(kaldi-hmm-gmm-core PUBLIC Eigen3::Eigen)
 if(KHG_ENABLE_TESTS)
   set(test_srcs
     diag-gmm-test.cc
+    eigen-test.cc
     event-map-test.cc
     hash-list-test.cc
-    eigen-test.cc
   )
 
   function(khg_add_test source)

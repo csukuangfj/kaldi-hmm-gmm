@@ -45,13 +45,10 @@ class GaussClusterable : public Clusterable {
   ~GaussClusterable() override = default;
   GaussClusterable() : count_(0.0), var_floor_(0.0) {}
   GaussClusterable(int32_t dim, float var_floor)
-      : count_(0.0), var_floor_(var_floor) {
-    x_stats_.resize(dim);
-    x2_stats_.resize(dim);
-
-    x_stats_.setZero();
-    x2_stats_.setZero();
-  }
+      : count_(0.0),
+        x_stats_(DoubleVector::Zero(dim)),
+        x2_stats_(DoubleVector::Zero(dim)),
+        var_floor_(var_floor) {}
 
   GaussClusterable(const DoubleVector &x_stats,   // 1-D tensor of shape (dim,)
                    const DoubleVector &x2_stats,  // 1-D tensor of shape (dim,)
