@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   build_wheels_win32:
-    name: ${{ matrix.os }}
+    name: ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
