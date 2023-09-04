@@ -20,7 +20,7 @@ set(srcs
   # lattice-faster-decoder.cc
   # lattice-simple-decoder.cc
   # mle-am-diag-gmm.cc
-  # mle-diag-gmm.cc
+  mle-diag-gmm.cc
   model-common.cc
   # training-graph-compiler.cc
   # transition-information.cc

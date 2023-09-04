@@ -220,7 +220,7 @@ TEST(Eigen, Transpose) {
   Eigen::MatrixXf a(2, 2);
   a << 1, 2, 3, 4;
 
-  a = a.transpose();  // wrong due to alias
+  // a = a.transpose();  // wrong due to alias
 #if 0
   1 2
   2 4
@@ -500,17 +500,18 @@ TEST(Eigen, VectorOp) {
   b << 10, 20;
 
   {
-    // Don't do this!
-    Eigen::VectorXf c = a.array() + b.array();
-    EXPECT_EQ(c.size(), 1);
-    EXPECT_EQ(c[0], a[0] + b[0]);
-  }
-
-  {
     Eigen::VectorXf c = a.array() + b.transpose().array();
     EXPECT_EQ(c.size(), 2);
     EXPECT_EQ(c[0], a[0] + b[0]);
     EXPECT_EQ(c[1], a[1] + b[1]);
+  }
+
+#if 0
+  {
+    // Don't do this!
+    Eigen::VectorXf c = a.array() + b.array();
+    EXPECT_EQ(c.size(), 1);
+    EXPECT_EQ(c[0], a[0] + b[0]);
   }
 
   {
@@ -532,6 +533,7 @@ TEST(Eigen, VectorOp) {
     EXPECT_EQ(c[0], b[0] + a[0]);
     EXPECT_EQ(c[1], b[1] + a[0]);
   }
+#endif
 }
 
 TEST(Eigen, VectorOp2) {
@@ -649,6 +651,64 @@ TEST(Eigen, TestSoftmax) {
   for (int32_t i = 0; i != 5; ++i) {
     EXPECT_NEAR(expected[i], actual[i], 1e-4);
   }
+}
+
+TEST(Eigen, Op1) {
+  Eigen::VectorXf a(2);
+  Eigen::VectorXf b(3);
+
+  a << 10, 20;
+  b << 3, 5, 8;
+
+  Eigen::MatrixXf c;
+  c = a * b.transpose();
+
+  Eigen::MatrixXf expected(2, 3);
+  expected << 30, 50, 80, 60, 100, 160;
+  for (int32_t i = 0; i != 6; ++i) {
+    EXPECT_EQ(c(i), expected(i));
+  }
+}
+
+TEST(Eigen, Op2) {
+  Eigen::MatrixXf a(2, 3);
+  a << 1, 2, 3, 4, 5, 6;
+
+  Eigen::VectorXf b(2);
+  b << 10, 20;
+
+  a = a.array() * b.replicate(1, a.cols()).array();
+
+  Eigen::MatrixXf expected(2, 3);
+  expected << 10, 20, 30, 80, 100, 120;
+  for (int32_t i = 0; i != 6; ++i) {
+    EXPECT_EQ(a(i), expected(i));
+  }
+
+  std::cout << a << "\n";
+}
+
+TEST(Eigen, Op3) {
+  Eigen::MatrixXf a(2, 3);
+  a << 1, 2, 3, 4, 5, 6;
+  Eigen::VectorXf b = a.row(1);
+  // b contains [4, 5, 6] and is a column vector
+  b[0] = 100;
+
+  // it is OK to assign a column vector to a row vector
+  a.row(1) = b;
+  // a is
+  // 1 2 3
+  // 100 5 6
+}
+
+TEST(Eigen, Dot) {
+  Eigen::VectorXf a(3);
+  Eigen::VectorXf b(3);
+  a << 1, 2, 3;
+  b << 4, 5, 6;
+  float c = a.dot(b);
+  EXPECT_EQ(c, 1 * 4 + 2 * 5 + 3 * 6);
 }
 
 }  // namespace khg

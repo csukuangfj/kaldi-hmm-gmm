@@ -11,8 +11,8 @@
 #include <string>
 
 #include "kaldi-hmm-gmm/csrc/diag-gmm.h"
+#include "kaldi-hmm-gmm/csrc/eigen.h"
 #include "kaldi-hmm-gmm/csrc/model-common.h"
-#include "torch/script.h"
 
 namespace khg {
 
@@ -23,7 +23,7 @@ namespace khg {
 struct MleDiagGmmOptions {
   /// Variance floor for each dimension [empty if not supplied].
   /// It is in double since the variance is computed in double precision.
-  torch::Tensor variance_floor_vector;  // a 1-D torch::kDouble tensor
+  DoubleVector variance_floor_vector;
   /// Minimum weight below which a Gaussian is not updated (and is
   /// removed, if remove_low_count_gaussians == true);
   float min_gaussian_weight;
@@ -102,7 +102,7 @@ class AccumDiagGmm {
   ///                    if flags_ is kGmmAll
   /// @param weight   mean_accumulator_[comp_index] += data * weight
   ///                 variance_accumulator_[comp_index] + data.square() * weight
-  void AccumulateForComponent(torch::Tensor data, int32_t comp_index,
+  void AccumulateForComponent(const FloatVector &data, int32_t comp_index,
                               float weight);
 
   /// Accumulate for all components, given the posteriors.
@@ -113,15 +113,15 @@ class AccumDiagGmm {
   /// occupancy_ += posteriors
   /// mean_accumulator_ += gauss_posteriors.unsqueeze(1) * data
   /// variance_accumulator_ += gauss_posteriors.unsqueeze(1) * data.square()
-  void AccumulateFromPosteriors(torch::Tensor data,
-                                torch::Tensor gauss_posteriors);
+  void AccumulateFromPosteriors(const FloatVector &data,
+                                const FloatVector &gauss_posteriors);
 
   /// Accumulate for all components given a diagonal-covariance GMM.
   /// Computes posteriors and returns log-likelihood
   ///
   /// @param gmm
   /// @param data 1-D float tensor of shape (dim,)
-  float AccumulateFromDiag(const DiagGmm &gmm, torch::Tensor data,
+  float AccumulateFromDiag(const DiagGmm &gmm, const FloatVector &data,
                            float weight);
 
   /// Increment the stats for this component by the specified amount
@@ -132,8 +132,9 @@ class AccumDiagGmm {
   /// @param occ
   /// @param x_stats 1-D double tensor of shape (dim,)
   /// @param x2_stats 1-D double tensor of shape (dim,)
-  void AddStatsForComponent(int32_t comp_id, double occ, torch::Tensor x_stats,
-                            torch::Tensor x2_stats);
+  void AddStatsForComponent(int32_t comp_id, double occ,
+                            const DoubleVector &x_stats,
+                            const DoubleVector &x2_stats);
 
   /// Increment with stats from this other accumulator (times scale)
   void Add(float scale, const AccumDiagGmm &acc);
@@ -154,11 +155,20 @@ class AccumDiagGmm {
   void SmoothWithModel(float tau, const DiagGmm &src_gmm);
 
   GmmFlagsType Flags() const { return flags_; }
-  const torch::Tensor &occupancy() const { return occupancy_; }
-  const torch::Tensor &mean_accumulator() const { return mean_accumulator_; }
-  const torch::Tensor &variance_accumulator() const {
+
+  const DoubleVector &occupancy() const { return occupancy_; }
+
+  DoubleVector &occupancy() { return occupancy_; }
+
+  const DoubleMatrix &mean_accumulator() const { return mean_accumulator_; }
+
+  DoubleMatrix &mean_accumulator() { return mean_accumulator_; }
+
+  const DoubleMatrix &variance_accumulator() const {
     return variance_accumulator_;
   }
+
+  DoubleMatrix &variance_accumulator() { return variance_accumulator_; }
 
  private:
   int32_t dim_;
@@ -166,13 +176,9 @@ class AccumDiagGmm {
   /// Flags corresponding to the accumulators that are stored.
   GmmFlagsType flags_;
 
-  torch::Tensor occupancy_;             // 1-D double tensor, (num_comp_,)
-  torch::Tensor mean_accumulator_;      // 2-D double tensor, (num_comp_, dim)
-  torch::Tensor variance_accumulator_;  // 2-d double tensor
-
-  // Vector<double> occupancy_;
-  // Matrix<double> mean_accumulator_;
-  // Matrix<double> variance_accumulator_;
+  DoubleVector occupancy_;             // 1-D double tensor, (num_comp_,)
+  DoubleMatrix mean_accumulator_;      // (num_comp_, dim)
+  DoubleMatrix variance_accumulator_;  // (num_comp_, dim)
 };
 
 /// for computing the maximum-likelihood estimates of the parameters of

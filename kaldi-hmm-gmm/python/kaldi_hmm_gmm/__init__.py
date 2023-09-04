@@ -1,7 +1,7 @@
 import torch
 from _kaldi_hmm_gmm import (
     #  AccumAmDiagGmm,
-    #  AccumDiagGmm,
+    AccumDiagGmm,
     #  AlignConfig,
     AmDiagGmm,
     Clusterable,
@@ -23,8 +23,8 @@ from _kaldi_hmm_gmm import (
     #  LatticeFasterDecoderStdVectorFst,
     #  LatticeSimpleDecoder,
     #  LatticeSimpleDecoderConfig,
-    #  MapDiagGmmOptions,
-    #  MleDiagGmmOptions,
+    MapDiagGmmOptions,
+    MleDiagGmmOptions,
     #  MleTransitionUpdateConfig,
     ScalarClusterable,
     #  TrainingGraphCompiler,

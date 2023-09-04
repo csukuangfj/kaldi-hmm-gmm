@@ -21,7 +21,7 @@
 // #include "kaldi-hmm-gmm/python/csrc/lattice-faster-decoder.h"
 // #include "kaldi-hmm-gmm/python/csrc/lattice-simple-decoder.h"
 // #include "kaldi-hmm-gmm/python/csrc/mle-am-diag-gmm.h"
-// #include "kaldi-hmm-gmm/python/csrc/mle-diag-gmm.h"
+#include "kaldi-hmm-gmm/python/csrc/mle-diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/model-common.h"
 // #include "kaldi-hmm-gmm/python/csrc/training-graph-compiler.h"
 // #include "kaldi-hmm-gmm/python/csrc/transition-information.h"
@@ -49,7 +49,7 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   // PybindTransitionModel(&m);
   //
   // PybindTrainingGraphCompiler(&m);
-  // PybindMleDiagGmm(&m);
+  PybindMleDiagGmm(&m);
   // PybindMleAmDiagGmm(&m);
   //
   // PybindDecodableItf(&m);

@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/mle-diag-gmm.h"
-#include "torch/torch.h"
 
 namespace khg {
 
@@ -73,10 +72,32 @@ void PybindMleDiagGmm(py::module *m) {
       .def_property_readonly("num_gauss", &PyClass::NumGauss)
       .def_property_readonly("dim", &PyClass::Dim)
       .def_property_readonly("flags", &PyClass::Flags)
-      .def_property_readonly("occupancy", &PyClass::occupancy)
-      .def_property_readonly("mean_accumulator", &PyClass::mean_accumulator)
-      .def_property_readonly("variance_accumulator",
-                             &PyClass::variance_accumulator)
+      .def_property(
+          "occupancy",
+          [](PyClass &self) -> DoubleVector & { return self.occupancy(); },
+          [](PyClass &self, const DoubleVector &m) { self.occupancy() = m; },
+          py::return_value_policy::reference_internal)
+
+      .def_property(
+          "mean_accumulator",
+          [](PyClass &self) -> DoubleMatrix & {
+            return self.mean_accumulator();
+          },
+          [](PyClass &self, const DoubleMatrix &m) {
+            self.mean_accumulator() = m;
+          },
+          py::return_value_policy::reference_internal)
+
+      .def_property(
+          "variance_accumulator",
+          [](PyClass &self) -> DoubleMatrix & {
+            return self.variance_accumulator();
+          },
+          [](PyClass &self, const DoubleMatrix &m) {
+            self.variance_accumulator() = m;
+          },
+          py::return_value_policy::reference_internal)
+
       .def("set_zero", &PyClass::SetZero, py::arg("flags"))
       .def("scale", &PyClass::Scale, py::arg("f"), py::arg("flags"))
       .def("accumulate_for_component", &PyClass::AccumulateForComponent,
