@@ -51,7 +51,11 @@ function(download_kaldi_native_io)
 
   set_target_properties(kaldi_native_io_core PROPERTIES OUTPUT_NAME "kaldi-hgmm-gmm-kaldi-native-io-core")
 
-  install(TARGETS kaldi_native_io_core DESTINATION lib)
+  if(KHG_BUILD_PYTHON AND WIN32)
+    install(TARGETS kaldi_native_io_core DESTINATION ..)
+  else()
+    install(TARGETS kaldi_native_io_core DESTINATION lib)
+  endif()
 endfunction()
 
 download_kaldi_native_io()

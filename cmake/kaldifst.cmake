@@ -58,7 +58,12 @@ function(download_kaldifst)
   set_target_properties(fst PROPERTIES OUTPUT_NAME "kaldi-hmm-gmm-fst")
   set_target_properties(fstscript PROPERTIES OUTPUT_NAME "kaldi-hmm-gmm-fstscript")
 
-  install(TARGETS kaldifst_core fst fstscript DESTINATION lib)
+  if(KHG_BUILD_PYTHON AND WIN32)
+    install(TARGETS kaldifst_core fst fstscript DESTINATION ..)
+  else()
+    install(TARGETS kaldifst_core fst fstscript DESTINATION lib)
+  endif()
+
 endfunction()
 
 download_kaldifst()
