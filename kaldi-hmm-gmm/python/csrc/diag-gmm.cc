@@ -37,7 +37,11 @@ void PybindDiagGmm(py::module *m) {
           },
           py::arg("data"),
           "Return the loglike of each component in a 1-D tensor")
-      .def_property_readonly("weights", &PyClass::weights)
+      .def_property(
+          "weights",
+          [](PyClass &self) -> FloatVector & { return self.weights(); },
+          [](PyClass &self, const FloatVector &m) { self.SetWeights(m); },
+          py::return_value_policy::reference_internal)
       .def_property_readonly("means", &PyClass::GetMeans)
       .def_property_readonly("vars", &PyClass::GetVars)
       .def_property_readonly("num_gauss", &PyClass::NumGauss)

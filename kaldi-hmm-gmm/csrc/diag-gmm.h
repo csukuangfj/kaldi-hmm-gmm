@@ -79,6 +79,7 @@ class DiagGmm {
   void LogLikelihoods(const FloatVector &data, FloatVector *loglikes) const;
 
   const FloatVector &weights() const { return weights_; }
+  FloatVector &weights() { return weights_; }
 
   bool valid_gconsts() const { return valid_gconsts_; }
 

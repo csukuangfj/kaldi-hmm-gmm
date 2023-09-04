@@ -58,9 +58,16 @@ class TestAmDiagGmm(unittest.TestCase):
             assert pdf.valid_gconsts is True
             assert pdf2.valid_gconsts is True
 
-            assert torch.allclose(pdf.weights, pdf2.weights)
-            assert torch.allclose(pdf.means_invvars, pdf2.means_invvars)
-            assert torch.allclose(pdf.inv_vars, pdf2.inv_vars)
+            assert torch.allclose(
+                torch.from_numpy(pdf.weights), torch.from_numpy(pdf2.weights)
+            )
+            assert torch.allclose(
+                torch.from_numpy(pdf.means_invvars),
+                torch.from_numpy(pdf2.means_invvars),
+            )
+            assert torch.allclose(
+                torch.from_numpy(pdf.inv_vars), torch.from_numpy(pdf2.inv_vars)
+            )
 
 
 if __name__ == "__main__":
