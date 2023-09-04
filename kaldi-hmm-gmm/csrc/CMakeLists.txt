@@ -29,6 +29,7 @@ set(srcs
 add_library(kaldi-hmm-gmm-core ${srcs})
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldi_native_io_core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC fst)
+target_link_libraries(kaldi-hmm-gmm-core PUBLIC fstscript)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldifst_core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC Eigen3::Eigen)
 
