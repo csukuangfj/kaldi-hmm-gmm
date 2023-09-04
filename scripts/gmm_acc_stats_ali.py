@@ -48,7 +48,9 @@ def gmm_acc_stats_ali(
         feat_frame = feats[i]
 
         pdf_id = transition_model.transition_id_to_pdf(tid)
-        transition_model.accumulate(prob=1.0, trans_id=tid, stats=transition_accs)
+        transition_accs = transition_model.accumulate(
+            prob=1.0, trans_id=tid, stats=transition_accs
+        )
         log_like += gmm_accs.accumulate_for_gmm(
             model=am_gmm, data=feat_frame, gmm_index=pdf_id, weight=1
         )

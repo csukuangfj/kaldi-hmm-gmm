@@ -32,7 +32,7 @@ def test_gmm_init_mono():
         sil_phone=lexiconp_disambig.get_sil_phone_id(),
     )
 
-    cuts_filename = "./data/fbank/yesno_cuts_train.jsonl.gz"
+    cuts_filename = "./data/fbank/audio_mnist_cuts.jsonl.gz"
     if not Path(cuts_filename).is_file():
         print(f"{cuts_filename} does not exist - skipping testing")
         return

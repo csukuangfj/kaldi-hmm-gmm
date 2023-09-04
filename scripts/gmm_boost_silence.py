@@ -4,6 +4,7 @@
 from typing import List
 
 import kaldi_hmm_gmm as khg
+import torch
 
 
 def gmm_boost_silence(
@@ -33,7 +34,7 @@ def gmm_boost_silence(
     for pdf in pdfs:
         gmm = dgm.get_pdf(pdf)
 
-        weights = gmm.weights
+        weights = torch.from_numpy(gmm.weights)
         weights.mul_(boost)
 
         gmm.set_weights(weights)

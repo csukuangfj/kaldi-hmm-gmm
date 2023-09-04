@@ -528,17 +528,15 @@ float TransitionModel::GetTransitionLogProbIgnoringSelfLoops(
 /// This version of the Update() function is for if the user specifies
 /// --share-for-pdfs=true.  We share the transitions for all states that
 /// share the same pdf.
-void TransitionModel::MleUpdateShared(torch::Tensor stats,
+void TransitionModel::MleUpdateShared(const DoubleVector &stats,
                                       const MleTransitionUpdateConfig &cfg,
                                       float *objf_impr_out, float *count_out) {
   KHG_ASSERT(cfg.share_for_pdfs);
 
   float count_sum = 0.0, objf_impr_sum = 0.0;
   int32_t num_skipped = 0, num_floored = 0;
-  KHG_ASSERT(stats.size(0) == NumTransitionIds() + 1);
+  KHG_ASSERT(stats.size() == NumTransitionIds() + 1);
   std::map<int32_t, std::set<int32_t>> pdf_to_tstate;
-
-  auto stats_acc = stats.accessor<double, 1>();
 
   for (int32_t tstate = 1; tstate <= NumTransitionStates(); ++tstate) {
     int32_t pdf = TransitionStateToForwardPdf(tstate);
@@ -575,7 +573,7 @@ void TransitionModel::MleUpdateShared(torch::Tensor stats,
 
         for (int32_t tidx = 0; tidx < n; ++tidx) {
           int32_t tid = PairToTransitionId(tstate, tidx);
-          auto acc = stats_acc[tid];
+          auto acc = stats[tid];
           counts[tidx] += acc;
           pdf_tot += acc;
         }
@@ -592,8 +590,7 @@ void TransitionModel::MleUpdateShared(torch::Tensor stats,
         // for all.
         std::vector<float> old_probs(n, 0);
 
-        torch::Tensor new_probs = torch::empty({n}, torch::kFloat);
-        auto new_probs_acc = new_probs.accessor<float, 1>();
+        FloatVector new_probs(n);
 
         for (int32_t tidx = 0; tidx < n; ++tidx) {
           int32_t tid = PairToTransitionId(one_tstate, tidx);
@@ -601,25 +598,25 @@ void TransitionModel::MleUpdateShared(torch::Tensor stats,
         }
 
         for (int32_t tidx = 0; tidx < n; ++tidx) {
-          new_probs_acc[tidx] = counts[tidx] / pdf_tot;
+          new_probs[tidx] = counts[tidx] / pdf_tot;
         }
 
         for (int32_t i = 0; i < 3; i++) {
           // keep flooring+renormalizing for 3 times..
-          new_probs.mul_(1.0 / new_probs.sum().item().toFloat());
+          new_probs /= new_probs.sum();
 
           for (int32_t tidx = 0; tidx < n; ++tidx) {
-            new_probs_acc[tidx] = std::max(new_probs_acc[tidx], cfg.floor);
+            new_probs[tidx] = std::max(new_probs[tidx], cfg.floor);
           }
         }
 
         // Compute objf change
         for (int32_t tidx = 0; tidx < n; ++tidx) {
-          if (new_probs_acc[tidx] == cfg.floor) {
+          if (new_probs[tidx] == cfg.floor) {
             num_floored++;
           }
 
-          double objf_change = counts[tidx] * (std::log(new_probs_acc[tidx]) -
+          double objf_change = counts[tidx] * (std::log(new_probs[tidx]) -
                                                std::log(old_probs[tidx]));
 
           objf_impr_sum += objf_change;
@@ -630,7 +627,7 @@ void TransitionModel::MleUpdateShared(torch::Tensor stats,
           int32_t tstate = *iter;
           for (int32_t tidx = 0; tidx < n; ++tidx) {
             int32_t tid = PairToTransitionId(tstate, tidx);
-            log_probs_(tid) = std::log(new_probs_acc[tidx]);
+            log_probs_(tid) = std::log(new_probs[tidx]);
             if (log_probs_(tid) - log_probs_(tid) != 0.0)
               KHG_ERR
                   << "Log probs is inf or NaN: error in update or bad stats?";
@@ -657,7 +654,7 @@ void TransitionModel::MleUpdateShared(torch::Tensor stats,
 }
 
 // stats are counts/weights, indexed by transition-id.
-void TransitionModel::MleUpdate(torch::Tensor stats,
+void TransitionModel::MleUpdate(const DoubleVector &stats,
                                 const MleTransitionUpdateConfig &cfg,
                                 float *objf_impr_out, float *count_out) {
   if (cfg.share_for_pdfs) {
@@ -668,9 +665,7 @@ void TransitionModel::MleUpdate(torch::Tensor stats,
   float count_sum = 0.0, objf_impr_sum = 0.0;
   int32_t num_skipped = 0, num_floored = 0;
 
-  KHG_ASSERT(stats.size(0) == NumTransitionIds() + 1);
-
-  auto stats_acc = stats.accessor<double, 1>();
+  KHG_ASSERT(stats.size() == NumTransitionIds() + 1);
 
   for (int32_t tstate = 1; tstate <= NumTransitionStates(); ++tstate) {
     int32_t n = NumTransitionIndices(tstate);
@@ -681,7 +676,7 @@ void TransitionModel::MleUpdate(torch::Tensor stats,
 
       for (int32_t tidx = 0; tidx < n; ++tidx) {
         int32_t tid = PairToTransitionId(tstate, tidx);
-        auto acc = stats_acc[tid];
+        auto acc = stats[tid];
         counts[tidx] = acc;
         tstate_tot += acc;
       }
@@ -692,8 +687,7 @@ void TransitionModel::MleUpdate(torch::Tensor stats,
       } else {
         std::vector<float> old_probs(n, 0);
 
-        torch::Tensor new_probs = torch::empty({n}, torch::kFloat);
-        auto new_probs_acc = new_probs.accessor<float, 1>();
+        FloatVector new_probs(n);
 
         for (int32_t tidx = 0; tidx < n; ++tidx) {
           int32_t tid = PairToTransitionId(tstate, tidx);
@@ -701,24 +695,24 @@ void TransitionModel::MleUpdate(torch::Tensor stats,
         }
 
         for (int32_t tidx = 0; tidx < n; tidx++) {
-          new_probs_acc[tidx] = counts[tidx] / tstate_tot;
+          new_probs[tidx] = counts[tidx] / tstate_tot;
         }
 
         for (int32_t i = 0; i < 3; i++) {
           // keep flooring+renormalizing for 3 times..
-          new_probs.mul_(1.0 / new_probs.sum().item().toFloat());
+          new_probs /= new_probs.sum();
 
           for (int32_t tidx = 0; tidx < n; tidx++)
-            new_probs_acc[tidx] = std::max(new_probs_acc[tidx], cfg.floor);
+            new_probs[tidx] = std::max(new_probs[tidx], cfg.floor);
         }
 
         // Compute objf change
         for (int32_t tidx = 0; tidx < n; ++tidx) {
-          if (new_probs_acc[tidx] == cfg.floor) {
+          if (new_probs[tidx] == cfg.floor) {
             ++num_floored;
           }
 
-          double objf_change = counts[tidx] * (std::log(new_probs_acc[tidx]) -
+          double objf_change = counts[tidx] * (std::log(new_probs[tidx]) -
                                                std::log(old_probs[tidx]));
           objf_impr_sum += objf_change;
         }
@@ -726,7 +720,7 @@ void TransitionModel::MleUpdate(torch::Tensor stats,
         // Commit updated values.
         for (int32_t tidx = 0; tidx < n; ++tidx) {
           int32_t tid = PairToTransitionId(tstate, tidx);
-          log_probs_(tid) = std::log(new_probs_acc[tidx]);
+          log_probs_(tid) = std::log(new_probs[tidx]);
 
           if (log_probs_(tid) - log_probs_(tid) != 0.0)
             KHG_ERR << "Log probs is inf or NaN: error in update or bad stats?";

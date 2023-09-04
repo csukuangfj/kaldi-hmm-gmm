@@ -55,8 +55,8 @@ def test_gmm_boost_silence():
 
     for pdf in pdfs:
         assert torch.allclose(
-            am.get_pdf(pdf).weights * boost,
-            am_boosted.get_pdf(pdf).weights,
+            torch.from_numpy(am.get_pdf(pdf).weights) * boost,
+            torch.from_numpy(am_boosted.get_pdf(pdf).weights),
         )
 
 

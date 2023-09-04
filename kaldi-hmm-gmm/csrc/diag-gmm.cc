@@ -25,7 +25,6 @@
 #include "kaldi-hmm-gmm/csrc/kaldi-math.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"
-#include "kaldi-hmm-gmm/csrc/utils.h"
 
 namespace khg {
 

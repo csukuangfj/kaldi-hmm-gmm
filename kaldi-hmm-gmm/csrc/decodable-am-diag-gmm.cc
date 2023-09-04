@@ -39,16 +39,15 @@ float DecodableAmDiagGmmUnmapped::LogLikelihoodZeroBased(int32_t frame,
   }
 
   if (frame != previous_frame_) {  // cache the squared stats.
-    data_squared_ = Row(feature_matrix_, frame).square();
+    data_squared_ = feature_matrix_.row(frame).array().square();
     previous_frame_ = frame;
   }
 
   const DiagGmm &pdf = acoustic_model_.GetPdf(state);
-  auto data = Row(feature_matrix_, frame);
 
   // check if everything is in order
-  if (pdf.Dim() != data.size(0)) {
-    KHG_ERR << "Dim mismatch: data dim = " << static_cast<int32_t>(data.size(0))
+  if (pdf.Dim() != feature_matrix_.cols()) {
+    KHG_ERR << "Dim mismatch: data dim = " << feature_matrix_.cols()
             << " vs. model dim = " << pdf.Dim();
   }
 
@@ -58,19 +57,13 @@ float DecodableAmDiagGmmUnmapped::LogLikelihoodZeroBased(int32_t frame,
                "before computing likelihood.";
   }
 
-  auto loglikes = pdf.gconsts().clone();  // need to recreate for each pdf
-
-  // loglikes +=  means * inv(vars) * data.
-  loglikes = loglikes.unsqueeze(1);  // (nmix, 1)
-  loglikes.addmm_(pdf.means_invvars(), data.unsqueeze(1));
-
-  // loglikes += -0.5 * inv(vars) * data_sq.
-  loglikes.addmm_(pdf.inv_vars(), data_squared_.unsqueeze(1), /*beta*/ 1.0,
-                  /*alpha*/ -0.5);
+  auto data = feature_matrix_.row(frame).transpose();
+  FloatVector loglikes = pdf.gconsts() + pdf.means_invvars() * data -
+                         0.5 * pdf.inv_vars() * data.array().square().matrix();
 
   // float log_sum = loglikes.LogSumExp(log_sum_exp_prune_);
   // Note: log_sum_exp_prune_ is never used
-  float log_sum = loglikes.logsumexp(/*dim*/ 0).item().toFloat();
+  float log_sum = LogSumExp(loglikes);
 
   if (KALDI_ISNAN(log_sum) || KALDI_ISINF(log_sum)) {
     KHG_ERR << "Invalid answer (overflow or invalid variances/features?)";

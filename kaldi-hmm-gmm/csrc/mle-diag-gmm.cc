@@ -14,7 +14,7 @@
 
 #include "kaldi-hmm-gmm/csrc/diag-gmm-normal.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
-#include "kaldi-hmm-gmm/csrc/utils.h"
+
 namespace khg {
 
 std::string MleDiagGmmOptions::ToString() const {

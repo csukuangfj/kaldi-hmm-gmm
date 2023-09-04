@@ -6,6 +6,7 @@ import pickle
 import unittest
 
 import kaldi_hmm_gmm as khg
+import numpy as np
 import torch
 
 
@@ -122,22 +123,22 @@ class TestTransitionModel(unittest.TestCase):
         # test stats
         stats = transition_model.init_stats()
         assert stats.ndim == 1, stats.ndim
-        assert stats.dtype == torch.double, stats.dtype
+        assert stats.dtype == np.float64, stats.dtype
 
         # transition_id starts from 1, so stats[0] is never used
         assert stats.shape[0] == transition_model.num_transition_ids + 1, (
             stats.shape[0],
             transition_model.num_transition_ids + 1,
         )
-        assert stats.abs().sum().item() == 0, stats
+        assert torch.from_numpy(stats).abs().sum().item() == 0, stats
 
-        transition_model.accumulate(prob=0.25, trans_id=1, stats=stats)
+        stats = transition_model.accumulate(prob=0.25, trans_id=1, stats=stats)
         assert stats[1].item() == 0.25, stats[1]
 
-        transition_model.accumulate(prob=0.25, trans_id=1, stats=stats)
+        stats = transition_model.accumulate(prob=0.25, trans_id=1, stats=stats)
         assert stats[1].item() == 0.50, stats[1]
 
-        transition_model.accumulate(prob=1.0, trans_id=10, stats=stats)
+        stats = transition_model.accumulate(prob=1.0, trans_id=10, stats=stats)
         assert stats[10].item() == 1.0, stats[10]
 
         # test pickle

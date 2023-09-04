@@ -16,7 +16,6 @@
 #include "kaldi-hmm-gmm/csrc/decodable-itf.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi-hmm-gmm/csrc/transition-model.h"
-#include "torch/script.h"
 
 namespace khg {
 
@@ -35,7 +34,7 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
   /// This is advisable if it's spending a long time doing exp
   /// operations.
   DecodableAmDiagGmmUnmapped(const AmDiagGmm &am,
-                             torch::Tensor feats,  // 2-D float matrix
+                             const FloatMatrix &feats,  // 2-D float matrix
                              float log_sum_exp_prune = -1.0)
       : acoustic_model_(am),
         feature_matrix_(feats),
@@ -54,7 +53,7 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
     return LogLikelihoodZeroBased(frame, state_index - 1);
   }
 
-  int32_t NumFramesReady() const override { return feature_matrix_.size(0); }
+  int32_t NumFramesReady() const override { return feature_matrix_.rows(); }
 
   // Indices are one-based!  This is for compatibility with OpenFst.
   int32_t NumIndices() const override { return acoustic_model_.NumPdfs(); }
@@ -69,7 +68,7 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
   virtual float LogLikelihoodZeroBased(int32_t frame, int32_t state_index);
 
   const AmDiagGmm &acoustic_model_;
-  torch::Tensor feature_matrix_;  // 2-D float matrix (num_frames, feature_dim)
+  const FloatMatrix feature_matrix_;  // (num_frames, feature_dim)
   int32_t previous_frame_;
   float log_sum_exp_prune_;  // never used
 
@@ -81,14 +80,14 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
   std::vector<LikelihoodCacheRecord> log_like_cache_;
 
  private:
-  torch::Tensor data_squared_;  ///< Cache for fast likelihood calculation
-                                ///< 1-D float tensor of shape (feature_dim,)
+  FloatVector data_squared_;  ///< Cache for fast likelihood calculation
+                              ///< 1-D float tensor of shape (feature_dim,)
 };
 
 class DecodableAmDiagGmmScaled : public DecodableAmDiagGmmUnmapped {
  public:
   DecodableAmDiagGmmScaled(const AmDiagGmm &am, const TransitionModel &tm,
-                           torch::Tensor feats,  // 2-D float matrix
+                           const FloatMatrix &feats,  // 2-D float matrix
                            float scale, float log_sum_exp_prune = -1.0)
       : DecodableAmDiagGmmUnmapped(am, feats, log_sum_exp_prune),
         trans_model_(tm),

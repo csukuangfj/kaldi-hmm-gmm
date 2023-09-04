@@ -13,21 +13,17 @@ TEST(DiagGmm, Case1) {
   int32_t dim = 2;
   DiagGmm dgm(nmix, dim);
 
-  torch::Tensor weights = torch::rand({nmix}, torch::kFloat);
-  weights.div_(weights.sum());
-  torch::Tensor means = torch::tensor(
-      {
-          {2, 2},
-          {-10, -10},
-          {1, 1},
-          {-100, -100},
-      },
-      torch::kFloat);
-  torch::Tensor vars = torch::rand({nmix, dim}, torch::kFloat);
+  FloatVector weights = FloatVector::Random(nmix).array() + 1;
+
+  weights /= weights.sum();
+
+  FloatMatrix means(nmix, dim);
+  means << 2, 2, -10, -10, 1, 1, -100, -100;
+  FloatMatrix vars = FloatMatrix::Random(nmix, dim).array() + 1;
 
   dgm.SetWeights(weights);
   dgm.SetMeans(means);
-  dgm.SetInvVars(1 / vars);
+  dgm.SetInvVars(1 / vars.array());
   dgm.ComputeGconsts();  // essential!!
 
   dgm.MergeKmeans(3);

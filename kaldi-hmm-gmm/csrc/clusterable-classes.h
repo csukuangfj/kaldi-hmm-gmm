@@ -9,7 +9,6 @@
 
 #include "kaldi-hmm-gmm/csrc/clusterable-itf.h"
 #include "kaldi-hmm-gmm/csrc/eigen.h"
-#include "kaldi-hmm-gmm/csrc/utils.h"
 
 namespace khg {
 

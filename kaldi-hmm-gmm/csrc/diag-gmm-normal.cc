@@ -26,8 +26,9 @@ void DiagGmmNormal::CopyToDiagGmm(DiagGmm *diaggmm, GmmFlagsType flags) const {
 
   DiagGmmNormal oldg(*diaggmm);
 
-  // weights_ is torch::kDouble; Converting it to kFloat will copy it
-  if (flags & kGmmWeights) diaggmm->weights_ = weights_.cast<float>();
+  if (flags & kGmmWeights) {
+    diaggmm->weights_ = weights_.cast<float>();
+  }
 
   if (flags & kGmmVariances) {
     diaggmm->inv_vars_ = (1.0 / vars_.array()).cast<float>();
