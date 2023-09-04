@@ -9,9 +9,6 @@ on:
 
   workflow_dispatch:
 
-env:
-  KHG_IS_FOR_PYPI: 1
-
 concurrency:
   group: build-wheels-win32-${{ github.ref }}
   cancel-in-progress: true
