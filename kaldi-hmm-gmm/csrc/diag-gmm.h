@@ -15,8 +15,8 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/cluster-utils.h"
+#include "kaldi-hmm-gmm/csrc/eigen.h"
 #include "kaldi-hmm-gmm/csrc/model-common.h"
-#include "torch/script.h"
 
 namespace khg {
 
@@ -33,8 +33,8 @@ class DiagGmm {
     CopyFromDiagGmm(gmm);
   }
 
-  DiagGmm(torch::Tensor weights, torch::Tensor inv_vars,
-          torch::Tensor means_invvars)
+  DiagGmm(const FloatVector &weights, const FloatMatrix &inv_vars,
+          const FloatMatrix &means_invvars)
       : valid_gconsts_(false),
         weights_(weights),
         inv_vars_(inv_vars),
@@ -48,9 +48,10 @@ class DiagGmm {
   void Resize(int32_t nMix, int32_t dim);
 
   /// Returns the number of mixture components in the GMM
-  int32_t NumGauss() const { return weights_.size(0); }
+  int32_t NumGauss() const { return weights_.size(); }
+
   /// Returns the dimensionality of the Gaussian mean vectors
-  int32_t Dim() const { return means_invvars_.size(1); }
+  int32_t Dim() const { return means_invvars_.cols(); }
 
   /// Copies from given DiagGmm
   void CopyFromDiagGmm(const DiagGmm &diaggmm);
@@ -70,20 +71,34 @@ class DiagGmm {
 
   /// Returns the log-likelihood of a data point (vector) given the GMM
   // @param data  A 1-D tensor
-  float LogLikelihood(const torch::Tensor &data) const;
+  float LogLikelihood(const FloatVector &data) const;
 
   /// Outputs the per-component log-likelihoods
   /// @param data  1-D tensor.
   /// @param loglikes  1-D tensor.
-  void LogLikelihoods(const torch::Tensor &data, torch::Tensor *loglikes) const;
+  void LogLikelihoods(const FloatVector &data, FloatVector *loglikes) const;
+
+  const FloatVector &weights() const { return weights_; }
+  FloatVector &weights() { return weights_; }
+
+  bool valid_gconsts() const { return valid_gconsts_; }
+
+  /// Const accessors
+  const FloatVector &gconsts() const {
+    KHG_ASSERT(valid_gconsts_);
+    return gconsts_;
+  }
+
+  const FloatMatrix &means_invvars() const { return means_invvars_; }
+  const FloatMatrix &inv_vars() const { return inv_vars_; }
 
   /// This version of the LogLikelihoods function operates on
   /// a sequence of frames simultaneously; the row index of both "data" and
   /// "loglikes" is the frame index.
   /// @param data 2-D matrix of (num-frames, dim)
   /// @param loglikes On ouput, it contains a  2-D matrix of (num_frames, nmix)
-  void LogLikelihoodsMatrix(const torch::Tensor &data,
-                            torch::Tensor *loglikes) const;
+  void LogLikelihoodsMatrix(const FloatMatrix &data,
+                            FloatMatrix *loglikes) const;
 
   /// Outputs the per-component log-likelihoods of a subset of mixture
   /// components.  Note: at output, loglikes->Dim() will equal indices.size().
@@ -93,9 +108,9 @@ class DiagGmm {
   /// @param data 1-D tensor of shape (dim,)
   /// @param indices
   /// @param loglikes 1-D tensor of shape (indices.size(),)
-  void LogLikelihoodsPreselect(const torch::Tensor &data,
+  void LogLikelihoodsPreselect(const FloatVector &data,
                                const std::vector<int32_t> &indices,
-                               torch::Tensor *loglikes) const;
+                               FloatVector *loglikes) const;
 
   /// Get gaussian selection information for one frame.  Returns log-like for
   /// this frame.  Output is the best "num_gselect" indices, sorted from best to
@@ -105,7 +120,7 @@ class DiagGmm {
   /// @param num_gselect
   /// @param output
   /// @return Return the total loglike of the selected gaussian
-  float GaussianSelection(const torch::Tensor &data, int32_t num_gselect,
+  float GaussianSelection(const FloatVector &data, int32_t num_gselect,
                           std::vector<int32_t> *output) const;
 
   /// This version of the Gaussian selection function works for a sequence
@@ -115,7 +130,7 @@ class DiagGmm {
   /// @param num_gselect
   /// @param output
   ///
-  float GaussianSelection(const torch::Tensor &data, int32_t num_gselect,
+  float GaussianSelection(const FloatMatrix &data, int32_t num_gselect,
                           std::vector<std::vector<int32_t>> *output) const;
 
   /// Get gaussian selection information for one frame.  Returns log-like for
@@ -124,7 +139,7 @@ class DiagGmm {
   /// NumGauss(), sets it to NumGauss().
   ///
   /// @param data 1-D tensor of shape (dim,)
-  float GaussianSelectionPreselect(const torch::Tensor &data,
+  float GaussianSelectionPreselect(const FloatVector &data,
                                    const std::vector<int32_t> &preselect,
                                    int32_t num_gselect,
                                    std::vector<int32_t> *output) const;
@@ -134,53 +149,41 @@ class DiagGmm {
   ///
   /// @param data 1-D tensor of shape (dim,)
   /// @param posteriors On return, it is a 1-D tensor of shape (nmix,)
-  float ComponentPosteriors(const torch::Tensor &data,
-                            torch::Tensor *posteriors) const;
+  float ComponentPosteriors(const FloatVector &data,
+                            FloatVector *posteriors) const;
 
   /// Computes the log-likelihood of a data point given a single Gaussian
   /// component. NOTE: Currently we make no guarantees about what happens if
   /// one of the variances is zero.
   /// @param data 1-D tensor of shape (dim,)
-  float ComponentLogLikelihood(const torch::Tensor &data,
-                               int32_t comp_id) const;
+  float ComponentLogLikelihood(const FloatVector &data, int32_t comp_id) const;
 
   /// Generates a random data-point from this distribution.
   /// @param output 1-D tensor of shape (dim,). Must be pre-allocated
-  void Generate(torch::Tensor *output) const;
-
-  /// Split the components and remember the order in which the components were
-  /// split
-  void Split(int32_t target_components, float perturb_factor,
-             std::vector<int32_t> *history = nullptr);
+  void Generate(FloatVector *output) const;
 
   /// Perturbs the component means with a random vector multiplied by the
   /// perturb factor.
   void Perturb(float perturb_factor);
 
-  /// Merge the components and remember the order in which the components were
-  /// merged (flat list of pairs)
-  void Merge(int32_t target_components,
-             std::vector<int32_t> *history = nullptr);
+  /// this = rho x source + (1-rho) x this
+  void Interpolate(float rho, const DiagGmm &source,
+                   GmmFlagsType flags = kGmmAll);
 
   // Merge the components to a specified target #components: this
   // version uses a different approach based on K-means.
   void MergeKmeans(int32_t target_components,
                    const ClusterKMeansOptions &cfg = ClusterKMeansOptions());
 
-  /// this = rho x source + (1-rho) x this
-  void Interpolate(float rho, const DiagGmm &source,
-                   GmmFlagsType flags = kGmmAll);
+  /// Merge the components and remember the order in which the components were
+  /// merged (flat list of pairs)
+  void Merge(int32_t target_components,
+             std::vector<int32_t> *history = nullptr);
 
-  /// Const accessors
-  const torch::Tensor &gconsts() const {
-    KHG_ASSERT(valid_gconsts_);
-    return gconsts_;
-  }
-
-  const torch::Tensor &weights() const { return weights_; }
-  const torch::Tensor &means_invvars() const { return means_invvars_; }
-  const torch::Tensor &inv_vars() const { return inv_vars_; }
-  bool valid_gconsts() const { return valid_gconsts_; }
+  /// Split the components and remember the order in which the components were
+  /// split
+  void Split(int32_t target_components, float perturb_factor,
+             std::vector<int32_t> *history = nullptr);
 
   /// Removes single component from model
   void RemoveComponent(int32_t gauss, bool renorm_weights);
@@ -189,67 +192,68 @@ class DiagGmm {
   void RemoveComponents(const std::vector<int32_t> &gauss, bool renorm_weights);
 
   // w is a 1-D tensor of shape (num_mix,)
-  void SetWeights(torch::Tensor w);  ///< Set mixture weights
-                                     ///
+  void SetWeights(const FloatVector &w);  ///< Set mixture weights
+                                          ///
   /// Use SetMeans to update only the Gaussian means (and not variances)
   /// m is a 2-D tensor of shape (num_mix, dim)
-  void SetMeans(torch::Tensor m);
-
-  /// Use SetInvVarsAndMeans if updating both means and (inverse) variances
-  void SetInvVarsAndMeans(torch::Tensor invvars, torch::Tensor means);
+  void SetMeans(const FloatMatrix &m);
+  /// Accessor for means.
+  FloatMatrix GetMeans() const;
 
   /// Set the (inverse) variances and recompute means_invvars_
-  void SetInvVars(torch::Tensor v);  // v is a 2-D matrix
-
+  void SetInvVars(const FloatMatrix &v);  // v is a 2-D matrix
+                                          //
   /// Accessor for covariances.
-  torch::Tensor GetVars() const;
-
-  /// Accessor for means.
-  torch::Tensor GetMeans() const;
-
-  /// Mutators for single component, supports float or double
-  /// Set mean for a single component - internally multiplies with inv(var)
-  /// in is a 1-D tensor
-  void SetComponentMean(int32_t gauss, torch::Tensor in);
-
-  /// Set inv-var for single component (recommend to do this before
-  /// setting the mean, if doing both, for numerical reasons).
-  /// in is a 1-D tensor
-  void SetComponentInvVar(int32_t gauss, torch::Tensor in);
+  FloatMatrix GetVars() const;
 
   /// Set weight for single component.
   void SetComponentWeight(int32_t gauss, float weight);
 
+  /// Mutators for single component, supports float or double
+  /// Set mean for a single component - internally multiplies with inv(var)
+  /// in is a 1-D tensor
+  void SetComponentMean(int32_t gauss, const FloatVector &in);
+
+  /// Use SetInvVarsAndMeans if updating both means and (inverse) variances
+  void SetInvVarsAndMeans(const FloatMatrix &invvars, const FloatMatrix &means);
+
+  /// Set inv-var for single component (recommend to do this before
+  /// setting the mean, if doing both, for numerical reasons).
+  /// in is a 1-D tensor
+  void SetComponentInvVar(int32_t gauss, const FloatVector &in);
+
   /// Accessor for single component mean
   /// Return a 1-D tensor
-  torch::Tensor GetComponentMean(int32_t gauss) const;
+  FloatVector GetComponentMean(int32_t gauss) const;
 
   /// Accessor for single component variance.
   /// Return a 1-D tensor
-  torch::Tensor GetComponentVariance(int32_t gauss) const;
+  FloatVector GetComponentVariance(int32_t gauss) const;
 
  private:
   // MergedComponentsLogdet computes logdet for merged components
   // f1, f2 are first-order stats (normalized by zero-order stats)
   // s1, s2 are second-order stats (normalized by zero-order stats)
   float MergedComponentsLogdet(float w1, float w2,
-                               torch::Tensor f1,         // 1-D
-                               torch::Tensor f2,         // 1-D
-                               torch::Tensor s1,         // 1-D
-                               torch::Tensor s2) const;  // 1-D
+                               const FloatVector &f1,         // 1-D
+                               const FloatVector &f2,         // 1-D
+                               const FloatVector &s1,         // 1-D
+                               const FloatVector &s2) const;  // 1-D
 
  private:
   /// Equals log(weight) - 0.5 * (log(2pi) + log det(var) + mean*mean*inv(var))
-  torch::Tensor gconsts_;  // 1-d tensor, (nimx,)
-  bool valid_gconsts_;     ///< Recompute gconsts_ if false
+  FloatVector gconsts_;  // 1-d tensor, (nimx,)
+
+  bool valid_gconsts_;  ///< Recompute gconsts_ if false
 
   /// 1-D, (nmix,) weights (not log)., kFloat
-  torch::Tensor weights_;
+  FloatVector weights_;
+
   /// 2-D, (nmix, dim), Inverted (diagonal) variances, kFloat
-  torch::Tensor inv_vars_;
+  FloatMatrix inv_vars_;
 
   /// 2-D, (nmix, dim), Means times inverted variance, kFloat
-  torch::Tensor means_invvars_;
+  FloatMatrix means_invvars_;
 };
 
 }  // namespace khg

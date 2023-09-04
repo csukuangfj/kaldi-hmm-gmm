@@ -104,18 +104,24 @@ std::string ScalarClusterable::Info() const {
 // Implementation of GaussClusterable class.
 // ============================================================================
 
-void GaussClusterable::AddStats(torch::Tensor vec, float weight /*=1.0*/) {
+void GaussClusterable::AddStats(const DoubleVector &vec,
+                                float weight /*=1.0*/) {
   count_ += weight;
-  Row(stats_, 0).add_(vec, /*alpha*/ weight);
-  Row(stats_, 1).add_(vec.square(), /*alpha*/ weight);
+
+  x_stats_ += vec * weight;
+
+  x2_stats_ = x2_stats_.array() + vec.array().square() * weight;
 }
 
 void GaussClusterable::Add(const Clusterable &other_in) {
   KHG_ASSERT(other_in.Type() == "gauss");
+
   const GaussClusterable *other =
       static_cast<const GaussClusterable *>(&other_in);
   count_ += other->count_;
-  stats_.add_(other->stats_);
+
+  x_stats_ += other->x_stats_;
+  x2_stats_ += other->x2_stats_;
 }
 
 void GaussClusterable::Sub(const Clusterable &other_in) {
@@ -123,12 +129,13 @@ void GaussClusterable::Sub(const Clusterable &other_in) {
   const GaussClusterable *other =
       static_cast<const GaussClusterable *>(&other_in);
   count_ -= other->count_;
-  stats_.sub_(other->stats_);
+
+  x_stats_ -= other->x_stats_;
+  x2_stats_ -= other->x2_stats_;
 }
 
 Clusterable *GaussClusterable::Copy() const {
-  KHG_ASSERT(stats_.dim() == 2);
-  GaussClusterable *ans = new GaussClusterable(stats_.size(1), var_floor_);
+  GaussClusterable *ans = new GaussClusterable(x_stats_.size(), var_floor_);
   ans->Add(*this);
   return ans;
 }
@@ -136,7 +143,9 @@ Clusterable *GaussClusterable::Copy() const {
 void GaussClusterable::Scale(float f) {
   KHG_ASSERT(f >= 0.0);
   count_ *= f;
-  stats_.mul_(f);
+
+  x_stats_ *= f;
+  x2_stats_ *= f;
 }
 
 float GaussClusterable::Objf() const {
@@ -146,23 +155,21 @@ float GaussClusterable::Objf() const {
     }
     return 0.0;
   } else {
-    int32_t dim = stats_.size(1);
-    torch::Tensor vars = torch::empty({dim}, torch::kDouble);
-    auto vars_acc = vars.accessor<double, 1>();
-
-    auto stats_acc = stats_.accessor<double, 2>();
+    int32_t dim = x_stats_.size();
+    DoubleVector vars(dim);
 
     // TODO(fangjun): Use tensor operations to replace the for loop
     double objf_per_frame = 0.0;
     for (int32_t d = 0; d < dim; ++d) {
-      double mean(stats_acc[0][d] / count_),
-          var = stats_acc[1][d] / count_ - mean * mean,
-          floored_var = std::max(var, var_floor_);
-      vars_acc[d] = floored_var;
+      double mean(x_stats_[d] / count_);
+      double var = x2_stats_[d] / count_ - mean * mean;
+      double floored_var = std::max(var, var_floor_);
+
+      vars[d] = floored_var;
       objf_per_frame += -0.5 * var / floored_var;
     }
-    objf_per_frame +=
-        -0.5 * (vars.log().sum().item().toFloat() + M_LOG_2PI * dim);
+
+    objf_per_frame += -0.5 * (vars.array().log().sum() + M_LOG_2PI * dim);
 
     if (KALDI_ISNAN(objf_per_frame)) {
       KHG_WARN << "GaussClusterable::Objf(), objf is NaN";

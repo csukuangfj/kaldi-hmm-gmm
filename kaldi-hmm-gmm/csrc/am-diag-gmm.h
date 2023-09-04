@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/diag-gmm.h"
+#include "kaldi-hmm-gmm/csrc/eigen.h"
 
 namespace khg {
 
@@ -55,14 +56,14 @@ class AmDiagGmm {
   // @param power  It is used to compute state_occs.pow(power)
   // @param min_count If the average of occupancy of gaussians in a pdf is less
   //                  than this number, then we won't split this pdf any more
-  void SplitByCount(torch::Tensor state_occs, int32_t target_components,
+  void SplitByCount(const FloatVector &state_occs, int32_t target_components,
                     float perturb_factor, float power, float min_count);
 
   // In MergeByCount we use the "target_components" and "power"
   // to work out targets for each state (according to power-of-occupancy rule),
   // and any state over its target gets mixed down.  If some states
   // were under their target, this may take the #Gauss below the target.
-  void MergeByCount(torch::Tensor state_occs,  // 1-D float tensor
+  void MergeByCount(const FloatVector &state_occs,  // 1-D float tensor
                     int32_t target_components, float power, float min_count);
 
   /// Sets the gconsts for all the PDFs. Returns the total number of Gaussians
@@ -72,7 +73,7 @@ class AmDiagGmm {
   // @param pdf_index
   // @param data 1-D float tensor
   // @return Return the total loglike of the specified pdf
-  float LogLikelihood(int32_t pdf_index, torch::Tensor data) const;
+  float LogLikelihood(int32_t pdf_index, const FloatVector &data) const;
 
   DiagGmm &GetPdf(int32_t pdf_index);
   const DiagGmm &GetPdf(int32_t pdf_index) const;
@@ -80,16 +81,16 @@ class AmDiagGmm {
   // @param pdf_index
   // @param gauss
   // @return Return a 1-D float tensor
-  torch::Tensor GetGaussianMean(int32_t pdf_index, int32_t gauss) const;
+  FloatVector GetGaussianMean(int32_t pdf_index, int32_t gauss) const;
 
   // @param pdf_index
   // @param gauss
   // @return Return a 1-D float tensor
-  torch::Tensor GetGaussianVariance(int32_t pdf_index, int32_t gauss) const;
+  FloatVector GetGaussianVariance(int32_t pdf_index, int32_t gauss) const;
 
   /// Mutators
   void SetGaussianMean(int32_t pdf_index, int32_t gauss_index,
-                       torch::Tensor in);  // 1-D float tensor
+                       const FloatVector &in);  // 1-D float tensor
 
  private:
   std::vector<DiagGmm *> densities_;

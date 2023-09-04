@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/am-diag-gmm.h"
+#include "kaldi-hmm-gmm/csrc/eigen.h"
 #include "kaldi-hmm-gmm/csrc/mle-diag-gmm.h"
 
 namespace khg {
@@ -34,7 +35,7 @@ class AccumAmDiagGmm {
   /// This does not work with multiple feature transforms.
   ///
   /// @param data 1-D float tensor
-  float AccumulateForGmm(const AmDiagGmm &model, torch::Tensor data,
+  float AccumulateForGmm(const AmDiagGmm &model, const FloatVector &data,
                          int32_t gmm_index, float weight);
 
   /// Accumulate stats for a single GMM in the model; uses data1 for
@@ -42,8 +43,9 @@ class AccumAmDiagGmm {
   ///
   /// @param data1 1-d float tensor
   /// @param data2 1-d float tensor
-  float AccumulateForGmmTwofeats(const AmDiagGmm &model, torch::Tensor data1,
-                                 torch::Tensor data2, int32_t gmm_index,
+  float AccumulateForGmmTwofeats(const AmDiagGmm &model,
+                                 const FloatVector &data1,
+                                 const FloatVector &data2, int32_t gmm_index,
                                  float weight);
 
   /// Accumulates stats for a single GMM in the model using pre-computed
@@ -51,13 +53,14 @@ class AccumAmDiagGmm {
   ///
   /// @param data 1-d float tensor (dim,)
   /// @param posteriors 1-d float tensor (num_comp,)
-  void AccumulateFromPosteriors(const AmDiagGmm &model, torch::Tensor data,
-                                int32_t gmm_index, torch::Tensor posteriors);
+  void AccumulateFromPosteriors(const AmDiagGmm &model, const FloatVector &data,
+                                int32_t gmm_index,
+                                const FloatVector &posteriors);
 
   /// Accumulate stats for a single Gaussian component in the model.
   ///
   /// @param data 1-d float tensor of shape (dim,)
-  void AccumulateForGaussian(const AmDiagGmm &am, torch::Tensor data,
+  void AccumulateForGaussian(const AmDiagGmm &am, const FloatVector &data,
                              int32_t gmm_index, int32_t gauss_index,
                              float weight);
 

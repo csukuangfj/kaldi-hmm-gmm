@@ -3,8 +3,10 @@
 #
 #  ctest --verbose -R  test_mle_diag_gmm_py
 import unittest
-import torch
+
 import kaldi_hmm_gmm as khg
+import numpy as np
+import torch
 
 
 class TestAccumDiagGmm(unittest.TestCase):
@@ -56,9 +58,11 @@ class TestAccumDiagGmm(unittest.TestCase):
         assert acc.mean_accumulator.shape == (num_gauss, dim)
         assert acc.variance_accumulator.shape == (num_gauss, dim)
 
-        assert acc.occupancy.dtype == torch.double
-        assert acc.mean_accumulator.dtype == torch.double
-        assert acc.variance_accumulator.dtype == torch.double
+        assert acc.occupancy.dtype == np.float64, acc.occupancy.dtype
+        assert acc.mean_accumulator.dtype == np.float64, acc.mean_accumulator.dtype
+        assert (
+            acc.variance_accumulator.dtype == np.float64
+        ), acc.variance_accumulator.dtype
 
         # kGmmWeights -> Only update weights
         acc.resize(num_gauss=num_gauss, dim=dim, flags=khg.GmmUpdateFlags.kGmmWeights)
@@ -66,8 +70,8 @@ class TestAccumDiagGmm(unittest.TestCase):
         assert acc.num_gauss == num_gauss
         assert acc.dim == dim
         assert acc.occupancy.shape == (num_gauss,)
-        assert acc.mean_accumulator is None, acc.mean_accumulator
-        assert acc.variance_accumulator is None, acc.variance_accumulator
+        assert len(acc.mean_accumulator) == 0, acc.mean_accumulator
+        assert len(acc.variance_accumulator) == 0, acc.variance_accumulator
 
         # Even if we only specify Means, it will also update weights
         acc.resize(num_gauss=num_gauss, dim=dim, flags=khg.GmmUpdateFlags.kGmmMeans)
@@ -75,7 +79,7 @@ class TestAccumDiagGmm(unittest.TestCase):
         assert acc.dim == dim
         assert acc.occupancy.shape == (num_gauss,)
         assert acc.mean_accumulator.shape == (num_gauss, dim)
-        assert acc.variance_accumulator is None, acc.variance_accumulator
+        assert len(acc.variance_accumulator) == 0, acc.variance_accumulator
 
         # Even if we only specify Variances, it will also update means, and weights
         acc.resize(num_gauss=num_gauss, dim=dim, flags=khg.GmmUpdateFlags.kGmmVariances)
@@ -98,12 +102,15 @@ class TestAccumDiagGmm(unittest.TestCase):
 
         assert acc.flags == khg.GmmUpdateFlags.kGmmAll
         assert torch.allclose(
-            acc.occupancy, torch.tensor([0, weight, 0]).double()
+            torch.from_numpy(acc.occupancy), torch.tensor([0, weight, 0]).double()
         ), acc.occupancy
-        assert torch.allclose(acc.mean_accumulator[comp_index], d.double() * weight)
+        assert torch.allclose(
+            torch.from_numpy(acc.mean_accumulator[comp_index]), d.double() * weight
+        )
 
         assert torch.allclose(
-            acc.variance_accumulator[comp_index], d.square().double() * weight
+            torch.from_numpy(acc.variance_accumulator[comp_index]),
+            d.square().double() * weight,
         )
 
         d0 = torch.rand(dim, dtype=torch.float32)
@@ -112,39 +119,48 @@ class TestAccumDiagGmm(unittest.TestCase):
         acc.accumulate_for_component(data=d0, comp_index=comp_index0, weight=weight0)
 
         assert torch.allclose(
-            acc.occupancy, torch.tensor([weight0, weight, 0]).double()
+            torch.from_numpy(acc.occupancy), torch.tensor([weight0, weight, 0]).double()
         ), acc.occupancy
 
-        assert torch.allclose(acc.mean_accumulator[comp_index0], d0.double() * weight0)
+        assert torch.allclose(
+            torch.from_numpy(acc.mean_accumulator[comp_index0]), d0.double() * weight0
+        )
 
         assert torch.allclose(
-            acc.variance_accumulator[comp_index0], d0.square().double() * weight0
+            torch.from_numpy(acc.variance_accumulator[comp_index0]),
+            d0.square().double() * weight0,
         )
 
         f = 0.1
         acc.scale(f=0.1, flags=khg.GmmUpdateFlags.kGmmAll)
 
         assert torch.allclose(
-            acc.occupancy, torch.tensor([weight0, weight, 0]).double() * f
+            torch.from_numpy(acc.occupancy),
+            torch.tensor([weight0, weight, 0]).double() * f,
         ), acc.occupancy
 
-        assert torch.allclose(acc.mean_accumulator[comp_index], d.double() * weight * f)
         assert torch.allclose(
-            acc.mean_accumulator[comp_index0], d0.double() * weight0 * f
+            torch.from_numpy(acc.mean_accumulator[comp_index]), d.double() * weight * f
+        )
+        assert torch.allclose(
+            torch.from_numpy(acc.mean_accumulator[comp_index0]),
+            d0.double() * weight0 * f,
         )
 
         assert torch.allclose(
-            acc.variance_accumulator[comp_index], d.square().double() * weight * f
+            torch.from_numpy(acc.variance_accumulator[comp_index]),
+            d.square().double() * weight * f,
         )
 
         assert torch.allclose(
-            acc.variance_accumulator[comp_index0], d0.square().double() * weight0 * f
+            torch.from_numpy(acc.variance_accumulator[comp_index0]),
+            d0.square().double() * weight0 * f,
         )
 
         acc.set_zero(khg.GmmUpdateFlags.kGmmAll)
-        assert acc.occupancy.abs().sum().item() == 0
-        assert acc.mean_accumulator.abs().sum().item() == 0
-        assert acc.variance_accumulator.abs().sum().item() == 0
+        assert acc.occupancy.sum() == 0
+        assert torch.from_numpy(acc.mean_accumulator).abs().sum().item() == 0
+        assert torch.from_numpy(acc.variance_accumulator).abs().sum().item() == 0
 
     def test_accumulate_from_posteriors(self):
         num_gauss = 3
@@ -158,24 +174,28 @@ class TestAccumDiagGmm(unittest.TestCase):
         weight = 0.25
         acc.accumulate_for_component(data=d, comp_index=comp_index, weight=weight)
 
-        occupancy = acc.occupancy.clone()
-        mean_accumulator = acc.mean_accumulator.clone()
-        variance_accumulator = acc.variance_accumulator.clone()
+        occupancy = torch.from_numpy(acc.occupancy).clone()
+        mean_accumulator = torch.from_numpy(acc.mean_accumulator).clone()
+        variance_accumulator = torch.from_numpy(acc.variance_accumulator).clone()
 
         data = torch.rand(dim, dtype=torch.float32)
         posteriors = torch.rand(num_gauss, dtype=torch.float32)
         acc.accumulate_from_posteriors(data=data, gauss_posteriors=posteriors)
 
         expected_occupancy = occupancy + posteriors
-        assert torch.allclose(acc.occupancy, expected_occupancy)
+        assert torch.allclose(torch.from_numpy(acc.occupancy), expected_occupancy)
 
         expected_mean_accumulator = mean_accumulator + posteriors.unsqueeze(1) * data
-        assert torch.allclose(acc.mean_accumulator, expected_mean_accumulator)
+        assert torch.allclose(
+            torch.from_numpy(acc.mean_accumulator), expected_mean_accumulator
+        )
 
         expected_variance_accumulator = (
             variance_accumulator + posteriors.unsqueeze(1) * data.square()
         )
-        assert torch.allclose(acc.variance_accumulator, expected_variance_accumulator)
+        assert torch.allclose(
+            torch.from_numpy(acc.variance_accumulator), expected_variance_accumulator
+        )
 
     def test_accumulate_from_diag(self):
         num_gauss = 3
@@ -189,9 +209,9 @@ class TestAccumDiagGmm(unittest.TestCase):
         weight = 0.25
         acc.accumulate_for_component(data=d, comp_index=comp_index, weight=weight)
 
-        occupancy = acc.occupancy.clone()
-        mean_accumulator = acc.mean_accumulator.clone()
-        variance_accumulator = acc.variance_accumulator.clone()
+        occupancy = torch.from_numpy(acc.occupancy).clone()
+        mean_accumulator = torch.from_numpy(acc.mean_accumulator).clone()
+        variance_accumulator = torch.from_numpy(acc.variance_accumulator).clone()
 
         data = torch.rand(dim, dtype=torch.float32)
 
@@ -210,21 +230,26 @@ class TestAccumDiagGmm(unittest.TestCase):
         log_like = acc.accumulate_from_diag(gmm=diag_gmm, data=data, weight=w)
 
         expected_log_like, posteriors = diag_gmm.component_posteriors(data)
+        posteriors = torch.from_numpy(posteriors)
         assert abs(log_like - expected_log_like) < 1e-5
 
         # similar to accumulate_from_posteriors()
 
         posteriors *= w  # scale it!
         expected_occupancy = occupancy + posteriors
-        assert torch.allclose(acc.occupancy, expected_occupancy)
+        assert torch.allclose(torch.from_numpy(acc.occupancy), expected_occupancy)
 
         expected_mean_accumulator = mean_accumulator + posteriors.unsqueeze(1) * data
-        assert torch.allclose(acc.mean_accumulator, expected_mean_accumulator)
+        assert torch.allclose(
+            torch.from_numpy(acc.mean_accumulator), expected_mean_accumulator
+        )
 
         expected_variance_accumulator = (
             variance_accumulator + posteriors.unsqueeze(1) * data.square()
         )
-        assert torch.allclose(acc.variance_accumulator, expected_variance_accumulator)
+        assert torch.allclose(
+            torch.from_numpy(acc.variance_accumulator), expected_variance_accumulator
+        )
 
     def test_add_stats_for_component(self):
         num_gauss = 3
@@ -238,9 +263,9 @@ class TestAccumDiagGmm(unittest.TestCase):
         weight = 0.25
         acc.accumulate_for_component(data=d, comp_index=comp_index, weight=weight)
 
-        occupancy = acc.occupancy.clone()
-        mean_accumulator = acc.mean_accumulator.clone()
-        variance_accumulator = acc.variance_accumulator.clone()
+        occupancy = torch.from_numpy(acc.occupancy).clone()
+        mean_accumulator = torch.from_numpy(acc.mean_accumulator).clone()
+        variance_accumulator = torch.from_numpy(acc.variance_accumulator).clone()
 
         occ = 0.3
         g = 0
@@ -253,9 +278,11 @@ class TestAccumDiagGmm(unittest.TestCase):
         mean_accumulator[g] += x_stats
         variance_accumulator[g] += x2_stats
 
-        assert torch.allclose(acc.occupancy, occupancy)
-        assert torch.allclose(acc.mean_accumulator, mean_accumulator)
-        assert torch.allclose(acc.variance_accumulator, variance_accumulator)
+        assert torch.allclose(torch.from_numpy(acc.occupancy), occupancy)
+        assert torch.allclose(torch.from_numpy(acc.mean_accumulator), mean_accumulator)
+        assert torch.allclose(
+            torch.from_numpy(acc.variance_accumulator), variance_accumulator
+        )
 
 
 if __name__ == "__main__":

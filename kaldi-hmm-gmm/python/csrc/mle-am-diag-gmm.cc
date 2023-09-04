@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/mle-am-diag-gmm.h"
-#include "torch/torch.h"
 
 namespace khg {
 

@@ -13,11 +13,11 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/context-dep-itf.h"
+#include "kaldi-hmm-gmm/csrc/eigen.h"
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi-hmm-gmm/csrc/transition-information.h"
 #include "kaldi_native_io/csrc/kaldi-vector.h"
-#include "torch/script.h"
 
 namespace khg {
 
@@ -173,20 +173,17 @@ class TransitionModel : public TransitionInformation {
 
   int32_t TransitionIdToTransitionState(int32_t trans_id) const;
 
-  // stats is a 1-D torch.kDouble tensor
-  void InitStats(torch::Tensor *stats) const {
+  void InitStats(DoubleVector *stats) const {
     // transition id starts from 1
     // stats[0] is never used
-    *stats = torch::zeros({NumTransitionIds() + 1}, torch::kDouble);
+    *stats = DoubleVector::Zero(NumTransitionIds() + 1);
   }
 
   // @param stats 1-d double tensor
-  void Accumulate(float prob, int32_t trans_id, torch::Tensor *stats) const {
+  void Accumulate(float prob, int32_t trans_id, DoubleVector *stats) const {
     KHG_ASSERT(trans_id <= NumTransitionIds());
 
-    auto stats_acc = stats->accessor<double, 1>();
-
-    stats_acc[trans_id] += prob;
+    (*stats)[trans_id] += prob;
     // This is trivial and doesn't require class members, but leaves us more
     // open to design changes than doing it manually.
   }
@@ -195,8 +192,9 @@ class TransitionModel : public TransitionInformation {
   /// by transition-id.  This was previously called Update().
   ///
   /// @param stats 1-D double tensor of shape (num_transiation_ids + 1,)
-  void MleUpdate(torch::Tensor stats, const MleTransitionUpdateConfig &cfg,
-                 float *objf_impr_out, float *count_out);
+  void MleUpdate(const DoubleVector &stats,
+                 const MleTransitionUpdateConfig &cfg, float *objf_impr_out,
+                 float *count_out);
 
   /// Returns the total number of transition-states (note, these are one-based).
   int32_t NumTransitionStates() const { return tuples_.size(); }
@@ -238,7 +236,7 @@ class TransitionModel : public TransitionInformation {
 
   int32_t TransitionIdToHmmState(int32_t trans_id) const;
 
-  void MleUpdateShared(torch::Tensor stats,
+  void MleUpdateShared(const DoubleVector &stats,
                        const MleTransitionUpdateConfig &cfg,
                        float *objf_impr_out, float *count_out);
 

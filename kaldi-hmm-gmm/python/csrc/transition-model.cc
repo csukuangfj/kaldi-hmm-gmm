@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/transition-model.h"
-#include "torch/torch.h"
 
 namespace khg {
 
@@ -100,15 +99,20 @@ void PybindTransitionModel(py::module *m) {
              return os.str();
            })
       .def("init_stats",
-           [](const PyClass &self) -> torch::Tensor {
-             torch::Tensor stats;
+           [](const PyClass &self) -> DoubleVector {
+             DoubleVector stats;
              self.InitStats(&stats);
              return stats;
            })
-      .def("accumulate", &PyClass::Accumulate, py::arg("prob"),
-           py::arg("trans_id"), py::arg("stats"))
+      .def(
+          "accumulate",
+          [](PyClass &self, float prob, int32_t trans_id, DoubleVector *stats) {
+            self.Accumulate(prob, trans_id, stats);
+            return *stats;
+          },
+          py::arg("prob"), py::arg("trans_id"), py::arg("stats"))
       .def("mle_update",
-           [](PyClass &self, torch::Tensor stats,
+           [](PyClass &self, const DoubleVector &stats,
               const MleTransitionUpdateConfig &cfg) -> std::pair<float, float> {
              float objf_impr_out = 0;
              float count_out = 0;

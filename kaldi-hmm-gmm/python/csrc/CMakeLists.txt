@@ -1,5 +1,4 @@
 include_directories(${PROJECT_SOURCE_DIR})
-add_definitions(-DTORCH_API_INCLUDE_EXTENSION_H)
 
 set(srcs
   add-self-loops.cc
@@ -12,6 +11,7 @@ set(srcs
   decoder-wrappers.cc
   determinize-lattice-pruned.cc
   diag-gmm.cc
+  eigen-test.cc
   event-map.cc
   hmm-topology.cc
   hmm-utils.cc
@@ -29,13 +29,6 @@ set(srcs
 
 pybind11_add_module(_kaldi_hmm_gmm ${srcs})
 target_link_libraries(_kaldi_hmm_gmm PRIVATE kaldi-hmm-gmm-core)
-if(UNIX AND NOT APPLE)
-  target_link_libraries(_kaldi_hmm_gmm PUBLIC ${TORCH_DIR}/lib/libtorch_python.so)
-  target_link_libraries(_kaldi_hmm_gmm PUBLIC ${PYTHON_LIBRARY})
-elseif(WIN32)
-  target_link_libraries(_kaldi_hmm_gmm PUBLIC ${TORCH_DIR}/lib/torch_python.lib)
-  target_link_libraries(_kaldi_hmm_gmm PUBLIC ${PYTHON_LIBRARIES})
-endif()
 
 if(APPLE)
   execute_process(

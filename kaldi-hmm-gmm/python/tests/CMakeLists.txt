@@ -22,6 +22,7 @@ set(py_test_files
   test_context_dep.py
   test_diag_gmm.py
   test_draw_tree.py
+  test_eigen.py
   test_gauss_clusterable.py
   test_gmm_update_flags.py
   test_hmm_topology.py

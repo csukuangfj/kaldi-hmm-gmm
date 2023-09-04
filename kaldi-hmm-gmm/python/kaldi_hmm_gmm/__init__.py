@@ -1,4 +1,3 @@
-import torch
 from _kaldi_hmm_gmm import (
     AccumAmDiagGmm,
     AccumDiagGmm,
@@ -17,9 +16,9 @@ from _kaldi_hmm_gmm import (
     GmmUpdateFlags,
     HmmTopology,
     HTransducerConfig,
+    LatticeFasterDecoder,
     LatticeFasterDecoderConfig,
     LatticeFasterDecoderStdConstFst,
-    LatticeFasterDecoder,
     LatticeFasterDecoderStdVectorFst,
     LatticeSimpleDecoder,
     LatticeSimpleDecoderConfig,

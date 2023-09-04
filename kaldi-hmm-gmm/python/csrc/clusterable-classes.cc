@@ -7,7 +7,6 @@
 #include "kaldi-hmm-gmm/csrc/cluster-utils.h"
 #include "kaldi-hmm-gmm/csrc/clusterable-classes.h"
 #include "kaldi-hmm-gmm/csrc/clusterable-itf.h"
-#include "torch/torch.h"
 
 namespace khg {
 
@@ -93,7 +92,7 @@ static void PybindGaussClusterable(py::module *m) {
   py::class_<PyClass, Clusterable>(*m, "GaussClusterable")
       .def(py::init<>())
       .def(py::init<int32_t, float>(), py::arg("dim"), py::arg("var_floor"))
-      .def(py::init<torch::Tensor, torch::Tensor, float, float>(),
+      .def(py::init<const DoubleVector &, const DoubleVector &, float, float>(),
            py::arg("x_stats"), py::arg("x2_stats"), py::arg("var_floor"),
            py::arg("count"))
       .def("add_stats", &PyClass::AddStats, py::arg("vec"), py::arg("weight"))

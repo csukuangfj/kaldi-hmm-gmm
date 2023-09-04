@@ -11,6 +11,7 @@ set(srcs
   decoder-wrappers.cc
   diag-gmm-normal.cc
   diag-gmm.cc
+  eigen.cc
   event-map.cc
   faster-decoder.cc
   hmm-topology.cc
@@ -30,11 +31,12 @@ target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldi_native_io_core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC fst)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC fstscript)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldifst_core)
-target_link_libraries(kaldi-hmm-gmm-core PUBLIC ${TORCH_LIBRARIES})
+target_link_libraries(kaldi-hmm-gmm-core PUBLIC Eigen3::Eigen)
 
 if(KHG_ENABLE_TESTS)
   set(test_srcs
     diag-gmm-test.cc
+    eigen-test.cc
     event-map-test.cc
     hash-list-test.cc
   )

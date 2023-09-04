@@ -64,8 +64,7 @@ if(KHG_BUILD_PYTHON)
   include(pybind11)
 endif()
 
-# Note: Include torch first since it may set the C++ ABI flag
-include(torch)
+include(eigen)
 
 include(kaldi-native-io)
 include(kaldifst)

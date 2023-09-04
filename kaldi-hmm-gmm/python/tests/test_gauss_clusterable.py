@@ -27,12 +27,14 @@ class TestGaussClusterable(unittest.TestCase):
 
         assert a.count() == 0.50 + w, a.count()
 
-        assert torch.allclose(a.x_stats(), (mean + mean2 * w).to(torch.double)), (
+        assert torch.allclose(
+            torch.from_numpy(a.x_stats()), (mean + mean2 * w).to(torch.double)
+        ), (
             a.x_stats(),
             mean + mean2 * w,
         )
         assert torch.allclose(
-            a.x2_stats(), (var + mean2.square() * w).to(torch.double)
+            torch.from_numpy(a.x2_stats()), (var + mean2.square() * w).to(torch.double)
         ), (
             a.x2_stats(),
             (var + mean2.square() * w).to(torch.double),

@@ -14,6 +14,7 @@
 #include "kaldi-hmm-gmm/python/csrc/decoder-wrappers.h"
 #include "kaldi-hmm-gmm/python/csrc/determinize-lattice-pruned.h"
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
+#include "kaldi-hmm-gmm/python/csrc/eigen-test.h"
 #include "kaldi-hmm-gmm/python/csrc/event-map.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-utils.h"
@@ -26,7 +27,6 @@
 #include "kaldi-hmm-gmm/python/csrc/transition-information.h"
 #include "kaldi-hmm-gmm/python/csrc/transition-model.h"
 #include "kaldi-hmm-gmm/python/csrc/tree-renderer.h"
-#include "torch/torch.h"
 
 namespace khg {
 
@@ -60,6 +60,8 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindLatticeSimpleDecoder(&m);
 
   PybindDecoderWrappers(&m);
+
+  PybindEigenTest(&m);
 }
 
 }  // namespace khg

@@ -8,7 +8,7 @@
 #include <string>
 
 #include "kaldi-hmm-gmm/csrc/clusterable-itf.h"
-#include "kaldi-hmm-gmm/csrc/utils.h"
+#include "kaldi-hmm-gmm/csrc/eigen.h"
 
 namespace khg {
 
@@ -46,15 +46,21 @@ class GaussClusterable : public Clusterable {
   GaussClusterable() : count_(0.0), var_floor_(0.0) {}
   GaussClusterable(int32_t dim, float var_floor)
       : count_(0.0),
-        stats_{torch::zeros({2, dim}, torch::kDouble)},
+        x_stats_(DoubleVector::Zero(dim)),
+        x2_stats_(DoubleVector::Zero(dim)),
         var_floor_(var_floor) {}
 
-  GaussClusterable(torch::Tensor x_stats,   // 1-D tensor of shape (dim,)
-                   torch::Tensor x2_stats,  // 1-D tensor of shape (dim,)
-                   float var_floor, float count);
+  GaussClusterable(const DoubleVector &x_stats,   // 1-D tensor of shape (dim,)
+                   const DoubleVector &x2_stats,  // 1-D tensor of shape (dim,)
+                   float var_floor, float count)
+      : count_(count),
+        x_stats_(x_stats),
+        x2_stats_(x2_stats),
+        var_floor_(var_floor) {}
 
   std::string Type() const override { return "gauss"; }
-  void AddStats(torch::Tensor vec,  // 1-D tensor of shape (dim,)
+
+  void AddStats(const DoubleVector &vec,  // 1-D tensor of shape (dim,)
                 float weight = 1.0);
 
   float Objf() const override;
@@ -68,32 +74,24 @@ class GaussClusterable : public Clusterable {
   float count() const { return count_; }
 
   // Return a 1-D tensor
-  torch::Tensor x_stats() const { return Row(stats_, 0).squeeze(0); }
+  const DoubleVector &x_stats() const { return x_stats_; }
 
   // Return a 1-D tensor
-  torch::Tensor x2_stats() const { return Row(stats_, 1).squeeze(0); }
+  const DoubleVector &x2_stats() const { return x2_stats_; }
 
  private:
   double count_;
-  torch::Tensor stats_;  // kDouble, two rows: sum, then sum-squared.
-  double var_floor_;     // should be common for all objects created.
+  DoubleVector x_stats_;
+  DoubleVector x2_stats_;
+  double var_floor_;  // should be common for all objects created.
 };
 
 /// @} end of "addtogroup clustering_group"
 
 inline void GaussClusterable::SetZero() {
   count_ = 0;
-  stats_.zero_();
-}
-
-inline GaussClusterable::GaussClusterable(torch::Tensor x_stats,
-                                          torch::Tensor x2_stats,
-                                          float var_floor, float count)
-    : count_(count),
-      stats_(torch::empty({2, x_stats.size(0)}, torch::kDouble)),
-      var_floor_(var_floor) {
-  Row(stats_, 0) = x_stats;
-  Row(stats_, 1) = x2_stats;
+  x_stats_.setZero();
+  x2_stats_.setZero();
 }
 
 }  // namespace khg

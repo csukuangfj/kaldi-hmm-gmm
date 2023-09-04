@@ -26,16 +26,14 @@ struct CountStats {
   }
 };
 
-void GetSplitTargets(torch::Tensor state_occs,  // 1-D float tensor
+void GetSplitTargets(const FloatVector &state_occs,  // 1-D float tensor
                      int32_t target_components, float power, float min_count,
                      std::vector<int32_t> *targets) {
   std::priority_queue<CountStats> split_queue;
-  int32_t num_pdfs = state_occs.size(0);
-
-  auto state_occs_acc = state_occs.accessor<float, 1>();
+  int32_t num_pdfs = state_occs.size();
 
   for (int32_t pdf_index = 0; pdf_index < num_pdfs; ++pdf_index) {
-    float occ = pow(state_occs_acc[pdf_index], power);
+    float occ = pow(state_occs[pdf_index], power);
     // initialize with one Gaussian per PDF, to put a floor
     // of 1 on the #Gauss
     split_queue.push(CountStats(pdf_index, 1, occ));
@@ -50,7 +48,7 @@ void GetSplitTargets(torch::Tensor state_occs,  // 1-D float tensor
       break;
     }
     split_queue.pop();
-    float orig_occ = state_occs_acc[state_to_split.pdf_index];
+    float orig_occ = state_occs[state_to_split.pdf_index];
 
     if ((state_to_split.num_components + 1) * min_count >= orig_occ) {
       state_to_split.occupancy = 0;  // min-count active -> disallow splitting

@@ -76,13 +76,19 @@ class TestInitGmmMono(unittest.TestCase):
             am_gmm.add_pdf(gmm)
 
         for i in range(1, num_pdfs):
-            assert torch.allclose(am_gmm.get_pdf(i).means, am_gmm.get_pdf(0).means)
+            assert torch.allclose(
+                torch.from_numpy(am_gmm.get_pdf(i).means),
+                torch.from_numpy(am_gmm.get_pdf(0).means),
+            )
 
         for i in range(num_pdfs):
             am_gmm.get_pdf(i).perturb(perturb_factor=0.01)
 
         for i in range(1, num_pdfs):
-            assert not torch.allclose(am_gmm.get_pdf(i).means, am_gmm.get_pdf(0).means)
+            assert not torch.allclose(
+                torch.from_numpy(am_gmm.get_pdf(i).means),
+                torch.from_numpy(am_gmm.get_pdf(0).means),
+            )
 
         trans_model = khg.TransitionModel(ctx_dep, hmm_topo)
         assert trans_model.num_pdfs == num_pdfs, (trans_model.num_pdfs, num_pdfs)
