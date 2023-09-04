@@ -68,7 +68,11 @@ class BuildExtension(build_ext):
             cmake_args = "-DCMAKE_BUILD_TYPE=Release"
 
         extra_cmake_args = f" -DCMAKE_INSTALL_PREFIX={install_dir} "
-        extra_cmake_args += f" -DBUILD_SHARED_LIBS=ON "
+        if is_windows():
+            extra_cmake_args += f" -DBUILD_SHARED_LIBS=OFF "
+        else:
+            extra_cmake_args += f" -DBUILD_SHARED_LIBS=ON "
+
         extra_cmake_args += f" -DKHG_BUILD_PYTHON=ON "
         extra_cmake_args += f" -DKHG_ENABLE_TESTS=OFF "
 
