@@ -1,0 +1,6 @@
+# torch # Please install torch separately
+graphviz
+kaldialign
+kaldifst
+kaldilm
+numpy
