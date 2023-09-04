@@ -39,8 +39,8 @@ void AccumAmDiagGmm::SetZero(GmmFlagsType flags) {
 }
 
 float AccumAmDiagGmm::AccumulateForGmm(const AmDiagGmm &model,
-                                       torch::Tensor data, int32_t gmm_index,
-                                       float weight) {
+                                       const FloatVector &data,
+                                       int32_t gmm_index, float weight) {
   KHG_ASSERT(gmm_index >= 0 && gmm_index < NumAccs());
 
   float log_like = gmm_accumulators_[gmm_index]->AccumulateFromDiag(
@@ -52,8 +52,8 @@ float AccumAmDiagGmm::AccumulateForGmm(const AmDiagGmm &model,
 }
 
 float AccumAmDiagGmm::AccumulateForGmmTwofeats(const AmDiagGmm &model,
-                                               torch::Tensor data1,
-                                               torch::Tensor data2,
+                                               const FloatVector &data1,
+                                               const FloatVector &data2,
                                                int32_t gmm_index,
                                                float weight) {
   KHG_ASSERT(gmm_index >= 0 && gmm_index < NumAccs());
@@ -61,10 +61,10 @@ float AccumAmDiagGmm::AccumulateForGmmTwofeats(const AmDiagGmm &model,
   const DiagGmm &gmm = model.GetPdf(gmm_index);
 
   AccumDiagGmm &acc = *(gmm_accumulators_[gmm_index]);
-  torch::Tensor posteriors;
+  FloatVector posteriors;
   float log_like = gmm.ComponentPosteriors(data1, &posteriors);
 
-  posteriors.mul_(weight);
+  posteriors *= weight;
 
   // TODO(fangjun): This looks strange since it uses posteriors from data1
   acc.AccumulateFromPosteriors(data2, posteriors);
@@ -76,17 +76,17 @@ float AccumAmDiagGmm::AccumulateForGmmTwofeats(const AmDiagGmm &model,
 }
 
 void AccumAmDiagGmm::AccumulateFromPosteriors(const AmDiagGmm &model,
-                                              torch::Tensor data,
+                                              const FloatVector &data,
                                               int32_t gmm_index,
-                                              torch::Tensor posteriors) {
+                                              const FloatVector &posteriors) {
   KHG_ASSERT(gmm_index >= 0 && gmm_index < NumAccs());
 
   gmm_accumulators_[gmm_index]->AccumulateFromPosteriors(data, posteriors);
-  total_frames_ += posteriors.sum().item().toFloat();
+  total_frames_ += posteriors.sum();
 }
 
 void AccumAmDiagGmm::AccumulateForGaussian(const AmDiagGmm &am,
-                                           torch::Tensor data,
+                                           const FloatVector &data,
                                            int32_t gmm_index,
                                            int32_t gauss_index, float weight) {
   KHG_ASSERT(gmm_index >= 0 && gmm_index < NumAccs());
@@ -100,7 +100,7 @@ float AccumAmDiagGmm::TotStatsCount() const {
   double ans = 0.0;
   for (int32_t i = 0; i < NumAccs(); ++i) {
     const AccumDiagGmm &acc = GetAcc(i);
-    ans += acc.occupancy().sum().item().toDouble();
+    ans += acc.occupancy().sum();
   }
   return ans;
 }
@@ -142,7 +142,8 @@ static void ResizeModel(int32_t dim, AmDiagGmm *am_gmm) {
     DiagGmm &pdf = am_gmm->GetPdf(pdf_id);
     pdf.Resize(pdf.NumGauss(), dim);
 
-    torch::Tensor inv_vars = torch::ones({pdf.NumGauss(), dim}, torch::kFloat);
+    FloatMatrix inv_vars = FloatMatrix::Ones(pdf.NumGauss(), dim);
+
     pdf.SetInvVars(inv_vars);
 
     pdf.ComputeGconsts();
@@ -164,10 +165,13 @@ void MleAmDiagGmmUpdate(const MleDiagGmmOptions &config,
   KHG_ASSERT(am_gmm != nullptr);
   KHG_ASSERT(am_diag_gmm_acc.NumAccs() == am_gmm->NumPdfs());
   if (obj_change_out != nullptr) *obj_change_out = 0.0;
+
   if (count_out != nullptr) *count_out = 0.0;
 
   float tot_obj_change = 0.0, tot_count = 0.0;
+
   int32_t tot_elems_floored = 0, tot_gauss_floored = 0, tot_gauss_removed = 0;
+
   for (int32_t i = 0; i < am_diag_gmm_acc.NumAccs(); ++i) {
     float obj_change, count;
     int32_t elems_floored, gauss_floored, gauss_removed;
@@ -175,6 +179,7 @@ void MleAmDiagGmmUpdate(const MleDiagGmmOptions &config,
     MleDiagGmmUpdate(config, am_diag_gmm_acc.GetAcc(i), flags,
                      &(am_gmm->GetPdf(i)), &obj_change, &count, &elems_floored,
                      &gauss_floored, &gauss_removed);
+
     tot_obj_change += obj_change;
     tot_count += count;
     tot_elems_floored += elems_floored;
@@ -182,6 +187,7 @@ void MleAmDiagGmmUpdate(const MleDiagGmmOptions &config,
     tot_gauss_removed += gauss_removed;
   }
   if (obj_change_out != nullptr) *obj_change_out = tot_obj_change;
+
   if (count_out != nullptr) *count_out = tot_count;
 
   KHG_LOG << tot_elems_floored << " variance elements floored in "

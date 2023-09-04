@@ -1,6 +1,6 @@
 import torch
 from _kaldi_hmm_gmm import (
-    #  AccumAmDiagGmm,
+    AccumAmDiagGmm,
     AccumDiagGmm,
     #  AlignConfig,
     AmDiagGmm,
@@ -39,8 +39,8 @@ from _kaldi_hmm_gmm import (
     #  get_h_transducer,
     #  get_pdfs_for_phones,
     #  gmm_flags_to_str,
-    #  map_am_diag_gmm_update,
-    #  mle_am_diag_gmm_update,
+    map_am_diag_gmm_update,
+    mle_am_diag_gmm_update,
     #  monophone_context_dependency,
     #  monophone_context_dependency_shared,
     #  str_to_gmm_flags,
