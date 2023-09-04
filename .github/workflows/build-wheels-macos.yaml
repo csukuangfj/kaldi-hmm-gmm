@@ -2,8 +2,8 @@ name: build-wheels-macos
 
 on:
   push:
-    branches:
-      - wheel
+    # branches:
+    #   - wheel
     tags:
       - '*'
 

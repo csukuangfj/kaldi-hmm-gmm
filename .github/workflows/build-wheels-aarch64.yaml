@@ -2,8 +2,8 @@ name: build-wheels-aarch64
 
 on:
   push:
-    branches:
-      - wheel
+    # branches:
+    #   - wheel
     tags:
       - '*'
 
