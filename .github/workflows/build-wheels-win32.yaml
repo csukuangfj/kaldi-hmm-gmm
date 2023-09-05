@@ -31,7 +31,6 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.11.4
         env:
-          CIBW_BEFORE_BUILD: "pip install -U cmake numpy"
           CIBW_ENVIRONMENT: KHG_CMAKE_ARGS="-A Win32"
           CIBW_BUILD: "${{ matrix.python-version}}-* "
           CIBW_SKIP: "*-win_amd64"
