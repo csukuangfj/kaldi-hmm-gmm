@@ -38,7 +38,6 @@ try:
                 # -linux_x86_64.whl
                 self.root_is_pure = False
 
-
 except ImportError:
     bdist_wheel = None
 
@@ -69,8 +68,13 @@ class BuildExtension(build_ext):
             cmake_args = "-DCMAKE_BUILD_TYPE=Release"
 
         extra_cmake_args = f" -DCMAKE_INSTALL_PREFIX={install_dir} "
-        extra_cmake_args += f" -DBUILD_SHARED_LIBS=ON "
+        if is_windows():
+            extra_cmake_args += f" -DBUILD_SHARED_LIBS=OFF "
+        else:
+            extra_cmake_args += f" -DBUILD_SHARED_LIBS=ON "
+
         extra_cmake_args += f" -DKHG_BUILD_PYTHON=ON "
+        extra_cmake_args += f" -DKHG_ENABLE_TESTS=OFF "
 
         if "PYTHON_EXECUTABLE" not in cmake_args:
             print(f"Setting PYTHON_EXECUTABLE to {sys.executable}")

@@ -41,6 +41,7 @@ install_requires = [
     "kaldifst",
     "numpy",
     "kaldilm",
+    # please install torch separately
 ]
 
 setuptools.setup(
