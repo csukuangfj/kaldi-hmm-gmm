@@ -34,17 +34,20 @@ def build_standard_ctc_topo(max_token_id: int) -> kaldifst.StdVectorFst:
     return fst
 
 
-def add_one(fst: kaldifst.StdVectorFst, update_olabel: bool):
-    """For every input label, it is increased by one.
+def add_one(fst: kaldifst.StdVectorFst, treat_ilabel_zero_specially: bool):
+    """For every non-zero output label, it is increased by one.
 
-    If update_olabel is True, then for every non-zero output label, it is
-    also increased by one.
+    If treat_ilabel_zero_specially is True, then every non-zero input label
+    is increased by one. If treat_ilabel_zero_specially is False, then every
+    input label is increased by one.
 
     The input fst is modified in-place.
     """
     for state in kaldifst.StateIterator(fst):
         for arc in kaldifst.ArcIterator(fst, state):
-            arc.ilabel += 1
+            if treat_ilabel_zero_specially is False or arc.ilabel != 0:
+                arc.ilabel += 1
+
             if arc.olabel != 0:
                 arc.olabel += 1
 
