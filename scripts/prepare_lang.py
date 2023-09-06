@@ -251,9 +251,17 @@ class Lexiconp:
             kept_phone_list.append(p)
 
         kept_phone_list.sort()
-        kept_phone_list.remove("SIL")
+
+        has_sil = "SIL" in kept_phone_list
+
+        if has_sil:
+            kept_phone_list.remove("SIL")
+
         kept_phone_list.insert(0, "<eps>")
-        kept_phone_list.insert(1, "SIL")
+
+        if has_sil:
+            kept_phone_list.insert(1, "SIL")
+
         for i in range(self._max_disambig + 2):
             kept_phone_list.append(f"#{i}")
 
@@ -430,6 +438,62 @@ def make_lexicon_fst_with_silence(
                 olabel=word2id[word] if i <= 0 else 0,
                 weight=sil_cost + (pron_cost if i <= 0 else 0),
                 nextstate=sil_state,
+            ),
+        )
+
+    # attach symbol table
+    isym = kaldifst.SymbolTable()
+    for p, i in phone2id.items():
+        isym.add_symbol(symbol=p, key=i)
+    fst.input_symbols = isym
+
+    osym = kaldifst.SymbolTable()
+    for w, i in word2id.items():
+        osym.add_symbol(symbol=w, key=i)
+    fst.output_symbols = osym
+
+    return fst
+
+
+def make_lexicon_fst_no_silence(
+    lexiconp: Lexiconp,
+) -> kaldifst.StdVectorFst:
+    phone2id = lexiconp.phone2id
+    word2id = lexiconp.word2id
+
+    fst = kaldifst.StdVectorFst()
+
+    start_state = fst.add_state()
+    fst.start = start_state
+    fst.set_final(state=start_state, weight=0)
+
+    for word, prob, phones in lexiconp:
+        phoneseq = phones.split()
+        pron_cost = -1 * math.log(float(prob))
+        cur_state = start_state
+
+        for i in range(len(phoneseq) - 1):
+            next_state = fst.add_state()
+            fst.add_arc(
+                state=cur_state,
+                arc=kaldifst.StdArc(
+                    ilabel=phone2id[phoneseq[i]],
+                    olabel=word2id[word] if i == 0 else 0,
+                    weight=pron_cost if i == 0 else 0,
+                    nextstate=next_state,
+                ),
+            )
+            cur_state = next_state
+
+        i = len(phoneseq) - 1  # note: i == -1 if phoneseq is empty.
+
+        fst.add_arc(
+            state=cur_state,
+            arc=kaldifst.StdArc(
+                ilabel=phone2id[phoneseq[i]] if i >= 0 else 0,
+                olabel=word2id[word] if i <= 0 else 0,
+                weight=pron_cost if i <= 0 else 0,
+                nextstate=start_state,
             ),
         )
 

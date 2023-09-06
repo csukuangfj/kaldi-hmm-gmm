@@ -16,6 +16,7 @@
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/eigen-test.h"
 #include "kaldi-hmm-gmm/python/csrc/event-map.h"
+#include "kaldi-hmm-gmm/python/csrc/faster-decoder.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-utils.h"
 #include "kaldi-hmm-gmm/python/csrc/lattice-faster-decoder.h"
@@ -60,6 +61,7 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindLatticeSimpleDecoder(&m);
 
   PybindDecoderWrappers(&m);
+  PybindFasterDecoder(&m);
 
   PybindEigenTest(&m);
 }
