@@ -12,6 +12,8 @@ from _kaldi_hmm_gmm import (
     DeterminizeLatticePhonePrunedOptions,
     DiagGmm,
     EventMap,
+    FasterDecoder,
+    FasterDecoderOptions,
     GaussClusterable,
     GmmUpdateFlags,
     HmmTopology,

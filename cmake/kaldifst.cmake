@@ -1,18 +1,18 @@
 function(download_kaldifst)
   include(FetchContent)
 
-  set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.7.4.tar.gz")
-  set(kaldifst_URL2 "https://huggingface.co/csukuangfj/kaldi-hmm-gmm-cmake-deps/resolve/main/kaldifst-1.7.4.tar.gz")
-  set(kaldifst_HASH "SHA256=91c4a5fe3fe5d65a26bd232d1fe727712ed839df1c01e56ce37705f886ef2b48")
+  set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.7.5.tar.gz")
+  set(kaldifst_URL2 "https://huggingface.co/csukuangfj/kaldi-hmm-gmm-cmake-deps/resolve/main/kaldifst-1.7.5.tar.gz")
+  set(kaldifst_HASH "SHA256=4a58efd3f4ac90e65b414ffe5ba17384657ccb551dd25d8f34cda8f0b008e133")
 
   # If you don't have access to the Internet,
   # please pre-download kaldi_native_io
   set(possible_file_locations
-    $ENV{HOME}/Downloads/kaldifst-1.7.4.tar.gz
-    ${PROJECT_SOURCE_DIR}/kaldifst-1.7.4.tar.gz
-    ${PROJECT_BINARY_DIR}/kaldifst-1.7.4.tar.gz
-    /tmp/kaldifst-1.7.4.tar.gz
-    /star-fj/fangjun/download/github/kaldifst-1.7.4.tar.gz
+    $ENV{HOME}/Downloads/kaldifst-1.7.5.tar.gz
+    ${PROJECT_SOURCE_DIR}/kaldifst-1.7.5.tar.gz
+    ${PROJECT_BINARY_DIR}/kaldifst-1.7.5.tar.gz
+    /tmp/kaldifst-1.7.5.tar.gz
+    /star-fj/fangjun/download/github/kaldifst-1.7.5.tar.gz
   )
 
   foreach(f IN LISTS possible_file_locations)
@@ -23,7 +23,6 @@ function(download_kaldifst)
       break()
     endif()
   endforeach()
-
 
   set(KALDIFST_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   set(KALDIFST_BUILD_PYTHON OFF CACHE BOOL "" FORCE)

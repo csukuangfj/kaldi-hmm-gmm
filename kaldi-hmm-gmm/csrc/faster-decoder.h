@@ -10,6 +10,7 @@
 #define KALDI_HMM_GMM_CSRC_FASTER_DECODER_H_
 
 #include <limits>
+#include <string>
 #include <vector>
 
 #include "fst/fst.h"
@@ -36,13 +37,29 @@ struct FasterDecoderOptions {
   // Setting used in decoder to control hash behavior
   float hash_ratio;
 
-  FasterDecoderOptions()
-      : beam(16.0),
-        max_active(std::numeric_limits<int32_t>::max()),
-        min_active(20),  // This decoder mostly used for
-                         // alignment, use small default.
-        beam_delta(0.5),
-        hash_ratio(2.0) {}
+  /*implicit*/ FasterDecoderOptions(
+      float beam = 16.0,
+      int32_t max_active = std::numeric_limits<int32_t>::max(),
+      int32_t min_active = 20, float beam_delta = 0.5, float hash_ratio = 2.0)
+      : beam(beam),
+        max_active(max_active),
+        min_active(min_active),  // This decoder mostly used for
+                                 // alignment, use small default.
+        beam_delta(beam_delta),
+        hash_ratio(hash_ratio) {}
+
+  std::string ToString() const {
+    std::ostringstream os;
+
+    os << "FasterDecoderOptions(";
+    os << "beam=" << beam << ", ";
+    os << "max_active=" << max_active << ", ";
+    os << "min_active=" << min_active << ", ";
+    os << "beam_delta=" << beam_delta << ", ";
+    os << "hash_ratio=" << hash_ratio << ")";
+
+    return os.str();
+  }
 };
 
 class FasterDecoder {

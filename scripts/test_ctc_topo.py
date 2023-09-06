@@ -1,17 +1,40 @@
 #!/usr/bin/env python3
 # Copyright    2023  Xiaomi Corp.        (author: Fangjun Kuang)
 
-import kaldifst
 import graphviz
+import kaldifst
+import torch
 
-from ctc_topo import build_standard_ctc_topo, add_one, add_disambig_self_loops
-
+from ctc_topo import add_disambig_self_loops, add_one, build_standard_ctc_topo
 from prepare_lang import (
     Lexicon,
     Lexiconp,
     make_lexicon_fst_no_silence,
     make_lexicon_fst_with_silence,
 )
+
+import numpy as np
+
+from kaldi_hmm_gmm import DecodableInterface, FasterDecoder, FasterDecoderOptions
+
+
+class CtcDecodable(DecodableInterface):
+    def __init__(self, nnet_output: torch.Tensor):
+        DecodableInterface.__init__(self)
+        assert nnet_output.ndim == 2, nnet_output.shape
+        self.nnet_output = nnet_output
+
+    def log_likelihood(self, frame: int, index: int) -> float:
+        return self.nnet_output[frame][index - 1].item()
+
+    def is_last_frame(self, frame: int) -> bool:
+        return frame == self.nnet_output.shape[0] - 1
+
+    def num_frames_ready(self) -> int:
+        return self.nnet_output.shape[0]
+
+    def num_indices(self) -> int:
+        return self.nnet_output.shape[1]
 
 
 def build_G():
@@ -113,6 +136,44 @@ def test_standard_ctc_topo():
     fst_dot = kaldifst.draw(HL, acceptor=False, portrait=True)
     source = graphviz.Source(fst_dot)
     source.render(outfile="HL.pdf")
+
+    state_dict = torch.load("./nnet_output.pt")
+    print(list(state_dict.keys()))
+    wave_filename = state_dict["wave"]
+    nnet_output = state_dict["nnet_output"]
+    print(wave_filename)
+    argmax = nnet_output[0].argmax(dim=-1)
+    hyps = torch.unique_consecutive(argmax)
+    hyps = hyps[hyps != 0]
+    hyps = [id2phone[i] for i in hyps.tolist()]
+    hyps = [s for s in hyps if s != "SIL"]
+    print(hyps)
+
+    decodable = CtcDecodable(nnet_output[0])
+    decoder_opts = FasterDecoderOptions()
+    decoder = FasterDecoder(HL, decoder_opts)
+    decoder.decode(decodable)
+    if not decoder.reached_final():
+        print("failed to decode")
+        return
+    ok, best_path = decoder.get_best_path()
+
+    if not ok:
+        print("failed to get best path")
+        return
+
+    (
+        ok,
+        isymbols_out,
+        osymbols_out,
+        total_weight,
+    ) = kaldifst.get_linear_symbol_sequence(best_path)
+    if not ok:
+        print("failed to get linear symbol sequence")
+        return
+
+    hyps = [lexiconp_disambig.id2word[i - 1] for i in osymbols_out]
+    print(hyps)
 
 
 def main():

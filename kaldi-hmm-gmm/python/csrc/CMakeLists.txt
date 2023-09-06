@@ -13,6 +13,7 @@ set(srcs
   diag-gmm.cc
   eigen-test.cc
   event-map.cc
+  faster-decoder.cc
   hmm-topology.cc
   hmm-utils.cc
   kaldi-hmm-gmm.cc

@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <utility>
 
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldifst/csrc/remove-eps-local.h"
