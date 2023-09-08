@@ -1,18 +1,18 @@
 function(download_kaldifst)
   include(FetchContent)
 
-  set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.7.5.tar.gz")
-  set(kaldifst_URL2 "https://huggingface.co/csukuangfj/kaldi-hmm-gmm-cmake-deps/resolve/main/kaldifst-1.7.5.tar.gz")
-  set(kaldifst_HASH "SHA256=4a58efd3f4ac90e65b414ffe5ba17384657ccb551dd25d8f34cda8f0b008e133")
+  set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.7.6.tar.gz")
+  set(kaldifst_URL2 "https://huggingface.co/csukuangfj/kaldi-hmm-gmm-cmake-deps/resolve/main/kaldifst-1.7.6.tar.gz")
+  set(kaldifst_HASH "SHA256=79280c0bb08b5ed1a2ab7c21320a2b071f1f0eb10d2f047e8d6f027f0d32b4d2")
 
   # If you don't have access to the Internet,
   # please pre-download kaldi_native_io
   set(possible_file_locations
-    $ENV{HOME}/Downloads/kaldifst-1.7.5.tar.gz
-    ${PROJECT_SOURCE_DIR}/kaldifst-1.7.5.tar.gz
-    ${PROJECT_BINARY_DIR}/kaldifst-1.7.5.tar.gz
-    /tmp/kaldifst-1.7.5.tar.gz
-    /star-fj/fangjun/download/github/kaldifst-1.7.5.tar.gz
+    $ENV{HOME}/Downloads/kaldifst-1.7.6.tar.gz
+    ${PROJECT_SOURCE_DIR}/kaldifst-1.7.6.tar.gz
+    ${PROJECT_BINARY_DIR}/kaldifst-1.7.6.tar.gz
+    /tmp/kaldifst-1.7.6.tar.gz
+    /star-fj/fangjun/download/github/kaldifst-1.7.6.tar.gz
   )
 
   foreach(f IN LISTS possible_file_locations)
@@ -56,12 +56,11 @@ function(download_kaldifst)
 
   set_target_properties(kaldifst_core PROPERTIES OUTPUT_NAME "kaldi-hmm-gmm-kaldi-fst-core")
   set_target_properties(fst PROPERTIES OUTPUT_NAME "kaldi-hmm-gmm-fst")
-  set_target_properties(fstscript PROPERTIES OUTPUT_NAME "kaldi-hmm-gmm-fst-script")
 
   if(KHG_BUILD_PYTHON AND WIN32)
-    install(TARGETS kaldifst_core fst fstscript DESTINATION ..)
+    install(TARGETS kaldifst_core fst DESTINATION ..)
   else()
-    install(TARGETS kaldifst_core fst fstscript DESTINATION lib)
+    install(TARGETS kaldifst_core fst DESTINATION lib)
   endif()
 
 endfunction()
