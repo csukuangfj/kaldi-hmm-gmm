@@ -95,9 +95,13 @@ void FasterDecoder::ProcessNonemitting(double cutoff) {
 
       Elem *e_found = toks_.Insert(arc.nextstate, new_tok);
       if (e_found->val == new_tok) {
+        // if inserted successfully
         queue_.push_back(e_found);
         continue;
       }
+
+      // there is another token at this state, we need
+      // to compare their costs and keep the one with a lower cost
 
       if (*(e_found->val) < *new_tok) {
         // i.e., if the cost of e_found is larger than new_tok
