@@ -8,6 +8,7 @@ from _kaldi_hmm_gmm import (
     ContextDependency,
     DecodableAmDiagGmmScaled,
     DecodableAmDiagGmmUnmapped,
+    DecodableCtc,
     DecodableInterface,
     DeterminizeLatticePhonePrunedOptions,
     DiagGmm,

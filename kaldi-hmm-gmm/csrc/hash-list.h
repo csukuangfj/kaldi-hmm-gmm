@@ -2,7 +2,7 @@
 
 // Copyright 2009-2011   Microsoft Corporation
 //                2013   Johns Hopkins University (author: Daniel Povey)
-// Copyright (c)  2023  Xiaomi Corporation
+// Copyright (c)  2023   Xiaomi Corporation
 
 // this file is copied and modified from
 // kaldi/src/utils/hash-list.h
