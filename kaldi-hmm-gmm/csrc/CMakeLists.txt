@@ -8,6 +8,7 @@ set(srcs
   clusterable-classes.cc
   context-dep.cc
   decodable-am-diag-gmm.cc
+  decodable-ctc.cc
   decoder-wrappers.cc
   diag-gmm-normal.cc
   diag-gmm.cc

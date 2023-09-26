@@ -7,6 +7,7 @@ set(srcs
   clusterable-classes.cc
   context-dep.cc
   decodable-am-diag-gmm.cc
+  decodable-ctc.cc
   decodable-itf.cc
   decoder-wrappers.cc
   determinize-lattice-pruned.cc

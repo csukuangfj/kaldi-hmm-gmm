@@ -10,6 +10,7 @@
 #include "kaldi-hmm-gmm/python/csrc/clusterable-classes.h"
 #include "kaldi-hmm-gmm/python/csrc/context-dep.h"
 #include "kaldi-hmm-gmm/python/csrc/decodable-am-diag-gmm.h"
+#include "kaldi-hmm-gmm/python/csrc/decodable-ctc.h"
 #include "kaldi-hmm-gmm/python/csrc/decodable-itf.h"
 #include "kaldi-hmm-gmm/python/csrc/decoder-wrappers.h"
 #include "kaldi-hmm-gmm/python/csrc/determinize-lattice-pruned.h"
@@ -55,6 +56,7 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
   PybindDecodableItf(&m);
   PybindDecodableAmDiagGmm(&m);
   PybindAddSelfLoops(&m);
+  PybindDecodableCtc(&m);
 
   PybindDeterminizeLatticePruned(&m);
   PybindLatticeFasterDecoder(&m);
