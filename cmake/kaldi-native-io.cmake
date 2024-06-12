@@ -9,8 +9,8 @@ function(download_kaldi_native_io)
   # please pre-download kaldi_native_io
   set(possible_file_locations
     $ENV{HOME}/Downloads/kaldi_native_io-1.22.1.tar.gz
-    ${PROJECT_SOURCE_DIR}/kaldi_native_io-1.22.1.tar.gz
-    ${PROJECT_BINARY_DIR}/kaldi_native_io-1.22.1.tar.gz
+    ${CMAKE_SOURCE_DIR}/kaldi_native_io-1.22.1.tar.gz
+    ${CMAKE_BINARY_DIR}/kaldi_native_io-1.22.1.tar.gz
     /tmp/kaldi_native_io-1.22.1.tar.gz
     /star-fj/fangjun/download/github/kaldi_native_io-1.22.1.tar.gz
   )
