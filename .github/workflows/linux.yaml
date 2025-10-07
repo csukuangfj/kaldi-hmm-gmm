@@ -37,7 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
         torch: ["2.3.1"]
 
     steps:
@@ -46,7 +46,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -62,7 +62,7 @@ jobs:
         shell: bash
         run: |
           python3 -m pip install -U pip graphviz
-          python3 -m pip install torch==${{ matrix.torch }} numpy -f https://download.pytorch.org/whl/cpu/torch_stable.html
+          python3 -m pip install torch==${{ matrix.torch }} numpy -f https://download.pytorch.org/whl/cpu/torch/
 
           python3 -m torch.utils.collect_env
 

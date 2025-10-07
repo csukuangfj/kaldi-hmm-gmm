@@ -46,7 +46,7 @@ install_requires = [
 
 setuptools.setup(
     name=package_name,
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     install_requires=install_requires,
     version=get_package_version(),
     author="The next-gen Kaldi development team",

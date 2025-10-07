@@ -23,22 +23,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["cp38", "cp39", "cp310", "cp311", "cp312"]
+        os: [ubuntu-24.04-arm]
+        python-version: ["cp38", "cp39", "cp310", "cp311", "cp312", "cp313", "cp314"]
+        manylinux: [manylinux2014]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-
-      # see https://cibuildwheel.readthedocs.io/en/stable/changelog/
       # for a list of versions
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.15.0
+        uses: pypa/cibuildwheel@v3.1.4
         env:
+          CIBW_MANYLINUX_AARCH64_IMAGE: quay.io/pypa/${{ matrix.manylinux }}_aarch64
           CIBW_BUILD: "${{ matrix.python-version}}-* "
           CIBW_SKIP: "cp27-* cp35-* cp36-* *-win32 pp* *-musllinux* *-manylinux_i686"
           CIBW_BUILD_VERBOSITY: 3
@@ -48,9 +44,11 @@ jobs:
         shell: bash
         run: |
           ls -lh ./wheelhouse/
+          unzip -l ./wheelhouse/*.whl
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
+          name: wheel-${{ matrix.python-version }}
           path: ./wheelhouse/*.whl
 
       - name: Publish wheels to PyPI
@@ -59,6 +57,6 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install wheel twine setuptools
+          python3 -m pip install wheel twine==5.0.0 setuptools
 
           twine upload ./wheelhouse/*.whl

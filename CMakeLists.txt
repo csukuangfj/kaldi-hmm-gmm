@@ -1,3 +1,6 @@
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "4.0.0")
+  set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+endif()
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 project(kaldi-hmm-gmm)
 
@@ -9,7 +12,7 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
   cmake_policy(SET CMP0135 NEW)
 endif()
 
-set(KHG_VERSION "1.1.2")
+set(KHG_VERSION "1.1.4")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
@@ -35,7 +38,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
-set(CMAKE_CXX_STANDARD 14 CACHE STRING "The C++ version to be used.")
+set(CMAKE_CXX_STANDARD 17 CACHE STRING "The C++ version to be used.")
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -72,6 +75,5 @@ if(KHG_ENABLE_TESTS)
   enable_testing()
   include(googletest)
 endif()
-
 
 add_subdirectory(kaldi-hmm-gmm)

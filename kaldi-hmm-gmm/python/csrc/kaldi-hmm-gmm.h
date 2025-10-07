@@ -5,7 +5,11 @@
 #ifndef KALDI_HMM_GMM_PYTHON_CSRC_KALDI_HMM_GMM_H_
 #define KALDI_HMM_GMM_PYTHON_CSRC_KALDI_HMM_GMM_H_
 
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+
 #include "pybind11/eigen.h"
+#include "pybind11/functional.h"
+#include "pybind11/numpy.h"
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
