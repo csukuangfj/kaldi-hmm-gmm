@@ -837,14 +837,14 @@ class TestDiagGmm(unittest.TestCase):
 
         assert diag_gmm2.valid_gconsts is True
         assert torch.allclose(
-            torch.from_numpy(diag_gmm2.weights), torch.from_numpy(diag_gmm2.weights)
+            torch.from_numpy(diag_gmm.weights), torch.from_numpy(diag_gmm2.weights)
         )
         assert torch.allclose(
-            torch.from_numpy(diag_gmm2.means_invvars),
+            torch.from_numpy(diag_gmm.means_invvars),
             torch.from_numpy(diag_gmm2.means_invvars),
         )
         assert torch.allclose(
-            torch.from_numpy(diag_gmm2.inv_vars), torch.from_numpy(diag_gmm2.inv_vars)
+            torch.from_numpy(diag_gmm.inv_vars), torch.from_numpy(diag_gmm2.inv_vars)
         )
 
 

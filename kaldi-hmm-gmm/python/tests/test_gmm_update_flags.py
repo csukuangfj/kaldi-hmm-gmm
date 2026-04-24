@@ -31,12 +31,12 @@ class TestGmmUpdateFlags(unittest.TestCase):
         assert khg.gmm_flags_to_str(all) == "mvwt", khg.gmm_flags_to_str(all)
 
     def test2(self):
-        khg.str_to_gmm_flags("m") == khg.GmmUpdateFlags.kGmmMeans
-        khg.str_to_gmm_flags("v") == khg.GmmUpdateFlags.kGmmVariances
-        khg.str_to_gmm_flags("w") == khg.GmmUpdateFlags.kGmmWeights
-        khg.str_to_gmm_flags("t") == khg.GmmUpdateFlags.kGmmTransitions
-        khg.str_to_gmm_flags("mvwt") == khg.GmmUpdateFlags.kGmmAll
-        khg.str_to_gmm_flags("a") == khg.GmmUpdateFlags.kGmmAll
+        assert khg.str_to_gmm_flags("m") == khg.GmmUpdateFlags.kGmmMeans
+        assert khg.str_to_gmm_flags("v") == khg.GmmUpdateFlags.kGmmVariances
+        assert khg.str_to_gmm_flags("w") == khg.GmmUpdateFlags.kGmmWeights
+        assert khg.str_to_gmm_flags("t") == khg.GmmUpdateFlags.kGmmTransitions
+        assert khg.str_to_gmm_flags("mvwt") == khg.GmmUpdateFlags.kGmmAll
+        assert khg.str_to_gmm_flags("a") == khg.GmmUpdateFlags.kGmmAll
 
 
 if __name__ == "__main__":

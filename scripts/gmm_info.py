@@ -22,7 +22,7 @@ def gmm_info(
     ans["number_of_pdfs"] = transition_model.num_pdfs
     ans["number_of_transition_ids"] = transition_model.num_transition_ids
     ans["number_of_transition_states"] = transition_model.num_transition_states
-    ans["feature_dimensition"] = am_gmm.dim
+    ans["feature_dimension"] = am_gmm.dim
     ans["number_of_gaussians"] = am_gmm.num_gauss
 
     return ans

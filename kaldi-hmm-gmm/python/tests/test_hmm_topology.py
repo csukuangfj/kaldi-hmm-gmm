@@ -57,23 +57,23 @@ class TestHmmTopology(unittest.TestCase):
         # phone_topo[0] is for state 0
         assert phone_topo[0].forward_pdf_class == 0, phone_topo[0].forward_pdf_class
         assert phone_topo[0].self_loop_pdf_class == 0, phone_topo[0].self_loop_pdf_class
-        phone_topo[0].transitions[0][0] == 0  # dst state, self loop
-        phone_topo[0].transitions[0][1] == 0.5  # transitions prob
+        assert phone_topo[0].transitions[0][0] == 0  # dst state, self loop
+        assert phone_topo[0].transitions[0][1] == 0.5  # transitions prob
 
-        phone_topo[0].transitions[1][0] == 1  # dst state, foward
-        phone_topo[0].transitions[1][1] == 0.5  # transtions prob
+        assert phone_topo[0].transitions[1][0] == 1  # dst state, forward
+        assert phone_topo[0].transitions[1][1] == 0.5  # transitions prob
 
-        phone_topo[1].transitions[0][0] == 1  # dst state, self loop
-        phone_topo[1].transitions[0][1] == 0.5  # transtions prob
+        assert phone_topo[1].transitions[0][0] == 1  # dst state, self loop
+        assert phone_topo[1].transitions[0][1] == 0.5  # transitions prob
 
-        phone_topo[1].transitions[1][0] == 2  # dst state, forward
-        phone_topo[1].transitions[1][1] == 0.5  # transtions prob
+        assert phone_topo[1].transitions[1][0] == 2  # dst state, forward
+        assert phone_topo[1].transitions[1][1] == 0.5  # transitions prob
 
-        phone_topo[2].transitions[0][0] == 3  # dst state, self loop
-        phone_topo[2].transitions[0][1] == 0.5  # transtions prob
+        assert phone_topo[2].transitions[0][0] == 2  # dst state, self loop
+        assert phone_topo[2].transitions[0][1] == 0.5  # transitions prob
 
-        phone_topo[2].transitions[0][0] == 4  # dst state, forward
-        phone_topo[2].transitions[0][1] == 0.5  # transtions prob
+        assert phone_topo[2].transitions[1][0] == 3  # dst state, forward
+        assert phone_topo[2].transitions[1][1] == 0.5  # transitions prob
 
         assert topo.num_pdf_classes(phone=1) == 3, topo.num_pdf_classes(phone=1)
 
