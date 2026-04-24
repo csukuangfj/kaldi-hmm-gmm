@@ -34,8 +34,8 @@ class TestAmDiagGmm(unittest.TestCase):
         am.add_pdf(diag_gmm)
         assert am.num_pdfs == 2
         assert am.num_gauss == nmix * 2
-        am.num_gauss_in_pdf(0) == nmix
-        am.num_gauss_in_pdf(1) == nmix
+        assert am.num_gauss_in_pdf(0) == nmix
+        assert am.num_gauss_in_pdf(1) == nmix
 
         am.split_pdf(pdf_idx=1, target_components=nmix * 5, perturb_factor=0.01)
         assert am.num_gauss_in_pdf(1) == nmix * 5

@@ -22,11 +22,11 @@ class ClusterKMeansOptions(object):
         refine_cfg: RefineClustersOptions,
         num_iters: int = 20,
         num_tries: int = 2,
-        verbose: bool = true,
+        verbose: bool = True,
     ) -> None:
         self.impl = _khg.ClusterKMeansOptions(
             refine_cfg=refine_cfg.impl,
-            num_iters=num_iter,
+            num_iters=num_iters,
             num_tries=num_tries,
             verbose=verbose,
         )

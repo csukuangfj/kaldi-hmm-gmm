@@ -57,9 +57,9 @@ def draw_hmm_topology(hmm: _kaldi_hmm_gmm.HmmTopology, phone: int) -> "Digraph":
     for src_state, hmm_state in enumerate(topo):
         for dst_state, prob in hmm_state.transitions:
             if src_state == dst_state:
-                pdf_class = hmm_state.forward_pdf_class
-            else:
                 pdf_class = hmm_state.self_loop_pdf_class
+            else:
+                pdf_class = hmm_state.forward_pdf_class
 
             dot.edge(str(src_state), str(dst_state), label=f"{pdf_class}/{prob}")
     return dot
