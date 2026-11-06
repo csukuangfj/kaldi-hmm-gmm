@@ -19,7 +19,6 @@ except ImportError as e:
     ) from e
 
 import numpy as np
-import torch
 
 try:
     import kaldi_native_fbank as knf
@@ -31,7 +30,7 @@ except ImportError as e:
     ) from e
 
 
-def load_feats(rspecifier: str) -> Dict[str, torch.Tensor]:
+def load_feats(rspecifier: str) -> Dict[str, np.ndarray]:
     """Load features for all utterances.
 
     Args:
@@ -42,21 +41,21 @@ def load_feats(rspecifier: str) -> Dict[str, torch.Tensor]:
       A dict mapping utterance id to a 2-D float32 tensor of shape
       (num_frames, feat_dim).
     """
-    ans: Dict[str, torch.Tensor] = {}
+    ans: Dict[str, np.ndarray] = {}
     with kaldi_native_io.SequentialFloatMatrixReader(rspecifier) as reader:
         for utt, feats in reader:
             # `feats` is a numpy float32 array
-            ans[utt] = torch.from_numpy(feats.copy())
+            ans[utt] = feats.copy()
     return ans
 
 
-def load_feat(rspecifier: str, utt: str) -> torch.Tensor:
+def load_feat(rspecifier: str, utt: str) -> np.ndarray:
     """Load features for a single utterance."""
     with kaldi_native_io.RandomAccessFloatMatrixReader(rspecifier) as reader:
         if utt not in reader:
             raise KeyError(f"{utt} not found in {rspecifier}")
         feats = reader[utt]
-    return torch.from_numpy(feats.copy())
+    return feats.copy()
 
 
 def load_text(path: str) -> Dict[str, List[str]]:
@@ -75,7 +74,7 @@ def load_text(path: str) -> Dict[str, List[str]]:
     return ans
 
 
-def load_delta_feats(feats_scp: str, cmvn_scp: str = "") -> Dict[str, torch.Tensor]:
+def load_delta_feats(feats_scp: str, cmvn_scp: str = "") -> Dict[str, np.ndarray]:
     """kaldi's use-time feature pipe (train_mono.sh's `feats` variable):
 
       apply-cmvn --utt2spk=... cmvn.scp feats.scp | add-deltas
@@ -93,13 +92,13 @@ def load_delta_feats(feats_scp: str, cmvn_scp: str = "") -> Dict[str, torch.Tens
         cmvn_scp = str(_Path(feats_scp).parent / "cmvn.scp")
     raw = load_feats(f"scp:{feats_scp}")
     cmvn = load_feats(f"scp:{cmvn_scp}")
-    stats = next(iter(cmvn.values())).numpy().astype(np.float64)
+    stats = next(iter(cmvn.values())).astype(np.float64)
     cmvn_opts = knf.CmvnOptions()
     delta_opts = knf.DeltaOptions(order=2, window=2)
-    out: Dict[str, torch.Tensor] = {}
+    out: Dict[str, np.ndarray] = {}
     for utt, x in raw.items():
-        f = x.numpy().astype(np.float32)
+        f = x.astype(np.float32)
         f = knf.apply_cmvn(stats, cmvn_opts, f)
         f = knf.compute_deltas(delta_opts, f)
-        out[utt] = torch.from_numpy(np.ascontiguousarray(f))
+        out[utt] = np.ascontiguousarray(f)
     return out

@@ -54,7 +54,7 @@ static void RandGauss2Local(float *a, float *b) {
   float u1 = RandUniform();
   float u2 = RandUniform();
   u1 = sqrtf(-2.0f * logf(u1));
-  u2 = 2.0f * M_PI * u2;
+  u2 = 2.0f * kPi * u2;
   *a = u1 * cosf(u2);
   *b = u1 * sinf(u2);
 }

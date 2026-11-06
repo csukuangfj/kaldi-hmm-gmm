@@ -7,7 +7,6 @@ import unittest
 
 import kaldi_hmm_gmm as khg
 import numpy as np
-import torch
 
 
 def get_hmm_topo():
@@ -130,7 +129,7 @@ class TestTransitionModel(unittest.TestCase):
             stats.shape[0],
             transition_model.num_transition_ids + 1,
         )
-        assert torch.from_numpy(stats).abs().sum().item() == 0, stats
+        assert np.abs(np.asarray(stats)).sum().item() == 0, stats
 
         stats = transition_model.accumulate(prob=0.25, trans_id=1, stats=stats)
         assert stats[1].item() == 0.25, stats[1]
@@ -161,10 +160,11 @@ class TestTransitionModel(unittest.TestCase):
         )
         assert transition_model.num_pdfs == transition_model2.num_pdfs
 
-        torch.save(transition_model, "transition_model.pt")
-        # torch>=2.6 defaults to weights_only=True, which cannot unpickle
+        with open("transition_model.pkl", "wb") as f:
+            pickle.dump(transition_model, f)
         # our pybind11 objects; this is a trusted local file.
-        transition_model3 = torch.load("transition_model.pt", weights_only=False)
+        with open("transition_model.pkl", "rb") as f:
+            transition_model3 = pickle.load(f)
 
         assert isinstance(transition_model3, khg.TransitionModel)
 

@@ -38,7 +38,7 @@ TEST(Randn, MatchesKaldiRandGauss2Formula) {
   srand(7);
   float u1 = (Rand() + 1.0f) / (RAND_MAX + 2.0f);
   float u2 = (Rand() + 1.0f) / (RAND_MAX + 2.0f);
-  float expect = sqrtf(-2.0f * logf(u1)) * cosf(2.0f * M_PI * u2);
+  float expect = sqrtf(-2.0f * logf(u1)) * cosf(2.0f * kPi * u2);
   EXPECT_FLOAT_EQ(got, expect);
 
   // shifted/scaled form

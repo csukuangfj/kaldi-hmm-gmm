@@ -17,7 +17,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
 import kaldi_hmm_gmm as khg  # noqa: E402
 import kaldifst  # noqa: E402
 import kaldi_native_io  # noqa: E402
-import torch  # noqa: E402
 
 from align import gmm_align_compiled  # noqa: E402
 from read_feats import load_delta_feats, load_feats, load_text  # noqa: E402
@@ -61,7 +60,7 @@ def main():
         f"ark,scp:{feats_ark},/tmp/parity_align_feats.scp"
     ) as w:
         for u in utts:
-            w.write(u, feats[u].numpy())
+            w.write(u, feats[u])
 
     # kaldi: gmm-align-compiled
     ali_out = "/tmp/parity_align_kaldi.ali"

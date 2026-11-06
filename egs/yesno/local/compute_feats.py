@@ -100,19 +100,22 @@ def compute_part(part, data_dir, out_mfcc_dir, log_dir):
     with kaldi_native_io.FloatMatrixWriter(f"ark,scp:{cmvn_ark},{cmvn_scp}") as w:
         w.write("global", acc.stats.astype(np.float32))
 
-    (data_dir / "feats.scp").write_text(
-        "".join(f"{u} {raw_ark.resolve()}:{o}\n" for u, o in _offsets(raw_scp)))
-    (data_dir / "cmvn.scp").write_text(cmvn_scp.read_text())
-    (data_dir / "utt2num_frames").write_text(
-        "".join(f"{u} {len(x)}\n" for u, x in zip(utts, feats)))
-    (data_dir / "utt2dur").write_text(
-        "".join(f"{u} {len(x) * 0.01:.4f}\n" for u, x in zip(utts, feats)))
+    with open(data_dir / "feats.scp", "w", encoding="utf-8", newline="\n") as f:
+        f.write("".join(f"{u} {raw_ark.resolve()}:{o}\n" for u, o in _offsets(raw_scp)))
+    with open(data_dir / "cmvn.scp", "w", encoding="utf-8", newline="\n") as f:
+        f.write(cmvn_scp.read_text())
+    with open(data_dir / "utt2num_frames", "w", encoding="utf-8", newline="\n") as f:
+        f.write("".join(f"{u} {len(x)}\n" for u, x in zip(utts, feats)))
+    with open(data_dir / "utt2dur", "w", encoding="utf-8", newline="\n") as f:
+        f.write("".join(f"{u} {len(x) * 0.01:.4f}\n" for u, x in zip(utts, feats)))
     conf = data_dir / "conf"
     conf.mkdir(exist_ok=True)
-    (conf / "mfcc.conf").write_text(
-        "--use-energy=false   # only non-default option.\n"
-        "--sample-frequency=8000 #  Switchboard is sampled at 8kHz\n")
-    (data_dir / "frame_shift").write_text("10\n")
+    with open(conf / "mfcc.conf", "w", encoding="utf-8", newline="\n") as f:
+        f.write(
+            "--use-energy=false   # only non-default option.\n"
+            "--sample-frequency=8000 #  Switchboard is sampled at 8kHz\n")
+    with open(data_dir / "frame_shift", "w", encoding="utf-8", newline="\n") as f:
+        f.write("10\n")
 
     # kaldi's utils/split_data.sh (nj=1) + utils/fix_data_dir.sh artifacts
     import shutil
@@ -137,10 +140,13 @@ def compute_part(part, data_dir, out_mfcc_dir, log_dir):
     print(f"fix_data_dir.sh: old files are kept in data/{part}/.backup")
 
     log_dir.mkdir(parents=True, exist_ok=True)
-    (log_dir / f"make_mfcc_{part}.1.log").write_text(
-        f"# compute-mfcc-feats --config=conf/mfcc.conf scp:data/{part}_yesno/wav.scp\n"
-        f"# (kaldi-native-fbank equivalent; wrote {raw_ark})\n"
-        f"Processed {len(utts)} utterances\n")
+    with open(
+        log_dir / f"make_mfcc_{part}.1.log", "w", encoding="utf-8", newline="\n"
+    ) as f:
+        f.write(
+            f"# compute-mfcc-feats --config=conf/mfcc.conf scp:data/{part}_yesno/wav.scp\n"
+            f"# (kaldi-native-fbank equivalent; wrote {raw_ark})\n"
+            f"Processed {len(utts)} utterances\n")
 
 
 def _offsets(scp_path):

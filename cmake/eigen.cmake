@@ -29,19 +29,16 @@ function(download_eigen)
   set(EIGEN_BUILD_DOC OFF CACHE BOOL "" FORCE)
 
   FetchContent_Declare(eigen
+    EXCLUDE_FROM_ALL
     URL               ${eigen_URL}
     URL_HASH          ${eigen_HASH}
   )
 
-  FetchContent_GetProperties(eigen)
-  if(NOT eigen_POPULATED)
     message(STATUS "Downloading eigen from ${eigen_URL}")
-    FetchContent_Populate(eigen)
-  endif()
+  FetchContent_MakeAvailable(eigen)
   message(STATUS "eigen is downloaded to ${eigen_SOURCE_DIR}")
   message(STATUS "eigen's binary dir is ${eigen_BINARY_DIR}")
 
-  add_subdirectory(${eigen_SOURCE_DIR} ${eigen_BINARY_DIR} EXCLUDE_FROM_ALL)
 endfunction()
 
 download_eigen()

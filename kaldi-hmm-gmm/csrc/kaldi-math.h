@@ -34,6 +34,9 @@ namespace khg {
 static const double kMinLogDiffDouble = std::log(DBL_EPSILON);  // negative!
 static const float kMinLogDiffFloat = std::log(FLT_EPSILON);    // negative!
 
+// 3.14159... (M_PI is not available with MSVC unless _USE_MATH_DEFINES)
+constexpr double kPi = 3.14159265358979323846;
+
 #if !defined(_MSC_VER) || (_MSC_VER >= 1700)
 inline double Log1p(double x) { return std::log1p(x); }
 inline float Log1p(float x) { return std::log1pf(x); }

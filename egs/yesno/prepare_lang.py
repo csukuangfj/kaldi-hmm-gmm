@@ -48,13 +48,13 @@ def get_lexicon() -> Lexicon:
 
 
 def write_sym_table(path: str, sym2id):
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
         for s, i in sym2id.items():
             f.write(f"{s} {i}\n")
 
 
 def write_list(path: str, items):
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
         for x in items:
             f.write(f"{x}\n")
 
@@ -197,13 +197,13 @@ def main():
     word2id = lexiconp_disambig.word2id
 
     # lexicon files
-    with open(dict_dir / "lexicon.txt", "w", encoding="utf-8") as f:
+    with open(dict_dir / "lexicon.txt", "w", encoding="utf-8", newline="\n") as f:
         for word, phones in lexicon:
             f.write(f"{word} {phones}\n")
-    with open(dict_dir / "lexiconp.txt", "w", encoding="utf-8") as f:
+    with open(dict_dir / "lexiconp.txt", "w", encoding="utf-8", newline="\n") as f:
         for word, prob, phones in lexiconp:
             f.write(f"{word} {prob} {phones}\n")
-    with open(dict_dir / "lexiconp_disambig.txt", "w", encoding="utf-8") as f:
+    with open(dict_dir / "lexiconp_disambig.txt", "w", encoding="utf-8", newline="\n") as f:
         for word, prob, phones in lexiconp_disambig:
             f.write(f"{word} {prob} {phones}\n")
 
@@ -223,40 +223,43 @@ def main():
     ):
         write_list(phones_dir / f"{name}.txt", phones)
         write_list(phones_dir / f"{name}.int", [phone2id[p] for p in phones])
-        with open(phones_dir / f"{name}.csl", "w", encoding="utf-8") as f:
+        with open(phones_dir / f"{name}.csl", "w", encoding="utf-8", newline="\n") as f:
             f.write(" ".join(str(phone2id[p]) for p in phones) + "\n")
     write_list(phones_dir / "optional_silence.txt", [sil_phone])
     write_list(phones_dir / "optional_silence.int", [phone2id[sil_phone]])
-    with open(phones_dir / "optional_silence.csl", "w", encoding="utf-8") as f:
+    with open(phones_dir / "optional_silence.csl", "w", encoding="utf-8", newline="\n") as f:
         f.write(f"{phone2id[sil_phone]}\n")
     # kaldi phone-set order: silence set first
     sets_int = [[sil_phone]] + [[p] for p in nonsil]
-    with open(phones_dir / "sets.txt", "w", encoding="utf-8") as f:
+    with open(phones_dir / "sets.txt", "w", encoding="utf-8", newline="\n") as f:
         for s in sets_int:
             f.write(" ".join(s) + "\n")
-    with open(phones_dir / "sets.int", "w", encoding="utf-8") as f:
+    with open(phones_dir / "sets.int", "w", encoding="utf-8", newline="\n") as f:
         for s in sets_int:
             f.write(" ".join(str(phone2id[p]) for p in s) + "\n")
     # kaldi's roots.txt ("shared split ..." per set)
-    with open(phones_dir / "roots.txt", "w", encoding="utf-8") as f:
+    with open(phones_dir / "roots.txt", "w", encoding="utf-8", newline="\n") as f:
         for s in sets_int:
             f.write("shared split " + " ".join(s) + "\n")
-    with open(phones_dir / "roots.int", "w", encoding="utf-8") as f:
+    with open(phones_dir / "roots.int", "w", encoding="utf-8", newline="\n") as f:
         for s in sets_int:
             f.write("shared split " + " ".join(str(phone2id[p]) for p in s) + "\n")
     # context_indep = silence phones; extra_questions empty (kaldi defaults)
     write_list(phones_dir / "context_indep.txt", [sil_phone])
     write_list(phones_dir / "context_indep.int", [phone2id[sil_phone]])
-    with open(phones_dir / "context_indep.csl", "w", encoding="utf-8") as f:
+    with open(phones_dir / "context_indep.csl", "w", encoding="utf-8", newline="\n") as f:
         f.write(f"{phone2id[sil_phone]}\n")
     for name in ("extra_questions",):
         write_list(phones_dir / f"{name}.txt", [])
         write_list(phones_dir / f"{name}.int", [])
-        (phones_dir / f"{name}.csl").write_text("\n")
+        with open(phones_dir / f"{name}.csl", "w", encoding="utf-8", newline="\n") as f:
+            f.write("\n")
     # word-level disambiguation symbols (fstaddselfloops inputs in kaldi)
     write_list(phones_dir / "wdisambig.txt", ["#0"])
-    (phones_dir / "wdisambig_phones.int").write_text(f"{phone2id['#0']}\n")
-    (phones_dir / "wdisambig_words.int").write_text(f"{word2id['#0']}\n")
+    with open(phones_dir / "wdisambig_phones.int", "w", encoding="utf-8", newline="\n") as f:
+        f.write(f"{phone2id['#0']}\n")
+    with open(phones_dir / "wdisambig_words.int", "w", encoding="utf-8", newline="\n") as f:
+        f.write(f"{word2id['#0']}\n")
 
     # topo
     topo = generate_hmm_topo(
@@ -265,7 +268,8 @@ def main():
         num_non_sil_states=args.num_nonsil_states,
         num_sil_states=args.num_sil_states,
     )
-    (lang_dir / "topo").write_text(str(topo), encoding="utf-8")
+    with open(lang_dir / "topo", "w", encoding="utf-8", newline="\n") as f:
+        f.write(str(topo))
 
     # L.fst / L_disambig.fst (kaldi: L.fst for training, L_disambig for mkgraph;
     # for this lexicon they only differ in disambig symbols, which are empty

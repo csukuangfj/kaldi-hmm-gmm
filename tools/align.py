@@ -7,7 +7,7 @@ from typing import Any, Dict
 
 import kaldi_hmm_gmm as khg
 import kaldifst
-import torch
+import numpy as np
 
 
 def gmm_align_compiled(
@@ -15,7 +15,7 @@ def gmm_align_compiled(
     transition_model: khg.TransitionModel,
     utt: str,
     fst: kaldifst.StdVectorFst,
-    feats: torch.Tensor,
+    feats: np.ndarray,
     align_config: khg.AlignConfig,
     acoustic_scale: float = 1.0,
     transition_scale: float = 1.0,

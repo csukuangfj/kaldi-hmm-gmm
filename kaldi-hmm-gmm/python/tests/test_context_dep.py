@@ -7,7 +7,13 @@ import pickle
 import unittest
 from typing import List, Tuple
 
-import graphviz
+try:
+    import graphviz  # noqa: F401
+    import shutil
+
+    _HAS_GRAPHVIZ = shutil.which("dot") is not None
+except ImportError:
+    _HAS_GRAPHVIZ = False
 import kaldi_hmm_gmm as khg
 
 
@@ -64,6 +70,7 @@ def get_hmm_topo():
     return topo
 
 
+@unittest.skipUnless(_HAS_GRAPHVIZ, "graphviz (with dot binary) not installed")
 class TestContextDep(unittest.TestCase):
     def test_monophone_context_dependency(self):
         topo = get_hmm_topo()

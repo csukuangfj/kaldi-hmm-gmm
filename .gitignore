@@ -32,3 +32,15 @@ train-err*.txt
 *.so
 *.dylib
 *.dll
+build-check/
+
+# yesno recipe: downloaded corpus + generated data
+egs/yesno/waves_yesno/
+egs/yesno/mfcc/
+egs/yesno/data/
+build-check/
+
+# yesno recipe: downloaded corpus + generated data
+egs/yesno/waves_yesno/
+egs/yesno/mfcc/
+egs/yesno/data/

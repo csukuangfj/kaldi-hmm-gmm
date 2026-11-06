@@ -25,7 +25,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
 import kaldi_hmm_gmm as khg  # noqa: E402
 import kaldifst  # noqa: E402
 import kaldi_native_io  # noqa: E402
-import torch  # noqa: E402
 
 from align import gmm_align_compiled  # noqa: E402
 from gmm import (  # noqa: E402
@@ -73,7 +72,7 @@ class Logger:
     """Writes both to stdout and to exp/mono0a/log/<name>.log (kaldi-style)."""
 
     def __init__(self, log_dir: Path, name: str):
-        self.f = open(log_dir / f"{name}.log", "w", encoding="utf-8")
+        self.f = open(log_dir / f"{name}.log", "w", encoding="utf-8", newline="\n")
 
     def log(self, msg: str):
         # stdout follows kaldi's train_mono.sh log (see the print() calls);
@@ -119,8 +118,8 @@ def write_fst_archive_gz(path: str, fsts: dict):
     Path(tmp).unlink()
 
 
-def write_occs(path: str, pdf_occs: torch.Tensor):
-    vec = kaldi_native_io.FloatVector(pdf_occs.numpy().copy())
+def write_occs(path: str, pdf_occs):
+    vec = kaldi_native_io.FloatVector(pdf_occs.copy())
     vec.write(path, True)
 
 
@@ -209,9 +208,11 @@ def main():
     ) as fout:
         fout.write(fin.read())
     (exp_dir / "fsts.1.ark").unlink()
-    (exp_dir / "num_jobs").write_text("1\n")
+    with open(exp_dir / "num_jobs", "w", encoding="utf-8", newline="\n") as f:
+        f.write("1\n")
     shutil.copy(Path(args.lang_dir) / "phones.txt", exp_dir / "phones.txt")
-    (exp_dir / "cmvn_opts").write_text("\n")
+    with open(exp_dir / "cmvn_opts", "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n")
 
     print("steps/train_mono.sh: Aligning data equally (pass 0)")
     # ---- align-equal + first update (stage -1..0) ----
@@ -286,7 +287,7 @@ def main():
         if x in REALIGN_ITERS:
             lg.log("Aligning data")
             print("steps/train_mono.sh: Aligning data")
-            with open(log_dir / f"align.{x}.log", "w", encoding="utf-8") as _lf3, \
+            with open(log_dir / f"align.{x}.log", "w", encoding="utf-8", newline="\n") as _lf3, \
                     contextlib.redirect_stdout(_lf3):
                 boosted = gmm_boost_silence(
                     am_gmm=am,
@@ -337,7 +338,7 @@ def main():
         lg.log(f"average log_like: {tot_log_like/len(utts)}")
 
         gmm_opts = khg.MleDiagGmmOptions()  # min_gaussian_occupancy=10 default
-        with open(log_dir / f"update.{x}.log", "w", encoding="utf-8") as _lf2, \
+        with open(log_dir / f"update.{x}.log", "w", encoding="utf-8", newline="\n") as _lf2, \
                 contextlib.redirect_stdout(_lf2):
           pdf_occs = gmm_est(
             am_gmm=am,

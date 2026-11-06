@@ -49,18 +49,17 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: ccache
+        if: runner.os != 'Windows'
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ matrix.name }}
+
       - name: Install Python dependencies
         shell: bash
         run: |
           python3 -m pip install -U pip
-          python3 -m pip install numpy kaldifst kaldi_native_io kaldi-native-fbank kaldialign kaldilm
-          # PyPI has no windows-arm64 torch wheels; torch 2.10.0+cpu is on the
-          # pytorch wheel index (same approach as kaldi-native-fbank's CI).
-          if [[ "${{ runner.os }}" == "Windows" && "${{ runner.arch }}" == "ARM64" ]]; then
-            python3 -m pip install "torch==2.10.0+cpu" --find-links https://download.pytorch.org/whl/torch
-          else
-            python3 -m pip install torch
-          fi
+          python3 -m pip install -r requirements.txt
 
       - name: Configure
         shell: bash
@@ -68,9 +67,13 @@ jobs:
           mkdir build
           cd build
           if [[ "${{ runner.os }}" == "Windows" ]]; then
-            cmake -DCMAKE_BUILD_TYPE=Release ${{ matrix.cmake-args }} ..
+            cmake -DCMAKE_BUILD_TYPE=Release \
+              -DPYTHON_EXECUTABLE=$(command -v python3 || command -v python) ..
           else
-            cmake -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=$(which python3) ..
+            cmake -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+              -DPYTHON_EXECUTABLE=$(command -v python3 || command -v python) ..
           fi
 
       - name: Build
@@ -78,6 +81,17 @@ jobs:
         run: |
           cd build
           cmake --build . --config Release -j 2
+
+      - name: Install graphviz
+        shell: bash
+        run: |
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
+            sudo apt-get update && sudo apt-get install -y graphviz
+          elif [[ "${{ runner.os }}" == "macOS" ]]; then
+            brew install graphviz
+          else
+            choco install graphviz -y
+          fi
 
       - name: Run C++ and Python tests
         shell: bash

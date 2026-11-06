@@ -6,7 +6,7 @@
 
 import unittest
 
-import torch
+import numpy as np
 
 import kaldi_hmm_gmm as khg
 
@@ -61,33 +61,33 @@ class TestInitGmmMono(unittest.TestCase):
 
         gmm = khg.DiagGmm(nmix=1, dim=dim)
 
-        features = torch.rand(100, dim, dtype=torch.float32)
+        features = np.random.rand(100, dim).astype(np.float32)
 
-        glob_inv_var = 1.0 / features.var(dim=0)
+        glob_inv_var = 1.0 / features.var(axis=0)
         assert glob_inv_var.shape == (dim,)
 
-        glob_mean = features.mean(dim=0)
-        gmm.set_invvars_and_means(glob_inv_var.unsqueeze(0), glob_mean.unsqueeze(0))
+        glob_mean = features.mean(axis=0)
+        gmm.set_invvars_and_means(np.expand_dims(glob_inv_var, 0), np.expand_dims(glob_mean, 0))
 
-        weights = torch.tensor([1], dtype=torch.float32)
+        weights = np.asarray([1], dtype=np.float32)
         gmm.set_weights(weights)
         gmm.compute_gconsts()
         for i in range(num_pdfs):
             am_gmm.add_pdf(gmm)
 
         for i in range(1, num_pdfs):
-            assert torch.allclose(
-                torch.from_numpy(am_gmm.get_pdf(i).means),
-                torch.from_numpy(am_gmm.get_pdf(0).means),
+            assert np.allclose(
+                np.asarray(am_gmm.get_pdf(i).means),
+                np.asarray(am_gmm.get_pdf(0).means),
             )
 
         for i in range(num_pdfs):
             am_gmm.get_pdf(i).perturb(perturb_factor=0.01)
 
         for i in range(1, num_pdfs):
-            assert not torch.allclose(
-                torch.from_numpy(am_gmm.get_pdf(i).means),
-                torch.from_numpy(am_gmm.get_pdf(0).means),
+            assert not np.allclose(
+                np.asarray(am_gmm.get_pdf(i).means),
+                np.asarray(am_gmm.get_pdf(0).means),
             )
 
         trans_model = khg.TransitionModel(ctx_dep, hmm_topo)
@@ -111,5 +111,5 @@ class TestInitGmmMono(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    torch.manual_seed(20230416)
+    np.random.seed(20230416)
     unittest.main()

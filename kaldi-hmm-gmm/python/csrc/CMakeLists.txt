@@ -34,6 +34,15 @@ set_target_properties(_kaldi_hmm_gmm PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../kaldi_hmm_gmm/lib"
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../kaldi_hmm_gmm/lib"
 )
+# multi-config generators (MSVC) append /<Config> to the output dirs above;
+# pin them so the module always lands in kaldi_hmm_gmm/lib/.
+foreach(cfg IN ITEMS DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+  string(TOUPPER "${cfg}" CFG)
+  set_target_properties(_kaldi_hmm_gmm PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY_${CFG} "${CMAKE_CURRENT_SOURCE_DIR}/../kaldi_hmm_gmm/lib"
+    RUNTIME_OUTPUT_DIRECTORY_${CFG} "${CMAKE_CURRENT_SOURCE_DIR}/../kaldi_hmm_gmm/lib"
+  )
+endforeach()
 
 target_link_libraries(_kaldi_hmm_gmm PRIVATE kaldi-hmm-gmm-core)
 

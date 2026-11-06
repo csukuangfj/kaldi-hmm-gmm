@@ -128,17 +128,21 @@ def main():
             f"%WER {wer:.2f} [ {S + D + I} / {N}, {I} in, {D} del, {S} sub ] "
             f"{out_dir}/wer_{int(lmwt)}_{wip}"
         )
-        (out_dir / f"wer_{int(lmwt)}_{wip}").write_text(line + "\n", encoding="utf-8")
+        with open(
+            out_dir / f"wer_{int(lmwt)}_{wip}", "w", encoding="utf-8", newline="\n"
+        ) as f:
+            f.write(line + "\n")
         if best is None or wer < best[0]:
             best = (wer, wip, lmwt, S, D, I, N, hyps)
 
     wer, wip, lmwt, S, D, I, N, hyps = best
-    with open(out_dir / "text", "w", encoding="utf-8") as f:
+    with open(out_dir / "text", "w", encoding="utf-8", newline="\n") as f:
         for utt, hyp in hyps.items():
             f.write(f"{utt} {' '.join(hyp)}\n")
     line = (f"%WER {wer:.2f} [ {S + D + I} / {N}, {I} in , {D} del, {S} sub ] "
             f"{out_dir}/wer_{int(lmwt)}_{wip}")
-    (out_dir / "wer").write_text(line + "\n", encoding="utf-8")
+    with open(out_dir / "wer", "w", encoding="utf-8", newline="\n") as f:
+        f.write(line + "\n")
     print(line)
 
 

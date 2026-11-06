@@ -38,7 +38,6 @@ jobs:
       matrix:
         os: [macos-latest]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        torch: ["2.3.1"]
 
     steps:
       - uses: actions/checkout@v4
@@ -63,9 +62,8 @@ jobs:
         run: |
           python3 -m pip install -U pip graphviz
 
-          python3 -m pip install torch==${{ matrix.torch }} numpy -f https://download.pytorch.org/whl/cpu/torch
+          python3 -m pip install -r requirements.txt
 
-          python3 -m torch.utils.collect_env
 
       - name: Configure CMake
         shell: bash

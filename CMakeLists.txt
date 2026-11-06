@@ -7,7 +7,18 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 if(POLICY CMP0077)
   cmake_policy(SET CMP0077 NEW)
 endif()
+# kaldifst.cmake calls FetchContent_Populate directly (it must set
+# CMAKE_MODULE_PATH between populate and add_subdirectory); allow it
+# without the CMP0169 deprecation warning.
+if(POLICY CMP0169)
+  cmake_policy(SET CMP0169 OLD)
+endif()
 project(kaldi-hmm-gmm)
+
+# Dependency builds (eigen/googletest/kaldi_native_io) still use old
+# cmake_minimum_required / cmake_policy forms; silence their deprecation
+# warnings like kaldi-native-io.cmake does locally.
+set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 
 # Disable warning about
 #
@@ -59,6 +70,12 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(BUILD_SHARED_LIBS AND MSVC)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
+if(MSVC)
+  # windows.h defines min/max macros that break std::min/std::max in the
+  # vendored headers (e.g. openfst's randgen.h).
+  add_compile_definitions(NOMINMAX)
 endif()
 
 if(NOT BUILD_SHARED_LIBS AND MSVC)

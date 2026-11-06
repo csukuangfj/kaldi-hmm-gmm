@@ -5,10 +5,20 @@
 import pickle
 import unittest
 
+try:
+    import graphviz  # noqa: F401
+    import shutil
+
+    # the tests render, so the graphviz "dot" binary must exist too
+    _HAS_GRAPHVIZ = shutil.which("dot") is not None
+except ImportError:
+    _HAS_GRAPHVIZ = False
+
 import kaldi_hmm_gmm as khg
 from hmm_topo_utils import draw_hmm_topology
 
 
+@unittest.skipUnless(_HAS_GRAPHVIZ, "graphviz (with dot binary) not installed")
 class TestHmmTopology(unittest.TestCase):
     def test_simple(self):
         s = """

@@ -3,7 +3,7 @@
 #
 #  ctest --verbose -R  test_constant_event_map_py
 import unittest
-import torch
+import numpy as np
 import kaldi_hmm_gmm as khg
 
 # An event is a list of pairs. Each pair has two integers.
@@ -60,5 +60,5 @@ class TestConstantEventMap(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    torch.manual_seed(20230522)
+    np.random.seed(20230522)
     unittest.main()

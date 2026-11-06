@@ -33,7 +33,6 @@ except ImportError as e:
     ) from e
 
 import numpy as np  # noqa: E402
-import torch  # noqa: E402
 import kaldi_hmm_gmm as khg  # noqa: E402
 import kaldifst  # noqa: E402
 
@@ -231,7 +230,8 @@ def build_textgrid(intervals, word_intervals, duration, out_path):
 
     add_tier(1, "phones", intervals)
     add_tier(2, "words", word_intervals)
-    Path(out_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
+    with open(out_path, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(lines) + "\n")
 
 
 def main():
@@ -377,7 +377,7 @@ def main():
         transition_model=tm,
         utt="utt",
         fst=graph,
-        feats=torch.from_numpy(feat),
+        feats=feat,
         align_config=cfg,
         acoustic_scale=1.0,
         transition_scale=1.0,

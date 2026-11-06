@@ -28,30 +28,20 @@ function(download_kaldi_native_io)
   set(KALDI_NATIVE_IO_BUILD_PYTHON OFF CACHE BOOL "" FORCE)
 
   FetchContent_Declare(kaldi_native_io
+    EXCLUDE_FROM_ALL
     URL
       ${kaldi_native_io_URL}
     URL_HASH          ${kaldi_native_io_HASH}
   )
-
-  FetchContent_GetProperties(kaldi_native_io)
-  if(NOT kaldi_native_io_POPULATED)
-    message(STATUS "Downloading kaldi_native_io from ${kaldi_native_io_URL}")
-    FetchContent_Populate(kaldi_native_io)
-  endif()
-  message(STATUS "kaldi_native_io is downloaded to ${kaldi_native_io_SOURCE_DIR}")
-  message(STATUS "kaldi_native_io's binary dir is ${kaldi_native_io_BINARY_DIR}")
 
   if(BUILD_SHARED_LIBS)
     set(_build_shared_libs_bak ${BUILD_SHARED_LIBS})
     set(BUILD_SHARED_LIBS OFF)
   endif()
 
-  set(_cmake_warn_deprecated_bak "${CMAKE_WARN_DEPRECATED}")
-  set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
-
-  add_subdirectory(${kaldi_native_io_SOURCE_DIR} ${kaldi_native_io_BINARY_DIR} EXCLUDE_FROM_ALL)
-
-  set(CMAKE_WARN_DEPRECATED "${_cmake_warn_deprecated_bak}" CACHE BOOL "" FORCE)
+  message(STATUS "Downloading kaldi_native_io from ${kaldi_native_io_URL}")
+  FetchContent_MakeAvailable(kaldi_native_io)
+  message(STATUS "kaldi_native_io is downloaded to ${kaldi_native_io_SOURCE_DIR}")
 
   if(_build_shared_libs_bak)
     set_target_properties(kaldi_native_io_core

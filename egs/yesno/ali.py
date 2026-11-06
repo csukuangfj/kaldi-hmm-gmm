@@ -88,7 +88,9 @@ def main():
     align_config.retry_beam = args.retry_beam
     align_config.careful = False
 
-    with contextlib.redirect_stdout(open(Path(args.exp_dir) / "log" / "ali_boost.log", "w")):
+    with contextlib.redirect_stdout(
+        open(Path(args.exp_dir) / "log" / "ali_boost.log", "w", newline="\n")
+    ):
         boosted = gmm_boost_silence(
         am_gmm=am,
         transition_model=tm,
@@ -140,7 +142,7 @@ def main():
         for utt, phones in all_phones.items():
             w.write(utt, phones)
 
-    with open(exp_dir / "ali_phones_sym.txt", "w", encoding="utf-8") as f:
+    with open(exp_dir / "ali_phones_sym.txt", "w", encoding="utf-8", newline="\n") as f:
         for utt, phones in all_phones_pf.items():
             syms = int2sym(phones, id2phone)
             f.write(f"{utt} {' '.join(syms)}\n")
@@ -150,7 +152,8 @@ def main():
         f"num_done={n_done} num_error={n_err} "
         f"tot_log_like={tot_like:.2f} avg_log_like={tot_like/max(n_done,1):.2f}\n"
     )
-    (exp_dir / "ali_stats.txt").write_text(stats, encoding="utf-8")
+    with open(exp_dir / "ali_stats.txt", "w", encoding="utf-8", newline="\n") as f:
+        f.write(stats)
 
     # head-style preview (as in todo.md)
     print(f"{exp_dir}/ali_phones.ark (first 5 lines):")

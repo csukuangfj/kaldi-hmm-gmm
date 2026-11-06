@@ -31,16 +31,14 @@ function(download_googltest)
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
   FetchContent_Declare(googletest
+    EXCLUDE_FROM_ALL
     URL
       ${googletest_URL}
     URL_HASH          ${googletest_HASH}
   )
 
-  FetchContent_GetProperties(googletest)
-  if(NOT googletest_POPULATED)
     message(STATUS "Downloading googletest from ${googletest_URL}")
-    FetchContent_Populate(googletest)
-  endif()
+  FetchContent_MakeAvailable(googletest)
   message(STATUS "googletest is downloaded to ${googletest_SOURCE_DIR}")
   message(STATUS "googletest's binary dir is ${googletest_BINARY_DIR}")
 
@@ -63,7 +61,6 @@ function(download_googltest)
   This warning is for project developers.  Use -Wno-dev to suppress it.
   ]==]
 
-  add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 
   target_include_directories(gtest
     INTERFACE

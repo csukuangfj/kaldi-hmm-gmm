@@ -57,9 +57,15 @@ for i, name in enumerate(entries, 1):
     if not name.endswith(".wav"):
         continue
     (train if i <= n / 2 else test).append(name)
-(local / "waves_all.list").write_text("\n".join(entries) + "\n")
-(local / "waves.train").write_text("\n".join(train) + "\n")
-(local / "waves.test").write_text("\n".join(test) + "\n")
+def wr(path, s):
+    # kaldi-style text artifacts must use LF on every platform (Windows
+    # text-mode writes would translate \n to \r\n)
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(s)
+
+wr(local / "waves_all.list", "\n".join(entries) + "\n")
+wr(local / "waves.train", "\n".join(train) + "\n")
+wr(local / "waves.test", "\n".join(test) + "\n")
 
 def utt_id(name):
     return name[: -len(".wav")]
@@ -71,15 +77,15 @@ for part, names in (("train", train), ("test", test)):
     u2s = Path(f"data/{part}_yesno")
     txt = "".join(f"{utt_id(x)} {transcript(utt_id(x))}\n" for x in names)
     scp = "".join(f"{utt_id(x)} {waves_dir / x}\n" for x in names)
-    (local / f"{part}_yesno.txt").write_text(txt)
-    (local / f"{part}_yesno_wav.scp").write_text(scp)
-    (u2s / "text").write_text(txt)
-    (u2s / "wav.scp").write_text(scp)
-    (u2s / "utt2spk").write_text("".join(f"{utt_id(x)} global\n" for x in names))
-    (u2s / "spk2utt").write_text("global " + " ".join(utt_id(x) for x in names) + "\n")
+    wr(local / f"{part}_yesno.txt", txt)
+    wr(local / f"{part}_yesno_wav.scp", scp)
+    wr(u2s / "text", txt)
+    wr(u2s / "wav.scp", scp)
+    wr(u2s / "utt2spk", "".join(f"{utt_id(x)} global\n" for x in names))
+    wr(u2s / "spk2utt", "global " + " ".join(utt_id(x) for x in names) + "\n")
     print(f"{part}: {len(names)} utterances in {u2s}")
 
-Path("data/local/lm_tg.arpa").write_text(Path("input/task.arpabo").read_text())
+wr(Path("data/local/lm_tg.arpa"), Path("input/task.arpabo").read_text())
 print("wrote data/local/lm_tg.arpa")
 PYEOF
 echo "$0: done."

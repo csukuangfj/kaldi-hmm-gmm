@@ -22,7 +22,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
 import kaldi_hmm_gmm as khg  # noqa: E402
 import kaldi_native_io  # noqa: E402
 import numpy as np  # noqa: E402
-import torch  # noqa: E402
 
 from gmm import gmm_acc_stats_ali, gmm_est  # noqa: E402
 from read_feats import load_delta_feats, load_feats  # noqa: E402
@@ -93,7 +92,7 @@ def run_ours(exp, feats_scp, ali, mixup):
     )
     out = f"/tmp/parity_gmm_ours_{mixup}.mdl"
     khg.write_model(out, tm, am, binary=True)
-    return out, occs.numpy()
+    return out, occs
 
 
 def model_arrays(path):

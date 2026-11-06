@@ -2,18 +2,30 @@ function(khg_add_py_test source)
   get_filename_component(name ${source} NAME_WE)
   set(name "${name}_py")
 
-  add_test(NAME ${name}
-    COMMAND
-      "${PYTHON_EXECUTABLE}"
-      "${CMAKE_CURRENT_SOURCE_DIR}/${source}"
-  )
-
   get_filename_component(khg_path ${CMAKE_CURRENT_LIST_DIR} DIRECTORY)
 
   # The extension module lives in ${khg_path}/kaldi_hmm_gmm/lib/ (built
   # there by the _kaldi_hmm_gmm target); helper modules live in tools/.
-  set_property(TEST ${name}
-    PROPERTY ENVIRONMENT "PYTHONPATH=${khg_path}:${khg_path}/../../tools:$ENV{PYTHONPATH}"
+  # PYTHONPATH entries are separated by ":" on posix and ";" on Windows.
+  # The ENVIRONMENT test property is a CMake list: a literal ";" in a value
+  # splits it into bogus entries, and $<SEMICOLON> does not help because
+  # ctest re-splits the property after evaluating the genex (so only the
+  # first entry would survive). Run the test through "cmake -E env" instead:
+  # it keeps the whole assignment as a single argument on all platforms.
+  if(WIN32)
+    set(_pathsep ";")
+  else()
+    set(_pathsep ":")
+  endif()
+  set(_pythonpath
+    "${khg_path}${_pathsep}${khg_path}/../../tools${_pathsep}$ENV{PYTHONPATH}"
+  )
+
+  add_test(NAME ${name}
+    COMMAND
+      "${CMAKE_COMMAND}" -E env "PYTHONPATH=${_pythonpath}"
+      "${PYTHON_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/${source}"
   )
 endfunction()
 

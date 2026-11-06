@@ -4,15 +4,15 @@
 # gmm-boost-silence and gmm-info.  Ported from this repo's scripts/gmm_*.py;
 # feature input is plain tensors (no lhotse).
 
+import numpy as np
 from typing import Dict, List, Optional, Tuple, Union
 
 import kaldi_hmm_gmm as khg
-import torch
 
 
 def _first_n_feats(
-    feats: Union[Dict[str, torch.Tensor], List[torch.Tensor]], n: int
-) -> List[torch.Tensor]:
+    feats: Union[Dict[str, np.ndarray], List[np.ndarray]], n: int
+) -> List[np.ndarray]:
     """First n utterances in order (mirrors kaldi's `subset-feats --n=...`)."""
     if isinstance(feats, dict):
         mats = list(feats.values())
@@ -23,7 +23,7 @@ def _first_n_feats(
 
 def gmm_init_mono(
     topo: khg.HmmTopology,
-    feats: Union[Dict[str, torch.Tensor], List[torch.Tensor]],
+    feats: Union[Dict[str, np.ndarray], List[np.ndarray]],
     shared_phones: Optional[List[List[int]]] = None,
     perturb_factor: float = 0.0,
     num_init_utts: int = 10,
@@ -52,20 +52,20 @@ def gmm_init_mono(
     # kaldi computes the statistics in double precision.
     count = 0.0
     feat_dim = mats[0].shape[1]
-    mean_stats = torch.zeros(feat_dim, dtype=torch.float64)
-    var_stats = torch.zeros(feat_dim, dtype=torch.float64)
+    mean_stats = np.zeros(feat_dim, dtype=np.float64)
+    var_stats = np.zeros(feat_dim, dtype=np.float64)
     for mat in mats:
-        m = mat.double()
+        m = mat.astype(np.float64)
         count += m.shape[0]
-        mean_stats += m.sum(dim=0)
-        var_stats += (m * m).sum(dim=0)
+        mean_stats += m.sum(axis=0)
+        var_stats += (m * m).sum(axis=0)
     mean_stats /= count
     var_stats /= count
     var_stats -= mean_stats * mean_stats  # E[x^2] - (E[x])^2
     assert var_stats.min() > 0, "bad variance"
 
-    means = mean_stats.float().unsqueeze(0)  # (1, feat_dim)
-    variances = var_stats.float().unsqueeze(0)
+    means = np.expand_dims(mean_stats.astype(np.float32), 0)  # (1, feat_dim)
+    variances = np.expand_dims(var_stats.astype(np.float32), 0)
 
     if shared_phones is None:
         tree = khg.monophone_context_dependency(
@@ -80,7 +80,7 @@ def gmm_init_mono(
 
     diag_gmm = khg.DiagGmm(nmix=1, dim=feat_dim)
 
-    weights = torch.ones(1, dtype=torch.float32)
+    weights = np.ones(1, dtype=np.float32)
 
     diag_gmm.set_weights(weights)
     diag_gmm.set_means(means)
@@ -107,10 +107,10 @@ def gmm_acc_stats_ali(
     am_gmm: khg.AmDiagGmm,
     gmm_accs: khg.AccumAmDiagGmm,
     transition_model: khg.TransitionModel,
-    feats: torch.Tensor,
+    feats: np.ndarray,
     ali: List[int],
-    transition_accs: Optional[torch.Tensor] = None,
-) -> Tuple[float, torch.Tensor]:
+    transition_accs: Optional[np.ndarray] = None,
+) -> Tuple[float, np.ndarray]:
     """
     Args:
       am_gmm:
@@ -159,7 +159,7 @@ def gmm_est(
     am_gmm: khg.AmDiagGmm,
     gmm_accs: khg.AccumAmDiagGmm,
     transition_model: khg.TransitionModel,
-    transition_accs: torch.Tensor,
+    transition_accs: np.ndarray,
     tcfg: khg.MleTransitionUpdateConfig,
     gmm_opts: khg.MleDiagGmmOptions,
     mixup: int = 0,
@@ -169,7 +169,7 @@ def gmm_est(
     min_count: float = 20.0,
     update_flags: str = "mvwt",
     verbose: bool = True,
-) -> torch.Tensor:
+) -> np.ndarray:
     """kaldi's gmm-est equivalent (updates models in place).
 
     Returns:
@@ -217,7 +217,7 @@ def gmm_est(
     pdf_occs = []
     for i in range(gmm_accs.num_accs):
         pdf_occs.append(gmm_accs.get_acc(i).occupancy.sum().item())
-    pdf_occs = torch.tensor(pdf_occs, dtype=torch.float32)
+    pdf_occs = np.asarray(pdf_occs, dtype=np.float32)
 
     if mixdown != 0:
         am_gmm.merge_by_count(
@@ -267,8 +267,8 @@ def gmm_boost_silence(
     for pdf in pdfs:
         gmm = dgm.get_pdf(pdf)
 
-        weights = torch.from_numpy(gmm.weights)
-        weights.mul_(boost)
+        weights = np.asarray(gmm.weights)
+        weights *= boost
 
         gmm.set_weights(weights)
         gmm.compute_gconsts()

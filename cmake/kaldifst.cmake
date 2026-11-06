@@ -36,17 +36,13 @@ function(download_kaldifst)
     URL_HASH          SHA256=225d8377d1d262e3aedab23558fead106b4cbc83462fb29f1c5e7d9e3b0c14dd
   )
 
-  FetchContent_GetProperties(kaldifst)
-  if(NOT kaldifst_POPULATED)
-    message(STATUS "Downloading kaldifst ${kaldifst_URL}")
-    FetchContent_Populate(kaldifst)
-  endif()
+  # kaldifst's CMakeLists needs its own cmake/ dir on CMAKE_MODULE_PATH at
+  # configure time (include(openfst)), so populate first, then add_subdirectory.
+  FetchContent_Populate(kaldifst)
   message(STATUS "kaldifst is downloaded to ${kaldifst_SOURCE_DIR}")
-  message(STATUS "kaldifst's binary dir is ${kaldifst_BINARY_DIR}")
-
   list(APPEND CMAKE_MODULE_PATH ${kaldifst_SOURCE_DIR}/cmake)
-
   add_subdirectory(${kaldifst_SOURCE_DIR} ${kaldifst_BINARY_DIR})
+
 
   target_include_directories(kaldifst_core
     PUBLIC
