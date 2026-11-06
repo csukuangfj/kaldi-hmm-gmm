@@ -13,7 +13,8 @@ static void PybindDecodableAmDiagGmmUnmapped(py::module *m) {
   py::class_<PyClass, DecodableInterface>(*m, "DecodableAmDiagGmmUnmapped")
       .def(py::init<const AmDiagGmm &, const FloatMatrix &, float>(),
            py::arg("am"), py::arg("feats"),
-           py::arg("log_sum_exp_prune") = -1.0);
+           py::arg("log_sum_exp_prune") = -1.0,
+           py::call_guard<py::gil_scoped_release>());
 }
 
 static void PybindDecodableAmDiagGmmScaled(py::module *m) {
@@ -23,7 +24,8 @@ static void PybindDecodableAmDiagGmmScaled(py::module *m) {
       .def(py::init<const AmDiagGmm &, const TransitionModel &,
                     const FloatMatrix &, float, float>(),
            py::arg("am"), py::arg("tm"), py::arg("feats"), py::arg("scale"),
-           py::arg("log_sum_exp_prune") = -1.0)
+           py::arg("log_sum_exp_prune") = -1.0,
+           py::call_guard<py::gil_scoped_release>())
       .def_property_readonly("transition_model", &PyClass::TransModel);
 }
 

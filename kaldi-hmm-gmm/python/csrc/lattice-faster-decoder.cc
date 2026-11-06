@@ -49,7 +49,7 @@ void PybindLatticeFasterDecoderTpl(py::module *m, const char *class_name) {
 
   py::class_<PyClass>(*m, class_name)
       .def(py::init<const FST &, const LatticeFasterDecoderConfig &>(),
-           py::arg("fst"), py::arg("config"));
+           py::arg("fst"), py::arg("config"), py::keep_alive<1, 2>());
 }
 
 void PybindLatticeFasterDecoder(py::module *m) {

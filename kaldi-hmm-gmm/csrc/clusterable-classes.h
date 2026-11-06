@@ -3,6 +3,9 @@
 // Copyright 2009-2011  Microsoft Corporation;  Saarland University
 //                2014  Daniel Povey
 //                2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/tree/clusterable-classes.h
+//
 #ifndef KALDI_HMM_GMM_CSRC_CLUSTERABLE_CLASSES_H_
 #define KALDI_HMM_GMM_CSRC_CLUSTERABLE_CLASSES_H_
 #include <string>

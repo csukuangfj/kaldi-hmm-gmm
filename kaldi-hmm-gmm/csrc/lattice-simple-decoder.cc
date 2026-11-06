@@ -5,8 +5,7 @@
 //                2014  Guoguo Chen
 // Copyright (c)  2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/decoder/lattice-simple-decoder.cc
+// This file is copied/modified from kaldi/src/decoder/lattice-simple-decoder.cc
 
 #include "kaldi-hmm-gmm/csrc/lattice-simple-decoder.h"
 
@@ -90,14 +89,6 @@ void LatticeSimpleDecoder::ProcessNonemitting() {
     }
 
     best_cost = std::min(best_cost, iter->second->tot_cost);
-  }
-
-  if (queue.empty()) {
-    if (!warned_) {
-      KHG_ERR << "Error in ProcessNonEmitting: no surviving tokens: frame is "
-              << frame;
-      warned_ = true;
-    }
   }
 
   float cutoff = best_cost + config_.beam;

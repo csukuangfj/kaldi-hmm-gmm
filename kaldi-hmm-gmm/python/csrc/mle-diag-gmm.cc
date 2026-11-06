@@ -72,6 +72,14 @@ void PybindMleDiagGmm(py::module *m) {
       .def_property_readonly("num_gauss", &PyClass::NumGauss)
       .def_property_readonly("dim", &PyClass::Dim)
       .def_property_readonly("flags", &PyClass::Flags)
+      .def_property_readonly(
+          "mean_accumulator",
+          [](PyClass &self) -> DoubleMatrix & { return self.mean_accumulator(); })
+      .def_property_readonly(
+          "variance_accumulator",
+          [](PyClass &self) -> DoubleMatrix & {
+            return self.variance_accumulator();
+          })
       .def_property(
           "occupancy",
           [](PyClass &self) -> DoubleVector & { return self.occupancy(); },
@@ -98,24 +106,30 @@ void PybindMleDiagGmm(py::module *m) {
           },
           py::return_value_policy::reference_internal)
 
-      .def("set_zero", &PyClass::SetZero, py::arg("flags"))
-      .def("scale", &PyClass::Scale, py::arg("f"), py::arg("flags"))
+      .def("set_zero", &PyClass::SetZero, py::arg("flags"), py::call_guard<py::gil_scoped_release>())
+      .def("scale", &PyClass::Scale, py::arg("f"), py::arg("flags"), py::call_guard<py::gil_scoped_release>())
       .def("accumulate_for_component", &PyClass::AccumulateForComponent,
-           py::arg("data"), py::arg("comp_index"), py::arg("weight"))
+           py::arg("data"), py::arg("comp_index"), py::arg("weight"),
+           py::call_guard<py::gil_scoped_release>())
       .def("accumulate_from_posteriors", &PyClass::AccumulateFromPosteriors,
-           py::arg("data"), py::arg("gauss_posteriors"))
+           py::arg("data"), py::arg("gauss_posteriors"),
+           py::call_guard<py::gil_scoped_release>())
       .def("accumulate_from_diag", &PyClass::AccumulateFromDiag, py::arg("gmm"),
-           py::arg("data"), py::arg("weight"))
+           py::arg("data"), py::arg("weight"),
+           py::call_guard<py::gil_scoped_release>())
       .def("add_stats_for_component", &PyClass::AddStatsForComponent,
            py::arg("g"), py::arg("occ"), py::arg("x_stats"),
-           py::arg("x2_stats"))
+           py::arg("x2_stats"),
+           py::call_guard<py::gil_scoped_release>())
       // TODO(fangjun): Add tests for the following methods and functions
-      .def("add", &PyClass::Add, py::arg("scale"), py::arg("acc"))
-      .def("smooth_stats", &PyClass::SmoothStats, py::arg("tau"))
+      .def("add", &PyClass::Add, py::arg("scale"), py::arg("acc"), py::call_guard<py::gil_scoped_release>())
+      .def("smooth_stats", &PyClass::SmoothStats, py::arg("tau"), py::call_guard<py::gil_scoped_release>())
       .def("smooth_with_accum", &PyClass::SmoothWithAccum, py::arg("tau"),
-           py::arg("src_acc"))
+           py::arg("src_acc"),
+           py::call_guard<py::gil_scoped_release>())
       .def("smooth_with_model", &PyClass::SmoothWithModel, py::arg("tau"),
-           py::arg("src_gmm"));
+           py::arg("src_gmm"),
+           py::call_guard<py::gil_scoped_release>());
   m->def(
       "mle_diag_gmm_update",
       [](const MleDiagGmmOptions &config, const AccumDiagGmm &diag_gmm_acc,
@@ -151,7 +165,7 @@ void PybindMleDiagGmm(py::module *m) {
       py::arg("config"), py::arg("diag_gmm_acc"), py::arg("flags"),
       py::arg("gmm"));
 
-  m->def("ml_objective", &MlObjective, py::arg("gmm"), py::arg("diaggmm_acc"));
+  m->def("ml_objective", &MlObjective, py::arg("gmm"), py::arg("diaggmm_acc"), py::call_guard<py::gil_scoped_release>());
 }
 
 }  // namespace khg

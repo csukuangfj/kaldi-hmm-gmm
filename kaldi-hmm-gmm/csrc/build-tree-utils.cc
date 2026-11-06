@@ -1,6 +1,10 @@
 // kaldi-hmm-gmm/csrc/build-tree-utils.cc
 //
+// Copyright 2009-2011  Microsoft Corporation;  Haihua Xu
 // Copyright (c)  2022  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/tree/build-tree-utils.cc
+//
 
 #include "kaldi-hmm-gmm/csrc/build-tree-utils.h"
 

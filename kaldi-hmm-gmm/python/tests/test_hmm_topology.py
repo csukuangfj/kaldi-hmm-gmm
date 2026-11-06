@@ -6,6 +6,7 @@ import pickle
 import unittest
 
 import kaldi_hmm_gmm as khg
+from hmm_topo_utils import draw_hmm_topology
 
 
 class TestHmmTopology(unittest.TestCase):
@@ -164,11 +165,11 @@ class TestHmmTopology(unittest.TestCase):
 
         assert str(topo) == str(topo2)
 
-        dot = khg.draw_hmm_topology(topo, phone=1)
+        dot = draw_hmm_topology(topo, phone=1)
         print(dot)
         print("--------------------")
 
-        dot = khg.draw_hmm_topology(topo, phone=10)
+        dot = draw_hmm_topology(topo, phone=10)
         print(dot)
 
 

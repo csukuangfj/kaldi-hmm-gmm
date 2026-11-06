@@ -5,8 +5,7 @@
 //                2014  Guoguo Chen
 // Copyright (c)  2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/decoder/lattice-simple-decoder.h
+// This file is copied/modified from kaldi/src/decoder/lattice-simple-decoder.h
 
 #ifndef KALDI_HMM_GMM_CSRC_LATTICE_SIMPLE_DECODER_H_
 #define KALDI_HMM_GMM_CSRC_LATTICE_SIMPLE_DECODER_H_

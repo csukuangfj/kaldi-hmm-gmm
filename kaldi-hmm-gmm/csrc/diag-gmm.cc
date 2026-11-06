@@ -7,8 +7,7 @@
 //           2013-2014  Johns Hopkins University (author: Daniel Povey)
 //                2023  Xiaomi Corporation
 
-// this if is copied and modified from
-// kaldi/src/gmm/diag-gmm.h
+// This file is copied/modified from kaldi/src/gmm/diag-gmm.cc
 
 #include "kaldi-hmm-gmm/csrc/diag-gmm.h"
 
@@ -23,6 +22,10 @@
 #include "kaldi-hmm-gmm/csrc/diag-gmm-normal.h"
 #include "kaldi-hmm-gmm/csrc/eigen.h"
 #include "kaldi-hmm-gmm/csrc/kaldi-math.h"
+
+#include "kaldi_native_io/csrc/io-funcs.h"
+#include "kaldi_native_io/csrc/kaldi-matrix.h"
+#include "kaldi_native_io/csrc/kaldi-vector.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"
 
@@ -32,11 +35,11 @@ void DiagGmm::Resize(int32_t nmix, int32_t dim) {
   KHG_ASSERT(nmix > 0 && dim > 0);
 
   if (!gconsts_.size() || gconsts_.size() != nmix) {
-    gconsts_.resize(nmix);
+    gconsts_ = FloatVector::Zero(nmix);
   }
 
   if (!weights_.size() || weights_.size() != nmix) {
-    weights_.resize(nmix);
+    weights_ = FloatVector::Zero(nmix);
   }
 
   if (!inv_vars_.size() || inv_vars_.rows() != nmix ||
@@ -48,7 +51,7 @@ void DiagGmm::Resize(int32_t nmix, int32_t dim) {
 
   if (!means_invvars_.size() || means_invvars_.rows() != nmix ||
       means_invvars_.cols() != dim) {
-    means_invvars_.resize(nmix, dim);
+    means_invvars_ = FloatMatrix::Zero(nmix, dim);
   }
 
   valid_gconsts_ = false;
@@ -85,10 +88,10 @@ DiagGmm::DiagGmm(const std::vector<std::pair<float, const DiagGmm *>> &gmms)
 
       const DiagGmm &gmm = *(gmms[i].second);
 
-      means_invvars_(Eigen::seqN(cur_gauss, gmm.NumGauss()), Eigen::all) =
+      means_invvars_(Eigen::seqN(cur_gauss, gmm.NumGauss()), Eigen::indexing::all) =
           gmm.means_invvars_;
 
-      inv_vars_(Eigen::seqN(cur_gauss, gmm.NumGauss()), Eigen::all) =
+      inv_vars_(Eigen::seqN(cur_gauss, gmm.NumGauss()), Eigen::indexing::all) =
           gmm.inv_vars_;
 
       weights_(Eigen::seqN(cur_gauss, gmm.NumGauss())) = weight * gmm.weights_;
@@ -168,7 +171,7 @@ void DiagGmm::LogLikelihoods(const FloatVector &data,
                              FloatVector *loglikes) const {
   if (data.size() != Dim()) {
     KHG_ERR << "DiagGmm::LogLikelihoods, dimension "
-            << "mismatch " << data.size() << " vs. " << Dim();
+            << "mismatch " << data.size() << " vs " << Dim();
   }
 
   *loglikes = gconsts_ + means_invvars_ * data -
@@ -194,8 +197,8 @@ void DiagGmm::LogLikelihoodsPreselect(const FloatVector &data,
   KHG_ASSERT(data.size() == Dim());
 
   *_loglikes =
-      gconsts_(indices) + means_invvars_(indices, Eigen::all) * data -
-      0.5 * inv_vars_(indices, Eigen::all) * data.array().square().matrix();
+      gconsts_(indices) + means_invvars_(indices, Eigen::indexing::all) * data -
+      0.5 * inv_vars_(indices, Eigen::indexing::all) * data.array().square().matrix();
 }
 
 /// Get gaussian selection information for one frame.
@@ -261,7 +264,7 @@ float DiagGmm::GaussianSelection(
       int32_t this_num_frames = std::min(num_frames - start_frame, part_frames);
 
       FloatMatrix data_part =
-          data(Eigen::seqN(start_frame, this_num_frames), Eigen::all);
+          data(Eigen::seqN(start_frame, this_num_frames), Eigen::indexing::all);
 
       tot_ans += GaussianSelection(data_part, num_gselect, &part_output);
 
@@ -414,12 +417,13 @@ void DiagGmm::Generate(FloatVector *output) const {
 
   KHG_ASSERT(tot > 0.0);
 
-  double r = tot * Randn() * 0.99999;
+  double r = tot * RandUniform() * 0.99999;  // kaldi uses RandUniform()
 
   int32_t i = 0;
   double sum = 0.0;
 
-  while (sum + weights_[i] < r && i < weights_.size()) {
+  KHG_ASSERT(i < static_cast<int32_t>(weights_.size()));
+  while (sum + weights_[i] < r) {
     sum += weights_[i];
     ++i;
   }
@@ -881,21 +885,21 @@ void DiagGmm::RemoveComponent(int32_t gauss, bool renorm_weights) {
   FloatMatrix new_inv_vars;
 
   if (gauss == 0) {
-    new_weights = weights_(Eigen::seq(1, Eigen::last));
+    new_weights = weights_(Eigen::seq(1, Eigen::indexing::last));
 
-    new_gconsts = gconsts_(Eigen::seq(1, Eigen::last));
+    new_gconsts = gconsts_(Eigen::seq(1, Eigen::indexing::last));
 
-    new_means_invvars = means_invvars_(Eigen::seq(1, Eigen::last), Eigen::all);
+    new_means_invvars = means_invvars_(Eigen::seq(1, Eigen::indexing::last), Eigen::indexing::all);
 
-    new_inv_vars = inv_vars_(Eigen::seq(1, Eigen::last), Eigen::all);
+    new_inv_vars = inv_vars_(Eigen::seq(1, Eigen::indexing::last), Eigen::indexing::all);
   } else if (gauss == NumGauss() - 1) {
-    new_weights = weights_(Eigen::seq(0, Eigen::last - 1));
-    new_gconsts = gconsts_(Eigen::seq(0, Eigen::last - 1));
+    new_weights = weights_(Eigen::seq(0, Eigen::indexing::last - 1));
+    new_gconsts = gconsts_(Eigen::seq(0, Eigen::indexing::last - 1));
 
     new_means_invvars =
-        means_invvars_(Eigen::seq(0, Eigen::last - 1), Eigen::all);
+        means_invvars_(Eigen::seq(0, Eigen::indexing::last - 1), Eigen::indexing::all);
 
-    new_inv_vars = inv_vars_(Eigen::seq(0, Eigen::last - 1), Eigen::all);
+    new_inv_vars = inv_vars_(Eigen::seq(0, Eigen::indexing::last - 1), Eigen::indexing::all);
   } else {
     new_weights.resize(NumGauss() - 1);
     new_gconsts.resize(NumGauss() - 1);
@@ -904,25 +908,25 @@ void DiagGmm::RemoveComponent(int32_t gauss, bool renorm_weights) {
 
     new_weights(Eigen::seq(0, gauss - 1)) = weights_(Eigen::seq(0, gauss - 1));
 
-    new_weights(Eigen::seq(gauss, Eigen::last)) =
-        weights_(Eigen::seq(gauss + 1, Eigen::last));
+    new_weights(Eigen::seq(gauss, Eigen::indexing::last)) =
+        weights_(Eigen::seq(gauss + 1, Eigen::indexing::last));
 
     new_gconsts(Eigen::seq(0, gauss - 1)) = gconsts_(Eigen::seq(0, gauss - 1));
 
-    new_gconsts(Eigen::seq(gauss, Eigen::last)) =
-        gconsts_(Eigen::seq(gauss + 1, Eigen::last));
+    new_gconsts(Eigen::seq(gauss, Eigen::indexing::last)) =
+        gconsts_(Eigen::seq(gauss + 1, Eigen::indexing::last));
 
-    new_means_invvars(Eigen::seq(0, gauss - 1), Eigen::all) =
-        means_invvars_(Eigen::seq(0, gauss - 1), Eigen::all);
+    new_means_invvars(Eigen::seq(0, gauss - 1), Eigen::indexing::all) =
+        means_invvars_(Eigen::seq(0, gauss - 1), Eigen::indexing::all);
 
-    new_means_invvars(Eigen::seq(gauss, Eigen::last), Eigen::all) =
-        means_invvars_(Eigen::seq(gauss + 1, Eigen::last), Eigen::all);
+    new_means_invvars(Eigen::seq(gauss, Eigen::indexing::last), Eigen::indexing::all) =
+        means_invvars_(Eigen::seq(gauss + 1, Eigen::indexing::last), Eigen::indexing::all);
 
-    new_inv_vars(Eigen::seq(0, gauss - 1), Eigen::all) =
-        inv_vars_(Eigen::seq(0, gauss - 1), Eigen::all);
+    new_inv_vars(Eigen::seq(0, gauss - 1), Eigen::indexing::all) =
+        inv_vars_(Eigen::seq(0, gauss - 1), Eigen::indexing::all);
 
-    new_inv_vars(Eigen::seq(gauss, Eigen::last), Eigen::all) =
-        inv_vars_(Eigen::seq(gauss + 1, Eigen::last), Eigen::all);
+    new_inv_vars(Eigen::seq(gauss, Eigen::indexing::last), Eigen::indexing::all) =
+        inv_vars_(Eigen::seq(gauss + 1, Eigen::indexing::last), Eigen::indexing::all);
   }
 
   if (renorm_weights) {
@@ -1018,6 +1022,95 @@ FloatVector DiagGmm::GetComponentMean(int32_t gauss) const {
 FloatVector DiagGmm::GetComponentVariance(int32_t gauss) const {
   KHG_ASSERT(gauss < NumGauss());
   return 1.0f / inv_vars_.row(gauss).array();
+}
+
+// The functions below are ported from ../kaldi/src/gmm/diag-gmm.cc; the
+// file format is identical to kaldi's.
+void DiagGmm::Read(std::istream &is, bool binary) {
+  std::string token;
+  kaldiio::ReadToken(is, binary, &token);
+  // <DiagGMMBegin> is for compatibility. Will be deleted later
+  if (token != "<DiagGMMBegin>" && token != "<DiagGMM>")
+    KHG_ERR << "Expected <DiagGMM>, got " << token;
+  kaldiio::ReadToken(is, binary, &token);
+  if (token == "<GCONSTS>") {  // The gconsts are optional.
+    kaldiio::Vector<float> gconsts;
+    gconsts.Read(is, binary);
+    gconsts_.resize(gconsts.Dim());
+    for (int32_t i = 0; i < gconsts.Dim(); ++i) gconsts_(i) = gconsts(i);
+    kaldiio::ExpectToken(is, binary, "<WEIGHTS>");
+  } else if (token != "<WEIGHTS>") {
+    KHG_ERR << "DiagGmm::Read, expected <WEIGHTS> or <GCONSTS>, got " << token;
+  }
+  kaldiio::Vector<float> weights;
+  weights.Read(is, binary);
+  kaldiio::ExpectToken(is, binary, "<MEANS_INVVARS>");
+  kaldiio::Matrix<float> means_invvars;
+  means_invvars.Read(is, binary);
+  kaldiio::ExpectToken(is, binary, "<INV_VARS>");
+  kaldiio::Matrix<float> inv_vars;
+  inv_vars.Read(is, binary);
+  kaldiio::ReadToken(is, binary, &token);
+  // <DiagGMMEnd> is for compatibility. Will be deleted later
+  if (token != "<DiagGMMEnd>" && token != "</DiagGMM>")
+    KHG_ERR << "Expected </DiagGMM>, got " << token;
+
+  int32_t num_gauss = weights.Dim();
+  int32_t dim = means_invvars.NumCols();
+  KHG_ASSERT(means_invvars.NumRows() == num_gauss &&
+             inv_vars.NumRows() == num_gauss && inv_vars.NumCols() == dim);
+
+  weights_.resize(num_gauss);
+  for (int32_t i = 0; i < num_gauss; ++i) weights_(i) = weights(i);
+  means_invvars_.resize(num_gauss, dim);
+  inv_vars_.resize(num_gauss, dim);
+  for (int32_t i = 0; i < num_gauss; ++i) {
+    for (int32_t j = 0; j < dim; ++j) {
+      means_invvars_(i, j) = means_invvars.RowData(i)[j];
+      inv_vars_(i, j) = inv_vars.RowData(i)[j];
+    }
+  }
+  valid_gconsts_ = false;
+  ComputeGconsts();  // safer option than trusting the read gconsts
+}
+
+void DiagGmm::Write(std::ostream &os, bool binary) const {
+  if (!valid_gconsts_)
+    KHG_ERR << "Must call ComputeGconsts() before writing the model.";
+  kaldiio::WriteToken(os, binary, "<DiagGMM>");
+  if (!binary) os << "\n";
+  kaldiio::WriteToken(os, binary, "<GCONSTS>");
+  {
+    kaldiio::Vector<float> gconsts(gconsts_.size());
+    for (int32_t i = 0; i < gconsts_.size(); ++i) gconsts(i) = gconsts_(i);
+    gconsts.Write(os, binary);
+  }
+  kaldiio::WriteToken(os, binary, "<WEIGHTS>");
+  {
+    kaldiio::Vector<float> weights(weights_.size());
+    for (int32_t i = 0; i < weights_.size(); ++i) weights(i) = weights_(i);
+    weights.Write(os, binary);
+  }
+  kaldiio::WriteToken(os, binary, "<MEANS_INVVARS>");
+  {
+    int32_t num_gauss = means_invvars_.rows(), dim = means_invvars_.cols();
+    kaldiio::Matrix<float> means_invvars(num_gauss, dim);
+    for (int32_t i = 0; i < num_gauss; ++i)
+      for (int32_t j = 0; j < dim; ++j)
+        means_invvars.RowData(i)[j] = means_invvars_(i, j);
+    means_invvars.Write(os, binary);
+  }
+  kaldiio::WriteToken(os, binary, "<INV_VARS>");
+  {
+    int32_t num_gauss = inv_vars_.rows(), dim = inv_vars_.cols();
+    kaldiio::Matrix<float> inv_vars(num_gauss, dim);
+    for (int32_t i = 0; i < num_gauss; ++i)
+      for (int32_t j = 0; j < dim; ++j)
+        inv_vars.RowData(i)[j] = inv_vars_(i, j);
+    inv_vars.Write(os, binary);
+  }
+  kaldiio::WriteToken(os, binary, "</DiagGMM>");
+  if (!binary) os << "\n";
 }
 
 }  // namespace khg

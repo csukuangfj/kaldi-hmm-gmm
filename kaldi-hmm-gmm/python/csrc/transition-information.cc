@@ -12,7 +12,8 @@ void PybindTransitionInformation(py::module *m) {
   using PyClass = TransitionInformation;
   py::class_<PyClass>(*m, "TransitionInformation")
       .def("transition_ids_equivalent", &PyClass::TransitionIdsEquivalent,
-           py::arg("trans_id1"), py::arg("trans_id2"))
+           py::arg("trans_id1"), py::arg("trans_id2"),
+           py::call_guard<py::gil_scoped_release>())
       .def("transition_ids_is_start_of_phone",
            &PyClass::TransitionIdIsStartOfPhone, py::arg("trans_id"))
       .def("transition_id_to_phone", &PyClass::TransitionIdToPhone,
@@ -21,7 +22,7 @@ void PybindTransitionInformation(py::module *m) {
       .def("is_self_loop", &PyClass::IsSelfLoop, py::arg("trans_id"))
       .def("transition_id_to_pdf", &PyClass::TransitionIdToPdf,
            py::arg("trans_id"))
-      .def("transition_id_to_pdf_array", &PyClass::TransitionIdToPdfArray)
+      .def("transition_id_to_pdf_array", &PyClass::TransitionIdToPdfArray, py::call_guard<py::gil_scoped_release>())
       .def_property_readonly("num_transition_ids", &PyClass::NumTransitionIds)
       .def_property_readonly("num_pdfs", &PyClass::NumPdfs);
 }

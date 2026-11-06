@@ -1,4 +1,4 @@
-function(kgh_add_py_test source)
+function(khg_add_py_test source)
   get_filename_component(name ${source} NAME_WE)
   set(name "${name}_py")
 
@@ -10,19 +10,21 @@ function(kgh_add_py_test source)
 
   get_filename_component(khg_path ${CMAKE_CURRENT_LIST_DIR} DIRECTORY)
 
+  # The extension module lives in ${khg_path}/kaldi_hmm_gmm/lib/ (built
+  # there by the _kaldi_hmm_gmm target); helper modules live in tools/.
   set_property(TEST ${name}
-    PROPERTY ENVIRONMENT "PYTHONPATH=${khg_path}:$<TARGET_FILE_DIR:_kaldi_hmm_gmm>:$ENV{PYTHONPATH}"
+    PROPERTY ENVIRONMENT "PYTHONPATH=${khg_path}:${khg_path}/../../tools:$ENV{PYTHONPATH}"
   )
 endfunction()
 
 # please sort the files in alphabetic order
 set(py_test_files
+  test_ali_to_phones.py
   test_am_diag_gmm.py
   test_const_event_map.py
   test_context_dep.py
   test_diag_gmm.py
   test_draw_tree.py
-  test_eigen.py
   test_gauss_clusterable.py
   test_gmm_update_flags.py
   test_hmm_topology.py
@@ -34,5 +36,5 @@ set(py_test_files
 )
 
 foreach(source IN LISTS py_test_files)
-  kgh_add_py_test(${source})
+  khg_add_py_test(${source})
 endforeach()

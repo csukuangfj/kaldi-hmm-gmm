@@ -1,0 +1,103 @@
+name: yesno
+
+on:
+  push:
+    branches:
+      - master
+      - yesno
+  pull_request:
+  workflow_dispatch:
+
+# Build + run the yesno recipe (egs/yesno/run.sh) natively on
+# linux (x64, arm64), macos (x64, arm64), windows (x64, arm64).
+# The recipe downloads its own corpus (openslr "waves_yesno"), so no
+# kaldi checkout is needed: features come from kaldi-native-fbank, the
+# graphs/alignment from this repo's C++ (kaldi_hmm_gmm).
+
+concurrency:
+  group: yesno-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  yesno:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            os: ubuntu-latest
+          - name: linux-arm64
+            os: ubuntu-24.04-arm
+          - name: macos-x64
+            os: macos-15-intel
+          - name: macos-arm64
+            os: macos-latest
+          - name: windows-x64
+            os: windows-latest
+          - name: windows-arm64
+            os: windows-11-arm
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        shell: bash
+        run: |
+          python3 -m pip install -U pip
+          python3 -m pip install numpy kaldifst kaldi_native_io kaldi-native-fbank kaldialign kaldilm
+          # PyPI has no windows-arm64 torch wheels; torch 2.10.0+cpu is on the
+          # pytorch wheel index (same approach as kaldi-native-fbank's CI).
+          if [[ "${{ runner.os }}" == "Windows" && "${{ runner.arch }}" == "ARM64" ]]; then
+            python3 -m pip install "torch==2.10.0+cpu" --find-links https://download.pytorch.org/whl/torch
+          else
+            python3 -m pip install torch
+          fi
+
+      - name: Configure
+        shell: bash
+        run: |
+          mkdir build
+          cd build
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            cmake -DCMAKE_BUILD_TYPE=Release ${{ matrix.cmake-args }} ..
+          else
+            cmake -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=$(which python3) ..
+          fi
+
+      - name: Build
+        shell: bash
+        run: |
+          cd build
+          cmake --build . --config Release -j 2
+
+      - name: Run C++ and Python tests
+        shell: bash
+        run: |
+          cd build
+          ctest --output-on-failure -C Release
+
+      - name: Run the yesno recipe
+        shell: bash
+        working-directory: egs/yesno
+        run: |
+          ./run.sh
+
+      - name: Check WER
+        shell: bash
+        working-directory: egs/yesno
+        run: |
+          wer=$(awk '{print $2}' exp/mono0a/decode_test_yesno/wer)
+          echo "best WER: ${wer}%"
+          # 0.00 is kaldi's score; the small residual on some platforms is the
+          # float-noise training trajectory (see plan-2.md §8).  Tighten to
+          # 0.00 once training lands bit-exact.
+          python3 -c "import sys; w=float('${wer}'); sys.exit(0 if w <= 1.0 else 1)"

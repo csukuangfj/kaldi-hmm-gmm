@@ -84,7 +84,8 @@ static std::string DrawTree(const std::string &phones_txt,
 
 void PybinTreeRenderer(py::module *m) {
   m->def("draw_tree", &DrawTree, py::arg("phones_txt"), py::arg("tree"),
-         py::arg("use_tooltips") = false, py::arg("query") = "");
+         py::arg("use_tooltips") = false, py::arg("query") = "",
+         py::call_guard<py::gil_scoped_release>());
   // query is of the form:
   // pdf_class/context-phone-sym-1/context-phone-sym-2/context-phone-sym-N
 }

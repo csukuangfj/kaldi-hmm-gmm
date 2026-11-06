@@ -17,31 +17,38 @@ void PybindMleAmDiagGmm(py::module *m) {
       .def(py::init<>())
       .def("init",
            (void (PyClass::*)(const AmDiagGmm &, GmmFlagsType))(&PyClass::Init),
-           py::arg("model"), py::arg("flags"))
+           py::arg("model"), py::arg("flags"),
+           py::call_guard<py::gil_scoped_release>())
       .def("init",
            (void (PyClass::*)(const AmDiagGmm &, int32_t, GmmFlagsType))(
                &PyClass::Init),
-           py::arg("model"), py::arg("dim"), py::arg("flags"))
-      .def("set_zero", &PyClass::SetZero, py::arg("flags"))
+           py::arg("model"), py::arg("dim"), py::arg("flags"),
+           py::call_guard<py::gil_scoped_release>())
+      .def("set_zero", &PyClass::SetZero, py::arg("flags"), py::call_guard<py::gil_scoped_release>())
       .def("accumulate_for_gmm", &PyClass::AccumulateForGmm, py::arg("model"),
-           py::arg("data"), py::arg("gmm_index"), py::arg("weight"))
+           py::arg("data"), py::arg("gmm_index"), py::arg("weight"),
+           py::call_guard<py::gil_scoped_release>())
       .def("accumulate_for_gmm_two_feats", &PyClass::AccumulateForGmmTwofeats,
            py::arg("model"), py::arg("data1"), py::arg("data2"),
-           py::arg("gmm_index"), py::arg("weight"))
+           py::arg("gmm_index"), py::arg("weight"),
+           py::call_guard<py::gil_scoped_release>())
       .def("accumulate_from_posteriors", &PyClass::AccumulateFromPosteriors,
            py::arg("model"), py::arg("data"), py::arg("gmm_index"),
-           py::arg("weight"))
+           py::arg("weight"),
+           py::call_guard<py::gil_scoped_release>())
       .def("accumulate_for_gaussian", &PyClass::AccumulateForGaussian,
            py::arg("am"), py::arg("data"), py::arg("gmm_index"),
-           py::arg("gauss_index"), py::arg("weight"))
+           py::arg("gauss_index"), py::arg("weight"),
+           py::call_guard<py::gil_scoped_release>())
       .def_property_readonly("num_accs", &PyClass::NumAccs)
       .def_property_readonly("tot_stats_count", &PyClass::TotStatsCount)
       .def_property_readonly("tot_count", &PyClass::TotCount)
       .def_property_readonly("tot_log_like", &PyClass::TotLogLike)
       .def("get_acc",
-           [](PyClass &self, int32_t index) { return self.GetAcc(index); })
-      .def("add", &PyClass::Add, py::arg("scale"), py::arg("other"))
-      .def("scale", &PyClass::Scale, py::arg("scale"))
+           [](PyClass &self, int32_t index) { return self.GetAcc(index); },
+           py::call_guard<py::gil_scoped_release>())
+      .def("add", &PyClass::Add, py::arg("scale"), py::arg("other"), py::call_guard<py::gil_scoped_release>())
+      .def("scale", &PyClass::Scale, py::arg("scale"), py::call_guard<py::gil_scoped_release>())
       .def_property_readonly("dim", &PyClass::Dim);
 
   m->def(

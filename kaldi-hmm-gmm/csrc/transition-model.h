@@ -6,8 +6,7 @@
 #ifndef KALDI_HMM_GMM_CSRC_TRANSITION_MODEL_H_
 #define KALDI_HMM_GMM_CSRC_TRANSITION_MODEL_H_
 
-// this if is copied and modified from
-// kaldi/src/hmm/transition-model.h
+// This file is copied/modified from kaldi/src/hmm/transition-model.h
 //
 #include <algorithm>
 #include <vector>
@@ -201,6 +200,10 @@ class TransitionModel : public TransitionInformation {
 
   int32_t TransitionStateToPhone(int32_t trans_state) const;
 
+  // public in ../kaldi/src/hmm/transition-model.h (used by e.g.
+  // SplitToPhones); keep the same access level here.
+  int32_t TransitionStateToHmmState(int32_t trans_state) const;
+
   int32_t TransitionStateToSelfLoopPdf(int32_t trans_state) const;
 
   int32_t TransitionStateToForwardPdf(int32_t trans_state) const;
@@ -229,8 +232,6 @@ class TransitionModel : public TransitionInformation {
   /// the same as "id", here.  A transition-index is a zero-based offset into
   /// the transitions out of a particular transition state.
   int32_t NumTransitionIndices(int32_t trans_state) const;
-
-  int32_t TransitionStateToHmmState(int32_t trans_state) const;
 
   int32_t TransitionIdToTransitionIndex(int32_t trans_id) const;
 

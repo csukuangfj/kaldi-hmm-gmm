@@ -162,7 +162,9 @@ class TestTransitionModel(unittest.TestCase):
         assert transition_model.num_pdfs == transition_model2.num_pdfs
 
         torch.save(transition_model, "transition_model.pt")
-        transition_model3 = torch.load("transition_model.pt")
+        # torch>=2.6 defaults to weights_only=True, which cannot unpickle
+        # our pybind11 objects; this is a trusted local file.
+        transition_model3 = torch.load("transition_model.pt", weights_only=False)
 
         assert isinstance(transition_model3, khg.TransitionModel)
 

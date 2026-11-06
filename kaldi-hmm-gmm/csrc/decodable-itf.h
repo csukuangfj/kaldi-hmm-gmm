@@ -4,8 +4,7 @@
 //                      Mirko Hannemann;  Go Vivace Inc.;
 //                2013  Johns Hopkins University (author: Daniel Povey)
 // Copyright (c)  2023  Xiaomi Corporation
-// this file is copied and modified from
-// kaldi/src/itf/decodable-itf.h
+// This file is copied/modified from kaldi/src/itf/decodable-itf.h
 #ifndef KALDI_HMM_GMM_CSRC_DECODABLE_ITF_H_
 #define KALDI_HMM_GMM_CSRC_DECODABLE_ITF_H_
 #include "kaldi-hmm-gmm/csrc/log.h"

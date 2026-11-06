@@ -15,7 +15,6 @@
 #include "kaldi-hmm-gmm/python/csrc/decoder-wrappers.h"
 #include "kaldi-hmm-gmm/python/csrc/determinize-lattice-pruned.h"
 #include "kaldi-hmm-gmm/python/csrc/diag-gmm.h"
-#include "kaldi-hmm-gmm/python/csrc/eigen-test.h"
 #include "kaldi-hmm-gmm/python/csrc/event-map.h"
 #include "kaldi-hmm-gmm/python/csrc/faster-decoder.h"
 #include "kaldi-hmm-gmm/python/csrc/hmm-topology.h"
@@ -64,8 +63,6 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
 
   PybindDecoderWrappers(&m);
   PybindFasterDecoder(&m);
-
-  PybindEigenTest(&m);
 }
 
 }  // namespace khg

@@ -4,8 +4,7 @@
 //                      Jan Silovsky;  Saarland University
 //                2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/base/kaldi-math.h
+// This file is copied/modified from kaldi/src/base/kaldi-math.h
 #ifndef KALDI_HMM_GMM_CSRC_KALDI_MATH_H_
 #define KALDI_HMM_GMM_CSRC_KALDI_MATH_H_
 
@@ -117,6 +116,11 @@ struct RandomState {
 
 // Returns a random integer between 0 and RAND_MAX, inclusive
 int32_t Rand(struct RandomState *state = nullptr);
+
+// Ported from ../kaldi/src/base/kaldi-math.h (RandUniform).
+inline float RandUniform(RandomState *state = nullptr) {
+  return static_cast<float>(Rand(state) + 1.0) / (RAND_MAX + 2.0);
+}
 
 template <class I>
 I Gcd(I m, I n) {

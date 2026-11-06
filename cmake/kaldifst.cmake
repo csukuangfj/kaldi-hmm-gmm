@@ -28,9 +28,12 @@ function(download_kaldifst)
   set(KALDIFST_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   set(KALDIFST_BUILD_PYTHON OFF CACHE BOOL "" FORCE)
 
+  # NOTE: v1.9.0+ provides the zero-copy interop helpers
+  # (_vector_fst_addr/_borrow/_take) and a matching openfst.  Keep in sync with
+  # the pip requirement `kaldifst>=1.9.0` in setup.py.
   FetchContent_Declare(kaldifst
-    URL               ${kaldifst_URL}
-    URL_HASH          ${kaldifst_HASH}
+    URL               https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.9.0.tar.gz
+    URL_HASH          SHA256=225d8377d1d262e3aedab23558fead106b4cbc83462fb29f1c5e7d9e3b0c14dd
   )
 
   FetchContent_GetProperties(kaldifst)
@@ -52,9 +55,7 @@ function(download_kaldifst)
 
   set_target_properties(kaldifst_core PROPERTIES OUTPUT_NAME "kaldi-hmm-gmm-kaldi-fst-core")
 
-  if(KHG_BUILD_PYTHON AND WIN32)
-    install(TARGETS kaldifst_core fst DESTINATION ..)
-  else()
+  if(KHG_INSTALL_CORE_LIB)
     install(TARGETS kaldifst_core fst DESTINATION lib)
   endif()
 

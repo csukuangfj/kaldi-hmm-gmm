@@ -1,9 +1,9 @@
 // kaldi-hmm-gmm/csrc/stl-utils.h
 //
+// Copyright 2009-2011  Microsoft Corporation;  Saarland University
 // Copyright (c)  2022  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/util/stl-utils.h
+// This file is copied/modified from kaldi/src/util/stl-utils.h
 
 #ifndef KALDI_HMM_GMM_CSRC_STL_UTILS_H_
 #define KALDI_HMM_GMM_CSRC_STL_UTILS_H_

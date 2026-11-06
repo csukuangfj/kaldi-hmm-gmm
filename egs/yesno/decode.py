@@ -1,192 +1,145 @@
 #!/usr/bin/env python3
+"""Decoding + scoring for the yesno recipe.
 
+Mirrors kaldi's steps/decode.sh + local/score.sh: decode the test set with
+HCLG (lattice-faster decoder, acoustic-scale 0.1) and report WER.
+
+Writes:
+  exp/mono0a/decode_test_yesno/text     (hypotheses)
+  exp/mono0a/decode_test_yesno/wer      (score, kaldi-style summary line)
+"""
+
+import argparse
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(".").resolve() / "scripts/"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "kaldi-hmm-gmm" / "python"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
 
-import re
-from pathlib import Path
+import kaldialign  # noqa: E402
+import kaldi_hmm_gmm as khg  # noqa: E402
 
-import graphviz
-import kaldi_hmm_gmm as khg
-import kaldifst
-import kaldilm
-import lhotse
-import torch
-from prepare_lang import Lexicon, Lexiconp, make_lexicon_fst_with_silence
-from utils import write_error_stats
-
-from train import get_lexicon
+from read_feats import load_delta_feats, load_feats, load_text  # noqa: E402
 
 
-def build_L():
-    lexicon = get_lexicon()
-    lexiconp = Lexiconp.from_lexicon(lexicon)
-    lexiconp_disambig = lexiconp.add_lex_disambig()
-
-    fst = make_lexicon_fst_with_silence(
-        lexiconp=lexiconp_disambig,
-        sil_prob=0.5,
-        sil_phone="SIL",
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data-dir", type=str, default="data/test_yesno")
+    parser.add_argument("--lang-dir", type=str, default="data/lang")
+    parser.add_argument("--feats-scp", type=str, default="data/test_yesno/feats.scp")
+    parser.add_argument("--exp-dir", type=str, default="exp/mono0a")
+    parser.add_argument("--graph", type=str, default="")
+    parser.add_argument("--mdl", type=str, default="", help="model file (default: exp-dir/final.mdl)")
+    parser.add_argument("--acoustic-scale", type=float, default=0.083333,
+                        help="kaldi steps/decode.sh default acwt")
+    parser.add_argument("--beam", type=float, default=13.0)
+    parser.add_argument("--lattice-beam", type=float, default=6.0)
+    parser.add_argument("--max-active", type=int, default=7000)
+    parser.add_argument(
+        "--lmwt", type=str, default="7,8,9,10,11,12,13,14,15,16,17",
+        help="LM weight sweep (kaldi score.sh min_lmwt..max_lmwt)")
+    parser.add_argument(
+        "--word-ins-penalty",
+        type=str,
+        default="0.0,0.5,1.0",
+        help="comma-separated word insertion penalties to sweep "
+        "(mirrors kaldi local/score.sh); best result is reported",
     )
-    kaldifst.arcsort(fst, sort_type="olabel")
-
-    fst_dot = kaldifst.draw(fst, acceptor=False, portrait=True)
-    fst_source = graphviz.Source(fst_dot)
-    fst_source.render(outfile="L_disambig.svg")
-
-    word2id = lexiconp_disambig.word2id
-    with open("words.txt", "w") as f:
-        for w, i in word2id.items():
-            f.write(f"{w} {i}\n")
-
-    phone2id = lexiconp_disambig.phone2id
-    with open("phones.txt", "w") as f:
-        for p, i in phone2id.items():
-            f.write(f"{p} {i}\n")
-
-    return fst
+    return parser.parse_args()
 
 
-def build_G():
-    G = kaldilm.arpa2fst(
-        input_arpa="./G.txt", disambig_symbol="#0", read_symbol_table="./words.txt"
-    )
-    isym = kaldifst.SymbolTable.read_text("./words.txt")
-    osym = kaldifst.SymbolTable.read_text("./words.txt")
-    fst = kaldifst.compile(
-        s=G,
-        acceptor=False,
-        keep_isymbols=True,
-        keep_osymbols=True,
-    )
-    fst.input_symbols = isym
-    fst.output_symbols = osym
+def add_word_ins_penalty(fst, wip: float):
+    """kaldi score.sh's lattice-add-penalty equivalent for best-path: add wip
+    to every word-emitting arc's weight."""
+    if wip == 0.0:
+        return fst
+    lines = []
+    for line in fst.to_str().splitlines():
+        parts = line.split()
+        if len(parts) == 5:
+            s, d, il, ol, w = parts
+            if ol != "0":
+                w = repr(float(w) + wip)
+            lines.append(f"{s} {d} {il} {ol} {w}")
+        else:
+            lines.append(line)
+    import kaldifst
 
-    kaldifst.arcsort(fst, sort_type="ilabel")
+    return kaldifst.compile(s="\n".join(lines) + "\n", acceptor=False)
 
-    fst_dot = kaldifst.draw(fst, acceptor=False, portrait=True)
-    fst_source = graphviz.Source(fst_dot)
-    fst_source.render(outfile="G.svg")
 
-    return fst
+def read_sym_table(path):
+    id2sym = {}
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            s, i = line.split()
+            id2sym[int(i)] = s
+    return id2sym
 
 
 def main():
-    L_disambig = build_L()
-    G = build_G()
-    LG = kaldifst.compose(L_disambig, G)
+    print("decode.sh: feature type is delta")
+    args = get_args()
+    exp_dir = Path(args.exp_dir)
+    graph_path = Path(args.graph) if args.graph else exp_dir / "graph_tgpr" / "HCLG.fst"
+    out_dir = exp_dir / "decode_test_yesno"
+    out_dir.mkdir(parents=True, exist_ok=True)
 
-    fst_dot = kaldifst.draw(LG, acceptor=False, portrait=True)
-    fst_source = graphviz.Source(fst_dot)
-    fst_source.render(outfile="LG.svg")
+    mdl_path = Path(args.mdl) if args.mdl else exp_dir / "final.mdl"
+    tm, am = khg.read_model(str(mdl_path))
+    import kaldifst
 
-    kaldifst.determinize_star(LG, use_log=True)
+    graph = kaldifst.StdVectorFst.read(str(graph_path))
+    id2word = read_sym_table(Path(args.lang_dir) / "words.txt")
 
-    disambig_phone_ids = []
-    pattern = re.compile(r"^#\d+$")
-    with open("phones.txt") as f:
-        for line in f:
-            p, i = line.split()
-            if pattern.match(p):
-                disambig_phone_ids.append(int(i))
+    feats = load_delta_feats(args.feats_scp)
+    text = load_text(f"{args.data_dir}/text")
+    utts = sorted(feats.keys())
 
-    state_dict = torch.load("./checkpoint.pt")
-    am = state_dict["acoustic_model"]
-    tm = state_dict["transition_model"]
-    tree = state_dict["tree"]
-
-    CLG, ilabels = kaldifst.compose_context(
-        disambig_syms=disambig_phone_ids,
-        context_width=tree.context_width,
-        central_position=tree.central_position,
-        ifst=LG,
-    )
-
-    fst_dot = kaldifst.draw(CLG, acceptor=False, portrait=True)
-    fst_source = graphviz.Source(fst_dot)
-    fst_source.render(outfile="CLG.svg")
-
-    kaldifst.arcsort(CLG, sort_type="ilabel")
-    hconfig = khg.HTransducerConfig(transition_scale=1.0)
-
-    Ha, _ = khg.get_h_transducer(
-        ilabel_info=ilabels,
-        ctx_dep=tree,
-        trans_model=tm,
-        config=hconfig,
-    )
-
-    fst_dot = kaldifst.draw(Ha, acceptor=False, portrait=True)
-    fst_source = graphviz.Source(fst_dot)
-    fst_source.render(outfile="Ha.svg")
-
-    # Now: we omit fstrmsymbols and fstrmepslocal here
-    # since the yesno dataset does not have disambig_syms
-
-    HCLGa = kaldifst.compose(Ha, CLG)
-
-    fst_dot = kaldifst.draw(HCLGa, acceptor=False, portrait=True)
-    fst_source = graphviz.Source(fst_dot)
-    fst_source.render(outfile="HCLGa.svg")
-
-    HCLG = khg.add_self_loops(
-        self_loop_scale=1.0, disambig_syms=[], reorder=False, trans_model=tm, ifst=HCLGa
-    )
-    HCLG.write("HCLG.fst")
-
-    fst_dot = kaldifst.draw(HCLG, acceptor=False, portrait=True)
-    fst_source = graphviz.Source(fst_dot)
-    fst_source.render(outfile="HCLG.svg")
-
-    config = khg.LatticeFasterDecoderConfig(
-        max_active=7000,
-        beam=13.0,
-        lattice_beam=6.0,
-    )
-    allow_partial = True
-    decoder = khg.LatticeFasterDecoder(HCLG, config)
-
-    name = "test"
-    cuts_filename = f"./data/fbank/yesno_cuts_{name}.jsonl.gz"
-    if not Path(cuts_filename).is_file():
-        raise RuntimeError(f"{cuts_filename} does not exist")
-
-    sym = kaldifst.SymbolTable.read_text("./words.txt")
-
-    #  cuts = lhotse.CutSet.from_file(cuts_filename).subset(first=10)
-    cuts = lhotse.CutSet.from_file(cuts_filename)
-    ans = []
-    for c in cuts:
-        decodable = khg.DecodableAmDiagGmmScaled(
-            am=am,
-            tm=tm,
-            feats=torch.from_numpy(c.load_features()),
-            scale=2.0,
+    print(f"local/score.sh --cmd utils/run.pl {args.data_dir} "
+          f"{args.lang_dir} {exp_dir / 'decode_test_yesno'}")
+    print(f"local/score.sh: scoring with word insertion penalty="
+          f"{args.word_ins_penalty}")
+    best = None
+    for lmwt in [float(x) for x in args.lmwt.split(",")]:
+     for wip in [float(x) for x in args.word_ins_penalty.split(",")]:
+        g = add_word_ins_penalty(graph.copy(), wip)
+        config = khg.LatticeFasterDecoderConfig(
+            max_active=args.max_active, beam=args.beam, lattice_beam=args.lattice_beam
         )
-        (
-            succeeded,
-            alignment_ids,
-            word_ids,
-            log_like,
-        ) = khg.decode_utterance_lattice_faster(
-            decoder=decoder,
-            decodable=decodable,
-            trans_model=tm,
-            utt=c.id,
-            allow_partial=allow_partial,
+        decoder = khg.LatticeFasterDecoder(g, config)
+
+        hyps = {}
+        for utt in utts:
+            decodable = khg.DecodableAmDiagGmmScaled(
+                am=am, tm=tm, feats=feats[utt], scale=args.acoustic_scale
+            )
+            succeeded, _ali, word_ids, _ll = khg.decode_utterance_lattice_faster(
+                decoder=decoder, decodable=decodable, trans_model=tm,
+                utt=utt, allow_partial=True, acoustic_scale=args.acoustic_scale,
+                    lm_scale=lmwt,
+            )
+            hyps[utt] = [id2word[w] for w in word_ids if w != 0] if succeeded else []
+
+        r = kaldialign.batch_error_rate([text[u] for u in utts], [hyps[u] for u in utts])
+        S, D, I, N = int(r["sub"]), int(r["del"]), int(r["ins"]), int(r["ref_len"])
+        wer = 100.0 * (S + D + I) / max(N, 1)
+        line = (
+            f"%WER {wer:.2f} [ {S + D + I} / {N}, {I} in, {D} del, {S} sub ] "
+            f"{out_dir}/wer_{int(lmwt)}_{wip}"
         )
-        if not succeeded:
-            print("Failed to decode")
-            ans.append([c.id, c.supervisions[0].text.split(), []])
-            continue
-        hyp = [sym.find(i) for i in word_ids]
+        (out_dir / f"wer_{int(lmwt)}_{wip}").write_text(line + "\n", encoding="utf-8")
+        if best is None or wer < best[0]:
+            best = (wer, wip, lmwt, S, D, I, N, hyps)
 
-        ans.append([c.id, c.supervisions[0].text.split(), hyp])
-
-    with open(f"{name}-err.txt", "w") as f:
-        write_error_stats(f, name, ans)
+    wer, wip, lmwt, S, D, I, N, hyps = best
+    with open(out_dir / "text", "w", encoding="utf-8") as f:
+        for utt, hyp in hyps.items():
+            f.write(f"{utt} {' '.join(hyp)}\n")
+    line = (f"%WER {wer:.2f} [ {S + D + I} / {N}, {I} in , {D} del, {S} sub ] "
+            f"{out_dir}/wer_{int(lmwt)}_{wip}")
+    (out_dir / "wer").write_text(line + "\n", encoding="utf-8")
+    print(line)
 
 
 if __name__ == "__main__":

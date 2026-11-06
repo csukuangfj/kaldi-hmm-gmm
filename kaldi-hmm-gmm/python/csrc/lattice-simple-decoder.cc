@@ -36,7 +36,7 @@ void PybindLatticeSimpleDecoder(py::module *m) {
   py::class_<PyClass>(*m, "LatticeSimpleDecoder")
       .def(py::init<const fst::Fst<fst::StdArc> &,
                     const LatticeSimpleDecoderConfig &>(),
-           py::arg("fst"), py::arg("config"));
+           py::arg("fst"), py::arg("config"), py::keep_alive<1, 2>());
 }
 
 }  // namespace khg

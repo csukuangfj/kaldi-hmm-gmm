@@ -13,6 +13,8 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
+#include "kaldi-hmm-gmm/python/csrc/fst-caster.h"
+
 namespace py = pybind11;
 
 #endif  // KALDI_HMM_GMM_PYTHON_CSRC_KALDI_HMM_GMM_H_

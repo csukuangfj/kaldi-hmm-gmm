@@ -8,8 +8,7 @@
 //                2023  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_DIAG_GMM_H_
 #define KALDI_HMM_GMM_CSRC_DIAG_GMM_H_
-// this if is copied and modified from
-// kaldi/src/gmm/diag-gmm.h
+// This file is copied/modified from kaldi/src/gmm/diag-gmm.h
 
 #include <utility>
 #include <vector>
@@ -229,6 +228,14 @@ class DiagGmm {
   /// Accessor for single component variance.
   /// Return a 1-D tensor
   FloatVector GetComponentVariance(int32_t gauss) const;
+
+  /// Reads from a kaldi-format stream (ported from
+  /// ../kaldi/src/gmm/diag-gmm.cc; file format is identical).
+  void Read(std::istream &is, bool binary);
+
+  /// Writes to a kaldi-format stream (ported from
+  /// ../kaldi/src/gmm/diag-gmm.cc; file format is identical).
+  void Write(std::ostream &os, bool binary) const;
 
  private:
   // MergedComponentsLogdet computes logdet for merged components

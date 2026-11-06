@@ -5,8 +5,7 @@
 //                2013  Johns Hopkins Universith (author: Daniel Povey)
 // Copyright (c)  2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/gmm/decodable-am-diag-gmm.h
+// This file is copied/modified from kaldi/src/gmm/decodable-am-diag-gmm.h
 #ifndef KALDI_HMM_GMM_CSRC_DECODABLE_AM_DIAG_GMM_H_
 #define KALDI_HMM_GMM_CSRC_DECODABLE_AM_DIAG_GMM_H_
 
@@ -68,7 +67,7 @@ class DecodableAmDiagGmmUnmapped : public DecodableInterface {
 
   const AmDiagGmm &acoustic_model_;
   const FloatMatrix feature_matrix_;  // (num_frames, feature_dim)
-  float log_sum_exp_prune_;           // never used
+  float log_sum_exp_prune_;
 
   /// Defines a cache record for a state
   struct LikelihoodCacheRecord {

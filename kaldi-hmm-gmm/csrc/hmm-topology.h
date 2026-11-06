@@ -1,12 +1,18 @@
 // kaldi-hmm-gmm/csrc/hmm-topology.h
+
+#include <cstdint>
+// Compat typedefs formerly provided transitively by old openfst headers.
+typedef int32_t int32;
+typedef uint32_t uint32;
+typedef int64_t int64;
+typedef uint64_t uint64;
 //
 // Copyright 2009-2011  Microsoft Corporation
 // Copyright (c)  2023  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_HMM_TOPOLOGY_H_
 #define KALDI_HMM_GMM_CSRC_HMM_TOPOLOGY_H_
 
-// this file is copied and modified from
-// kaldi/src/hmm/hmm-topology.h
+// This file is copied/modified from kaldi/src/hmm/hmm-topology.h
 
 #include <assert.h>
 

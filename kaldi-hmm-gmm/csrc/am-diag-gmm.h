@@ -4,6 +4,9 @@
 //                      Johns Hopkins University (Author: Daniel Povey)
 //                      Karel Vesely
 //                2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/gmm/am-diag-gmm.h
+//
 #ifndef KALDI_HMM_GMM_CSRC_AM_DIAG_GMM_H_
 #define KALDI_HMM_GMM_CSRC_AM_DIAG_GMM_H_
 
@@ -91,6 +94,11 @@ class AmDiagGmm {
   /// Mutators
   void SetGaussianMean(int32_t pdf_index, int32_t gauss_index,
                        const FloatVector &in);  // 1-D float tensor
+
+  /// Reads/writes in kaldi's format (ported from
+  /// ../kaldi/src/gmm/am-diag-gmm.cc; file format is identical).
+  void Read(std::istream &is, bool binary);
+  void Write(std::ostream &os, bool binary) const;
 
  private:
   std::vector<DiagGmm *> densities_;

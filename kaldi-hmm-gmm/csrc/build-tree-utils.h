@@ -1,10 +1,10 @@
 // kaldi-hmm-gmm/csrc/build-tree-utils.h
 //
+// Copyright 2009-2011  Microsoft Corporation
 // Copyright (c)  2022  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_BUILD_TREE_UTILS_H_
 #define KALDI_HMM_GMM_CSRC_BUILD_TREE_UTILS_H_
-// this file is copied and modified from
-// kaldi/src/tree/build-tree-utils.h
+// This file is copied/modified from kaldi/src/tree/build-tree-utils.h
 
 #include <vector>
 

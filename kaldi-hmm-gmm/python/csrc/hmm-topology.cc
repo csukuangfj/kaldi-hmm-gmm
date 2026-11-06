@@ -55,22 +55,24 @@ void PybindHmmTopology(py::module *m) {
   using PyClass = HmmTopology;
   py::class_<PyClass>(*m, "HmmTopology")
       .def(py::init<>())
-      .def("check", &PyClass::Check)
-      .def("topology_for_phone", &PyClass::TopologyForPhone, py::arg("phone"))
+      .def("check", &PyClass::Check, py::call_guard<py::gil_scoped_release>())
+      .def("topology_for_phone", &PyClass::TopologyForPhone, py::arg("phone"), py::call_guard<py::gil_scoped_release>())
       .def("num_pdf_classes", &PyClass::NumPdfClasses, py::arg("phone"))
       .def("get_phone_to_num_pdf_classes",
            [](const PyClass &self) -> std::vector<int32_t> {
              std::vector<int32_t> phone2num_pdf_classes;
              self.GetPhoneToNumPdfClasses(&phone2num_pdf_classes);
              return phone2num_pdf_classes;
-           })
+           },
+           py::call_guard<py::gil_scoped_release>())
       .def("min_length", &PyClass::MinLength, py::arg("phone"))
       .def("read",
            [](PyClass &self, const std::string &s) {
              std::stringstream ss(s);
              bool binary = false;
              self.Read(ss, binary);
-           })
+           },
+           py::call_guard<py::gil_scoped_release>())
       .def("__str__",
            [](const PyClass &self) {
              std::ostringstream os;

@@ -1,5 +1,6 @@
 // kaldi-hmm-gmm/csrc/event-map.h
 //
+// Copyright 2009-2011  Microsoft Corporation;  Haihua Xu
 // Copyright (c)  2022  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_EVENT_MAP_H_
 #define KALDI_HMM_GMM_CSRC_EVENT_MAP_H_
@@ -17,8 +18,7 @@
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"
 
-// this file is copied and modified from
-// kaldi/src/tree/event-map.h
+// This file is copied/modified from kaldi/src/tree/event-map.h
 
 namespace khg {
 
@@ -357,7 +357,7 @@ class SplitEventMap : public EventMap {
   SplitEventMap(EventKeyType key, const std::vector<EventValueType> &yes_set,
                 EventMap *yes, EventMap *no)
       : key_(key), yes_set_(yes_set), yes_(yes), no_(no) {
-    assert(IsSorted(yes_set));
+    KHG_PARANOID_ASSERT(IsSorted(yes_set));
     KHG_ASSERT(yes_ != NULL && no_ != NULL);
   }
 

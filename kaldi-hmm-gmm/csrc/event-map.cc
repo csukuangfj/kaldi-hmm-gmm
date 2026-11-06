@@ -1,6 +1,11 @@
 // kaldi-hmm-gmm/csrc/event-map.cc
 //
+// Copyright 2009-2011  Microsoft Corporation
+//                2013  Johns Hopkins University (author: Daniel Povey)
 // Copyright (c)  2022  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/tree/event-map.cc
+//
 
 #include "kaldi-hmm-gmm/csrc/event-map.h"
 
@@ -56,7 +61,7 @@ size_t EventMapVectorHash::operator()(const EventType &vec) const {
   size_t ans = 0;
   constexpr size_t kPrime1 = 47087, kPrime2 = 1321;
   for (; iter != end; ++iter) {
-#ifdef DEBUG  // Check names are distinct and increasing.
+#ifdef KHG_PARANOID  // Check names are distinct and increasing.
     EventType::const_iterator iter2 = iter;
     iter2++;
     if (iter2 != end) {
@@ -84,7 +89,7 @@ bool EventMap::Lookup(const EventType &event, EventKeyType key,
   // this assumes that the "event" array is sorted (e.g. on the KeyType value;
   // just doing std::sort will do this) and has no duplicate values with the
   // same key.  call Check() to verify this.
-#ifdef DEBUG
+#ifdef KHG_PARANOID
   Check(event);
 #endif
   auto begin = event.begin(), end = event.end();

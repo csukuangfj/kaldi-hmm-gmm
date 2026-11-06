@@ -1,7 +1,11 @@
 // kaldi-hmm-gmm/csrc/decoder-wrappers.cc
 
 // Copyright   2014  Johns Hopkins University (author: Daniel Povey)
+// Copyright 2014  Johns Hopkins University (author: Daniel Povey)
 // Copyright (c)  2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/decoder/decoder-wrappers.cc
+//
 
 #include "kaldi-hmm-gmm/csrc/decoder-wrappers.h"
 
@@ -10,6 +14,8 @@
 #include "kaldi-hmm-gmm/csrc/faster-decoder.h"
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldifst/csrc/fstext-utils.h"
+#include "kaldifst/csrc/lattice-utils.h"
+#include "fst/shortest-path.h"
 
 namespace khg {
 
@@ -143,7 +149,8 @@ bool DecodeUtteranceLatticeSimple(
     LatticeSimpleDecoder &decoder,  // NOLINT not const but is really an input.
     DecodableInterface &decodable,  // NOLINT not const but is really an input.
     const TransitionInformation &trans_model, const std::string &utt,
-    bool allow_partial, std::vector<int32_t> *alignments,
+    bool allow_partial, float acoustic_scale, float lm_scale,
+    std::vector<int32_t> *alignments,
     std::vector<int32_t> *words, double *like_ptr) {
   if (!decoder.Decode(&decodable)) {
     KHG_WARN << "Failed to decode utterance with id " << utt;
@@ -166,18 +173,63 @@ bool DecodeUtteranceLatticeSimple(
 
   double likelihood;
   fst::LatticeWeight weight = fst::LatticeWeight::Zero();
-  int32_t num_frames;
 
-  // First do some stuff with word-level traceback...
+  // Likelihood as in kaldi: total cost of the decode-time best path.
   fst::VectorFst<fst::LatticeArc> decoded;
   if (!decoder.GetBestPath(&decoded))
-    // Shouldn't really reach this point as already checked success.
     KHG_ERR << "Failed to get traceback for utterance " << utt;
-
-  fst::GetLinearSymbolSequence(decoded, alignments, words, &weight);
-
+  std::vector<int32_t> tmp_alignment;
+  std::vector<int32_t> tmp_words;
+  fst::GetLinearSymbolSequence(decoded, &tmp_alignment, &tmp_words, &weight);
   likelihood = -(weight.Value1() + weight.Value2());
   *like_ptr = likelihood;
+
+  // kaldi's output block (../kaldi/src/decoder/decoder-wrappers.cc) selects
+  // the words on the raw lattice with the acoustic costs rescaled by
+  // 1/acoustic_scale (ScaleLattice [[1,0],[0,1/acoustic_scale]] followed by
+  // lattice-best-path), so the word sequence is acoustic-scale independent.
+  // lattice-best-path minimizes Value1 + Value2, which is equivalent to the
+  // scalarized cost below; determinization does not change the 1-best word
+  // sequence and is therefore not needed here.
+  fst::VectorFst<fst::LatticeArc> raw_lat;
+  if (!decoder.GetRawLattice(&raw_lat))
+    KHG_ERR << "Failed to get raw lattice for utterance " << utt;
+
+  const float inv_acoustic_scale = 1.0f / acoustic_scale;
+  fst::VectorFst<fst::StdArc> scaled;
+  std::vector<fst::StdArc::StateId> state_map(raw_lat.NumStates());
+  for (fst::StateIterator<fst::VectorFst<fst::LatticeArc>> siter(raw_lat);
+       !siter.Done(); siter.Next()) {
+    state_map[siter.Value()] = scaled.AddState();
+  }
+  if (raw_lat.Start() != fst::kNoStateId) {
+    scaled.SetStart(state_map[raw_lat.Start()]);
+  }
+  for (fst::StateIterator<fst::VectorFst<fst::LatticeArc>> siter(raw_lat);
+       !siter.Done(); siter.Next()) {
+    fst::LatticeArc::StateId s = siter.Value();
+    fst::LatticeWeight final_w = raw_lat.Final(s);
+    if (final_w != fst::LatticeWeight::Zero()) {
+      float cost = lm_scale * final_w.Value1() + final_w.Value2() * inv_acoustic_scale;
+      scaled.SetFinal(state_map[s], fst::TropicalWeight(cost));
+    }
+    for (fst::ArcIterator<fst::VectorFst<fst::LatticeArc>> aiter(raw_lat, s);
+         !aiter.Done(); aiter.Next()) {
+      const fst::LatticeArc &arc = aiter.Value();
+      float cost = lm_scale * arc.weight.Value1() + arc.weight.Value2() * inv_acoustic_scale;
+      scaled.AddArc(state_map[s],
+                    fst::StdArc(arc.ilabel, arc.olabel, fst::TropicalWeight(cost),
+                                state_map[arc.nextstate]));
+    }
+  }
+
+  fst::VectorFst<fst::StdArc> best;
+  fst::ShortestPath(static_cast<const fst::Fst<fst::StdArc> &>(scaled),
+                   &best);
+  if (best.NumStates() == 0)
+    KHG_ERR << "Failed to get best path for utterance " << utt;
+  fst::TropicalWeight best_weight;
+  fst::GetLinearSymbolSequence(best, alignments, words, &best_weight);
   return true;
 }
 
@@ -188,7 +240,8 @@ bool DecodeUtteranceLatticeFaster(
         &decoder,                   // NOLINT not const but is really an input.
     DecodableInterface &decodable,  // NOLINT not const but is really an input.
     const TransitionInformation &trans_model, const std::string &utt,
-    bool allow_partial, std::vector<int32_t> *alignments,
+    bool allow_partial, float acoustic_scale, float lm_scale,
+    std::vector<int32_t> *alignments,
     std::vector<int32_t> *words, double *like_ptr) {
   using fst::VectorFst;
 
@@ -209,16 +262,64 @@ bool DecodeUtteranceLatticeFaster(
   }
 
   double likelihood;
-  fst::LatticeWeight weight;
-  // First do some stuff with word-level traceback...
+  fst::LatticeWeight weight = fst::LatticeWeight::Zero();
+
+  // Likelihood as in kaldi: total cost of the decode-time best path.
   fst::VectorFst<fst::LatticeArc> decoded;
   if (!decoder.GetBestPath(&decoded))
-    // Shouldn't really reach this point as already checked success.
     KHG_ERR << "Failed to get traceback for utterance " << utt;
-
-  fst::GetLinearSymbolSequence(decoded, alignments, words, &weight);
+  std::vector<int32_t> tmp_alignment;
+  std::vector<int32_t> tmp_words;
+  fst::GetLinearSymbolSequence(decoded, &tmp_alignment, &tmp_words, &weight);
   likelihood = -(weight.Value1() + weight.Value2());
   *like_ptr = likelihood;
+
+  // kaldi's output block (../kaldi/src/decoder/decoder-wrappers.cc) selects
+  // the words on the raw lattice with the acoustic costs rescaled by
+  // 1/acoustic_scale (ScaleLattice [[1,0],[0,1/acoustic_scale]] followed by
+  // lattice-best-path), so the word sequence is acoustic-scale independent.
+  // lattice-best-path minimizes Value1 + Value2, which is equivalent to the
+  // scalarized cost below; determinization does not change the 1-best word
+  // sequence and is therefore not needed here.
+  fst::VectorFst<fst::LatticeArc> raw_lat;
+  if (!decoder.GetRawLattice(&raw_lat))
+    KHG_ERR << "Failed to get raw lattice for utterance " << utt;
+
+  const float inv_acoustic_scale = 1.0f / acoustic_scale;
+  fst::VectorFst<fst::StdArc> scaled;
+  std::vector<fst::StdArc::StateId> state_map(raw_lat.NumStates());
+  for (fst::StateIterator<fst::VectorFst<fst::LatticeArc>> siter(raw_lat);
+       !siter.Done(); siter.Next()) {
+    state_map[siter.Value()] = scaled.AddState();
+  }
+  if (raw_lat.Start() != fst::kNoStateId) {
+    scaled.SetStart(state_map[raw_lat.Start()]);
+  }
+  for (fst::StateIterator<fst::VectorFst<fst::LatticeArc>> siter(raw_lat);
+       !siter.Done(); siter.Next()) {
+    fst::LatticeArc::StateId s = siter.Value();
+    fst::LatticeWeight final_w = raw_lat.Final(s);
+    if (final_w != fst::LatticeWeight::Zero()) {
+      float cost = lm_scale * final_w.Value1() + final_w.Value2() * inv_acoustic_scale;
+      scaled.SetFinal(state_map[s], fst::TropicalWeight(cost));
+    }
+    for (fst::ArcIterator<fst::VectorFst<fst::LatticeArc>> aiter(raw_lat, s);
+         !aiter.Done(); aiter.Next()) {
+      const fst::LatticeArc &arc = aiter.Value();
+      float cost = lm_scale * arc.weight.Value1() + arc.weight.Value2() * inv_acoustic_scale;
+      scaled.AddArc(state_map[s],
+                    fst::StdArc(arc.ilabel, arc.olabel, fst::TropicalWeight(cost),
+                                state_map[arc.nextstate]));
+    }
+  }
+
+  fst::VectorFst<fst::StdArc> best;
+  fst::ShortestPath(static_cast<const fst::Fst<fst::StdArc> &>(scaled),
+                   &best);
+  if (best.NumStates() == 0)
+    KHG_ERR << "Failed to get best path for utterance " << utt;
+  fst::TropicalWeight best_weight;
+  fst::GetLinearSymbolSequence(best, alignments, words, &best_weight);
 
   return true;
 }
@@ -227,21 +328,24 @@ template bool DecodeUtteranceLatticeFaster(
     LatticeFasterDecoderTpl<fst::Fst<fst::StdArc>> &decoder,  // NOLINT
     DecodableInterface &decodable,                            // NOLINT
     const TransitionInformation &trans_model, const std::string &utt,
-    bool allow_partial, std::vector<int32_t> *alignments,
+    bool allow_partial, float acoustic_scale, float lm_scale,
+    std::vector<int32_t> *alignments,
     std::vector<int32_t> *words, double *like_ptr);
 
 template bool DecodeUtteranceLatticeFaster(
     LatticeFasterDecoderTpl<fst::ConstFst<fst::StdArc>> &decoder,  // NOLINT
     DecodableInterface &decodable,                                 // NOLINT
     const TransitionInformation &trans_model, const std::string &utt,
-    bool allow_partial, std::vector<int32_t> *alignments,
+    bool allow_partial, float acoustic_scale, float lm_scale,
+    std::vector<int32_t> *alignments,
     std::vector<int32_t> *words, double *like_ptr);
 
 template bool DecodeUtteranceLatticeFaster(
     LatticeFasterDecoderTpl<fst::VectorFst<fst::StdArc>> &decoder,  // NOLINT
     DecodableInterface &decodable,                                  // NOLINT
     const TransitionInformation &trans_model, const std::string &utt,
-    bool allow_partial, std::vector<int32_t> *alignments,
+    bool allow_partial, float acoustic_scale, float lm_scale,
+    std::vector<int32_t> *alignments,
     std::vector<int32_t> *words, double *like_ptr);
 
 }  // namespace khg

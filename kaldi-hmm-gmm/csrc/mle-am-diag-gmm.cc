@@ -3,6 +3,9 @@
 // Copyright 2009-2011  Saarland University (Author: Arnab Ghoshal);
 //                      Microsoft Corporation;  Georg Stemmer;  Yanmin Qian
 //                2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/gmm/mle-am-diag-gmm.cc
+//
 #include "kaldi-hmm-gmm/csrc/mle-am-diag-gmm.h"
 
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"

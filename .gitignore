@@ -2,3 +2,33 @@ build
 __pycache__
 kaldi_hmm_gmm.egg-info
 dist/
+
+# recipe generated data/artifacts (egs/*/data, egs/*/exp, checkpoints, archives)
+exp/
+data/feats/
+data/lang/
+data/train_yesno/
+data/test_yesno/
+checkpoint.pt
+*.pt
+*.ark
+*.ark.*
+*.scp
+*.occs
+*.gz
+
+# MFA acoustic models / alignment test corpora (large binary data)
+english/
+mandarin/
+
+# experiment logs / error dumps
+*-err*.txt
+train-err*.txt
+
+# OS / editor noise
+.DS_Store
+
+# built python module / shared libs
+*.so
+*.dylib
+*.dll

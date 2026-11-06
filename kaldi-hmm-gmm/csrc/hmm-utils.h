@@ -3,11 +3,11 @@
 // Copyright 2009-2011  Microsoft Corporation
 // Copyright (c)  2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/hmm/hmm-utils.h
+// This file is copied/modified from kaldi/src/hmm/hmm-utils.h
 #ifndef KALDI_HMM_GMM_CSRC_HMM_UTILS_H_
 #define KALDI_HMM_GMM_CSRC_HMM_UTILS_H_
 
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -77,7 +77,7 @@ struct HmmCacheHash {
 
 /// HmmCacheType is a map from (central-phone, sequence of pdf-ids) to FST, used
 /// as cache in GetHmmAsFsa, as an optimization.
-typedef unordered_map<std::pair<int32_t, std::vector<int32_t>>,
+typedef std::unordered_map<std::pair<int32_t, std::vector<int32_t>>,
                       fst::VectorFst<fst::StdArc> *, HmmCacheHash>
     HmmCacheType;
 
@@ -138,6 +138,29 @@ void AddTransitionProbs(const TransitionModel &trans_model,
                         const std::vector<int32_t> &disambig_syms,
                         float transition_scale, float self_loop_scale,
                         fst::VectorFst<fst::StdArc> *fst);
+
+/// SplitToPhones splits up the TransitionIds in "alignment" into their
+/// individual phones (one vector per instance of a phone).  At output,
+/// the sum of the sizes of the vectors in split_alignment will be the same
+/// as the corresponding sum for "alignment".  The function returns
+/// true on success.  If the alignment appears to be incomplete, e.g.
+/// not ending at the end-state of a phone, it will still break it up into
+/// phones but it will return false.  For more serious errors it will
+/// die or throw an exception.
+/// This function works out by itself whether the graph was created
+/// with "reordering", and just does the right thing.
+///
+/// This is ported from ../kaldi/src/hmm/hmm-utils.cc.
+bool SplitToPhones(const TransitionModel &trans_model,
+                   const std::vector<int32_t> &alignment,
+                   std::vector<std::vector<int32_t>> *split_alignment);
+
+/// GetPdfToPhonesMap creates a map which maps each pdf-id into its
+/// corresponding monophones.
+///
+/// This is ported from ../kaldi/src/hmm/hmm-utils.cc.
+void GetPdfToPhonesMap(const TransitionModel &trans_model,
+                       std::vector<std::set<int32_t>> *pdf2phones);
 
 }  // namespace khg
 

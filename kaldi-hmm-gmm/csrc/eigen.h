@@ -21,7 +21,7 @@ using FloatRowVector = Eigen::Matrix<float, 1, Eigen::Dynamic>;
 
 using DoubleRowVector = Eigen::Matrix<double, 1, Eigen::Dynamic>;
 
-float LogSumExp(const FloatVector &v);
+float LogSumExp(const FloatVector &v, float prune = -1.0f);
 
 FloatVector Softmax(const FloatVector &v, float *log_sum_exp = nullptr);
 

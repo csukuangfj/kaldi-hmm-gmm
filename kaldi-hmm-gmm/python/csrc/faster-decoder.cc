@@ -33,9 +33,9 @@ void PybindFasterDecoder(py::module *m) {
   py::class_<PyClass>(*m, "FasterDecoder")
       .def(py::init<const fst::Fst<fst::StdArc> &,
                     const FasterDecoderOptions &>(),
-           py::arg("fst"), py::arg("config"))
+           py::arg("fst"), py::arg("config"), py::keep_alive<1, 2>())
       .def("set_options", &PyClass::SetOptions, py::arg("config"))
-      .def("decode", &PyClass::Decode, py::arg("decodable"))
+      .def("decode", &PyClass::Decode, py::arg("decodable"), py::call_guard<py::gil_scoped_release>())
       .def("reached_final", &PyClass::ReachedFinal)
       .def(
           "get_best_path",
@@ -46,9 +46,10 @@ void PybindFasterDecoder(py::module *m) {
             return std::make_pair(ok, fst);
           },
           py::arg("use_final_probs") = true)
-      .def("init_decoding", &PyClass::InitDecoding)
+      .def("init_decoding", &PyClass::InitDecoding, py::call_guard<py::gil_scoped_release>())
       .def("advanced_decoding", &PyClass::AdvanceDecoding, py::arg("decodable"),
-           py::arg("max_num_frames") = -1)
+           py::arg("max_num_frames") = -1,
+           py::call_guard<py::gil_scoped_release>())
       .def("num_frames_decoded", &PyClass::NumFramesDecoded);
 }
 

@@ -1,13 +1,19 @@
 // kaldi-hmm-gmm/csrc/lattice-faster-decoder.cc
 
+#include <cstdint>
+// Compat typedefs formerly provided transitively by old openfst headers.
+typedef int32_t int32;
+typedef uint32_t uint32;
+typedef int64_t int64;
+typedef uint64_t uint64;
+
 // Copyright 2009-2012  Microsoft Corporation  Mirko Hannemann
 //           2013-2018  Johns Hopkins University (Author: Daniel Povey)
 //                2014  Guoguo Chen
 //                2018  Zhehuai Chen
 // Copyright (c)  2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/decoder/lattice-faster-decoder.cc
+// This file is copied/modified from kaldi/src/decoder/lattice-faster-decoder.cc
 
 #include "kaldi-hmm-gmm/csrc/lattice-faster-decoder.h"
 

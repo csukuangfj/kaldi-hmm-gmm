@@ -2,6 +2,11 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "4.0.0")
   set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 endif()
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+# Let normal variables shadow option() in dependency subprojects (e.g. the
+# BUILD_SHARED_LIBS dance in cmake/kaldi-native-io.cmake).
+if(POLICY CMP0077)
+  cmake_policy(SET CMP0077 NEW)
+endif()
 project(kaldi-hmm-gmm)
 
 # Disable warning about
@@ -41,11 +46,16 @@ message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 set(CMAKE_CXX_STANDARD 17 CACHE STRING "The C++ version to be used.")
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 option(BUILD_SHARED_LIBS "Whether to build shared libraries" ON)
 option(KHG_ENABLE_TESTS "Whether to build tests" ON)
 option(KHG_BUILD_PYTHON "Whether to build Python" ON)
+option(KHG_INSTALL_CORE_LIB "Whether to install the C++ libraries" ON)
+
+# Static libraries are linked into the Python extension module; they must be
+# position independent. (Same approach as sherpa-onnx.)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(BUILD_SHARED_LIBS AND MSVC)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)

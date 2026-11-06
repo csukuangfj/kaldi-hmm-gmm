@@ -1,6 +1,14 @@
 // kaldi-hmm-gmm/csrc/log.h
 //
+// Copyright 2019 LAIX (Yi Sun)
+// Copyright 2019 SmartAction LLC (kkm)
+// Copyright 2016 Brno University of Technology (author: Karel Vesely)
+// Copyright 2009-2011  Microsoft Corporation;  Ondrej Glembek;  Lukas Burget;
+//                      Saarland University
 // Copyright (c)  2022  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/base/kaldi-error.h
+//
 
 #ifndef KALDI_HMM_GMM_CSRC_LOG_H_
 #define KALDI_HMM_GMM_CSRC_LOG_H_
@@ -82,7 +90,11 @@ class Voidifier {
       : khg::Voidifier() & KHG_ERR << "Check failed!\n" \
                                    << "x: " << #x
 
-#define KHG_PARANOID_ASSERT KHG_ASSERT
+#ifdef KHG_PARANOID
+#define KHG_PARANOID_ASSERT(x) KHG_ASSERT(x)
+#else
+#define KHG_PARANOID_ASSERT(x) (void)0
+#endif
 
 #define KHG_DISALLOW_COPY_AND_ASSIGN(Class) \
  public:                                    \

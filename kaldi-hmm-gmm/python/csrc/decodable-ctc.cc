@@ -11,7 +11,8 @@ namespace khg {
 void PybindDecodableCtc(py::module *m) {
   using PyClass = DecodableCtc;
   py::class_<PyClass, DecodableInterface>(*m, "DecodableCtc")
-      .def(py::init<const FloatMatrix &>(), py::arg("feats"));
+      .def(py::init<const FloatMatrix &>(), py::arg("feats"),
+           py::call_guard<py::gil_scoped_release>());
 }
 
 }  // namespace khg

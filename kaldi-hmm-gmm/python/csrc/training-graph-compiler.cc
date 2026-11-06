@@ -40,7 +40,8 @@ void PybindTrainingGraphCompiler(py::module *m) {
                  disambig_syms, opts);
            }),
            py::arg("trans_model"), py::arg("ctx_dep"), py::arg("lex_fst"),
-           py::arg("disambig_syms"), py::arg("opts"))
+           py::arg("disambig_syms"), py::arg("opts"),
+           py::call_guard<py::gil_scoped_release>())
       .def(
           "compile_graph_from_text",
           [](PyClass &self, const std::vector<int32_t> &transcript)
@@ -50,7 +51,8 @@ void PybindTrainingGraphCompiler(py::module *m) {
             KHG_ASSERT(succeeded);
             return out_fst;
           },
-          py::arg("transcript"));
+          py::arg("transcript"),
+          py::call_guard<py::gil_scoped_release>());
 }
 
 }  // namespace khg

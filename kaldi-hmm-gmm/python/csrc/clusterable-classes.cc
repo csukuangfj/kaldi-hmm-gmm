@@ -64,17 +64,17 @@ When subtracting one :class:`ScalarClusterable` from another, we use:
 static void PybindClusterable(py::module *m) {
   using PyClass = Clusterable;
   py::class_<PyClass>(*m, "Clusterable")
-      .def("copy", &PyClass::Copy, py::return_value_policy::take_ownership)
+      .def("copy", &PyClass::Copy, py::return_value_policy::take_ownership, py::call_guard<py::gil_scoped_release>())
       .def("objf", &PyClass::Objf)
       .def("normalizer", &PyClass::Normalizer)
-      .def("set_zero", &PyClass::SetZero)
-      .def("add", &PyClass::Add, py::arg("other"))
-      .def("sub", &PyClass::Sub, py::arg("other"))
-      .def("scale", &PyClass::Scale, py::arg("f"))
+      .def("set_zero", &PyClass::SetZero, py::call_guard<py::gil_scoped_release>())
+      .def("add", &PyClass::Add, py::arg("other"), py::call_guard<py::gil_scoped_release>())
+      .def("sub", &PyClass::Sub, py::arg("other"), py::call_guard<py::gil_scoped_release>())
+      .def("scale", &PyClass::Scale, py::arg("f"), py::call_guard<py::gil_scoped_release>())
       .def("type", &PyClass::Type)
-      .def("objf_plus", &PyClass::ObjfPlus, py::arg("other"))
-      .def("objf_minus", &PyClass::ObjfMinus, py::arg("other"))
-      .def("distance", &PyClass::Distance, py::arg("oter"));
+      .def("objf_plus", &PyClass::ObjfPlus, py::arg("other"), py::call_guard<py::gil_scoped_release>())
+      .def("objf_minus", &PyClass::ObjfMinus, py::arg("other"), py::call_guard<py::gil_scoped_release>())
+      .def("distance", &PyClass::Distance, py::arg("oter"), py::call_guard<py::gil_scoped_release>());
 }
 
 static void PybindScalarClusterable(py::module *m) {
@@ -95,7 +95,7 @@ static void PybindGaussClusterable(py::module *m) {
       .def(py::init<const DoubleVector &, const DoubleVector &, float, float>(),
            py::arg("x_stats"), py::arg("x2_stats"), py::arg("var_floor"),
            py::arg("count"))
-      .def("add_stats", &PyClass::AddStats, py::arg("vec"), py::arg("weight"))
+      .def("add_stats", &PyClass::AddStats, py::arg("vec"), py::arg("weight"), py::call_guard<py::gil_scoped_release>())
       .def("count", &PyClass::count)
       .def("x_stats", &PyClass::x_stats)
       .def("x2_stats", &PyClass::x2_stats);
@@ -105,11 +105,13 @@ void PybindClusterableClass(py::module *m) {
   PybindClusterable(m);
   PybindScalarClusterable(m);
   PybindGaussClusterable(m);
-  m->def("sum_clusterable_objf", &SumClusterableObjf, py::arg("vec"));
+  m->def("sum_clusterable_objf", &SumClusterableObjf, py::arg("vec"), py::call_guard<py::gil_scoped_release>());
   m->def("sum_clusterable_normalizer", &SumClusterableNormalizer,
-         py::arg("vec"));
+         py::arg("vec"),
+         py::call_guard<py::gil_scoped_release>());
   m->def("sum_clusterable", &SumClusterable, py::arg("vec"),
-         py::return_value_policy::take_ownership);
+         py::return_value_policy::take_ownership,
+         py::call_guard<py::gil_scoped_release>());
 }
 
 }  // namespace khg

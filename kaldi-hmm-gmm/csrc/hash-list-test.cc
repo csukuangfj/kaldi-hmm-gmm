@@ -4,8 +4,7 @@
 //                2013     Johns Hopkins University (author: Daniel Povey)
 // Copyright (c)  2023     Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/utils/hash-list-test.cc
+// This file is copied/modified from kaldi/src/util/hash-list-test.cc
 
 #include "kaldi-hmm-gmm/csrc/hash-list.h"
 

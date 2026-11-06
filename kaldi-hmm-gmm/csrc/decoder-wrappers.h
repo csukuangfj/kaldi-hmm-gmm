@@ -3,8 +3,7 @@
 // Copyright   2014  Johns Hopkins University (author: Daniel Povey)
 // Copyright (c)  2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/decoder/decoder-wrappers.h
+// This file is copied/modified from kaldi/src/decoder/decoder-wrappers.h
 #ifndef KALDI_HMM_GMM_CSRC_DECODER_WRAPPERS_H_
 #define KALDI_HMM_GMM_CSRC_DECODER_WRAPPERS_H_
 
@@ -76,7 +75,8 @@ bool DecodeUtteranceLatticeSimple(
     LatticeSimpleDecoder &decoder,  // NOLINT not const but is really an input.
     DecodableInterface &decodable,  // NOLINT not const but is really an input.
     const TransitionInformation &trans_model, const std::string &utt,
-    bool allow_partial, std::vector<int32_t> *alignments,
+    bool allow_partial, float acoustic_scale, float lm_scale,
+    std::vector<int32_t> *alignments,
     std::vector<int32_t> *words,
     double *like_ptr);  // puts utterance's likelihood in like_ptr on success.
 
@@ -96,7 +96,8 @@ bool DecodeUtteranceLatticeFaster(
         &decoder,                   // NOLINT not const but is really an input.
     DecodableInterface &decodable,  // NOLINT not const but is really an input.
     const TransitionInformation &trans_model, const std::string &utt,
-    bool allow_partial, std::vector<int32_t> *alignments,
+    bool allow_partial, float acoustic_scale, float lm_scale,
+    std::vector<int32_t> *alignments,
     std::vector<int32_t> *words,
     double *like_ptr);  // puts utterance's likelihood in like_ptr on success.
 

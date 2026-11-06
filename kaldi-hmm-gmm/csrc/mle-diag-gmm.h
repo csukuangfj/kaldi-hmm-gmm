@@ -5,6 +5,9 @@
 //                      Johns Hopkins University (author: Daniel Povey)
 //                      Cisco Systems (author: Neha Agrawal)
 //                2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/gmm/mle-diag-gmm.h
+//
 #ifndef KALDI_HMM_GMM_CSRC_MLE_DIAG_GMM_H_
 #define KALDI_HMM_GMM_CSRC_MLE_DIAG_GMM_H_
 

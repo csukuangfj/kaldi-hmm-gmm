@@ -17,22 +17,29 @@ class PyDecodableInterface : public DecodableInterface {
  public:
   using DecodableInterface::DecodableInterface;
 
+  // The GIL is acquired in each override: callers (e.g. align_utterance,
+  // the decoders) run with the GIL released and may dispatch into a
+  // Python-implemented decodable.
   float LogLikelihood(int32_t frame, int32_t index) override {
+    py::gil_scoped_acquire acquire;
     PYBIND11_OVERRIDE_PURE_NAME(float, DecodableInterface, "log_likelihood",
                                 LogLikelihood, frame, index);
   }
 
   bool IsLastFrame(int32_t frame) const override {
+    py::gil_scoped_acquire acquire;
     PYBIND11_OVERRIDE_PURE_NAME(bool, DecodableInterface, "is_last_frame",
                                 IsLastFrame, frame);
   }
 
   int32_t NumFramesReady() const override {
+    py::gil_scoped_acquire acquire;
     PYBIND11_OVERRIDE_NAME(int32_t, DecodableInterface, "num_frames_ready",
                            NumFramesReady);
   }
 
   int32_t NumIndices() const override {
+    py::gil_scoped_acquire acquire;
     PYBIND11_OVERRIDE_PURE_NAME(int32_t, DecodableInterface, "num_indices",
                                 NumIndices);
   }

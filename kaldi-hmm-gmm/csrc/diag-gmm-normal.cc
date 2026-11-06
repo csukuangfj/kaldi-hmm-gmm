@@ -4,6 +4,9 @@
 //                      Yanmin Qian
 //                2023  Xiaomi Corporation
 
+//
+// This file is copied/modified from kaldi/src/gmm/diag-gmm-normal.cc
+//
 #include "kaldi-hmm-gmm/csrc/diag-gmm-normal.h"
 
 #include "kaldi-hmm-gmm/csrc/diag-gmm.h"

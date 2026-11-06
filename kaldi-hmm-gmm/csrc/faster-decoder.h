@@ -4,8 +4,7 @@
 //                2013  Johns Hopkins University (author: Daniel Povey)
 // Copyright (c)  2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/decoder/faster-decoder.h
+// This file is copied/modified from kaldi/src/decoder/faster-decoder.h
 #ifndef KALDI_HMM_GMM_CSRC_FASTER_DECODER_H_
 #define KALDI_HMM_GMM_CSRC_FASTER_DECODER_H_
 

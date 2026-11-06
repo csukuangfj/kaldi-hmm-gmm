@@ -3,6 +3,9 @@
 // Copyright 2012   Arnab Ghoshal
 // Copyright 2009-2011  Microsoft Corporation;  Saarland University
 //                2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/tree/cluster-utils.h
+//
 #ifndef KALDI_HMM_GMM_CSRC_CLUSTER_UTILS_H_
 #define KALDI_HMM_GMM_CSRC_CLUSTER_UTILS_H_
 

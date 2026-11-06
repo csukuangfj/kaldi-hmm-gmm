@@ -4,8 +4,7 @@
 //                2018  Johns Hopkins University (author: Daniel Povey)
 // Copyright (c)  2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/hmm/hmm-utils.cc
+// This file is copied/modified from kaldi/src/hmm/hmm-utils.cc
 
 #include "kaldi-hmm-gmm/csrc/hmm-utils.h"
 
@@ -489,6 +488,143 @@ void AddTransitionProbs(
       }
       aiter.SetValue(arc);
     }
+  }
+}
+
+// IsReordered returns true if the transitions were possibly reordered.  This
+// reordering can happen in AddSelfLoops, if the "reorder" option was true.
+// This makes the out-transition occur before the self-loop transition.
+// The function returns false (no reordering) if there is not enough
+// information in the alignment to tell (i.e. no self-loop were taken), and in
+// this case the calling code doesn't care what the answer is.
+// The "alignment" vector contains a sequence of TransitionIds.
+//
+// This is ported from ../kaldi/src/hmm/hmm-utils.cc.
+static bool IsReordered(const TransitionModel &trans_model,
+                        const std::vector<int32_t> &alignment) {
+  for (size_t i = 0; i + 1 < alignment.size(); i++) {
+    int32_t tstate1 = trans_model.TransitionIdToTransitionState(alignment[i]),
+            tstate2 = trans_model.TransitionIdToTransitionState(alignment[i + 1]);
+    if (tstate1 != tstate2) {
+      bool is_loop_1 = trans_model.IsSelfLoop(alignment[i]),
+           is_loop_2 = trans_model.IsSelfLoop(alignment[i + 1]);
+      KHG_ASSERT(!(is_loop_1 && is_loop_2));  // Invalid.
+      if (is_loop_1) return true;  // Reordered. self-loop is last.
+      if (is_loop_2) return false;  // Not reordered.  self-loop is first.
+    }
+  }
+
+  // Just one trans-state in whole sequence.
+  if (alignment.empty())
+    return false;
+  else {
+    bool is_loop_front = trans_model.IsSelfLoop(alignment.front()),
+         is_loop_back = trans_model.IsSelfLoop(alignment.back());
+    if (is_loop_front) return false;  // Not reordered.  Self-loop is first.
+    if (is_loop_back) return true;  // Reordered.  Self-loop is last.
+    return false;  // We really don't know in this case but calling code should
+    // not care.
+  }
+}
+
+// SplitToPhonesInternal takes as input the "alignment" vector containing
+// a sequence of transition-ids, and appends a single vector to
+// "split_output" for each instance of a phone that occurs in the
+// output.
+// Returns true if the alignment passes some non-exhaustive consistency
+// checks (if the input does not start at the start of a phone or does not
+// end at the end of a phone, we should expect that false will be returned).
+//
+// This is ported from ../kaldi/src/hmm/hmm-utils.cc.
+static bool SplitToPhonesInternal(const TransitionModel &trans_model,
+                                  const std::vector<int32_t> &alignment,
+                                  bool reordered,
+                                  std::vector<std::vector<int32_t>> *split_output) {
+  if (alignment.empty()) return true;  // nothing to split.
+  std::vector<size_t> end_points;  // points at which phones end [in an
+  // stl iterator sense, i.e. actually one past the last transition-id within
+  // each phone]..
+
+  bool was_ok = true;
+  for (size_t i = 0; i < alignment.size(); i++) {
+    int32_t trans_id = alignment[i];
+    if (trans_model.IsFinal(trans_id)) {  // is final-prob
+      if (!reordered)
+        end_points.push_back(i + 1);
+      else {  // reordered.
+        while (i + 1 < alignment.size() &&
+               trans_model.IsSelfLoop(alignment[i + 1])) {
+          KHG_ASSERT(trans_model.TransitionIdToTransitionState(alignment[i]) ==
+                     trans_model.TransitionIdToTransitionState(alignment[i + 1]));
+          i++;
+        }
+        end_points.push_back(i + 1);
+      }
+    } else if (i + 1 == alignment.size()) {
+      // need to have an end-point at the actual end.
+      // but this is an error- should have been detected already.
+      was_ok = false;
+      end_points.push_back(i + 1);
+    } else {
+      int32_t this_state =
+                  trans_model.TransitionIdToTransitionState(alignment[i]),
+              next_state =
+                  trans_model.TransitionIdToTransitionState(alignment[i + 1]);
+      if (this_state == next_state) continue;  // optimization.
+      int32_t this_phone = trans_model.TransitionStateToPhone(this_state),
+              next_phone = trans_model.TransitionStateToPhone(next_state);
+      if (this_phone != next_phone) {
+        // The phone changed, but this is an error-- we should have detected
+        // this via the IsFinal check.
+        was_ok = false;
+        end_points.push_back(i + 1);
+      }
+    }
+  }
+
+  size_t cur_point = 0;
+  for (size_t i = 0; i < end_points.size(); i++) {
+    split_output->push_back(std::vector<int32_t>());
+    // The next if-statement checks if the initial trans-id at the current end
+    // point is the initial-state of the current phone if that initial-state
+    // is emitting (a cursory check that the alignment is plausible).
+    int32_t trans_state =
+        trans_model.TransitionIdToTransitionState(alignment[cur_point]);
+    int32_t phone = trans_model.TransitionStateToPhone(trans_state);
+    int32_t forward_pdf_class =
+        trans_model.GetTopo().TopologyForPhone(phone)[0].forward_pdf_class;
+    if (forward_pdf_class != kNoPdf)  // initial-state of the current phone is
+                                      // emitting
+      if (trans_model.TransitionStateToHmmState(trans_state) != 0) was_ok = false;
+    for (size_t j = cur_point; j < end_points[i]; j++)
+      split_output->back().push_back(alignment[j]);
+    cur_point = end_points[i];
+  }
+  return was_ok;
+}
+
+// This is ported from ../kaldi/src/hmm/hmm-utils.cc.
+bool SplitToPhones(const TransitionModel &trans_model,
+                   const std::vector<int32_t> &alignment,
+                   std::vector<std::vector<int32_t>> *split_alignment) {
+  KHG_ASSERT(split_alignment != nullptr);
+  split_alignment->clear();
+
+  bool is_reordered = IsReordered(trans_model, alignment);
+  return SplitToPhonesInternal(trans_model, alignment, is_reordered,
+                               split_alignment);
+}
+
+// This is ported from ../kaldi/src/hmm/hmm-utils.cc.
+void GetPdfToPhonesMap(const TransitionModel &trans_model,
+                       std::vector<std::set<int32_t>> *pdf2phones) {
+  pdf2phones->clear();
+  pdf2phones->resize(trans_model.NumPdfs());
+  for (int32_t i = 0; i < trans_model.NumTransitionIds(); i++) {
+    int32_t trans_id = i + 1;
+    int32_t pdf_id = trans_model.TransitionIdToPdf(trans_id);
+    int32_t phone = trans_model.TransitionIdToPhone(trans_id);
+    (*pdf2phones)[pdf_id].insert(phone);
   }
 }
 

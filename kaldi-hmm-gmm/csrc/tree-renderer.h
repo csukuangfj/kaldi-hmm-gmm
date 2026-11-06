@@ -1,11 +1,11 @@
 // kaldi-hmm-gmm/csrc/tree-renderer.h
 //
+// Copyright 2012 Vassil Panayotov
 // Copyright (c)  2022  Xiaomi Corporation
 #ifndef KALDI_HMM_GMM_CSRC_TREE_RENDERER_H_
 #define KALDI_HMM_GMM_CSRC_TREE_RENDERER_H_
 
-// this file is copied and modified from
-// kaldi/src/tree/tree-renderer.h
+// This file is copied/modified from kaldi/src/tree/tree-renderer.h
 
 #include <ostream>
 #include <string>

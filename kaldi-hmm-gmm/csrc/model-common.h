@@ -4,6 +4,9 @@
 //                      Johns Hopkins University (author: Daniel Povey)
 
 //                2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/gmm/model-common.h
+//
 #ifndef KALDI_HMM_GMM_CSRC_MODEL_COMMON_H_
 #define KALDI_HMM_GMM_CSRC_MODEL_COMMON_H_
 

@@ -17,7 +17,7 @@ class DiagGmm;
  *  mode: where the parameters are stored as means and variances (instead of
  *  the exponential form that the DiagGmm class is stored as). This class will
  *  be used in the update (since the update formulas are for the standard
- *  parameterization) and then copied to the exponential form of the DiagGmm
+// This file is copied/modified from kaldi/src/gmm/diag-gmm-normal.h
  *  class. The DiagGmmNormal class will not be used anywhere else, and should
  *  not have any extra methods that are not needed.
  */
