@@ -7,8 +7,6 @@ on:
     tags:
       - '*'
   workflow_dispatch:
-env:
-  KHG_IS_FOR_PYPI: 1
 concurrency:
   group: build-wheels-win-arm64-${{ github.ref }}
   cancel-in-progress: true
