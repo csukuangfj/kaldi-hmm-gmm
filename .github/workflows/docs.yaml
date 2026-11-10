@@ -58,7 +58,7 @@ jobs:
 
       - name: Prepare documentation audio (page audio + per-word clips)
         run: |
-          python3 -m pip install kaldi-native-fbank librosa soundfile pypinyin
+          python3 -m pip install numpy kaldifst kaldi-native-fbank librosa soundfile pypinyin
           bash docs/prepare_audio.sh
 
       - name: Build HTML (sphinx + doxygen C++ API)
