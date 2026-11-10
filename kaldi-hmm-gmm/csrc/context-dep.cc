@@ -1,9 +1,9 @@
 // kaldi-hmm-gmm/csrc/context-dep.cc
 //
+// Copyright 2009-2011  Microsoft Corporation
 // Copyright (c)  2022  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/tree/context-dep.cc
+// This file is copied/modified from kaldi/src/tree/context-dep.cc
 
 #include "kaldi-hmm-gmm/csrc/context-dep.h"
 

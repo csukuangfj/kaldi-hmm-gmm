@@ -4,8 +4,7 @@
 //                      Jan Silovsky;  Saarland University
 //                2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/base/kaldi-math.cc
+// This file is copied/modified from kaldi/src/base/kaldi-math.cc
 
 #include "kaldi-hmm-gmm/csrc/kaldi-math.h"
 

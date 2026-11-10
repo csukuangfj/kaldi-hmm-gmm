@@ -1,8 +1,9 @@
+include_guard(GLOBAL)
+
 function(download_googltest)
   include(FetchContent)
 
   set(googletest_URL  "https://github.com/google/googletest/archive/refs/tags/v1.13.0.tar.gz")
-  set(googletest_URL2 "https://huggingface.co/csukuangfj/sherpa-cmake-deps/resolve/main/googletest-1.13.0.tar.gz")
   set(googletest_HASH "SHA256=ad7fdba11ea011c1d925b3289cf4af2c66a352e18d4c7264392fead75e919363")
 
   # If you don't have access to the Internet,
@@ -19,7 +20,7 @@ function(download_googltest)
     if(EXISTS ${f})
       set(googletest_URL  "${f}")
       file(TO_CMAKE_PATH "${googletest_URL}" googletest_URL)
-      set(googletest_URL2)
+      message(STATUS "Found local downloaded googletest: ${googletest_URL}")
       break()
     endif()
   endforeach()
@@ -30,17 +31,14 @@ function(download_googltest)
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
   FetchContent_Declare(googletest
+    EXCLUDE_FROM_ALL
     URL
       ${googletest_URL}
-      ${googletest_URL2}
     URL_HASH          ${googletest_HASH}
   )
 
-  FetchContent_GetProperties(googletest)
-  if(NOT googletest_POPULATED)
     message(STATUS "Downloading googletest from ${googletest_URL}")
-    FetchContent_Populate(googletest)
-  endif()
+  FetchContent_MakeAvailable(googletest)
   message(STATUS "googletest is downloaded to ${googletest_SOURCE_DIR}")
   message(STATUS "googletest's binary dir is ${googletest_BINARY_DIR}")
 
@@ -63,7 +61,6 @@ function(download_googltest)
   This warning is for project developers.  Use -Wno-dev to suppress it.
   ]==]
 
-  add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 
   target_include_directories(gtest
     INTERFACE

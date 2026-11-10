@@ -7,19 +7,13 @@ set(srcs
   clusterable-classes.cc
   context-dep.cc
   decodable-am-diag-gmm.cc
-  decodable-ctc.cc
   decodable-itf.cc
   decoder-wrappers.cc
-  determinize-lattice-pruned.cc
   diag-gmm.cc
-  eigen-test.cc
   event-map.cc
-  faster-decoder.cc
   hmm-topology.cc
   hmm-utils.cc
   kaldi-hmm-gmm.cc
-  lattice-faster-decoder.cc
-  lattice-simple-decoder.cc
   mle-am-diag-gmm.cc
   mle-diag-gmm.cc
   model-common.cc
@@ -30,11 +24,26 @@ set(srcs
 )
 
 pybind11_add_module(_kaldi_hmm_gmm ${srcs})
+
+set_target_properties(_kaldi_hmm_gmm PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../kaldi_hmm_gmm/lib"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../kaldi_hmm_gmm/lib"
+)
+# multi-config generators (MSVC) append /<Config> to the output dirs above;
+# pin them so the module always lands in kaldi_hmm_gmm/lib/.
+foreach(cfg IN ITEMS DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+  string(TOUPPER "${cfg}" CFG)
+  set_target_properties(_kaldi_hmm_gmm PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY_${CFG} "${CMAKE_CURRENT_SOURCE_DIR}/../kaldi_hmm_gmm/lib"
+    RUNTIME_OUTPUT_DIRECTORY_${CFG} "${CMAKE_CURRENT_SOURCE_DIR}/../kaldi_hmm_gmm/lib"
+  )
+endforeach()
+
 target_link_libraries(_kaldi_hmm_gmm PRIVATE kaldi-hmm-gmm-core)
 
 if(APPLE)
   execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
+    COMMAND "${PYTHON_EXECUTABLE}" -c "import sysconfig; print(sysconfig.get_path('purelib'))"
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE PYTHON_SITE_PACKAGE_DIR
   )
@@ -52,5 +61,5 @@ endif()
 
 
 install(TARGETS _kaldi_hmm_gmm
-  DESTINATION ../
+  DESTINATION lib
 )

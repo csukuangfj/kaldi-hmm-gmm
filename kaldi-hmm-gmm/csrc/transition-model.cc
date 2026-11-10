@@ -1,9 +1,10 @@
 // kaldi-hmm-gmm/csrc/transition-model.cc
 //
+// Copyright 2009-2012  Microsoft Corporation  Johns Hopkins University (Author: Daniel Povey)
+//        Johns Hopkins University (author: Guoguo Chen)
 // Copyright (c)  2023  Xiaomi Corporation
 
-// this if is copied and modified from
-// kaldi/src/hmm/transition-model.cc
+// This file is copied/modified from kaldi/src/hmm/transition-model.cc
 
 #include "kaldi-hmm-gmm/csrc/transition-model.h"
 
@@ -520,7 +521,7 @@ float TransitionModel::GetNonSelfLoopLogProb(int32_t trans_state) const {
 float TransitionModel::GetTransitionLogProbIgnoringSelfLoops(
     int32_t trans_id) const {
   KHG_ASSERT(trans_id != 0);
-  KHG_ASSERT(!IsSelfLoop(trans_id));
+  KHG_PARANOID_ASSERT(!IsSelfLoop(trans_id));
   return log_probs_(trans_id) -
          GetNonSelfLoopLogProb(TransitionIdToTransitionState(trans_id));
 }

@@ -1,0 +1,81 @@
+name: docs
+
+on:
+  push:
+    branches:
+      - master
+      - yesno
+    paths:
+      - 'docs/**'
+      - 'kaldi-hmm-gmm/**'
+      - '.github/workflows/docs.yaml'
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: docs-html
+
+      - name: Install doc dependencies
+        run: |
+          python3 -m pip install -U pip
+          python3 -m pip install -r docs/requirements.txt
+
+      - name: Build python module (autodoc imports it)
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DKHG_ENABLE_TESTS=OFF \
+            -DPYTHON_EXECUTABLE=$(which python3)
+          cmake --build build -j2
+
+      - name: Prepare documentation audio (page audio + per-word clips)
+        run: |
+          python3 -m pip install numpy kaldifst kaldi-native-fbank librosa soundfile pypinyin
+          bash docs/prepare_audio.sh
+
+      - name: Build HTML (sphinx + doxygen C++ API)
+        run: |
+          cd docs
+          make html
+
+      - name: Upload HTML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-html
+          path: docs/build/html
+
+      - name: Deploy to GitHub Pages
+        # PR builds have a read-only token and must not touch gh-pages.
+        if: github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/html

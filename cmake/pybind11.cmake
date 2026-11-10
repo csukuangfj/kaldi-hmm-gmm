@@ -1,8 +1,9 @@
+include_guard(GLOBAL)
+
 function(download_pybind11)
   include(FetchContent)
 
   set(pybind11_URL  "https://github.com/pybind/pybind11/archive/refs/tags/v3.0.0.tar.gz")
-  set(pybind11_URL2 "https://hf-mirror.com/csukuangfj/sherpa-onnx-cmake-deps/resolve/main/pybind11-3.0.0.tar.gz")
   set(pybind11_HASH "SHA256=453b1a3e2b266c3ae9da872411cadb6d693ac18063bd73226d96cfb7015a200c")
 
   # If you don't have access to the Internet,
@@ -19,25 +20,19 @@ function(download_pybind11)
     if(EXISTS ${f})
       set(pybind11_URL  "${f}")
       file(TO_CMAKE_PATH "${pybind11_URL}" pybind11_URL)
-      set(pybind11_URL2)
       break()
     endif()
   endforeach()
 
   FetchContent_Declare(pybind11
-    URL
-      ${pybind11_URL}
-      ${pybind11_URL2}
+    EXCLUDE_FROM_ALL
+    URL               ${pybind11_URL}
     URL_HASH          ${pybind11_HASH}
   )
 
-  FetchContent_GetProperties(pybind11)
-  if(NOT pybind11_POPULATED)
     message(STATUS "Downloading pybind11 from ${pybind11_URL}")
-    FetchContent_Populate(pybind11)
-  endif()
+  FetchContent_MakeAvailable(pybind11)
   message(STATUS "pybind11 is downloaded to ${pybind11_SOURCE_DIR}")
-  add_subdirectory(${pybind11_SOURCE_DIR} ${pybind11_BINARY_DIR} EXCLUDE_FROM_ALL)
 endfunction()
 
 download_pybind11()

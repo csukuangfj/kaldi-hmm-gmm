@@ -1,0 +1,19 @@
+PROJECT_NAME           = "kaldi-hmm-gmm C++ API"
+PROJECT_BRIEF          = "Kaldi HMM-GMM reimplementation (Eigen) C++ API"
+OUTPUT_DIRECTORY       = build/doxygen
+INPUT                  = ../kaldi-hmm-gmm/csrc \
+                         mainpage.dox
+FILE_PATTERNS          = *.h
+RECURSIVE              = NO
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+GENERATE_XML           = YES
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = NO
+JAVADOC_AUTOBRIEF      = YES
+USE_MATHJAX            = YES
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+FULL_PATH_NAMES        = NO

@@ -24,7 +24,8 @@ static void PybindEventMapBase(py::module *m) {
             bool found = PyClass::Lookup(event, key, &anwser);
             return std::make_pair(found, anwser);
           },
-          py::arg("event"), py::arg("key"))
+          py::arg("event"), py::arg("key"),
+          py::call_guard<py::gil_scoped_release>())
       .def(
           "map",
           [](PyClass &self,
@@ -33,7 +34,8 @@ static void PybindEventMapBase(py::module *m) {
             bool found = self.Map(event, &anwser);
             return std::make_pair(found, anwser);
           },
-          py::arg("event"))
+          py::arg("event"),
+          py::call_guard<py::gil_scoped_release>())
       .def(
           "multimap",
           [](PyClass &self, const EventType &event,
@@ -41,7 +43,8 @@ static void PybindEventMapBase(py::module *m) {
             self.MultiMap(event, &answers);
             return answers;
           },
-          py::arg("event"), py::arg("answers") = std::vector<int32_t>{})
+          py::arg("event"), py::arg("answers") = std::vector<int32_t>{},
+          py::call_guard<py::gil_scoped_release>())
       .def("__str__", [](PyClass &self) -> std::string {
         std::ostringstream os;
         self.Write(os, /*binary*/ false);

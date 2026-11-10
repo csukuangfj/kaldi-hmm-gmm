@@ -3,6 +3,9 @@
 // Copyright 2009-2011  Microsoft Corporation
 
 //                2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/gmm/model-common.cc
+//
 #include "kaldi-hmm-gmm/csrc/model-common.h"
 
 #include <cmath>

@@ -6,7 +6,7 @@ import pickle
 import unittest
 
 import kaldi_hmm_gmm as khg
-import torch
+import numpy as np
 
 
 class TestAmDiagGmm(unittest.TestCase):
@@ -15,11 +15,11 @@ class TestAmDiagGmm(unittest.TestCase):
         dim = 8
 
         diag_gmm = khg.DiagGmm(nmix=nmix, dim=dim)
-        weights = torch.rand(nmix, dtype=torch.float32)
+        weights = np.random.rand(nmix).astype(np.float32)
         weights /= weights.sum()
 
-        mean = torch.rand(nmix, dim)
-        var = torch.rand(nmix, dim)
+        mean = np.random.rand(nmix, dim)
+        var = np.random.rand(nmix, dim)
         diag_gmm.set_weights(weights)
         diag_gmm.set_means(mean)
         diag_gmm.set_invvars(1 / var)
@@ -58,18 +58,18 @@ class TestAmDiagGmm(unittest.TestCase):
             assert pdf.valid_gconsts is True
             assert pdf2.valid_gconsts is True
 
-            assert torch.allclose(
-                torch.from_numpy(pdf.weights), torch.from_numpy(pdf2.weights)
+            assert np.allclose(
+                np.asarray(pdf.weights), np.asarray(pdf2.weights)
             )
-            assert torch.allclose(
-                torch.from_numpy(pdf.means_invvars),
-                torch.from_numpy(pdf2.means_invvars),
+            assert np.allclose(
+                np.asarray(pdf.means_invvars),
+                np.asarray(pdf2.means_invvars),
             )
-            assert torch.allclose(
-                torch.from_numpy(pdf.inv_vars), torch.from_numpy(pdf2.inv_vars)
+            assert np.allclose(
+                np.asarray(pdf.inv_vars), np.asarray(pdf2.inv_vars)
             )
 
 
 if __name__ == "__main__":
-    torch.manual_seed(20230416)
+    np.random.seed(20230416)
     unittest.main()

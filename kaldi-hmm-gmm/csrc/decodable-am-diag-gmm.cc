@@ -4,8 +4,7 @@
 //                2013  Johns Hopkins Universith (author: Daniel Povey)
 // Copyright (c)  2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/gmm/decodable-am-diag-gmm.cc
+// This file is copied/modified from kaldi/src/gmm/decodable-am-diag-gmm.cc
 
 #include "kaldi-hmm-gmm/csrc/decodable-am-diag-gmm.h"
 
@@ -56,9 +55,7 @@ float DecodableAmDiagGmmUnmapped::LogLikelihoodZeroBased(int32_t frame,
   FloatVector loglikes = pdf.gconsts() + pdf.means_invvars() * data -
                          0.5 * pdf.inv_vars() * data.array().square().matrix();
 
-  // float log_sum = loglikes.LogSumExp(log_sum_exp_prune_);
-  // Note: log_sum_exp_prune_ is never used
-  float log_sum = LogSumExp(loglikes);
+  float log_sum = LogSumExp(loglikes, log_sum_exp_prune_);
 
   if (KALDI_ISNAN(log_sum) || KALDI_ISINF(log_sum)) {
     KHG_ERR << "Invalid answer (overflow or invalid variances/features?)";

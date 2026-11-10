@@ -4,6 +4,9 @@
 //                2014  Daniel Povey
 //                2023  Xiaomi Corporation
 
+//
+// This file is copied/modified from kaldi/src/tree/clusterable-classes.cc
+//
 #include "kaldi-hmm-gmm/csrc/clusterable-classes.h"
 
 #include <algorithm>

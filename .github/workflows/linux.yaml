@@ -38,7 +38,6 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        torch: ["2.3.1"]
 
     steps:
       - uses: actions/checkout@v4
@@ -49,6 +48,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ matrix.os }}-${{ matrix.python-version }}
 
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
@@ -62,16 +66,17 @@ jobs:
         shell: bash
         run: |
           python3 -m pip install -U pip graphviz
-          python3 -m pip install torch==${{ matrix.torch }} numpy -f https://download.pytorch.org/whl/cpu/torch/
+          python3 -m pip install -r requirements.txt
 
-          python3 -m torch.utils.collect_env
 
       - name: Configure CMake
         shell: bash
         run: |
           mkdir build
           cd build
-          cmake -D CMAKE_BUILD_TYPE=Release ..
+          cmake -D CMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ..
 
       - name: Build
         run: |

@@ -4,8 +4,20 @@
 //                      Jan Silovsky;  Saarland University
 //                2023  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/base/kaldi-math.h
+// This file is copied/modified from kaldi/src/base/kaldi-math.h
+
+/**
+ * \file kaldi-math.h
+ * \brief Small math helpers ported from kaldi/src/base/kaldi-math.h.
+ *
+ * This file is copied/modified from kaldi/src/base/kaldi-math.h.
+ *
+ * It provides the constants \c kMinLogDiffDouble / \c kMinLogDiffFloat and
+ * \c kPi, the log-domain addition helpers \c LogAdd and \c Log1p, the
+ * comparison helper \c ApproxEqual, and simple random number generation
+ * (\c RandomState, \c Rand, \c RandUniform) plus \c Gcd.
+ */
+
 #ifndef KALDI_HMM_GMM_CSRC_KALDI_MATH_H_
 #define KALDI_HMM_GMM_CSRC_KALDI_MATH_H_
 
@@ -35,6 +47,9 @@ namespace khg {
 static const double kMinLogDiffDouble = std::log(DBL_EPSILON);  // negative!
 static const float kMinLogDiffFloat = std::log(FLT_EPSILON);    // negative!
 
+// 3.14159... (M_PI is not available with MSVC unless _USE_MATH_DEFINES)
+constexpr double kPi = 3.14159265358979323846;
+
 #if !defined(_MSC_VER) || (_MSC_VER >= 1700)
 inline double Log1p(double x) { return std::log1p(x); }
 inline float Log1p(float x) { return std::log1pf(x); }
@@ -56,7 +71,7 @@ inline float Log1p(float x) {
 }
 #endif
 
-// returns log(exp(x) + exp(y)).
+/// returns log(exp(x) + exp(y)).
 inline float LogAdd(float x, float y) {
   float diff;
 
@@ -77,7 +92,7 @@ inline float LogAdd(float x, float y) {
   }
 }
 
-// returns log(exp(x) + exp(y)).
+/// returns log(exp(x) + exp(y)).
 inline double LogAdd(double x, double y) {
   double diff;
 
@@ -109,15 +124,21 @@ static inline bool ApproxEqual(float a, float b,
   return (diff <= relative_tolerance * (std::abs(a) + std::abs(b)));
 }
 
-// State for thread-safe random number generator
+/// State for thread-safe random number generator
 struct RandomState {
   RandomState();
   unsigned seed;
 };
 
-// Returns a random integer between 0 and RAND_MAX, inclusive
+/// Returns a random integer between 0 and RAND_MAX, inclusive
 int32_t Rand(struct RandomState *state = nullptr);
 
+/// Ported from ../kaldi/src/base/kaldi-math.h (RandUniform).
+inline float RandUniform(RandomState *state = nullptr) {
+  return static_cast<float>(Rand(state) + 1.0) / (RAND_MAX + 2.0);
+}
+
+/// Returns the greatest common divisor of m and n (error if both are zero).
 template <class I>
 I Gcd(I m, I n) {
   if (m == 0 || n == 0) {

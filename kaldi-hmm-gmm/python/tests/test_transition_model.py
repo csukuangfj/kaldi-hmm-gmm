@@ -7,7 +7,6 @@ import unittest
 
 import kaldi_hmm_gmm as khg
 import numpy as np
-import torch
 
 
 def get_hmm_topo():
@@ -99,9 +98,9 @@ class TestTransitionModel(unittest.TestCase):
         # transition id 1 and 2 corresponds to the hmm state 0 for phone 1
         # transition id 3 corresponds to state 1 for phone 1, which is not the
         # start state.
-        assert transition_model.transition_ids_is_start_of_phone(1) is True
-        assert transition_model.transition_ids_is_start_of_phone(2) is True
-        assert transition_model.transition_ids_is_start_of_phone(3) is False
+        assert transition_model.transition_id_is_start_of_phone(1) is True
+        assert transition_model.transition_id_is_start_of_phone(2) is True
+        assert transition_model.transition_id_is_start_of_phone(3) is False
 
         assert transition_model.transition_id_to_phone(1) == 1
         assert transition_model.transition_id_to_phone(2) == 1
@@ -118,7 +117,7 @@ class TestTransitionModel(unittest.TestCase):
 
         # 5: phone 1 has 5 pdf ids
         # 3: phone 1 to phone 3, each has 3 pdf ids
-        assert transition_model.num_pdfs == 5 + 3 * 3, transition_model.num_pdfs
+        assert transition_model.num_pdfs() == 5 + 3 * 3, transition_model.num_pdfs()
 
         # test stats
         stats = transition_model.init_stats()
@@ -126,11 +125,11 @@ class TestTransitionModel(unittest.TestCase):
         assert stats.dtype == np.float64, stats.dtype
 
         # transition_id starts from 1, so stats[0] is never used
-        assert stats.shape[0] == transition_model.num_transition_ids + 1, (
+        assert stats.shape[0] == transition_model.num_transition_ids() + 1, (
             stats.shape[0],
-            transition_model.num_transition_ids + 1,
+            transition_model.num_transition_ids() + 1,
         )
-        assert torch.from_numpy(stats).abs().sum().item() == 0, stats
+        assert np.abs(np.asarray(stats)).sum().item() == 0, stats
 
         stats = transition_model.accumulate(prob=0.25, trans_id=1, stats=stats)
         assert stats[1].item() == 0.25, stats[1]
@@ -159,10 +158,13 @@ class TestTransitionModel(unittest.TestCase):
             transition_model.non_self_loop_log_probs
             == transition_model2.non_self_loop_log_probs
         )
-        assert transition_model.num_pdfs == transition_model2.num_pdfs
+        assert transition_model.num_pdfs() == transition_model2.num_pdfs()
 
-        torch.save(transition_model, "transition_model.pt")
-        transition_model3 = torch.load("transition_model.pt")
+        with open("transition_model.pkl", "wb") as f:
+            pickle.dump(transition_model, f)
+        # our pybind11 objects; this is a trusted local file.
+        with open("transition_model.pkl", "rb") as f:
+            transition_model3 = pickle.load(f)
 
         assert isinstance(transition_model3, khg.TransitionModel)
 
@@ -179,7 +181,7 @@ class TestTransitionModel(unittest.TestCase):
             transition_model.non_self_loop_log_probs
             == transition_model3.non_self_loop_log_probs
         )
-        assert transition_model.num_pdfs == transition_model3.num_pdfs
+        assert transition_model.num_pdfs() == transition_model3.num_pdfs()
 
 
 """

@@ -5,11 +5,15 @@
 // Corporation;
 //                      Georg Stemmer
 //                2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/gmm/am-diag-gmm.cc
+//
 #include "kaldi-hmm-gmm/csrc/am-diag-gmm.h"
 
 #include "kaldi-hmm-gmm/csrc/log.h"
 #include "kaldi-hmm-gmm/csrc/model-common.h"
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"
+#include "kaldi_native_io/csrc/io-funcs.h"
 namespace khg {
 
 AmDiagGmm::~AmDiagGmm() { DeletePointers(&densities_); }
@@ -159,6 +163,41 @@ void AmDiagGmm::SetGaussianMean(int32_t pdf_index, int32_t gauss_index,
   KHG_ASSERT((static_cast<size_t>(pdf_index) < densities_.size()) &&
              (densities_[pdf_index] != nullptr));
   densities_[pdf_index]->SetComponentMean(gauss_index, in);
+}
+
+// The functions below are ported from ../kaldi/src/gmm/am-diag-gmm.cc; the
+// file format is identical to kaldi's.
+void AmDiagGmm::Read(std::istream &is, bool binary) {
+  int32_t num_pdfs = 0;
+  int32_t dim = 0;
+
+  kaldiio::ExpectToken(is, binary, "<DIMENSION>");
+  kaldiio::ReadBasicType(is, binary, &dim);
+  kaldiio::ExpectToken(is, binary, "<NUMPDFS>");
+  kaldiio::ReadBasicType(is, binary, &num_pdfs);
+  KHG_ASSERT(num_pdfs > 0);
+  if (!densities_.empty()) {
+    for (auto *d : densities_) delete d;
+    densities_.clear();
+  }
+  densities_.reserve(num_pdfs);
+  for (int32_t i = 0; i < num_pdfs; i++) {
+    densities_.push_back(new DiagGmm());
+    densities_.back()->Read(is, binary);
+    KHG_ASSERT(densities_.back()->Dim() == dim);
+  }
+}
+
+void AmDiagGmm::Write(std::ostream &os, bool binary) const {
+  int32_t dim = this->Dim();
+  if (dim == 0) {
+    KHG_WARN << "Trying to write empty AmDiagGmm object.";
+  }
+  kaldiio::WriteToken(os, binary, "<DIMENSION>");
+  kaldiio::WriteBasicType(os, binary, dim);
+  kaldiio::WriteToken(os, binary, "<NUMPDFS>");
+  kaldiio::WriteBasicType(os, binary, static_cast<int32_t>(densities_.size()));
+  for (const DiagGmm *d : densities_) d->Write(os, binary);
 }
 
 }  // namespace khg

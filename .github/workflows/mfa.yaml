@@ -1,0 +1,159 @@
+name: mfa
+
+on:
+  push:
+    branches:
+      - master
+      - yesno
+    paths:
+      - 'tools/**'
+      - 'kaldi-hmm-gmm/**'
+      - '.github/workflows/mfa.yaml'
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: mfa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mfa-english:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: mfa-english
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install -U pip
+          python3 -m pip install numpy kaldifst kaldi-native-fbank librosa soundfile
+
+      - name: Build kaldi-hmm-gmm
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DKHG_ENABLE_TESTS=OFF \
+            -DPYTHON_EXECUTABLE=$(which python3)
+          cmake --build build -j2
+
+      - name: Download acoustic model, dictionary and test audio
+        run: |
+          mkdir -p english
+          wget -q https://github.com/MontrealCorpusTools/mfa-models/releases/download/acoustic-english_mfa-v3.1.0/english_mfa.zip
+          unzip -q english_mfa.zip -d english
+          wget -q -O english/english_mfa.dict \
+            https://github.com/MontrealCorpusTools/mfa-models/releases/download/dictionary-english_mfa-v3.1.0/english_mfa.dict
+          wget -q -O english/en.wav \
+            https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav
+
+      - name: Run MFA alignment (prints audio duration, elapsed, RTF)
+        run: |
+          python3 tools/align_mfa.py --wav english/en.wav \
+            --text "Ask not what your country can do for you, ask what you can do for your country." \
+            --model-dir english/english_mfa --dict english/english_mfa.dict \
+            --phones-txt english/english_mfa/phones.txt --out english/en.TextGrid
+
+      - name: Extract per-word audio (TextGrid words tier)
+        run: |
+          python3 tools/textgrid_to_word_wavs.py --wav english/en.wav \
+            --textgrid english/en.TextGrid --out-dir english/en.words
+
+      - name: Upload TextGrid, audio and per-word clips
+        uses: actions/upload-artifact@v4
+        with:
+          name: mfa-english
+          path: |
+            english/en.TextGrid
+            english/en.wav
+            english/en.words
+
+  mfa-mandarin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: mfa-mandarin
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install -U pip
+          python3 -m pip install numpy kaldifst kaldi-native-fbank librosa soundfile pypinyin
+
+      - name: Build kaldi-hmm-gmm
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DKHG_ENABLE_TESTS=OFF \
+            -DPYTHON_EXECUTABLE=$(which python3)
+          cmake --build build -j2
+
+      - name: Download acoustic models and test audio
+        run: |
+          mkdir -p mandarin
+          for name in aishell3_pinyin large_pinyin; do
+            mkdir -p "$name"
+            wget -q "https://github.com/lars76/forced-alignment-chinese/releases/download/model_files/${name}.zip"
+            # the outer zip holds the pronunciation dictionary (.dict/.txt)
+            # and a nested acoustic-model zip
+            unzip -q "${name}.zip" -d "$name"
+            unzip -q "$name/${name}_acoustic.zip" -d "$name"
+          done
+          wget -q -O mandarin/zh.wav \
+            https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/zh.wav
+
+      - name: Run MFA alignment, aishell3 model (prints audio duration, elapsed, RTF)
+        run: |
+          python3 tools/align_mfa.py --wav mandarin/zh.wav \
+            --text "不要问你的国家能为你做什么，而要问你能为你的国家做什么。" \
+            --model-dir aishell3_pinyin/aishell3_pinyin_acoustic \
+            --dict aishell3_pinyin/aishell3_pinyin_dictionary.dict \
+            --phones-txt aishell3_pinyin/aishell3_pinyin_acoustic/phones.txt \
+            --tokenize pinyin --out mandarin/zh-aishell3.TextGrid
+
+      - name: Run MFA alignment, large_pinyin model (prints audio duration, elapsed, RTF)
+        run: |
+          python3 tools/align_mfa.py --wav mandarin/zh.wav \
+            --text "不要问你的国家能为你做什么，而要问你能为你的国家做什么。" \
+            --model-dir large_pinyin/d_pinyin_acoustic \
+            --dict large_pinyin/large_pinyin_dictionary.dict \
+            --phones-txt large_pinyin/d_pinyin_acoustic/phones.txt \
+            --tokenize pinyin --out mandarin/zh-large.TextGrid
+
+      - name: Extract per-word audio (TextGrid words tier)
+        run: |
+          python3 tools/textgrid_to_word_wavs.py --wav mandarin/zh.wav \
+            --textgrid mandarin/zh-aishell3.TextGrid --out-dir mandarin/zh-aishell3.words
+          python3 tools/textgrid_to_word_wavs.py --wav mandarin/zh.wav \
+            --textgrid mandarin/zh-large.TextGrid --out-dir mandarin/zh-large.words
+
+      - name: Upload TextGrid, audio and per-word clips
+        uses: actions/upload-artifact@v4
+        with:
+          name: mfa-mandarin
+          path: |
+            mandarin/zh-aishell3.TextGrid
+            mandarin/zh-large.TextGrid
+            mandarin/zh.wav
+            mandarin/zh-aishell3.words
+            mandarin/zh-large.words

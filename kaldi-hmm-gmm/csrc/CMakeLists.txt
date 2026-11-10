@@ -1,4 +1,6 @@
-include_directories(${CMAKE_SOURCE_DIR})
+# PROJECT_SOURCE_DIR (not CMAKE_SOURCE_DIR): correct both standalone
+# and when built as a subproject (e.g. a sherpa-onnx-style consumer).
+include_directories(${PROJECT_SOURCE_DIR})
 
 # Please keep the source files alphabetically sorted
 set(srcs
@@ -8,18 +10,13 @@ set(srcs
   clusterable-classes.cc
   context-dep.cc
   decodable-am-diag-gmm.cc
-  decodable-ctc.cc
-  decoder-wrappers.cc
   diag-gmm-normal.cc
   diag-gmm.cc
   eigen.cc
   event-map.cc
-  faster-decoder.cc
   hmm-topology.cc
   hmm-utils.cc
   kaldi-math.cc
-  lattice-simple-decoder.cc
-  lattice-faster-decoder.cc
   mle-am-diag-gmm.cc
   mle-diag-gmm.cc
   model-common.cc
@@ -27,18 +24,37 @@ set(srcs
   transition-model.cc
   tree-renderer.cc
 )
-add_library(kaldi-hmm-gmm-core ${srcs})
+# The core library is always built as a static library (like
+# kaldi-native-fbank-core); it is linked into the Python extension module
+# and into the gtests.
+add_library(kaldi-hmm-gmm-core STATIC ${srcs})
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldi_native_io_core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC fst)
+# Export the include root so consumers (e.g. a sherpa-onnx-style project)
+# can #include "kaldi-hmm-gmm/csrc/..." after linking this target.
+target_include_directories(kaldi-hmm-gmm-core PUBLIC ${PROJECT_SOURCE_DIR})
+
+target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldi-decoder-core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldifst_core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC Eigen3::Eigen)
 
 if(KHG_ENABLE_TESTS)
   set(test_srcs
+    am-diag-gmm-test.cc
+    build-tree-utils-test.cc
+    cluster-utils-test.cc
+    context-dep-test.cc
+    decodable-am-diag-gmm-test.cc
     diag-gmm-test.cc
     eigen-test.cc
     event-map-test.cc
-    hash-list-test.cc
+    hmm-topology-test.cc
+    hmm-utils-test.cc
+    kaldi-math-test.cc
+    mle-am-diag-gmm-test.cc
+    mle-diag-gmm-test.cc
+    model-common-test.cc
+    transition-model-test.cc
   )
 
   function(khg_add_test source)
@@ -62,8 +78,6 @@ if(KHG_ENABLE_TESTS)
   endforeach()
 endif()
 
-if(KHG_BUILD_PYTHON AND WIN32)
-  install(TARGETS kaldi-hmm-gmm-core DESTINATION ..)
-else()
+if(KHG_INSTALL_CORE_LIB)
   install(TARGETS kaldi-hmm-gmm-core DESTINATION lib)
 endif()

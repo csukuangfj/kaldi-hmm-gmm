@@ -5,6 +5,21 @@
 // this file is copied and modified from
 // kaldi/src/util/const-integer-set.h
 
+/**
+ * \file const-integer-set.h
+ * \brief Immutable integer set with fast membership tests.
+ *
+ * This file is copied and modified from kaldi/src/util/const-integer-set.h.
+ *
+ * It declares \c ConstIntegerSet, a read-only set of integers that is
+ * initialized once (from a vector or set) and then supports efficient
+ * membership queries (\c count) and iteration.  Depending on the density of
+ * the input it stores either a sorted vector (binary search) or a bit/bool
+ * lookup table, giving O(1) membership in the dense case.  It is used e.g. by
+ * \c SplitEventMap in event-map.h to test question membership quickly; the
+ * member function bodies live in const-integer-set-inl.h.
+ */
+
 #ifndef KALDI_HMM_GMM_CSRC_CONST_INTEGER_SET_H_
 #define KALDI_HMM_GMM_CSRC_CONST_INTEGER_SET_H_
 #include <algorithm>
@@ -15,19 +30,21 @@
 
 #include "kaldi-hmm-gmm/csrc/stl-utils.h"
 
-/* ConstIntegerSet is a way to efficiently test whether something is in a
-   supplied set of integers.  It can be initialized from a vector or set, but
-   never changed after that. It either uses a sorted vector or an array of
-   bool, depending on the input.  It behaves like a const version of an STL set,
-   with only a subset of the functionality, except all the member functions are
-   upper-case.
-
-   Note that we could get rid of the member slow_set_, but we'd have to
-   do more work to implement an iterator type.  This would save memory.
-*/
-
 namespace khg {
 
+/**
+ * \brief A read-only set of integers with fast membership tests.
+ *
+ * ConstIntegerSet is a way to efficiently test whether something is in a
+ * supplied set of integers.  It can be initialized from a vector or set, but
+ * never changed after that. It either uses a sorted vector or an array of
+ * bool, depending on the input.  It behaves like a const version of an STL set,
+ * with only a subset of the functionality, except all the member functions are
+ * upper-case.
+ *
+ * Note that we could get rid of the member slow_set_, but we'd have to
+ * do more work to implement an iterator type.  This would save memory.
+ */
 template <class I>
 class ConstIntegerSet {
  public:

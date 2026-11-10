@@ -1,9 +1,16 @@
 // kaldi-hmm-gmm/csrc/tree-renderer.cc
+
+#include <cstdint>
+// Compat typedefs formerly provided transitively by old openfst headers.
+typedef int32_t int32;
+typedef uint32_t uint32;
+typedef int64_t int64;
+typedef uint64_t uint64;
 //
+// Copyright 2012 Vassil Panayotov
 // Copyright (c)  2022  Xiaomi Corporation
 
-// this file is copied and modified from
-// kaldi/src/tree/tree-renderer.cc
+// This file is copied/modified from kaldi/src/tree/tree-renderer.cc
 #include "kaldi-hmm-gmm/csrc/tree-renderer.h"
 
 #include <string>

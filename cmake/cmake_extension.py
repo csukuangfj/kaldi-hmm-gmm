@@ -68,13 +68,12 @@ class BuildExtension(build_ext):
             cmake_args = "-DCMAKE_BUILD_TYPE=Release"
 
         extra_cmake_args = f" -DCMAKE_INSTALL_PREFIX={install_dir} "
-        if is_windows():
-            extra_cmake_args += f" -DBUILD_SHARED_LIBS=OFF "
-        else:
-            extra_cmake_args += f" -DBUILD_SHARED_LIBS=ON "
-
+        # Everything is linked statically into _kaldi_hmm_gmm; install only
+        # the module itself into kaldi_hmm_gmm/lib/ (like kaldi-native-fbank).
+        extra_cmake_args += f" -DBUILD_SHARED_LIBS=OFF "
         extra_cmake_args += f" -DKHG_BUILD_PYTHON=ON "
         extra_cmake_args += f" -DKHG_ENABLE_TESTS=OFF "
+        extra_cmake_args += f" -DKHG_INSTALL_CORE_LIB=OFF "
 
         if "PYTHON_EXECUTABLE" not in cmake_args:
             print(f"Setting PYTHON_EXECUTABLE to {sys.executable}")

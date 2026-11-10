@@ -407,13 +407,13 @@ TEST(Eigen, Sequence) {
   Eigen::VectorXf v(5);
   v << 0, 1, 2, 3, 4;
 
-  Eigen::VectorXf a = v(Eigen::seq(2, Eigen::last));
+  Eigen::VectorXf a = v(Eigen::seq(2, Eigen::indexing::last));
   EXPECT_EQ(a.size(), 3);
   EXPECT_EQ(a[0], 2);
   EXPECT_EQ(a[1], 3);
   EXPECT_EQ(a[2], 4);
 
-  a = v(Eigen::seq(2, Eigen::last - 1));
+  a = v(Eigen::seq(2, Eigen::indexing::last - 1));
   EXPECT_EQ(a.size(), 2);
   EXPECT_EQ(a[0], 2);
   EXPECT_EQ(a[1], 3);
@@ -431,14 +431,14 @@ TEST(Eigen, CopyRow) {
   a = Eigen::MatrixXf::Random(5, 3);
   b.resize(5, 3);
 
-  b(Eigen::seqN(0, 3), Eigen::all) = a(Eigen::seqN(0, 3), Eigen::all);
-  b(Eigen::seqN(3, 2), Eigen::all) = a(Eigen::seqN(3, 2), Eigen::all);
+  b(Eigen::seqN(0, 3), Eigen::indexing::all) = a(Eigen::seqN(0, 3), Eigen::indexing::all);
+  b(Eigen::seqN(3, 2), Eigen::indexing::all) = a(Eigen::seqN(3, 2), Eigen::indexing::all);
   for (int32_t i = 0; i != a.size(); ++i) {
     EXPECT_EQ(a(i), b(i));
   }
 
   Eigen::MatrixXf c(5, 3);
-  c(Eigen::seqN(0, 5), Eigen::all) = a;
+  c(Eigen::seqN(0, 5), Eigen::indexing::all) = a;
   for (int32_t i = 0; i != a.size(); ++i) {
     EXPECT_EQ(a(i), c(i));
   }
@@ -629,7 +629,7 @@ TEST(Eigen, Indexes) {
   m << 0, 1, 2, 3, 4, 5;
 
   indexes = {1, 0, 2, 1};
-  Eigen::MatrixXf b = m(indexes, Eigen::all);
+  Eigen::MatrixXf b = m(indexes, Eigen::indexing::all);
 #if 0
     2 3
     0 1
@@ -709,6 +709,165 @@ TEST(Eigen, Dot) {
   b << 4, 5, 6;
   float c = a.dot(b);
   EXPECT_EQ(c, 1 * 4 + 2 * 5 + 3 * 6);
+}
+
+// The tests below cover LogSumExp(prune) against kaldi's
+// VectorBase::LogSumExp semantics (../kaldi/src/matrix/kaldi-vector.cc):
+// terms below max + kMinLogDiffFloat are dropped; when prune > 0, terms
+// below max - prune are dropped instead, but only if that is stricter; the
+// max term is always kept; result = max + log(sum(exp(f - max))) over the
+// kept terms.
+
+TEST(Eigen, LogSumExpAllTermsClose) {
+  srand(1);
+  Eigen::VectorXf v(4);
+  v << 0.1f, -0.2f, 0.05f, 0.3f;
+
+  double sum = 0.0;
+  for (int32_t i = 0; i != 4; ++i) {
+    sum += std::exp(static_cast<double>(v[i]));
+  }
+  double expected = std::log(sum);
+
+  auto rel_eq = [](double a, double b, double tol) {
+    EXPECT_LE(std::fabs(a - b), 0.5 * tol * (std::fabs(a) + std::fabs(b)))
+        << "a = " << a << ", b = " << b;
+  };
+
+  // all terms are close to the max: nothing is dropped, so the result is
+  // log(sum(exp(v)))
+  rel_eq(LogSumExp(v), expected, 1.0e-6);
+
+  // no pruning (default) equals explicitly disabled pruning
+  // all terms lie within kMinLogDiffFloat of the max, so even a zero
+  // prune keeps every term
+  EXPECT_FLOAT_EQ(LogSumExp(v, 0.0f), LogSumExp(v));
+}
+
+TEST(Eigen, LogSumExpFarTermDropped) {
+  srand(1);
+  Eigen::VectorXf without_far(2);
+  without_far << 1.0f, 0.5f;
+
+  // max - 20 is below max + kMinLogDiffFloat: the term is dropped and the
+  // result is unchanged
+  Eigen::VectorXf v(3);
+  v << 1.0f, 0.5f, 1.0f - 20.0f;
+  EXPECT_FLOAT_EQ(LogSumExp(v), LogSumExp(without_far));
+
+  // max - 5 is above the cutoff: the term is kept and changes the result
+  Eigen::VectorXf v2(3);
+  v2 << 1.0f, 0.5f, 1.0f - 5.0f;
+  EXPECT_GT(std::fabs(LogSumExp(v2) - LogSumExp(without_far)), 1.0e-3);
+}
+
+TEST(Eigen, LogSumExpPrune) {
+  srand(1);
+  Eigen::VectorXf v(4);
+  v << 0.0f, -0.3f, -1.5f, -2.5f;
+
+  auto rel_eq = [](double a, double b, double tol) {
+    EXPECT_LE(std::fabs(a - b), 0.5 * tol * (std::fabs(a) + std::fabs(b)))
+        << "a = " << a << ", b = " << b;
+  };
+
+  // no term is below max + kMinLogDiffFloat: everything is kept
+  rel_eq(LogSumExp(v),
+         std::log(std::exp(0.0) + std::exp(-0.3) + std::exp(-1.5) +
+                  std::exp(-2.5)),
+         1.0e-6);
+
+  // prune = 2 drops terms below max - 2 = -2, even though -2.5 is above
+  // the float-epsilon cutoff
+  rel_eq(LogSumExp(v, 2.0f),
+         std::log(std::exp(0.0) + std::exp(-0.3) + std::exp(-1.5)), 1.0e-6);
+
+  // prune = 1 drops terms below max - 1 = -1
+  rel_eq(LogSumExp(v, 1.0f), std::log(std::exp(0.0) + std::exp(-0.3)),
+         1.0e-6);
+
+  // the prune argument really changes the result
+  EXPECT_GT(std::fabs(LogSumExp(v) - LogSumExp(v, 2.0f)), 1.0e-2);
+
+  // prune is applied only if it is stricter than the float-epsilon cutoff:
+  // max - 100 is below max + kMinLogDiffFloat, so nothing extra is dropped
+  EXPECT_FLOAT_EQ(LogSumExp(v, 100.0f), LogSumExp(v));
+}
+
+TEST(Eigen, LogSumExpEdgeCases) {
+  srand(1);
+  auto rel_eq = [](double a, double b, double tol) {
+    EXPECT_LE(std::fabs(a - b), 0.5 * tol * (std::fabs(a) + std::fabs(b)))
+        << "a = " << a << ", b = " << b;
+  };
+
+  // the max term is always kept: with a tiny prune only the max survives
+  // and the result equals the max itself
+  {
+    Eigen::VectorXf v(2);
+    v << 0.0f, -1.0f;
+    EXPECT_FLOAT_EQ(LogSumExp(v, 0.5f), 0.0f);
+    EXPECT_FLOAT_EQ(LogSumExp(v, 0.5f), v.maxCoeff());
+  }
+
+  // single element: the result is the element itself
+  {
+    Eigen::VectorXf v(1);
+    v << -2.5f;
+    EXPECT_FLOAT_EQ(LogSumExp(v), -2.5f);
+    EXPECT_FLOAT_EQ(LogSumExp(v, 0.1f), -2.5f);
+  }
+
+  // all terms equal: c + log(n)
+  {
+    Eigen::VectorXf v(3);
+    v << -3.0f, -3.0f, -3.0f;
+    rel_eq(LogSumExp(v), -3.0 + std::log(3.0), 1.0e-6);
+  }
+
+  // negative values with a negative max
+  {
+    Eigen::VectorXf v(3);
+    v << -3.0f, -4.0f, -5.0f;
+    rel_eq(LogSumExp(v),
+           std::log(std::exp(-3.0) + std::exp(-4.0) + std::exp(-5.0)), 1.0e-6);
+  }
+}
+
+TEST(Eigen, SoftmaxLogSumExpOutParam) {
+  srand(1);
+  Eigen::VectorXf v(5);
+  v << 0.4f, -1.2f, 2.0f, 0.0f, 1.1f;
+
+  auto rel_eq = [](double a, double b, double tol) {
+    EXPECT_LE(std::fabs(a - b), 0.5 * tol * (std::fabs(a) + std::fabs(b)))
+        << "a = " << a << ", b = " << b;
+  };
+
+  float log_sum_exp = 0.0f;
+  Eigen::VectorXf p = Softmax(v, &log_sum_exp);
+
+  // the returned log_sum_exp equals LogSumExp of the input
+  rel_eq(log_sum_exp, LogSumExp(v), 1.0e-6);
+
+  // p is the softmax distribution: p_i = exp(v_i) / sum(exp(v))
+  double sum = 0.0;
+  for (int32_t i = 0; i != 5; ++i) {
+    sum += std::exp(static_cast<double>(v[i]));
+  }
+  double p_sum = 0.0;
+  for (int32_t i = 0; i != 5; ++i) {
+    EXPECT_GT(p[i], 0.0f);
+    rel_eq(p[i], std::exp(static_cast<double>(v[i])) / sum, 1.0e-5);
+    p_sum += p[i];
+  }
+  rel_eq(p_sum, 1.0, 1.0e-5);
+
+  // the out-param is optional and does not change the result
+  Eigen::VectorXf p2 = Softmax(v);
+  for (int32_t i = 0; i != 5; ++i) {
+    EXPECT_FLOAT_EQ(p[i], p2[i]);
+  }
 }
 
 }  // namespace khg

@@ -5,6 +5,18 @@
 // this file is copied and modified from
 // kaldi/src/util/const-integer-set-inl.h
 
+/**
+ * \file const-integer-set-inl.h
+ * \brief Inline/templated implementations of \c ConstIntegerSet.
+ *
+ * This file is copied and modified from kaldi/src/util/const-integer-set-inl.h.
+ *
+ * It contains the out-of-class definitions of the \c ConstIntegerSet member
+ * functions (\c InitInternal, \c count, \c Write, \c Read).  Do not include
+ * this file directly: it is included by const-integer-set.h at the end of that
+ * header.
+ */
+
 #ifndef KALDI_HMM_GMM_CSRC_CONST_INTEGER_SET_INL_H_
 #define KALDI_HMM_GMM_CSRC_CONST_INTEGER_SET_INL_H_
 

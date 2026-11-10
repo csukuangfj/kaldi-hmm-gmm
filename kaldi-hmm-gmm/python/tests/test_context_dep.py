@@ -7,7 +7,13 @@ import pickle
 import unittest
 from typing import List, Tuple
 
-import graphviz
+try:
+    import graphviz  # noqa: F401
+    import shutil
+
+    _HAS_GRAPHVIZ = shutil.which("dot") is not None
+except ImportError:
+    _HAS_GRAPHVIZ = False
 import kaldi_hmm_gmm as khg
 
 
@@ -127,9 +133,10 @@ class TestContextDep(unittest.TestCase):
             f.write("g 8\n")
             f.write("h 9\n")
             f.write("i 10\n")
-        dot = khg.draw_tree(phones_txt="phones.txt", tree="./tree")
-        source = graphviz.Source(dot)
-        source.render("tree", format="pdf")  # It will generate ./tree.pdf
+        if _HAS_GRAPHVIZ:
+            dot = khg.draw_tree(phones_txt="phones.txt", tree="./tree")
+            source = graphviz.Source(dot)
+            source.render("tree", format="pdf")  # It will generate ./tree.pdf
 
         # test pickle
         data = pickle.dumps(tree, 2)  # Must use pickle protocol >= 2
@@ -161,9 +168,10 @@ class TestContextDep(unittest.TestCase):
 
         # query: pdf_class/context-phone1/context-phone2/context-phoneN
         # note: it uses phone symbol instead of ID in the query
-        dot = khg.draw_tree(phones_txt="phones.txt", tree="./tree-shared", query="0/h")
-        source = graphviz.Source(dot)
-        source.render("tree-shared", format="pdf")  # It will generate ./tree.pdf
+        if _HAS_GRAPHVIZ:
+            dot = khg.draw_tree(phones_txt="phones.txt", tree="./tree-shared", query="0/h")
+            source = graphviz.Source(dot)
+            source.render("tree-shared", format="pdf")  # It will generate ./tree.pdf
 
         # test pickle
         data = pickle.dumps(tree, 2)  # Must use pickle protocol >= 2

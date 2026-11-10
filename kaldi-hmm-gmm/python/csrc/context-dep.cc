@@ -26,7 +26,8 @@ static void PybindContextDependencyInterface(py::module *m) {
             bool found = self.Compute(phoneseq, pdf_class, &pdf_id);
             return std::make_pair(found, pdf_id);
           },
-          py::arg("phone_seq"), py::arg("pdf_class"))
+          py::arg("phone_seq"), py::arg("pdf_class"),
+          py::call_guard<py::gil_scoped_release>())
       .def(
           "get_pdf_info",
           [](const PyClass &self, const std::vector<int32_t> &phones,
@@ -42,7 +43,8 @@ static void PybindContextDependencyInterface(py::module *m) {
             // The size of the returned list is usually 1
             //
           },
-          py::arg("phones"), py::arg("num_pdf_classes"));
+          py::arg("phones"), py::arg("num_pdf_classes"),
+          py::call_guard<py::gil_scoped_release>());
 }
 
 void PybindContextDep(py::module *m) {
@@ -54,7 +56,17 @@ void PybindContextDep(py::module *m) {
           [](const PyClass &self, bool binary, const std::string &filename) {
             self.Write(kaldiio::Output(filename, binary).Stream(), binary);
           },
-          py::arg("binary"), py::arg("filename"))
+          py::arg("binary"), py::arg("filename"),
+          py::call_guard<py::gil_scoped_release>())
+      .def(
+          "read",
+          [](PyClass &self, const std::string &filename) {
+            bool binary = true;
+            kaldiio::Input ki(filename, &binary);
+            self.Read(ki.Stream(), binary);
+          },
+          py::arg("filename"),
+          py::call_guard<py::gil_scoped_release>())
       .def("__str__",
            [](const PyClass &self) -> std::string {
              std::ostringstream os;
@@ -81,12 +93,26 @@ void PybindContextDep(py::module *m) {
 
   m->def("monophone_context_dependency", &MonophoneContextDependency,
          py::arg("phones"), py::arg("phone2num_pdf_classes"),
-         py::return_value_policy::take_ownership);
+         py::return_value_policy::take_ownership,
+         py::call_guard<py::gil_scoped_release>());
+
+  m->def(
+      "read_tree",
+      [](const std::string &filename) -> std::unique_ptr<ContextDependency> {
+        bool binary = true;
+        kaldiio::Input ki(filename, &binary);
+        auto ans = std::make_unique<ContextDependency>();
+        ans->Read(ki.Stream(), binary);
+        return ans;
+      },
+      py::arg("filename"),
+      "Reads a ContextDependency (tree) from a kaldi-format file.");
 
   m->def("monophone_context_dependency_shared",
          &MonophoneContextDependencyShared, py::arg("phone_classes"),
          py::arg("phone2num_pdf_classes"),
-         py::return_value_policy::take_ownership);
+         py::return_value_policy::take_ownership,
+         py::call_guard<py::gil_scoped_release>());
 }
 
 }  // namespace khg

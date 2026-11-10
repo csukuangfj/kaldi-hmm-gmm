@@ -6,9 +6,16 @@
 import unittest
 
 import kaldi_hmm_gmm as khg
-import graphviz
+try:
+    import graphviz  # noqa: F401
+    import shutil
+
+    _HAS_GRAPHVIZ = shutil.which("dot") is not None
+except ImportError:
+    _HAS_GRAPHVIZ = False
 
 
+@unittest.skipUnless(_HAS_GRAPHVIZ, "graphviz (with dot binary) not installed")
 class TestDrawTree(unittest.TestCase):
     def test_monophone_context_dependency(self):
         tree = khg.monophone_context_dependency(

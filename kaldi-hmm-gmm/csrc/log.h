@@ -1,6 +1,30 @@
 // kaldi-hmm-gmm/csrc/log.h
 //
+// Copyright 2019 LAIX (Yi Sun)
+// Copyright 2019 SmartAction LLC (kkm)
+// Copyright 2016 Brno University of Technology (author: Karel Vesely)
+// Copyright 2009-2011  Microsoft Corporation;  Ondrej Glembek;  Lukas Burget;
+//                      Saarland University
 // Copyright (c)  2022  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/base/kaldi-error.h
+//
+
+/**
+ * \file log.h
+ * \brief Logging and assertion macros used throughout the library.
+ *
+ * This file is copied/modified from kaldi/src/base/kaldi-error.h.
+ *
+ * It provides the \c Logger stream-style logging class and the macros
+ * \c KHG_LOG (info), \c KHG_WARN (warning) and \c KHG_ERR (error; throws
+ * std::runtime_error when the message is flushed), the assertion macros
+ * \c KHG_ASSERT and \c KHG_PARANOID_ASSERT (the latter active only when
+ * \c KHG_PARANOID is defined), and the convenience macro
+ * \c KHG_DISALLOW_COPY_AND_ASSIGN.  Usage is like kaldi's
+ * \c KALDI_LOG / \c KALDI_WARN / \c KALDI_ERR, e.g.
+ * <tt>KHG_ASSERT(x); KHG_ERR &lt;&lt; "bad value: " &lt;&lt; v;</tt>.
+ */
 
 #ifndef KALDI_HMM_GMM_CSRC_LOG_H_
 #define KALDI_HMM_GMM_CSRC_LOG_H_
@@ -82,7 +106,11 @@ class Voidifier {
       : khg::Voidifier() & KHG_ERR << "Check failed!\n" \
                                    << "x: " << #x
 
-#define KHG_PARANOID_ASSERT KHG_ASSERT
+#ifdef KHG_PARANOID
+#define KHG_PARANOID_ASSERT(x) KHG_ASSERT(x)
+#else
+#define KHG_PARANOID_ASSERT(x) (void)0
+#endif
 
 #define KHG_DISALLOW_COPY_AND_ASSIGN(Class) \
  public:                                    \

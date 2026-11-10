@@ -21,14 +21,15 @@ void PybindDiagGmm(py::module *m) {
       .def(py::init<const std::vector<std::pair<float, const DiagGmm *>> &>(),
            py::arg("gmms"))
 
-      .def("resize", &PyClass::Resize, py::arg("nmix"), py::arg("dim"))
-      .def("copy_from_diag_gmm", &PyClass::CopyFromDiagGmm, py::arg("diaggmm"))
-      .def("compute_gconsts", &PyClass::ComputeGconsts)
-      .def("set_weights", &PyClass::SetWeights, py::arg("w"))
-      .def("set_means", &PyClass::SetMeans, py::arg("m"))
-      .def("set_invvars", &PyClass::SetInvVars, py::arg("inv_vars"))
+      .def("resize", &PyClass::Resize, py::arg("nmix"), py::arg("dim"), py::call_guard<py::gil_scoped_release>())
+      .def("copy_from_diag_gmm", &PyClass::CopyFromDiagGmm, py::arg("diaggmm"), py::call_guard<py::gil_scoped_release>())
+      .def("compute_gconsts", &PyClass::ComputeGconsts, py::call_guard<py::gil_scoped_release>())
+      .def("set_weights", &PyClass::SetWeights, py::arg("w"), py::call_guard<py::gil_scoped_release>())
+      .def("set_means", &PyClass::SetMeans, py::arg("m"), py::call_guard<py::gil_scoped_release>())
+      .def("set_invvars", &PyClass::SetInvVars, py::arg("inv_vars"), py::call_guard<py::gil_scoped_release>())
       .def("log_likelihood", &PyClass::LogLikelihood, py::arg("data"),
-           "Return the total loglikes in a float")
+           "Return the total loglikes in a float",
+           py::call_guard<py::gil_scoped_release>())
       .def(
           "log_likelihoods",
           [](const PyClass &self, const FloatVector &data) {
@@ -37,7 +38,7 @@ void PybindDiagGmm(py::module *m) {
             return ans;
           },
           py::arg("data"),
-          "Return the loglike of each component in a 1-D tensor")
+          "Return the loglike of each component in a 1-D tensor", py::call_guard<py::gil_scoped_release>())
       .def_property(
           "weights",
           [](PyClass &self) -> FloatVector & { return self.weights(); },
@@ -52,20 +53,27 @@ void PybindDiagGmm(py::module *m) {
       .def_property_readonly("means_invvars", &PyClass::means_invvars)
       .def_property_readonly("inv_vars", &PyClass::inv_vars)
       .def("set_component_weight", &PyClass::SetComponentWeight,
-           py::arg("gauss"), py::arg("weight"))
+           py::arg("gauss"), py::arg("weight"),
+           py::call_guard<py::gil_scoped_release>())
       .def("set_component_mean", &PyClass::SetComponentMean, py::arg("gauss"),
-           py::arg("mean"))
+           py::arg("mean"),
+           py::call_guard<py::gil_scoped_release>())
       .def("set_invvars_and_means", &PyClass::SetInvVarsAndMeans,
-           py::arg("inv_vars"), py::arg("means"))
+           py::arg("inv_vars"), py::arg("means"),
+           py::call_guard<py::gil_scoped_release>())
       .def("set_component_inv_var", &PyClass::SetComponentInvVar,
-           py::arg("gauss"), py::arg("inv_var"))
-      .def("get_component_mean", &PyClass::GetComponentMean, py::arg("gauss"))
+           py::arg("gauss"), py::arg("inv_var"),
+           py::call_guard<py::gil_scoped_release>())
+      .def("get_component_mean", &PyClass::GetComponentMean, py::arg("gauss"), py::call_guard<py::gil_scoped_release>())
       .def("get_component_variance", &PyClass::GetComponentVariance,
-           py::arg("gauss"))
+           py::arg("gauss"),
+           py::call_guard<py::gil_scoped_release>())
       .def("remove_component", &PyClass::RemoveComponent, py::arg("gauss"),
-           py::arg("renorm_weights"))
+           py::arg("renorm_weights"),
+           py::call_guard<py::gil_scoped_release>())
       .def("remove_components", &PyClass::RemoveComponents, py::arg("gauss"),
-           py::arg("renorm_weights"))
+           py::arg("renorm_weights"),
+           py::call_guard<py::gil_scoped_release>())
       .def(
           "split",
           [](PyClass &self, int32_t target_components,
@@ -74,7 +82,7 @@ void PybindDiagGmm(py::module *m) {
             self.Split(target_components, perturb_factor, &history);
             return history;
           },
-          py::arg("target_components"), py::arg("perturb_factor"))
+          py::arg("target_components"), py::arg("perturb_factor"), py::call_guard<py::gil_scoped_release>())
       .def(
           "merge",
           [](PyClass &self, int32_t target_components) -> std::vector<int32_t> {
@@ -82,9 +90,10 @@ void PybindDiagGmm(py::module *m) {
             self.Merge(target_components, &history);
             return history;
           },
-          py::arg("target_components"))
+          py::arg("target_components"), py::call_guard<py::gil_scoped_release>())
       .def("merge_kmeans", &PyClass::MergeKmeans, py::arg("target_components"),
-           py::arg("cfg") = ClusterKMeansOptions())
+           py::arg("cfg") = ClusterKMeansOptions(),
+           py::call_guard<py::gil_scoped_release>())
       .def(
           "log_likelihoods_matrix",
           [](const PyClass &self, const FloatMatrix &data) {
@@ -95,7 +104,7 @@ void PybindDiagGmm(py::module *m) {
           py::arg("data"),
           "data is a 2-D tensor of shape (N, dim);"
           "it returns a 2-D tensor of shape (N, nmix) containing the "
-          "loglike of each component")
+          "loglike of each component", py::call_guard<py::gil_scoped_release>())
       .def(
           "log_likelihoods_preselect",
           [](const PyClass &self, const FloatVector &data,
@@ -104,7 +113,7 @@ void PybindDiagGmm(py::module *m) {
             self.LogLikelihoodsPreselect(data, indices, &ans);
             return ans;
           },
-          py::arg("data"), py::arg("indices"))
+          py::arg("data"), py::arg("indices"), py::call_guard<py::gil_scoped_release>())
       .def(
           "gaussian_selection_1d",
           [](const PyClass &self, const FloatVector &data,
@@ -113,7 +122,7 @@ void PybindDiagGmm(py::module *m) {
             float f = self.GaussianSelection(data, num_gselect, &output);
             return std::make_pair(f, output);
           },
-          py::arg("data"), py::arg("num_gselect"))
+          py::arg("data"), py::arg("num_gselect"), py::call_guard<py::gil_scoped_release>())
       .def(
           "gaussian_selection_2d",
           [](const PyClass &self, const FloatMatrix &data, int32_t num_gselect)
@@ -122,7 +131,7 @@ void PybindDiagGmm(py::module *m) {
             float f = self.GaussianSelection(data, num_gselect, &output);
             return std::make_pair(f, output);
           },
-          py::arg("data"), py::arg("num_gselect"))
+          py::arg("data"), py::arg("num_gselect"), py::call_guard<py::gil_scoped_release>())
       .def(
           "gaussian_selection_preselect",
           [](const PyClass &self, const FloatVector &data,
@@ -133,7 +142,7 @@ void PybindDiagGmm(py::module *m) {
                                                       num_gselect, &output);
             return std::make_pair(f, output);
           },
-          py::arg("data"), py::arg("preselect"), py::arg("num_gselect"))
+          py::arg("data"), py::arg("preselect"), py::arg("num_gselect"), py::call_guard<py::gil_scoped_release>())
       .def(
           "component_posteriors",
           [](const PyClass &self,
@@ -142,18 +151,21 @@ void PybindDiagGmm(py::module *m) {
             float f = self.ComponentPosteriors(data, &posteriors);
             return std::make_pair(f, posteriors);
           },
-          py::arg("data"))
+          py::arg("data"), py::call_guard<py::gil_scoped_release>())
       .def("component_log_likelihood", &PyClass::ComponentLogLikelihood,
-           py::arg("data"), py::arg("comp_id"))
+           py::arg("data"), py::arg("comp_id"),
+           py::call_guard<py::gil_scoped_release>())
       .def("generate",
            [](const PyClass &self) {
              FloatVector data(self.Dim());
              self.Generate(&data);
              return data;
-           })
-      .def("perturb", &PyClass::Perturb, py::arg("perturb_factor"))
+           },
+           py::call_guard<py::gil_scoped_release>())
+      .def("perturb", &PyClass::Perturb, py::arg("perturb_factor"), py::call_guard<py::gil_scoped_release>())
       .def("interpolate", &PyClass::Interpolate, py::arg("rho"),
-           py::arg("source"), py::arg("flags") = kGmmAll)
+           py::arg("source"), py::arg("flags") = kGmmAll,
+           py::call_guard<py::gil_scoped_release>())
       .def(py::pickle(
           [](const PyClass &self) -> py::tuple {
             return py::make_tuple(self.weights(), self.inv_vars(),

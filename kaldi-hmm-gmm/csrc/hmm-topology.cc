@@ -1,9 +1,10 @@
 // kaldi-hmm-gmm/csrc/hmm-topology.cc
 //
+// Copyright 2009-2011  Microsoft Corporation
+//                2014  Johns Hopkins University (author: Daniel Povey)
 // Copyright (c)  2022  Xiaomi Corporation
 
-// This file is copied and modified from
-// kaldi/src/hmm/hmm-topology.cc
+// This file is copied/modified from kaldi/src/hmm/hmm-topology.cc
 #include "kaldi-hmm-gmm/csrc/hmm-topology.h"
 
 #include <algorithm>

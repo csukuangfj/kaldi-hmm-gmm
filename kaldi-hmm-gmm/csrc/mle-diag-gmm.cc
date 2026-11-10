@@ -5,6 +5,10 @@
 //                      Johns Hopkins University (author: Daniel Povey);
 //                      Cisco Systems (author: Neha Agrawal)
 
+//                2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/gmm/mle-diag-gmm.cc
+//
 #include "kaldi-hmm-gmm/csrc/mle-diag-gmm.h"
 
 #include <algorithm>
@@ -305,7 +309,6 @@ void MleDiagGmmUpdate(const MleDiagGmmOptions &config,
         // adding the difference between the new and old mean
         if (!(flags & kGmmMeans)) {
           old_mean = old_mean - ngmm.means_.row(i).transpose();
-
           var = var.array() + old_mean.array().square();
         }
 

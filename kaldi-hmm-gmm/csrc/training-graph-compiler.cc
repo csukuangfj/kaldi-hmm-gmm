@@ -4,6 +4,9 @@
 //                2018  Johns Hopkins University (author: Daniel Povey)
 //                2021  Xiaomi Corporation (Author: Junbo Zhang)
 // Copyright (c)  2023  Xiaomi Corporation
+//
+// This file is copied/modified from kaldi/src/decoder/training-graph-compiler.cc
+//
 
 #include "kaldi-hmm-gmm/csrc/training-graph-compiler.h"
 
