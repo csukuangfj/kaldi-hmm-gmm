@@ -1,0 +1,104 @@
+[
+  {
+    "word": "ask",
+    "start": 0.11,
+    "end": 0.45,
+    "file": "w01.wav"
+  },
+  {
+    "word": "not",
+    "start": 0.45,
+    "end": 0.63,
+    "file": "w02.wav"
+  },
+  {
+    "word": "what",
+    "start": 0.63,
+    "end": 0.73,
+    "file": "w03.wav"
+  },
+  {
+    "word": "your",
+    "start": 0.73,
+    "end": 0.85,
+    "file": "w04.wav"
+  },
+  {
+    "word": "country",
+    "start": 0.85,
+    "end": 1.22,
+    "file": "w05.wav"
+  },
+  {
+    "word": "can",
+    "start": 1.22,
+    "end": 1.41,
+    "file": "w06.wav"
+  },
+  {
+    "word": "do",
+    "start": 1.41,
+    "end": 1.56,
+    "file": "w07.wav"
+  },
+  {
+    "word": "for",
+    "start": 1.56,
+    "end": 1.69,
+    "file": "w08.wav"
+  },
+  {
+    "word": "you",
+    "start": 1.69,
+    "end": 1.87,
+    "file": "w09.wav"
+  },
+  {
+    "word": "ask",
+    "start": 2.05,
+    "end": 2.37,
+    "file": "w10.wav"
+  },
+  {
+    "word": "what",
+    "start": 2.37,
+    "end": 2.53,
+    "file": "w11.wav"
+  },
+  {
+    "word": "you",
+    "start": 2.53,
+    "end": 2.64,
+    "file": "w12.wav"
+  },
+  {
+    "word": "can",
+    "start": 2.64,
+    "end": 2.83,
+    "file": "w13.wav"
+  },
+  {
+    "word": "do",
+    "start": 2.83,
+    "end": 2.97,
+    "file": "w14.wav"
+  },
+  {
+    "word": "for",
+    "start": 2.97,
+    "end": 3.1,
+    "file": "w15.wav"
+  },
+  {
+    "word": "your",
+    "start": 3.1,
+    "end": 3.21,
+    "file": "w16.wav"
+  },
+  {
+    "word": "country",
+    "start": 3.21,
+    "end": 3.79,
+    "file": "w17.wav"
+  }
+]

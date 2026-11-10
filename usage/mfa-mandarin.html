@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MFA alignment — Mandarin &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+  <title>MFA alignment — Mandarin &mdash; kaldi-hmm-gmm 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,9 +57,12 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">MFA alignment — Mandarin</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#test-audio">Test audio</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#aishell-3-pinyin-model">AISHELL-3 pinyin model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-resulting-textgrid">The resulting TextGrid</a></li>
+<li><a class="reference internal" href="#listen-to-each-word">Listen to each word</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#large-pinyin-model">Large pinyin model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#inspect-the-results">Inspect the results</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#the-official-mfa-mandarin-model">The official MFA Mandarin model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">The resulting TextGrid</a></li>
+<li><a class="reference internal" href="#id2">Listen to each word</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="mfa.html#what-a-model-directory-contains">What a model directory contains</a></li>
@@ -108,15 +111,9 @@ See <a class="reference internal" href="mfa.html"><span class="doc">MFA-style fo
 the dependencies (<code class="docutils literal notranslate"><span class="pre">pypinyin</span></code> is required for <code class="docutils literal notranslate"><span class="pre">--tokenize</span> <span class="pre">pinyin</span></code>).</p>
 <section id="test-audio">
 <h2>Test audio<a class="headerlink" href="#test-audio" title="Link to this heading"></a></h2>
-<audio controls src="https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/zh.wav">
+<audio controls src="../_static/zh.wav">
   Your browser does not support the audio element.
-</audio><p>Download it with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>mandarin
-wget<span class="w"> </span>-O<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/zh.wav
-</pre></div>
-</div>
-<ul class="simple">
+</audio><ul class="simple">
 <li><p>file: <code class="docutils literal notranslate"><span class="pre">zh.wav</span></code> (mono, 16-bit PCM, <strong>24 kHz</strong>, 4.76 s)</p></li>
 <li><p>transcript: 不要问你的国家能为你做什么，而要问你能为你的国家做什么。</p></li>
 </ul>
@@ -126,21 +123,23 @@ TextGrid word tier.</p>
 </section>
 <section id="aishell-3-pinyin-model">
 <h2>AISHELL-3 pinyin model<a class="headerlink" href="#aishell-3-pinyin-model" title="Link to this heading"></a></h2>
-<p>Step 1 — download the model (from
-<a class="reference external" href="https://github.com/lars76/forced-alignment-chinese">lars76/forced-alignment-chinese</a>).
-The outer zip contains the <strong>pronunciation dictionary</strong>
-(<code class="docutils literal notranslate"><span class="pre">*_dictionary.dict</span></code> — no extra download needed) and a <strong>nested</strong>
-acoustic-model zip; unzip both inside the model directory so the
-<code class="docutils literal notranslate"><span class="pre">--dict</span></code>/<code class="docutils literal notranslate"><span class="pre">--model-dir</span></code> paths below resolve:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>aishell3_pinyin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>aishell3_pinyin
+<p>Run it — copy and paste:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. environment (once)</span>
+pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>kaldi-hmm-gmm<span class="w"> </span>kaldi-native-fbank<span class="w"> </span>kaldifst<span class="w"> </span>numpy<span class="w"> </span>soundfile<span class="w"> </span>librosa<span class="w"> </span>pypinyin
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/csukuangfj/kaldi-hmm-gmm
+<span class="nb">cd</span><span class="w"> </span>kaldi-hmm-gmm
+
+<span class="c1"># 2. download the model (the dictionary ships inside the zip) and the audio</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>aishell3_pinyin<span class="w"> </span>mandarin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>aishell3_pinyin
 wget<span class="w"> </span>https://github.com/lars76/forced-alignment-chinese/releases/download/model_files/aishell3_pinyin.zip
 unzip<span class="w"> </span>aishell3_pinyin.zip<span class="w">          </span><span class="c1"># -&gt; aishell3_pinyin_acoustic.zip + dictionaries</span>
 unzip<span class="w"> </span>aishell3_pinyin_acoustic.zip<span class="w"> </span><span class="c1"># -&gt; aishell3_pinyin_acoustic/</span>
 <span class="nb">cd</span><span class="w"> </span>..
-</pre></div>
-</div>
-<p>Step 2 — run the alignment from the repository root:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tools/align_mfa.py<span class="w"> </span>--wav<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
+wget<span class="w"> </span>-O<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/zh.wav
+
+<span class="c1"># 3. align</span>
+python3<span class="w"> </span>tools/align_mfa.py<span class="w"> </span>--wav<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--text<span class="w"> </span><span class="s2">"不要问你的国家能为你做什么，而要问你能为你的国家做什么。"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--model-dir<span class="w"> </span>aishell3_pinyin/aishell3_pinyin_acoustic<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--dict<span class="w"> </span>aishell3_pinyin/aishell3_pinyin_dictionary.dict<span class="w"> </span><span class="se">\</span>
@@ -154,19 +153,471 @@ timing: audio duration 4.76s, elapsed 0.67s, RTF 0.140
 </pre></div>
 </div>
 </section>
+<section id="the-resulting-textgrid">
+<h2>The resulting TextGrid<a class="headerlink" href="#the-resulting-textgrid" title="Link to this heading"></a></h2>
+<details>
+<summary>Show mandarin/zh-aishell3.TextGrid (408 lines)</summary><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0
+xmax = 4.7600
+tiers? &lt;exists&gt;
+size = 2
+item []:
+    item [1]:
+        class = "IntervalTier"
+        name = "phones"
+        xmin = 0
+        xmax = 4.7600
+        intervals: size = 71
+        intervals [1]:
+            xmin = 0.0000
+            xmax = 0.0600
+            text = "sil"
+        intervals [2]:
+            xmin = 0.0600
+            xmax = 0.1200
+            text = "p"
+        intervals [3]:
+            xmin = 0.1200
+            xmax = 0.1800
+            text = "u"
+        intervals [4]:
+            xmin = 0.1800
+            xmax = 0.2700
+            text = "j"
+        intervals [5]:
+            xmin = 0.2700
+            xmax = 0.3200
+            text = "au̯"
+        intervals [6]:
+            xmin = 0.3200
+            xmax = 0.3900
+            text = "w"
+        intervals [7]:
+            xmin = 0.3900
+            xmax = 0.4200
+            text = "ə"
+        intervals [8]:
+            xmin = 0.4200
+            xmax = 0.4800
+            text = "n"
+        intervals [9]:
+            xmin = 0.4800
+            xmax = 0.5500
+            text = "n"
+        intervals [10]:
+            xmin = 0.5500
+            xmax = 0.6400
+            text = "i"
+        intervals [11]:
+            xmin = 0.6400
+            xmax = 0.7100
+            text = "t"
+        intervals [12]:
+            xmin = 0.7100
+            xmax = 0.7600
+            text = "ɤ"
+        intervals [13]:
+            xmin = 0.7600
+            xmax = 0.8500
+            text = "k"
+        intervals [14]:
+            xmin = 0.8500
+            xmax = 0.9000
+            text = "w"
+        intervals [15]:
+            xmin = 0.9000
+            xmax = 0.9500
+            text = "o"
+        intervals [16]:
+            xmin = 0.9500
+            xmax = 0.9900
+            text = "sil"
+        intervals [17]:
+            xmin = 0.9900
+            xmax = 1.0500
+            text = "tɕ"
+        intervals [18]:
+            xmin = 1.0500
+            xmax = 1.1000
+            text = "j"
+        intervals [19]:
+            xmin = 1.1000
+            xmax = 1.1400
+            text = "a"
+        intervals [20]:
+            xmin = 1.1400
+            xmax = 1.2300
+            text = "n"
+        intervals [21]:
+            xmin = 1.2300
+            xmax = 1.2900
+            text = "ə"
+        intervals [22]:
+            xmin = 1.2900
+            xmax = 1.3200
+            text = "ŋ"
+        intervals [23]:
+            xmin = 1.3200
+            xmax = 1.3800
+            text = "w"
+        intervals [24]:
+            xmin = 1.3800
+            xmax = 1.4400
+            text = "ei̯"
+        intervals [25]:
+            xmin = 1.4400
+            xmax = 1.5300
+            text = "n"
+        intervals [26]:
+            xmin = 1.5300
+            xmax = 1.6000
+            text = "i"
+        intervals [27]:
+            xmin = 1.6000
+            xmax = 1.6300
+            text = "sil"
+        intervals [28]:
+            xmin = 1.6300
+            xmax = 1.6900
+            text = "ts"
+        intervals [29]:
+            xmin = 1.6900
+            xmax = 1.7200
+            text = "w"
+        intervals [30]:
+            xmin = 1.7200
+            xmax = 1.7300
+            text = "o"
+        intervals [31]:
+            xmin = 1.7300
+            xmax = 1.7600
+            text = "sil"
+        intervals [32]:
+            xmin = 1.7600
+            xmax = 1.8600
+            text = "ʂ"
+        intervals [33]:
+            xmin = 1.8600
+            xmax = 1.9100
+            text = "ə"
+        intervals [34]:
+            xmin = 1.9100
+            xmax = 1.9400
+            text = "n"
+        intervals [35]:
+            xmin = 1.9400
+            xmax = 2.0200
+            text = "m"
+        intervals [36]:
+            xmin = 2.0200
+            xmax = 2.1900
+            text = "ɤ"
+        intervals [37]:
+            xmin = 2.1900
+            xmax = 2.4800
+            text = "sil"
+        intervals [38]:
+            xmin = 2.4800
+            xmax = 2.5500
+            text = "aɚ̯"
+        intervals [39]:
+            xmin = 2.5500
+            xmax = 2.6800
+            text = "j"
+        intervals [40]:
+            xmin = 2.6800
+            xmax = 2.7400
+            text = "au̯"
+        intervals [41]:
+            xmin = 2.7400
+            xmax = 2.8000
+            text = "w"
+        intervals [42]:
+            xmin = 2.8000
+            xmax = 2.8400
+            text = "ə"
+        intervals [43]:
+            xmin = 2.8400
+            xmax = 2.8900
+            text = "n"
+        intervals [44]:
+            xmin = 2.8900
+            xmax = 2.9600
+            text = "n"
+        intervals [45]:
+            xmin = 2.9600
+            xmax = 3.0400
+            text = "i"
+        intervals [46]:
+            xmin = 3.0400
+            xmax = 3.1000
+            text = "n"
+        intervals [47]:
+            xmin = 3.1000
+            xmax = 3.1700
+            text = "ə"
+        intervals [48]:
+            xmin = 3.1700
+            xmax = 3.2000
+            text = "ŋ"
+        intervals [49]:
+            xmin = 3.2000
+            xmax = 3.2600
+            text = "w"
+        intervals [50]:
+            xmin = 3.2600
+            xmax = 3.3300
+            text = "ei̯"
+        intervals [51]:
+            xmin = 3.3300
+            xmax = 3.4300
+            text = "n"
+        intervals [52]:
+            xmin = 3.4300
+            xmax = 3.5000
+            text = "i"
+        intervals [53]:
+            xmin = 3.5000
+            xmax = 3.5700
+            text = "t"
+        intervals [54]:
+            xmin = 3.5700
+            xmax = 3.6100
+            text = "ɤ"
+        intervals [55]:
+            xmin = 3.6100
+            xmax = 3.6900
+            text = "k"
+        intervals [56]:
+            xmin = 3.6900
+            xmax = 3.7200
+            text = "w"
+        intervals [57]:
+            xmin = 3.7200
+            xmax = 3.7700
+            text = "o"
+        intervals [58]:
+            xmin = 3.7700
+            xmax = 3.8400
+            text = "tɕ"
+        intervals [59]:
+            xmin = 3.8400
+            xmax = 3.8800
+            text = "j"
+        intervals [60]:
+            xmin = 3.8800
+            xmax = 3.9500
+            text = "a"
+        intervals [61]:
+            xmin = 3.9500
+            xmax = 3.9900
+            text = "sil"
+        intervals [62]:
+            xmin = 3.9900
+            xmax = 4.0500
+            text = "ts"
+        intervals [63]:
+            xmin = 4.0500
+            xmax = 4.0800
+            text = "w"
+        intervals [64]:
+            xmin = 4.0800
+            xmax = 4.1100
+            text = "o"
+        intervals [65]:
+            xmin = 4.1100
+            xmax = 4.1400
+            text = "sil"
+        intervals [66]:
+            xmin = 4.1400
+            xmax = 4.2500
+            text = "ʂ"
+        intervals [67]:
+            xmin = 4.2500
+            xmax = 4.3000
+            text = "ə"
+        intervals [68]:
+            xmin = 4.3000
+            xmax = 4.3400
+            text = "n"
+        intervals [69]:
+            xmin = 4.3400
+            xmax = 4.4400
+            text = "m"
+        intervals [70]:
+            xmin = 4.4400
+            xmax = 4.5500
+            text = "ɤ"
+        intervals [71]:
+            xmin = 4.5500
+            xmax = 4.7600
+            text = "sil"
+    item [2]:
+        class = "IntervalTier"
+        name = "words"
+        xmin = 0
+        xmax = 4.7600
+        intervals: size = 26
+        intervals [1]:
+            xmin = 0.0600
+            xmax = 0.1800
+            text = "不"
+        intervals [2]:
+            xmin = 0.1800
+            xmax = 0.3200
+            text = "要"
+        intervals [3]:
+            xmin = 0.3200
+            xmax = 0.4800
+            text = "问"
+        intervals [4]:
+            xmin = 0.4800
+            xmax = 0.6400
+            text = "你"
+        intervals [5]:
+            xmin = 0.6400
+            xmax = 0.7600
+            text = "的"
+        intervals [6]:
+            xmin = 0.7600
+            xmax = 0.9500
+            text = "国"
+        intervals [7]:
+            xmin = 0.9900
+            xmax = 1.1400
+            text = "家"
+        intervals [8]:
+            xmin = 1.1400
+            xmax = 1.3200
+            text = "能"
+        intervals [9]:
+            xmin = 1.3200
+            xmax = 1.4400
+            text = "为"
+        intervals [10]:
+            xmin = 1.4400
+            xmax = 1.6000
+            text = "你"
+        intervals [11]:
+            xmin = 1.6300
+            xmax = 1.7300
+            text = "做"
+        intervals [12]:
+            xmin = 1.7600
+            xmax = 1.9400
+            text = "什"
+        intervals [13]:
+            xmin = 1.9400
+            xmax = 2.1900
+            text = "么"
+        intervals [14]:
+            xmin = 2.4800
+            xmax = 2.5500
+            text = "而"
+        intervals [15]:
+            xmin = 2.5500
+            xmax = 2.7400
+            text = "要"
+        intervals [16]:
+            xmin = 2.7400
+            xmax = 2.8900
+            text = "问"
+        intervals [17]:
+            xmin = 2.8900
+            xmax = 3.0400
+            text = "你"
+        intervals [18]:
+            xmin = 3.0400
+            xmax = 3.2000
+            text = "能"
+        intervals [19]:
+            xmin = 3.2000
+            xmax = 3.3300
+            text = "为"
+        intervals [20]:
+            xmin = 3.3300
+            xmax = 3.5000
+            text = "你"
+        intervals [21]:
+            xmin = 3.5000
+            xmax = 3.6100
+            text = "的"
+        intervals [22]:
+            xmin = 3.6100
+            xmax = 3.7700
+            text = "国"
+        intervals [23]:
+            xmin = 3.7700
+            xmax = 3.9500
+            text = "家"
+        intervals [24]:
+            xmin = 3.9900
+            xmax = 4.1100
+            text = "做"
+        intervals [25]:
+            xmin = 4.1400
+            xmax = 4.3400
+            text = "什"
+        intervals [26]:
+            xmin = 4.3400
+            xmax = 4.5500
+            text = "么"
+</pre></div>
+</div>
+</details></section>
+<section id="listen-to-each-word">
+<h2>Listen to each word<a class="headerlink" href="#listen-to-each-word" title="Link to this heading"></a></h2>
+<p>Transcript: 不要问你的国家能为你做什么，而要问你能为你的国家做什么。</p>
+<p>Every character of the transcript, cut by the word intervals of
+<code class="docutils literal notranslate"><span class="pre">zh-aishell3.TextGrid</span></code>.  Reproduce the clips with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tools/textgrid_to_word_wavs.py<span class="w"> </span>--wav<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--textgrid<span class="w"> </span>mandarin/zh-aishell3.TextGrid<span class="w"> </span>--out-dir<span class="w"> </span>mandarin/zh-aishell3.words
+</pre></div>
+</div>
+<table>
+  <tr><th>Word</th><th>Time (s)</th><th>Audio</th></tr>
+    <tr><td>不</td><td>0.06 – 0.18</td><td><audio controls src="../_static/words/zh-aishell3/w01.wav"></audio></td></tr>
+    <tr><td>要</td><td>0.18 – 0.32</td><td><audio controls src="../_static/words/zh-aishell3/w02.wav"></audio></td></tr>
+    <tr><td>问</td><td>0.32 – 0.48</td><td><audio controls src="../_static/words/zh-aishell3/w03.wav"></audio></td></tr>
+    <tr><td>你</td><td>0.48 – 0.64</td><td><audio controls src="../_static/words/zh-aishell3/w04.wav"></audio></td></tr>
+    <tr><td>的</td><td>0.64 – 0.76</td><td><audio controls src="../_static/words/zh-aishell3/w05.wav"></audio></td></tr>
+    <tr><td>国</td><td>0.76 – 0.95</td><td><audio controls src="../_static/words/zh-aishell3/w06.wav"></audio></td></tr>
+    <tr><td>家</td><td>0.99 – 1.14</td><td><audio controls src="../_static/words/zh-aishell3/w07.wav"></audio></td></tr>
+    <tr><td>能</td><td>1.14 – 1.32</td><td><audio controls src="../_static/words/zh-aishell3/w08.wav"></audio></td></tr>
+    <tr><td>为</td><td>1.32 – 1.44</td><td><audio controls src="../_static/words/zh-aishell3/w09.wav"></audio></td></tr>
+    <tr><td>你</td><td>1.44 – 1.60</td><td><audio controls src="../_static/words/zh-aishell3/w10.wav"></audio></td></tr>
+    <tr><td>做</td><td>1.63 – 1.73</td><td><audio controls src="../_static/words/zh-aishell3/w11.wav"></audio></td></tr>
+    <tr><td>什</td><td>1.76 – 1.94</td><td><audio controls src="../_static/words/zh-aishell3/w12.wav"></audio></td></tr>
+    <tr><td>么</td><td>1.94 – 2.19</td><td><audio controls src="../_static/words/zh-aishell3/w13.wav"></audio></td></tr>
+    <tr><td>而</td><td>2.48 – 2.55</td><td><audio controls src="../_static/words/zh-aishell3/w14.wav"></audio></td></tr>
+    <tr><td>要</td><td>2.55 – 2.74</td><td><audio controls src="../_static/words/zh-aishell3/w15.wav"></audio></td></tr>
+    <tr><td>问</td><td>2.74 – 2.89</td><td><audio controls src="../_static/words/zh-aishell3/w16.wav"></audio></td></tr>
+    <tr><td>你</td><td>2.89 – 3.04</td><td><audio controls src="../_static/words/zh-aishell3/w17.wav"></audio></td></tr>
+    <tr><td>能</td><td>3.04 – 3.20</td><td><audio controls src="../_static/words/zh-aishell3/w18.wav"></audio></td></tr>
+    <tr><td>为</td><td>3.20 – 3.33</td><td><audio controls src="../_static/words/zh-aishell3/w19.wav"></audio></td></tr>
+    <tr><td>你</td><td>3.33 – 3.50</td><td><audio controls src="../_static/words/zh-aishell3/w20.wav"></audio></td></tr>
+    <tr><td>的</td><td>3.50 – 3.61</td><td><audio controls src="../_static/words/zh-aishell3/w21.wav"></audio></td></tr>
+    <tr><td>国</td><td>3.61 – 3.77</td><td><audio controls src="../_static/words/zh-aishell3/w22.wav"></audio></td></tr>
+    <tr><td>家</td><td>3.77 – 3.95</td><td><audio controls src="../_static/words/zh-aishell3/w23.wav"></audio></td></tr>
+    <tr><td>做</td><td>3.99 – 4.11</td><td><audio controls src="../_static/words/zh-aishell3/w24.wav"></audio></td></tr>
+    <tr><td>什</td><td>4.14 – 4.34</td><td><audio controls src="../_static/words/zh-aishell3/w25.wav"></audio></td></tr>
+    <tr><td>么</td><td>4.34 – 4.55</td><td><audio controls src="../_static/words/zh-aishell3/w26.wav"></audio></td></tr>
+</table></section>
 <section id="large-pinyin-model">
 <h2>Large pinyin model<a class="headerlink" href="#large-pinyin-model" title="Link to this heading"></a></h2>
-<p>Step 1 — same pattern (note: the nested zip unpacks into the directory
-<code class="docutils literal notranslate"><span class="pre">d_pinyin_acoustic/</span></code>):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>large_pinyin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>large_pinyin
+<p>Run it — copy and paste:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># model + dictionary (the dictionary ships inside the zip); run from the</span>
+<span class="c1"># repository root</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>large_pinyin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>large_pinyin
 wget<span class="w"> </span>https://github.com/lars76/forced-alignment-chinese/releases/download/model_files/large_pinyin.zip
 unzip<span class="w"> </span>large_pinyin.zip<span class="w">             </span><span class="c1"># -&gt; large_pinyin_acoustic.zip + dictionaries</span>
 unzip<span class="w"> </span>large_pinyin_acoustic.zip<span class="w">    </span><span class="c1"># -&gt; d_pinyin_acoustic/</span>
 <span class="nb">cd</span><span class="w"> </span>..
-</pre></div>
-</div>
-<p>Step 2 — run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tools/align_mfa.py<span class="w"> </span>--wav<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
+
+<span class="c1"># align</span>
+python3<span class="w"> </span>tools/align_mfa.py<span class="w"> </span>--wav<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--text<span class="w"> </span><span class="s2">"不要问你的国家能为你做什么，而要问你能为你的国家做什么。"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--model-dir<span class="w"> </span>large_pinyin/d_pinyin_acoustic<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--dict<span class="w"> </span>large_pinyin/large_pinyin_dictionary.dict<span class="w"> </span><span class="se">\</span>
@@ -180,22 +631,453 @@ timing: audio duration 4.76s, elapsed 0.67s, RTF 0.141
 </pre></div>
 </div>
 </section>
-<section id="inspect-the-results">
-<h2>Inspect the results<a class="headerlink" href="#inspect-the-results" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">mandarin/zh-aishell3.TextGrid</span></code> and <code class="docutils literal notranslate"><span class="pre">mandarin/zh-large.TextGrid</span></code> each
-have phones and words tiers; the word tier contains the 26 characters of
-the transcript.  Open them in <a class="reference external" href="https://praat.org/">Praat</a> next to
-<code class="docutils literal notranslate"><span class="pre">mandarin/zh.wav</span></code>.  The two models produce slightly different phone
-inventories (71 vs 66 phone intervals) — both alignments are valid; choose
-the model that fits your data.</p>
-</section>
-<section id="the-official-mfa-mandarin-model">
-<h2>The official MFA Mandarin model<a class="headerlink" href="#the-official-mfa-mandarin-model" title="Link to this heading"></a></h2>
-<p>The official
-<a class="reference external" href="https://github.com/MontrealCorpusTools/mfa-models/releases/tag/acoustic-mandarin_mfa-v2.0.0">acoustic-mandarin_mfa</a>
-model is also supported (its <code class="docutils literal notranslate"><span class="pre">meta.json</span></code> turns pitch features on, so add
-<code class="docutils literal notranslate"><span class="pre">--pitch</span></code>).  It needs a matching MFA pinyin dictionary — pass it with
-<code class="docutils literal notranslate"><span class="pre">--dict</span></code> just like the examples above.</p>
+<section id="id1">
+<h2>The resulting TextGrid<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<details>
+<summary>Show mandarin/zh-large.TextGrid (388 lines)</summary><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0
+xmax = 4.7600
+tiers? &lt;exists&gt;
+size = 2
+item []:
+    item [1]:
+        class = "IntervalTier"
+        name = "phones"
+        xmin = 0
+        xmax = 4.7600
+        intervals: size = 66
+        intervals [1]:
+            xmin = 0.0000
+            xmax = 0.0400
+            text = "sil"
+        intervals [2]:
+            xmin = 0.0400
+            xmax = 0.1100
+            text = "p"
+        intervals [3]:
+            xmin = 0.1100
+            xmax = 0.1800
+            text = "u"
+        intervals [4]:
+            xmin = 0.1800
+            xmax = 0.2600
+            text = "j"
+        intervals [5]:
+            xmin = 0.2600
+            xmax = 0.3300
+            text = "au̯"
+        intervals [6]:
+            xmin = 0.3300
+            xmax = 0.3900
+            text = "w"
+        intervals [7]:
+            xmin = 0.3900
+            xmax = 0.4300
+            text = "ə"
+        intervals [8]:
+            xmin = 0.4300
+            xmax = 0.4800
+            text = "n"
+        intervals [9]:
+            xmin = 0.4800
+            xmax = 0.5500
+            text = "n"
+        intervals [10]:
+            xmin = 0.5500
+            xmax = 0.6300
+            text = "i"
+        intervals [11]:
+            xmin = 0.6300
+            xmax = 0.7000
+            text = "t"
+        intervals [12]:
+            xmin = 0.7000
+            xmax = 0.7600
+            text = "ɤ"
+        intervals [13]:
+            xmin = 0.7600
+            xmax = 0.8500
+            text = "k"
+        intervals [14]:
+            xmin = 0.8500
+            xmax = 0.8900
+            text = "w"
+        intervals [15]:
+            xmin = 0.8900
+            xmax = 0.9600
+            text = "o"
+        intervals [16]:
+            xmin = 0.9600
+            xmax = 1.0500
+            text = "tɕ"
+        intervals [17]:
+            xmin = 1.0500
+            xmax = 1.0900
+            text = "j"
+        intervals [18]:
+            xmin = 1.0900
+            xmax = 1.1400
+            text = "a"
+        intervals [19]:
+            xmin = 1.1400
+            xmax = 1.2200
+            text = "n"
+        intervals [20]:
+            xmin = 1.2200
+            xmax = 1.2800
+            text = "ə"
+        intervals [21]:
+            xmin = 1.2800
+            xmax = 1.3200
+            text = "ŋ"
+        intervals [22]:
+            xmin = 1.3200
+            xmax = 1.3700
+            text = "w"
+        intervals [23]:
+            xmin = 1.3700
+            xmax = 1.4500
+            text = "ei̯"
+        intervals [24]:
+            xmin = 1.4500
+            xmax = 1.5300
+            text = "n"
+        intervals [25]:
+            xmin = 1.5300
+            xmax = 1.6000
+            text = "i"
+        intervals [26]:
+            xmin = 1.6000
+            xmax = 1.6800
+            text = "ts"
+        intervals [27]:
+            xmin = 1.6800
+            xmax = 1.7200
+            text = "w"
+        intervals [28]:
+            xmin = 1.7200
+            xmax = 1.7500
+            text = "o"
+        intervals [29]:
+            xmin = 1.7500
+            xmax = 1.8600
+            text = "ʂ"
+        intervals [30]:
+            xmin = 1.8600
+            xmax = 1.9100
+            text = "ə"
+        intervals [31]:
+            xmin = 1.9100
+            xmax = 1.9400
+            text = "n"
+        intervals [32]:
+            xmin = 1.9400
+            xmax = 2.0200
+            text = "m"
+        intervals [33]:
+            xmin = 2.0200
+            xmax = 2.1600
+            text = "ɤ"
+        intervals [34]:
+            xmin = 2.1600
+            xmax = 2.4800
+            text = "sil"
+        intervals [35]:
+            xmin = 2.4800
+            xmax = 2.5800
+            text = "aɚ̯"
+        intervals [36]:
+            xmin = 2.5800
+            xmax = 2.6800
+            text = "j"
+        intervals [37]:
+            xmin = 2.6800
+            xmax = 2.7400
+            text = "au̯"
+        intervals [38]:
+            xmin = 2.7400
+            xmax = 2.8000
+            text = "w"
+        intervals [39]:
+            xmin = 2.8000
+            xmax = 2.8400
+            text = "ə"
+        intervals [40]:
+            xmin = 2.8400
+            xmax = 2.8800
+            text = "n"
+        intervals [41]:
+            xmin = 2.8800
+            xmax = 2.9600
+            text = "n"
+        intervals [42]:
+            xmin = 2.9600
+            xmax = 3.0300
+            text = "i"
+        intervals [43]:
+            xmin = 3.0300
+            xmax = 3.1000
+            text = "n"
+        intervals [44]:
+            xmin = 3.1000
+            xmax = 3.1700
+            text = "ə"
+        intervals [45]:
+            xmin = 3.1700
+            xmax = 3.2100
+            text = "ŋ"
+        intervals [46]:
+            xmin = 3.2100
+            xmax = 3.2600
+            text = "w"
+        intervals [47]:
+            xmin = 3.2600
+            xmax = 3.3400
+            text = "ei̯"
+        intervals [48]:
+            xmin = 3.3400
+            xmax = 3.4200
+            text = "n"
+        intervals [49]:
+            xmin = 3.4200
+            xmax = 3.4900
+            text = "i"
+        intervals [50]:
+            xmin = 3.4900
+            xmax = 3.5600
+            text = "t"
+        intervals [51]:
+            xmin = 3.5600
+            xmax = 3.6100
+            text = "ɤ"
+        intervals [52]:
+            xmin = 3.6100
+            xmax = 3.6800
+            text = "k"
+        intervals [53]:
+            xmin = 3.6800
+            xmax = 3.7200
+            text = "w"
+        intervals [54]:
+            xmin = 3.7200
+            xmax = 3.7700
+            text = "o"
+        intervals [55]:
+            xmin = 3.7700
+            xmax = 3.8400
+            text = "tɕ"
+        intervals [56]:
+            xmin = 3.8400
+            xmax = 3.8800
+            text = "j"
+        intervals [57]:
+            xmin = 3.8800
+            xmax = 3.9600
+            text = "a"
+        intervals [58]:
+            xmin = 3.9600
+            xmax = 4.0400
+            text = "ts"
+        intervals [59]:
+            xmin = 4.0400
+            xmax = 4.0800
+            text = "w"
+        intervals [60]:
+            xmin = 4.0800
+            xmax = 4.1100
+            text = "o"
+        intervals [61]:
+            xmin = 4.1100
+            xmax = 4.2500
+            text = "ʂ"
+        intervals [62]:
+            xmin = 4.2500
+            xmax = 4.3000
+            text = "ə"
+        intervals [63]:
+            xmin = 4.3000
+            xmax = 4.3400
+            text = "n"
+        intervals [64]:
+            xmin = 4.3400
+            xmax = 4.4300
+            text = "m"
+        intervals [65]:
+            xmin = 4.4300
+            xmax = 4.5400
+            text = "ɤ"
+        intervals [66]:
+            xmin = 4.5400
+            xmax = 4.7600
+            text = "sil"
+    item [2]:
+        class = "IntervalTier"
+        name = "words"
+        xmin = 0
+        xmax = 4.7600
+        intervals: size = 26
+        intervals [1]:
+            xmin = 0.0400
+            xmax = 0.1800
+            text = "不"
+        intervals [2]:
+            xmin = 0.1800
+            xmax = 0.3300
+            text = "要"
+        intervals [3]:
+            xmin = 0.3300
+            xmax = 0.4800
+            text = "问"
+        intervals [4]:
+            xmin = 0.4800
+            xmax = 0.6300
+            text = "你"
+        intervals [5]:
+            xmin = 0.6300
+            xmax = 0.7600
+            text = "的"
+        intervals [6]:
+            xmin = 0.7600
+            xmax = 0.9600
+            text = "国"
+        intervals [7]:
+            xmin = 0.9600
+            xmax = 1.1400
+            text = "家"
+        intervals [8]:
+            xmin = 1.1400
+            xmax = 1.3200
+            text = "能"
+        intervals [9]:
+            xmin = 1.3200
+            xmax = 1.4500
+            text = "为"
+        intervals [10]:
+            xmin = 1.4500
+            xmax = 1.6000
+            text = "你"
+        intervals [11]:
+            xmin = 1.6000
+            xmax = 1.7500
+            text = "做"
+        intervals [12]:
+            xmin = 1.7500
+            xmax = 1.9400
+            text = "什"
+        intervals [13]:
+            xmin = 1.9400
+            xmax = 2.1600
+            text = "么"
+        intervals [14]:
+            xmin = 2.4800
+            xmax = 2.5800
+            text = "而"
+        intervals [15]:
+            xmin = 2.5800
+            xmax = 2.7400
+            text = "要"
+        intervals [16]:
+            xmin = 2.7400
+            xmax = 2.8800
+            text = "问"
+        intervals [17]:
+            xmin = 2.8800
+            xmax = 3.0300
+            text = "你"
+        intervals [18]:
+            xmin = 3.0300
+            xmax = 3.2100
+            text = "能"
+        intervals [19]:
+            xmin = 3.2100
+            xmax = 3.3400
+            text = "为"
+        intervals [20]:
+            xmin = 3.3400
+            xmax = 3.4900
+            text = "你"
+        intervals [21]:
+            xmin = 3.4900
+            xmax = 3.6100
+            text = "的"
+        intervals [22]:
+            xmin = 3.6100
+            xmax = 3.7700
+            text = "国"
+        intervals [23]:
+            xmin = 3.7700
+            xmax = 3.9600
+            text = "家"
+        intervals [24]:
+            xmin = 3.9600
+            xmax = 4.1100
+            text = "做"
+        intervals [25]:
+            xmin = 4.1100
+            xmax = 4.3400
+            text = "什"
+        intervals [26]:
+            xmin = 4.3400
+            xmax = 4.5400
+            text = "么"
+</pre></div>
+</div>
+</details></section>
+<section id="id2">
+<h2>Listen to each word<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>Transcript: 不要问你的国家能为你做什么，而要问你能为你的国家做什么。</p>
+<p>Every character of the transcript, cut by the word intervals of
+<code class="docutils literal notranslate"><span class="pre">zh-large.TextGrid</span></code>.  Reproduce the clips with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tools/textgrid_to_word_wavs.py<span class="w"> </span>--wav<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--textgrid<span class="w"> </span>mandarin/zh-large.TextGrid<span class="w"> </span>--out-dir<span class="w"> </span>mandarin/zh-large.words
+</pre></div>
+</div>
+<table>
+  <tr><th>Word</th><th>Time (s)</th><th>Audio</th></tr>
+    <tr><td>不</td><td>0.04 – 0.18</td><td><audio controls src="../_static/words/zh-large/w01.wav"></audio></td></tr>
+    <tr><td>要</td><td>0.18 – 0.33</td><td><audio controls src="../_static/words/zh-large/w02.wav"></audio></td></tr>
+    <tr><td>问</td><td>0.33 – 0.48</td><td><audio controls src="../_static/words/zh-large/w03.wav"></audio></td></tr>
+    <tr><td>你</td><td>0.48 – 0.63</td><td><audio controls src="../_static/words/zh-large/w04.wav"></audio></td></tr>
+    <tr><td>的</td><td>0.63 – 0.76</td><td><audio controls src="../_static/words/zh-large/w05.wav"></audio></td></tr>
+    <tr><td>国</td><td>0.76 – 0.96</td><td><audio controls src="../_static/words/zh-large/w06.wav"></audio></td></tr>
+    <tr><td>家</td><td>0.96 – 1.14</td><td><audio controls src="../_static/words/zh-large/w07.wav"></audio></td></tr>
+    <tr><td>能</td><td>1.14 – 1.32</td><td><audio controls src="../_static/words/zh-large/w08.wav"></audio></td></tr>
+    <tr><td>为</td><td>1.32 – 1.45</td><td><audio controls src="../_static/words/zh-large/w09.wav"></audio></td></tr>
+    <tr><td>你</td><td>1.45 – 1.60</td><td><audio controls src="../_static/words/zh-large/w10.wav"></audio></td></tr>
+    <tr><td>做</td><td>1.60 – 1.75</td><td><audio controls src="../_static/words/zh-large/w11.wav"></audio></td></tr>
+    <tr><td>什</td><td>1.75 – 1.94</td><td><audio controls src="../_static/words/zh-large/w12.wav"></audio></td></tr>
+    <tr><td>么</td><td>1.94 – 2.16</td><td><audio controls src="../_static/words/zh-large/w13.wav"></audio></td></tr>
+    <tr><td>而</td><td>2.48 – 2.58</td><td><audio controls src="../_static/words/zh-large/w14.wav"></audio></td></tr>
+    <tr><td>要</td><td>2.58 – 2.74</td><td><audio controls src="../_static/words/zh-large/w15.wav"></audio></td></tr>
+    <tr><td>问</td><td>2.74 – 2.88</td><td><audio controls src="../_static/words/zh-large/w16.wav"></audio></td></tr>
+    <tr><td>你</td><td>2.88 – 3.03</td><td><audio controls src="../_static/words/zh-large/w17.wav"></audio></td></tr>
+    <tr><td>能</td><td>3.03 – 3.21</td><td><audio controls src="../_static/words/zh-large/w18.wav"></audio></td></tr>
+    <tr><td>为</td><td>3.21 – 3.34</td><td><audio controls src="../_static/words/zh-large/w19.wav"></audio></td></tr>
+    <tr><td>你</td><td>3.34 – 3.49</td><td><audio controls src="../_static/words/zh-large/w20.wav"></audio></td></tr>
+    <tr><td>的</td><td>3.49 – 3.61</td><td><audio controls src="../_static/words/zh-large/w21.wav"></audio></td></tr>
+    <tr><td>国</td><td>3.61 – 3.77</td><td><audio controls src="../_static/words/zh-large/w22.wav"></audio></td></tr>
+    <tr><td>家</td><td>3.77 – 3.96</td><td><audio controls src="../_static/words/zh-large/w23.wav"></audio></td></tr>
+    <tr><td>做</td><td>3.96 – 4.11</td><td><audio controls src="../_static/words/zh-large/w24.wav"></audio></td></tr>
+    <tr><td>什</td><td>4.11 – 4.34</td><td><audio controls src="../_static/words/zh-large/w25.wav"></audio></td></tr>
+    <tr><td>么</td><td>4.34 – 4.54</td><td><audio controls src="../_static/words/zh-large/w26.wav"></audio></td></tr>
+</table></section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>the two models produce slightly different phone inventories (71 vs 66
+phone intervals); both alignments are valid — choose the model that fits
+your data;</p></li>
+<li><p>the word tier contains the 26 characters of the transcript;</p></li>
+<li><p>open the TextGrids in <a class="reference external" href="https://praat.org/">Praat</a> next to
+<code class="docutils literal notranslate"><span class="pre">mandarin/zh.wav</span></code> to inspect the alignment;</p></li>
+<li><p>the official MFA Mandarin model
+(<a class="reference external" href="https://github.com/MontrealCorpusTools/mfa-models/releases/tag/acoustic-mandarin_mfa-v2.0.0">acoustic-mandarin_mfa</a>)
+is also supported: its <code class="docutils literal notranslate"><span class="pre">meta.json</span></code> turns pitch features on, so add
+<code class="docutils literal notranslate"><span class="pre">--pitch</span></code>.  It needs a matching MFA pinyin dictionary — pass it with
+<code class="docutils literal notranslate"><span class="pre">--dict</span></code> just like the examples above.</p></li>
+</ul>
 </section>
 </section>
 

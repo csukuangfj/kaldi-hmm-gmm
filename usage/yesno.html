@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The yesno recipe — train a monophone GMM &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+  <title>The yesno recipe — train a monophone GMM &mdash; kaldi-hmm-gmm 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -94,7 +94,7 @@
              
   <section id="the-yesno-recipe-train-a-monophone-gmm">
 <h1>The yesno recipe — train a monophone GMM<a class="headerlink" href="#the-yesno-recipe-train-a-monophone-gmm" title="Link to this heading"></a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">egs/yesno</span></code> mirrors kaldi's <a class="reference external" href="https://github.com/kaldi-asr/kaldi/tree/master/egs/yesno/s5">egs/yesno/s5</a> stage by
+<p><a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/egs/yesno">egs/yesno</a> mirrors kaldi's <a class="reference external" href="https://github.com/kaldi-asr/kaldi/tree/master/egs/yesno/s5">egs/yesno/s5</a> stage by
 stage: it trains a monophone GMM on the &quot;yesno&quot; corpus (60 recordings of
 8-digit sequences), builds an HCLG decoding graph, decodes the test set and
 reports WER — using only the <code class="docutils literal notranslate"><span class="pre">kaldi_hmm_gmm</span></code> Python API, <strong>no kaldi
@@ -132,14 +132,14 @@ lines look like:</p>
 </section>
 <section id="stage-by-stage">
 <h2>Stage by stage<a class="headerlink" href="#stage-by-stage" title="Link to this heading"></a></h2>
-<p><strong>Stage 0 — prepare the data</strong> (<code class="docutils literal notranslate"><span class="pre">local/prepare_data.sh</span></code>).
+<p><strong>Stage 0 — prepare the data</strong> (<a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/egs/yesno/local/prepare_data.sh">local/prepare_data.sh</a>).
 Downloads the &quot;yesno&quot; corpus if <code class="docutils literal notranslate"><span class="pre">waves_yesno/</span></code> is missing, then splits it
 into <code class="docutils literal notranslate"><span class="pre">data/train_yesno</span></code> (31 utterances) and <code class="docutils literal notranslate"><span class="pre">data/test_yesno</span></code> (29
 utterances) with kaldi-style <code class="docutils literal notranslate"><span class="pre">wav.scp</span></code> / <code class="docutils literal notranslate"><span class="pre">text</span></code> / <code class="docutils literal notranslate"><span class="pre">utt2spk</span></code> /
 <code class="docutils literal notranslate"><span class="pre">spk2utt</span></code>.  The wav file names encode the transcripts
 (e.g. <code class="docutils literal notranslate"><span class="pre">0_0_0_1_0_1_1_0.wav</span></code> is the digit sequence <code class="docutils literal notranslate"><span class="pre">zero</span> <span class="pre">zero</span> <span class="pre">zero</span> <span class="pre">one</span> <span class="pre">...</span></code>).</p>
 <p>The corpus is the OpenSLR &quot;waves_yesno&quot; release (the same one kaldi's
-<code class="docutils literal notranslate"><span class="pre">egs/yesno/s5/run.sh</span></code> downloads):</p>
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/egs/yesno/s5/run.sh">egs/yesno/s5/run.sh</a> downloads):</p>
 <ul class="simple">
 <li><p>original URL (OpenSLR resource 1):
 <a class="reference external" href="http://www.openslr.org/resources/1/waves_yesno.tar.gz">http://www.openslr.org/resources/1/waves_yesno.tar.gz</a></p></li>
@@ -153,11 +153,11 @@ Builds <code class="docutils literal notranslate"><span class="pre">data/lang</s
 disambiguated counterpart <code class="docutils literal notranslate"><span class="pre">L_disambig.fst</span></code>, and the test-language G.fst
 (<code class="docutils literal notranslate"><span class="pre">data/lang_test_tg</span></code>).  This is the kaldi <code class="docutils literal notranslate"><span class="pre">utils/prepare_lang.sh</span></code>
 equivalent.</p>
-<p><strong>Stage 2 — compute features</strong> (<code class="docutils literal notranslate"><span class="pre">local/compute_feats.py</span></code>).
+<p><strong>Stage 2 — compute features</strong> (<a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/egs/yesno/local/compute_feats.py">local/compute_feats.py</a>).
 Raw 13-dim MFCC (kaldi-compatible, <code class="docutils literal notranslate"><span class="pre">mfcc/raw_mfcc_{train,test}_yesno.1.ark</span></code>)
 plus per-speaker CMVN stats; <code class="docutils literal notranslate"><span class="pre">data/{train,test}_yesno/feats.scp</span></code> points at
 the MFCC arks.  CMVN + deltas (→ 39-dim) are applied at load time
-(<code class="docutils literal notranslate"><span class="pre">tools/read_feats.load_delta_feats</span></code>), mirroring kaldi's
+(<code class="docutils literal notranslate"><span class="pre">load_delta_feats</span></code> in <a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/tools/read_feats.py">tools/read_feats.py</a>), mirroring kaldi's
 <code class="docutils literal notranslate"><span class="pre">apply-cmvn</span> <span class="pre">|</span> <span class="pre">add-deltas</span></code> use-time pipeline.  The training/decoding code
 itself is feature-agnostic — it just reads <code class="docutils literal notranslate"><span class="pre">feats.scp</span></code>.</p>
 <p><strong>Stage 3 — train the monophone GMM</strong> (<code class="docutils literal notranslate"><span class="pre">train.py</span></code>).
@@ -213,7 +213,7 @@ Lattice-faster decoding (kaldi <code class="docutils literal notranslate"><span 
 utterance is written to <code class="docutils literal notranslate"><span class="pre">exp/mono0a/decode_test_yesno/text</span></code> and scored
 against the reference with <code class="docutils literal notranslate"><span class="pre">kaldialign</span></code>.  The sweep over
 word-insertion-penalties <code class="docutils literal notranslate"><span class="pre">0,0.5,1.0</span></code> (and lmwt) reproduces kaldi's
-<code class="docutils literal notranslate"><span class="pre">local/score.sh</span></code>; the best result lands in <code class="docutils literal notranslate"><span class="pre">exp/mono0a/decode_test_yesno/wer</span></code>.</p>
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/egs/yesno/s5/local/score.sh">local/score.sh</a>; the best result lands in <code class="docutils literal notranslate"><span class="pre">exp/mono0a/decode_test_yesno/wer</span></code>.</p>
 </section>
 <section id="expected-result">
 <h2>Expected result<a class="headerlink" href="#expected-result" title="Link to this heading"></a></h2>

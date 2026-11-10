@@ -1,0 +1,158 @@
+[
+  {
+    "word": "不",
+    "start": 0.06,
+    "end": 0.18,
+    "file": "w01.wav"
+  },
+  {
+    "word": "要",
+    "start": 0.18,
+    "end": 0.32,
+    "file": "w02.wav"
+  },
+  {
+    "word": "问",
+    "start": 0.32,
+    "end": 0.48,
+    "file": "w03.wav"
+  },
+  {
+    "word": "你",
+    "start": 0.48,
+    "end": 0.64,
+    "file": "w04.wav"
+  },
+  {
+    "word": "的",
+    "start": 0.64,
+    "end": 0.76,
+    "file": "w05.wav"
+  },
+  {
+    "word": "国",
+    "start": 0.76,
+    "end": 0.95,
+    "file": "w06.wav"
+  },
+  {
+    "word": "家",
+    "start": 0.99,
+    "end": 1.14,
+    "file": "w07.wav"
+  },
+  {
+    "word": "能",
+    "start": 1.14,
+    "end": 1.32,
+    "file": "w08.wav"
+  },
+  {
+    "word": "为",
+    "start": 1.32,
+    "end": 1.44,
+    "file": "w09.wav"
+  },
+  {
+    "word": "你",
+    "start": 1.44,
+    "end": 1.6,
+    "file": "w10.wav"
+  },
+  {
+    "word": "做",
+    "start": 1.63,
+    "end": 1.73,
+    "file": "w11.wav"
+  },
+  {
+    "word": "什",
+    "start": 1.76,
+    "end": 1.94,
+    "file": "w12.wav"
+  },
+  {
+    "word": "么",
+    "start": 1.94,
+    "end": 2.19,
+    "file": "w13.wav"
+  },
+  {
+    "word": "而",
+    "start": 2.48,
+    "end": 2.55,
+    "file": "w14.wav"
+  },
+  {
+    "word": "要",
+    "start": 2.55,
+    "end": 2.74,
+    "file": "w15.wav"
+  },
+  {
+    "word": "问",
+    "start": 2.74,
+    "end": 2.89,
+    "file": "w16.wav"
+  },
+  {
+    "word": "你",
+    "start": 2.89,
+    "end": 3.04,
+    "file": "w17.wav"
+  },
+  {
+    "word": "能",
+    "start": 3.04,
+    "end": 3.2,
+    "file": "w18.wav"
+  },
+  {
+    "word": "为",
+    "start": 3.2,
+    "end": 3.33,
+    "file": "w19.wav"
+  },
+  {
+    "word": "你",
+    "start": 3.33,
+    "end": 3.5,
+    "file": "w20.wav"
+  },
+  {
+    "word": "的",
+    "start": 3.5,
+    "end": 3.61,
+    "file": "w21.wav"
+  },
+  {
+    "word": "国",
+    "start": 3.61,
+    "end": 3.77,
+    "file": "w22.wav"
+  },
+  {
+    "word": "家",
+    "start": 3.77,
+    "end": 3.95,
+    "file": "w23.wav"
+  },
+  {
+    "word": "做",
+    "start": 3.99,
+    "end": 4.11,
+    "file": "w24.wav"
+  },
+  {
+    "word": "什",
+    "start": 4.14,
+    "end": 4.34,
+    "file": "w25.wav"
+  },
+  {
+    "word": "么",
+    "start": 4.34,
+    "end": 4.55,
+    "file": "w26.wav"
+  }
+]

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MFA alignment — English &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+  <title>MFA alignment — English &mdash; kaldi-hmm-gmm 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,10 +55,10 @@
 <li class="toctree-l2 current"><a class="reference internal" href="mfa.html">MFA-style forced alignment</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">MFA alignment — English</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#test-audio">Test audio</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#step-1-download-the-acoustic-model-and-the-dictionary">Step 1: download the acoustic model and the dictionary</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#step-2-run-the-alignment">Step 2: run the alignment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#run-it-copy-and-paste">Run it — copy and paste</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#expected-output">Expected output</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#step-3-inspect-the-result">Step 3: inspect the result</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-resulting-textgrid">The resulting TextGrid</a></li>
+<li><a class="reference internal" href="#listen-to-each-word">Listen to each word</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="mfa-mandarin.html">MFA alignment — Mandarin</a></li>
@@ -107,43 +107,49 @@
 the pipeline works and <a class="reference internal" href="setup.html"><span class="doc">Environment setup</span></a> for installing the dependencies.</p>
 <section id="test-audio">
 <h2>Test audio<a class="headerlink" href="#test-audio" title="Link to this heading"></a></h2>
-<audio controls src="https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav">
+<audio controls src="../_static/en.wav">
   Your browser does not support the audio element.
-</audio><p>Download it with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav
-</pre></div>
-</div>
-<ul class="simple">
+</audio><ul class="simple">
 <li><p>file: <code class="docutils literal notranslate"><span class="pre">en.wav</span></code> (mono, 16-bit PCM, <strong>24 kHz</strong>, 3.85 s)</p></li>
 <li><p>transcript: <em>Ask not what your country can do for you, ask what you can
 do for your country.</em></p></li>
 </ul>
 </section>
-<section id="step-1-download-the-acoustic-model-and-the-dictionary">
-<h2>Step 1: download the acoustic model and the dictionary<a class="headerlink" href="#step-1-download-the-acoustic-model-and-the-dictionary" title="Link to this heading"></a></h2>
-<p>The <a class="reference external" href="https://github.com/MontrealCorpusTools/mfa-models/releases/tag/acoustic-english_mfa-v3.1.0">english_mfa</a>
-model (MFA v3.1.0), the matching
-<a class="reference external" href="https://github.com/MontrealCorpusTools/mfa-models/releases/tag/dictionary-english_mfa-v3.1.0">english_mfa dictionary</a>,
-and the test audio:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>english<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>english
+<section id="run-it-copy-and-paste">
+<h2>Run it — copy and paste<a class="headerlink" href="#run-it-copy-and-paste" title="Link to this heading"></a></h2>
+<p>Everything from zero (Python 3.8+):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. environment (once)</span>
+pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>kaldi-hmm-gmm<span class="w"> </span>kaldi-native-fbank<span class="w"> </span>kaldifst<span class="w"> </span>numpy<span class="w"> </span>soundfile<span class="w"> </span>librosa
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/csukuangfj/kaldi-hmm-gmm
+<span class="nb">cd</span><span class="w"> </span>kaldi-hmm-gmm
+
+<span class="c1"># 2. download the acoustic model, the dictionary and the test audio</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>english<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>english
 wget<span class="w"> </span>https://github.com/MontrealCorpusTools/mfa-models/releases/download/acoustic-english_mfa-v3.1.0/english_mfa.zip
-unzip<span class="w"> </span>english_mfa.zip<span class="w">        </span><span class="c1"># -&gt; english_mfa/ (final.alimdl, final.mdl, tree,</span>
-<span class="w">                             </span><span class="c1">#    lda.mat, meta.json, phones.txt, ...)</span>
+unzip<span class="w"> </span>english_mfa.zip
 wget<span class="w"> </span>https://github.com/MontrealCorpusTools/mfa-models/releases/download/dictionary-english_mfa-v3.1.0/english_mfa.dict
 wget<span class="w"> </span>https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav
 <span class="nb">cd</span><span class="w"> </span>..
-</pre></div>
-</div>
-</section>
-<section id="step-2-run-the-alignment">
-<h2>Step 2: run the alignment<a class="headerlink" href="#step-2-run-the-alignment" title="Link to this heading"></a></h2>
-<p>From the repository root:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tools/align_mfa.py<span class="w"> </span>--wav<span class="w"> </span>english/en.wav<span class="w"> </span><span class="se">\</span>
+
+<span class="c1"># 3. align</span>
+python3<span class="w"> </span>tools/align_mfa.py<span class="w"> </span>--wav<span class="w"> </span>english/en.wav<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--text<span class="w"> </span><span class="s2">"Ask not what your country can do for you, ask what you can do for your country."</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--model-dir<span class="w"> </span>english/english_mfa<span class="w"> </span>--dict<span class="w"> </span>english/english_mfa.dict<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--phones-txt<span class="w"> </span>english/english_mfa/phones.txt<span class="w"> </span>--out<span class="w"> </span>english/en.TextGrid
 </pre></div>
 </div>
+<p>What the steps do:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">english_mfa</span></code> is the MFA v3.1.0 acoustic model; <code class="docutils literal notranslate"><span class="pre">english_mfa.dict</span></code> is
+the matching pronunciation dictionary (both from
+<a class="reference external" href="https://github.com/MontrealCorpusTools/mfa-models">mfa-models</a>);
+the model directory also contains <code class="docutils literal notranslate"><span class="pre">final.alimdl</span></code>, <code class="docutils literal notranslate"><span class="pre">tree</span></code>, <code class="docutils literal notranslate"><span class="pre">lda.mat</span></code>,
+<code class="docutils literal notranslate"><span class="pre">meta.json</span></code> and <code class="docutils literal notranslate"><span class="pre">phones.txt</span></code>.</p></li>
+<li><p>the wav is 24 kHz while the model expects 16 kHz; the tool resamples
+automatically (librosa, MFA's <code class="docutils literal notranslate"><span class="pre">allow_downsample</span></code> semantics);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--out</span> <span class="pre">english/en.TextGrid</span></code> writes a Praat TextGrid with phone and word
+tiers (open it next to <code class="docutils literal notranslate"><span class="pre">en.wav</span></code> in <a class="reference external" href="https://praat.org/">Praat</a>).</p></li>
+</ul>
 </section>
 <section id="expected-output">
 <h2>Expected output<a class="headerlink" href="#expected-output" title="Link to this heading"></a></h2>
@@ -155,19 +161,347 @@ model/dictionary loading — and the real-time factor, lower is faster):</p>
 timing: audio duration 3.85s, elapsed 0.60s, RTF 0.156
 </pre></div>
 </div>
-<p>The wav is 24 kHz while the model expects 16 kHz; the tool resamples
-automatically (librosa, MFA's <code class="docutils literal notranslate"><span class="pre">allow_downsample</span></code> semantics).</p>
 </section>
-<section id="step-3-inspect-the-result">
-<h2>Step 3: inspect the result<a class="headerlink" href="#step-3-inspect-the-result" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">english/en.TextGrid</span></code> has two tiers (phones and words).  Open it in
-<a class="reference external" href="https://praat.org/">Praat</a> together with <code class="docutils literal notranslate"><span class="pre">english/en.wav</span></code> to inspect
-the alignment; the word tier contains the 17 words of the transcript:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ask  not  what  your  country  can  do  for  you  ask
-what  you  can  do  for  your  country
+<section id="the-resulting-textgrid">
+<h2>The resulting TextGrid<a class="headerlink" href="#the-resulting-textgrid" title="Link to this heading"></a></h2>
+<details>
+<summary>Show english/en.TextGrid (304 lines)</summary><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0
+xmax = 3.8500
+tiers? &lt;exists&gt;
+size = 2
+item []:
+    item [1]:
+        class = "IntervalTier"
+        name = "phones"
+        xmin = 0
+        xmax = 3.8500
+        intervals: size = 54
+        intervals [1]:
+            xmin = 0.0000
+            xmax = 0.1100
+            text = "sil"
+        intervals [2]:
+            xmin = 0.1100
+            xmax = 0.2600
+            text = "a"
+        intervals [3]:
+            xmin = 0.2600
+            xmax = 0.2900
+            text = "k"
+        intervals [4]:
+            xmin = 0.2900
+            xmax = 0.4500
+            text = "s"
+        intervals [5]:
+            xmin = 0.4500
+            xmax = 0.5100
+            text = "n"
+        intervals [6]:
+            xmin = 0.5100
+            xmax = 0.5900
+            text = "a"
+        intervals [7]:
+            xmin = 0.5900
+            xmax = 0.6300
+            text = "t"
+        intervals [8]:
+            xmin = 0.6300
+            xmax = 0.6600
+            text = "ʋ"
+        intervals [9]:
+            xmin = 0.6600
+            xmax = 0.7000
+            text = "ɒ"
+        intervals [10]:
+            xmin = 0.7000
+            xmax = 0.7300
+            text = "ʈ"
+        intervals [11]:
+            xmin = 0.7300
+            xmax = 0.7900
+            text = "j"
+        intervals [12]:
+            xmin = 0.7900
+            xmax = 0.8200
+            text = "ɒ"
+        intervals [13]:
+            xmin = 0.8200
+            xmax = 0.8500
+            text = "ɹ"
+        intervals [14]:
+            xmin = 0.8500
+            xmax = 0.9600
+            text = "k"
+        intervals [15]:
+            xmin = 0.9600
+            xmax = 1.0100
+            text = "ə"
+        intervals [16]:
+            xmin = 1.0100
+            xmax = 1.0500
+            text = "n"
+        intervals [17]:
+            xmin = 1.0500
+            xmax = 1.1300
+            text = "ʈ"
+        intervals [18]:
+            xmin = 1.1300
+            xmax = 1.1700
+            text = "ɹ"
+        intervals [19]:
+            xmin = 1.1700
+            xmax = 1.2200
+            text = "i"
+        intervals [20]:
+            xmin = 1.2200
+            xmax = 1.3100
+            text = "cʰ"
+        intervals [21]:
+            xmin = 1.3100
+            xmax = 1.3500
+            text = "æ"
+        intervals [22]:
+            xmin = 1.3500
+            xmax = 1.4100
+            text = "n"
+        intervals [23]:
+            xmin = 1.4100
+            xmax = 1.4800
+            text = "d"
+        intervals [24]:
+            xmin = 1.4800
+            xmax = 1.5600
+            text = "əw"
+        intervals [25]:
+            xmin = 1.5600
+            xmax = 1.6600
+            text = "f"
+        intervals [26]:
+            xmin = 1.6600
+            xmax = 1.6900
+            text = "a"
+        intervals [27]:
+            xmin = 1.6900
+            xmax = 1.8100
+            text = "j"
+        intervals [28]:
+            xmin = 1.8100
+            xmax = 1.8700
+            text = "ə"
+        intervals [29]:
+            xmin = 1.8700
+            xmax = 2.0500
+            text = "sil"
+        intervals [30]:
+            xmin = 2.0500
+            xmax = 2.2500
+            text = "a"
+        intervals [31]:
+            xmin = 2.2500
+            xmax = 2.2800
+            text = "k"
+        intervals [32]:
+            xmin = 2.2800
+            xmax = 2.3700
+            text = "s"
+        intervals [33]:
+            xmin = 2.3700
+            xmax = 2.4600
+            text = "ʋ"
+        intervals [34]:
+            xmin = 2.4600
+            xmax = 2.4900
+            text = "ɒ"
+        intervals [35]:
+            xmin = 2.4900
+            xmax = 2.5300
+            text = "ʈ"
+        intervals [36]:
+            xmin = 2.5300
+            xmax = 2.6300
+            text = "j"
+        intervals [37]:
+            xmin = 2.6300
+            xmax = 2.6400
+            text = "ə"
+        intervals [38]:
+            xmin = 2.6400
+            xmax = 2.7200
+            text = "cʰ"
+        intervals [39]:
+            xmin = 2.7200
+            xmax = 2.7600
+            text = "æ"
+        intervals [40]:
+            xmin = 2.7600
+            xmax = 2.8300
+            text = "n"
+        intervals [41]:
+            xmin = 2.8300
+            xmax = 2.8900
+            text = "d"
+        intervals [42]:
+            xmin = 2.8900
+            xmax = 2.9700
+            text = "əw"
+        intervals [43]:
+            xmin = 2.9700
+            xmax = 3.0700
+            text = "f"
+        intervals [44]:
+            xmin = 3.0700
+            xmax = 3.1000
+            text = "a"
+        intervals [45]:
+            xmin = 3.1000
+            xmax = 3.1400
+            text = "j"
+        intervals [46]:
+            xmin = 3.1400
+            xmax = 3.1700
+            text = "ɒ"
+        intervals [47]:
+            xmin = 3.1700
+            xmax = 3.2100
+            text = "ɹ"
+        intervals [48]:
+            xmin = 3.2100
+            xmax = 3.3200
+            text = "k"
+        intervals [49]:
+            xmin = 3.3200
+            xmax = 3.3800
+            text = "ə"
+        intervals [50]:
+            xmin = 3.3800
+            xmax = 3.4500
+            text = "n"
+        intervals [51]:
+            xmin = 3.4500
+            xmax = 3.5500
+            text = "ʈ"
+        intervals [52]:
+            xmin = 3.5500
+            xmax = 3.6000
+            text = "ɹ"
+        intervals [53]:
+            xmin = 3.6000
+            xmax = 3.7900
+            text = "i"
+        intervals [54]:
+            xmin = 3.7900
+            xmax = 3.8500
+            text = "sil"
+    item [2]:
+        class = "IntervalTier"
+        name = "words"
+        xmin = 0
+        xmax = 3.8500
+        intervals: size = 17
+        intervals [1]:
+            xmin = 0.1100
+            xmax = 0.4500
+            text = "ask"
+        intervals [2]:
+            xmin = 0.4500
+            xmax = 0.6300
+            text = "not"
+        intervals [3]:
+            xmin = 0.6300
+            xmax = 0.7300
+            text = "what"
+        intervals [4]:
+            xmin = 0.7300
+            xmax = 0.8500
+            text = "your"
+        intervals [5]:
+            xmin = 0.8500
+            xmax = 1.2200
+            text = "country"
+        intervals [6]:
+            xmin = 1.2200
+            xmax = 1.4100
+            text = "can"
+        intervals [7]:
+            xmin = 1.4100
+            xmax = 1.5600
+            text = "do"
+        intervals [8]:
+            xmin = 1.5600
+            xmax = 1.6900
+            text = "for"
+        intervals [9]:
+            xmin = 1.6900
+            xmax = 1.8700
+            text = "you"
+        intervals [10]:
+            xmin = 2.0500
+            xmax = 2.3700
+            text = "ask"
+        intervals [11]:
+            xmin = 2.3700
+            xmax = 2.5300
+            text = "what"
+        intervals [12]:
+            xmin = 2.5300
+            xmax = 2.6400
+            text = "you"
+        intervals [13]:
+            xmin = 2.6400
+            xmax = 2.8300
+            text = "can"
+        intervals [14]:
+            xmin = 2.8300
+            xmax = 2.9700
+            text = "do"
+        intervals [15]:
+            xmin = 2.9700
+            xmax = 3.1000
+            text = "for"
+        intervals [16]:
+            xmin = 3.1000
+            xmax = 3.2100
+            text = "your"
+        intervals [17]:
+            xmin = 3.2100
+            xmax = 3.7900
+            text = "country"
 </pre></div>
 </div>
-</section>
+</details></section>
+<section id="listen-to-each-word">
+<h2>Listen to each word<a class="headerlink" href="#listen-to-each-word" title="Link to this heading"></a></h2>
+<p>Transcript: <em>Ask not what your country can do for you, ask what you can
+do for your country.</em></p>
+<p>Every word of the transcript, cut from <code class="docutils literal notranslate"><span class="pre">en.wav</span></code> by the word intervals of
+the TextGrid.  Reproduce the clips with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tools/textgrid_to_word_wavs.py<span class="w"> </span>--wav<span class="w"> </span>english/en.wav<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--textgrid<span class="w"> </span>english/en.TextGrid<span class="w"> </span>--out-dir<span class="w"> </span>english/en.words
+</pre></div>
+</div>
+<table>
+  <tr><th>Word</th><th>Time (s)</th><th>Audio</th></tr>
+    <tr><td>ask</td><td>0.11 – 0.45</td><td><audio controls src="../_static/words/en/w01.wav"></audio></td></tr>
+    <tr><td>not</td><td>0.45 – 0.63</td><td><audio controls src="../_static/words/en/w02.wav"></audio></td></tr>
+    <tr><td>what</td><td>0.63 – 0.73</td><td><audio controls src="../_static/words/en/w03.wav"></audio></td></tr>
+    <tr><td>your</td><td>0.73 – 0.85</td><td><audio controls src="../_static/words/en/w04.wav"></audio></td></tr>
+    <tr><td>country</td><td>0.85 – 1.22</td><td><audio controls src="../_static/words/en/w05.wav"></audio></td></tr>
+    <tr><td>can</td><td>1.22 – 1.41</td><td><audio controls src="../_static/words/en/w06.wav"></audio></td></tr>
+    <tr><td>do</td><td>1.41 – 1.56</td><td><audio controls src="../_static/words/en/w07.wav"></audio></td></tr>
+    <tr><td>for</td><td>1.56 – 1.69</td><td><audio controls src="../_static/words/en/w08.wav"></audio></td></tr>
+    <tr><td>you</td><td>1.69 – 1.87</td><td><audio controls src="../_static/words/en/w09.wav"></audio></td></tr>
+    <tr><td>ask</td><td>2.05 – 2.37</td><td><audio controls src="../_static/words/en/w10.wav"></audio></td></tr>
+    <tr><td>what</td><td>2.37 – 2.53</td><td><audio controls src="../_static/words/en/w11.wav"></audio></td></tr>
+    <tr><td>you</td><td>2.53 – 2.64</td><td><audio controls src="../_static/words/en/w12.wav"></audio></td></tr>
+    <tr><td>can</td><td>2.64 – 2.83</td><td><audio controls src="../_static/words/en/w13.wav"></audio></td></tr>
+    <tr><td>do</td><td>2.83 – 2.97</td><td><audio controls src="../_static/words/en/w14.wav"></audio></td></tr>
+    <tr><td>for</td><td>2.97 – 3.10</td><td><audio controls src="../_static/words/en/w15.wav"></audio></td></tr>
+    <tr><td>your</td><td>3.10 – 3.21</td><td><audio controls src="../_static/words/en/w16.wav"></audio></td></tr>
+    <tr><td>country</td><td>3.21 – 3.79</td><td><audio controls src="../_static/words/en/w17.wav"></audio></td></tr>
+</table></section>
 </section>
 
 

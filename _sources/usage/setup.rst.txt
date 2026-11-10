@@ -28,7 +28,7 @@ Python 3.8+ is required.  Then::
 2. Get the example scripts
 --------------------------
 
-The example drivers (``tools/align_mfa.py`` and the yesno recipe) live in
+The example drivers (:khg:`tools/align_mfa.py` and the :khg:`yesno recipe <egs/yesno>`) live in
 the repository — clone it (no build needed):
 
 .. code-block:: bash

@@ -1,7 +1,7 @@
 The yesno recipe — train a monophone GMM
 ========================================
 
-``egs/yesno`` mirrors kaldi's `egs/yesno/s5
+:khg:`egs/yesno` mirrors kaldi's `egs/yesno/s5
 <https://github.com/kaldi-asr/kaldi/tree/master/egs/yesno/s5>`_ stage by
 stage: it trains a monophone GMM on the "yesno" corpus (60 recordings of
 8-digit sequences), builds an HCLG decoding graph, decodes the test set and
@@ -43,7 +43,7 @@ To run a single stage or a range::
 Stage by stage
 --------------
 
-**Stage 0 — prepare the data** (``local/prepare_data.sh``).
+**Stage 0 — prepare the data** (:khg:`local/prepare_data.sh <egs/yesno/local/prepare_data.sh>`).
 Downloads the "yesno" corpus if ``waves_yesno/`` is missing, then splits it
 into ``data/train_yesno`` (31 utterances) and ``data/test_yesno`` (29
 utterances) with kaldi-style ``wav.scp`` / ``text`` / ``utt2spk`` /
@@ -51,7 +51,7 @@ utterances) with kaldi-style ``wav.scp`` / ``text`` / ``utt2spk`` /
 (e.g. ``0_0_0_1_0_1_1_0.wav`` is the digit sequence ``zero zero zero one ...``).
 
 The corpus is the OpenSLR "waves_yesno" release (the same one kaldi's
-``egs/yesno/s5/run.sh`` downloads):
+:kaldi:`egs/yesno/s5/run.sh <egs/yesno/s5/run.sh>` downloads):
 
 - original URL (OpenSLR resource 1):
   http://www.openslr.org/resources/1/waves_yesno.tar.gz
@@ -66,11 +66,11 @@ disambiguated counterpart ``L_disambig.fst``, and the test-language G.fst
 (``data/lang_test_tg``).  This is the kaldi ``utils/prepare_lang.sh``
 equivalent.
 
-**Stage 2 — compute features** (``local/compute_feats.py``).
+**Stage 2 — compute features** (:khg:`local/compute_feats.py <egs/yesno/local/compute_feats.py>`).
 Raw 13-dim MFCC (kaldi-compatible, ``mfcc/raw_mfcc_{train,test}_yesno.1.ark``)
 plus per-speaker CMVN stats; ``data/{train,test}_yesno/feats.scp`` points at
 the MFCC arks.  CMVN + deltas (→ 39-dim) are applied at load time
-(``tools/read_feats.load_delta_feats``), mirroring kaldi's
+(``load_delta_feats`` in :khg:`tools/read_feats.py`), mirroring kaldi's
 ``apply-cmvn | add-deltas`` use-time pipeline.  The training/decoding code
 itself is feature-agnostic — it just reads ``feats.scp``.
 
@@ -116,7 +116,7 @@ Lattice-faster decoding (kaldi ``steps/decode.sh`` semantics, acoustic scale
 utterance is written to ``exp/mono0a/decode_test_yesno/text`` and scored
 against the reference with ``kaldialign``.  The sweep over
 word-insertion-penalties ``0,0.5,1.0`` (and lmwt) reproduces kaldi's
-``local/score.sh``; the best result lands in ``exp/mono0a/decode_test_yesno/wer``.
+:kaldi:`local/score.sh <egs/yesno/s5/local/score.sh>`; the best result lands in ``exp/mono0a/decode_test_yesno/wer``.
 
 Expected result
 ---------------
