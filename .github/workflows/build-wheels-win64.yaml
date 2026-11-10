@@ -57,9 +57,6 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          # python3 on macOS runners is managed by Homebrew and cannot be
-          # upgraded in place ("no RECORD file was found for pip"), so install
-          # twine into a throwaway venv instead of the system environment.
-          python3 -m venv "$RUNNER_TEMP/twine"
-          "$RUNNER_TEMP/twine/bin/python" -m pip install -U pip wheel twine==5.0.0 setuptools
-          "$RUNNER_TEMP/twine/bin/twine" upload --skip-existing ./wheelhouse/*.whl
+          python3 -m pip install --upgrade pip
+          python3 -m pip install wheel twine==5.0.0 setuptools
+          twine upload --skip-existing ./wheelhouse/*.whl

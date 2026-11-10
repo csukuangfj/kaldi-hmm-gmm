@@ -234,11 +234,14 @@ class TestSelfContained(unittest.TestCase):
         except ImportError:
             self.skipTest("kaldi-decoder is not installed")
 
-        for order in ("khg_first", "kd_first"):
+        pairs = (
+            ("kaldi_hmm_gmm", "kaldi_decoder"),
+            ("kaldi_decoder", "kaldi_hmm_gmm"),
+        )
+        for first, second in pairs:
             code = (
                 "import importlib\n"
-                "first, second = "
-                f"{'(\"kaldi_hmm_gmm\", \"kaldi_decoder\")' if order == 'khg_first' else ('(\"kaldi_decoder\", \"kaldi_hmm_gmm\")')}\n"
+                f"first, second = {first!r}, {second!r}\n"
                 "importlib.import_module(first)\n"
                 "importlib.import_module(second)\n"
             )
