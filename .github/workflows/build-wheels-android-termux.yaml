@@ -1,0 +1,168 @@
+name: build-wheels-android-termux
+# Builds Python wheels inside termux/termux-docker instead of with the Android
+# NDK, so that the result imports in Termux. Cross-compiling with the NDK
+# toolchain produces binaries that cannot load there.  Ported from
+# kaldi-native-fbank; see that repo for the long-form rationale:
+#
+#   1. the objects use the NDK C++ runtime (DT_NEEDED libc++_shared.so) --
+#      correct for Termux, do NOT rewrite DT_NEEDED;
+#   2. RPATH must keep the Termux lib directory (patchelf --set-rpath
+#      replaces the whole RUNPATH);
+#   3. the container script is passed as one single-quoted string -- it must
+#      contain NO single quotes at all, not even in comments;
+#   4. there is no auditwheel on Android: RPATH is fixed up by hand with
+#      patchelf and the wheel is unzipped/re-zipped;
+#   5. termux-docker images are native per architecture; run with
+#      --user 0:0, pre-create the output dirs, chmod -R a+w the workspace;
+#   6. the smoke test runs in the same image from a clean cwd.
+#
+# kaldi-hmm-gmm notes: the extension is self-contained (the static core is
+# linked in) and lives at kaldi_hmm_gmm/lib/, so a single $ORIGIN + Termux
+# lib RPATH covers every .so; the smoke test installs with --no-deps to
+# avoid building the python dependencies inside Termux.
+on:
+  push:
+    branches:
+      - wheel
+      - fix-ci
+    tags:
+      - '*'
+  workflow_dispatch:
+concurrency:
+  group: build-wheels-android-termux-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    name: ${{ matrix.abi }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 3 ABIs (x86 / i686 is skipped: its package mirror is unreliable).
+          - abi: aarch64
+            os: ubuntu-24.04-arm
+            plat: android_24_arm64_v8a
+          - abi: arm
+            os: ubuntu-24.04-arm
+            plat: android_24_armeabi_v7a
+          - abi: x86_64
+            os: ubuntu-latest
+            plat: android_24_x86_64
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheel with the Termux toolchain
+        shell: bash
+        run: |
+          mkdir -p build dist wheelhouse
+          chmod -R a+w "${{ github.workspace }}"
+          docker run --rm \
+            --user 0:0 \
+            --volume ${{ github.workspace }}/:/work \
+            termux/termux-docker:${{ matrix.abi }} \
+          bash -c '
+            set -e
+            for i in 1 2 3 4 5; do apt update -y && break || sleep 10; done
+            for i in 1 2 3 4 5; do apt install -y cmake make git python python-pip clang libc++ && break || sleep 10; done
+            for i in 1 2 3 4 5; do apt install -y android-liblog || true && break || sleep 10; done
+            for i in 1 2 3 4 5; do apt install -y libandroid-dev || true && break || sleep 10; done
+            for i in 1 2 3 4 5; do apt install -y android-libandroid || true && break || sleep 10; done
+            for i in 1 2 3 4 5; do apt install -y patchelf zip unzip && break || sleep 10; done
+            pip install --upgrade pip setuptools wheel
+            cd /work
+            python3 setup.py bdist_wheel --plat-name=${{ matrix.plat }}
+            TERMUX_LIB=/data/data/com.termux/files/usr/lib
+            RPATH="\$ORIGIN:$TERMUX_LIB"
+            for whl in dist/*.whl; do
+              echo "Patching RPATH in $whl"
+              tmpdir=$(mktemp -d)
+              unzip -q "$whl" -d "$tmpdir"
+              find "$tmpdir" -name "*.so" -print -exec patchelf --set-rpath "$RPATH" {} \;
+              rm "$whl"
+              (cd "$tmpdir" && zip -qr "$OLDPWD/$whl" .)
+              rm -rf "$tmpdir"
+            done
+            ls -lh dist
+          '
+
+      - name: Display wheels
+        shell: bash
+        run: |
+          sudo chown -R "$USER" ./build ./dist ./wheelhouse ./kaldi-hmm-gmm
+          ls -lh ./dist/
+          unzip -l ./dist/*.whl
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-android-${{ matrix.abi }}
+          path: ./dist/*.whl
+
+  # Install the wheel inside the matching Termux image and load the
+  # extension: a broken RPATH or a wrong architecture fails right here.
+  test:
+    name: test ${{ matrix.abi }}
+    needs: [build]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - abi: aarch64
+            os: ubuntu-24.04-arm
+          - abi: arm
+            os: ubuntu-24.04-arm
+          - abi: x86_64
+            os: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheel-android-${{ matrix.abi }}
+          path: /tmp/wheels
+
+      - name: Run smoke test
+        shell: bash
+        run: |
+          chmod -R a+w /tmp/wheels
+          docker run --rm \
+            --user 0:0 \
+            --volume /tmp/wheels:/wheels:ro \
+            --volume ${{ github.workspace }}/tools/smoke_test.py:/test/smoke_test.py:ro \
+            termux/termux-docker:${{ matrix.abi }} \
+          bash -c '
+            set -e
+            for i in 1 2 3 4 5; do apt update -y && break || sleep 10; done
+            for i in 1 2 3 4 5; do apt install -y python python-pip libc++ clang && break || sleep 10; done
+            for i in 1 2 3 4 5; do apt install -y android-liblog || true && break || sleep 10; done
+            for i in 1 2 3 4 5; do apt install -y libandroid-dev || true && break || sleep 10; done
+            for i in 1 2 3 4 5; do apt install -y android-libandroid || true && break || sleep 10; done
+            for i in 1 2 3 4 5; do apt install -y python-numpy || true && break || sleep 10; done
+            pip install --upgrade pip setuptools wheel
+            pip install --no-deps /wheels/*.whl
+            cd /
+            python3 /test/smoke_test.py
+          '
+
+  publish:
+    name: publish to PyPI
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheel-android-*
+          path: /tmp/wheels
+          merge-multiple: true
+
+      - name: Publish wheels to PyPI
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        shell: bash
+        run: |
+          ls -lh /tmp/wheels/
+          python3 -m pip install --upgrade pip
+          python3 -m pip install wheel twine==5.0.0 setuptools
+          twine upload --skip-existing /tmp/wheels/*.whl

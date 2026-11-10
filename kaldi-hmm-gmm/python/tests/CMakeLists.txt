@@ -2,6 +2,17 @@ function(khg_add_py_test source)
   get_filename_component(name ${source} NAME_WE)
   set(name "${name}_py")
 
+  # Fall back to the interpreter found by FindPython when the legacy
+  # PYTHON_EXECUTABLE cache variable was not provided (ctest would otherwise
+  # fail with "no such file or directory").
+  if(NOT PYTHON_EXECUTABLE)
+    if(Python_EXECUTABLE)
+      set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
+    elseif(Python3_EXECUTABLE)
+      set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+    endif()
+  endif()
+
   get_filename_component(khg_path ${CMAKE_CURRENT_LIST_DIR} DIRECTORY)
 
   # The extension module lives in ${khg_path}/kaldi_hmm_gmm/lib/ (built
