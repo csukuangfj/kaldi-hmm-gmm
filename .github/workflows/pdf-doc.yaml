@@ -35,7 +35,7 @@ jobs:
           sudo apt-get install -y doxygen graphviz \
             texlive-latex-recommended texlive-fonts-recommended \
             texlive-latex-extra latexmk texlive-xetex texlive-lang-chinese \
-            fonts-freefont-otf fonts-noto-cjk
+            fonts-freefont-otf fonts-noto-cjk xindy
 
       - name: Setup Python
         uses: actions/setup-python@v5

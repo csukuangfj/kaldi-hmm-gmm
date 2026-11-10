@@ -1,21 +1,16 @@
 name: build-wheels-macos
-
 on:
   push:
     branches:
       - wheel
     tags:
       - '*'
-
   workflow_dispatch:
-
 env:
   KHG_IS_FOR_PYPI: 1
-
 concurrency:
   group: build-wheels-macos-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   build_wheels:
     name: ${{ matrix.python-version }}
@@ -24,24 +19,36 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest]
-        python-version: ["cp38", "cp39", "cp310", "cp311", "cp312", "cp313", "cp314"]
-
+        python-version: ["cp38", "cp39", "cp310", "cp311", "cp312", "cp313", "cp314", "cp315"]
     steps:
       - uses: actions/checkout@v4
+      # CPython 3.8 is EOL and has been dropped upstream: the manylinux
+      # images removed the interpreter on 2026-05-07 and cibuildwheel 4.0
+      # removed support for building it.  The last combination that still
+      # works is cibuildwheel 3.x plus a pinned pre-drop image (for linux).
 
-      # see https://cibuildwheel.readthedocs.io/en/stable/changelog/
-      # for a list of versions
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v3.1.4
+      - name: Build wheels (cp38)
+        if: matrix.python-version == 'cp38'
+        uses: pypa/cibuildwheel@v3.4.1
         env:
           CIBW_BUILD: "${{ matrix.python-version}}-* "
+          CIBW_BUILD_VERBOSITY: 3
+          CIBW_ARCHS: "universal2"
           CIBW_ENVIRONMENT: >
             MACOSX_DEPLOYMENT_TARGET=10.15
             KHG_CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET='10.15'"
-          CIBW_ARCHS: "universal2"
-          CIBW_BUILD_VERBOSITY: 3
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: ""
 
-          #  Don't repair macOS wheels
+      - name: Build wheels
+        if: matrix.python-version != 'cp38'
+        uses: pypa/cibuildwheel@v4.3.2
+        env:
+          CIBW_BUILD: "${{ matrix.python-version}}-* "
+          CIBW_BUILD_VERBOSITY: 3
+          CIBW_ARCHS: "universal2"
+          CIBW_ENVIRONMENT: >
+            MACOSX_DEPLOYMENT_TARGET=10.15
+            KHG_CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET='10.15'"
           CIBW_REPAIR_WHEEL_COMMAND_MACOS: ""
 
       - name: Display wheels
@@ -54,13 +61,15 @@ jobs:
         with:
           name: wheel-${{ matrix.python-version }}
           path: ./wheelhouse/*.whl
-
       - name: Publish wheels to PyPI
+        shell: bash
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          python3 -m pip install --break-system-packages --upgrade pip
-          python3 -m pip install --break-system-packages wheel twine==5.0.0 setuptools
-
-          twine upload ./wheelhouse/*.whl
+          # python3 on macOS runners is managed by Homebrew and cannot be
+          # upgraded in place ("no RECORD file was found for pip"), so install
+          # twine into a throwaway venv instead of the system environment.
+          python3 -m venv "$RUNNER_TEMP/twine"
+          "$RUNNER_TEMP/twine/bin/python" -m pip install -U pip wheel twine==5.0.0 setuptools
+          "$RUNNER_TEMP/twine/bin/twine" upload --skip-existing ./wheelhouse/*.whl

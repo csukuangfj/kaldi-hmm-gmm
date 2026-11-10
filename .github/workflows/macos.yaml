@@ -77,7 +77,8 @@ jobs:
           cd build
           cmake -D CMAKE_BUILD_TYPE=Release \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ..
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DPYTHON_EXECUTABLE=$(command -v python3 || command -v python) ..
 
       - name: Build
         run: |
