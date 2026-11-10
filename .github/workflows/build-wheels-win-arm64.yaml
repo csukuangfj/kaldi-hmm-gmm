@@ -59,7 +59,7 @@ jobs:
         run: |
           python3 -m pip install --force-reinstall ./wheelhouse/*.whl
           cd "$RUNNER_TEMP"
-          python3 -c "import kaldi_hmm_gmm as khg; print(khg.AlignConfig()); print(khg.__file__)"
+          python3 "$GITHUB_WORKSPACE/tools/smoke_test.py"
 
       - name: Publish wheels to PyPI
         env:

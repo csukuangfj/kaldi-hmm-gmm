@@ -115,6 +115,8 @@ jobs:
           - abi: x86_64
             os: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/download-artifact@v4
         with:
           name: wheel-android-${{ matrix.abi }}
@@ -127,6 +129,7 @@ jobs:
           docker run --rm \
             --user 0:0 \
             --volume /tmp/wheels:/wheels:ro \
+            --volume ${{ github.workspace }}/tools/smoke_test.py:/test/smoke_test.py:ro \
             termux/termux-docker:${{ matrix.abi }} \
           bash -c '
             set -e
@@ -135,10 +138,11 @@ jobs:
             for i in 1 2 3 4 5; do apt install -y android-liblog || true && break || sleep 10; done
             for i in 1 2 3 4 5; do apt install -y libandroid-dev || true && break || sleep 10; done
             for i in 1 2 3 4 5; do apt install -y android-libandroid || true && break || sleep 10; done
-            pip install --upgrade pip
+            for i in 1 2 3 4 5; do apt install -y python-numpy || true && break || sleep 10; done
+            pip install --upgrade pip setuptools wheel
             pip install --no-deps /wheels/*.whl
             cd /
-            python3 -c "import kaldi_hmm_gmm as khg; print(khg.AlignConfig()); print(khg.__file__)"
+            python3 /test/smoke_test.py
           '
 
   publish:
