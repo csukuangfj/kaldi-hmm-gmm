@@ -168,7 +168,8 @@ void AmDiagGmm::SetGaussianMean(int32_t pdf_index, int32_t gauss_index,
 // The functions below are ported from ../kaldi/src/gmm/am-diag-gmm.cc; the
 // file format is identical to kaldi's.
 void AmDiagGmm::Read(std::istream &is, bool binary) {
-  int32_t num_pdfs, dim;
+  int32_t num_pdfs = 0;
+  int32_t dim = 0;
 
   kaldiio::ExpectToken(is, binary, "<DIMENSION>");
   kaldiio::ReadBasicType(is, binary, &dim);

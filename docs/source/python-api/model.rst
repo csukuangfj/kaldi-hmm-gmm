@@ -21,7 +21,6 @@ Transition model
 
 .. autoclass:: kaldi_hmm_gmm.TransitionModelTuple
 
-.. autoclass:: kaldi_hmm_gmm.MleTransitionUpdateConfig
 
 HMM topology
 ------------

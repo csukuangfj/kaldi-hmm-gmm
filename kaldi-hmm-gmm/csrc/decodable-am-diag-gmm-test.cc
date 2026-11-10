@@ -32,7 +32,8 @@ void ExpectEqual(double a, double b, double tol = 1.0e-6) {
       << "a = " << a << ", b = " << b;
 }
 
-// Random well-conditioned diagonal GMM (kaldi unittest::InitRandDiagGmm).
+// Random well-conditioned diagonal GMM (similar in spirit to kaldi's
+// unittest::InitRandDiagGmm, different parameterization).
 void InitRandDiagGmm(int32_t dim, int32_t num_comp, DiagGmm *gmm) {
   gmm->Resize(num_comp, dim);
   FloatVector weights(num_comp);

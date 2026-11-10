@@ -201,7 +201,29 @@ void PybindDecoderWrappers(py::module *m) {
       py::arg("num_done") = 0, py::arg("num_error") = 0,
       py::arg("num_retried") = 0, py::arg("tot_like") = 0.0,
       py::arg("frame_count") = 0,
-      py::call_guard<py::gil_scoped_release>());
+      py::call_guard<py::gil_scoped_release>(),
+      R"doc(Force-align one utterance (kaldi's ``gmm-align-compiled`` core).
+
+Adds the transition probabilities to the training graph (``AddTransitionProbs``
+with ``transition_scale``/``self_loop_scale``) and runs the Viterbi alignment
+in a single C++ call.  **Mutates** the graph in place (same as kaldi's
+``gmm-align-compiled``); pass a copy to reuse it afterwards.
+
+Returns ``(num_done, num_error, num_retried, tot_like, frame_count,
+alignment, words)``: the five counters are INPUTS that get incremented
+(kaldi's accumulating-table semantics) -- omit them to get this utterance's
+contributions only, or thread running totals through a loop.  ``alignment``
+is transition-ids.
+
+:param config: Alignment beams (:class:`AlignConfig`).
+:param utt: Utterance id (for log messages).
+:param acoustic_scale: Acoustic scale used in the alignment.
+:param transition_scale: Transition-probability scale.
+:param self_loop_scale: Self-loop versus non-self-loop log-prob scale.
+:param trans_model: Transition model (:class:`TransitionModel`; needed for
+   ``AddTransitionProbs``).
+:param fst: Per-utterance training graph; mutated in place.
+:param decodable: Scores (:class:`DecodableInterface`).)doc");
 
   // Decoding: kaldi's gmm-latgen-simple/faster output block.  The decoder is
   // constructed internally (no cross-module decoder objects).
@@ -213,8 +235,8 @@ void PybindDecoderWrappers(py::module *m) {
       [](const kaldi_decoder::LatticeSimpleDecoderConfig &config,
          fst::VectorFst<fst::StdArc> *fst,
          kaldi_decoder::DecodableInterface &decodable,
-         const TransitionModel &trans_model, const std::string &utt,
-         bool allow_partial, float acoustic_scale)
+         const kaldi_decoder::TransitionInformation &trans_model,
+         const std::string &utt, bool allow_partial, float acoustic_scale)
           -> std::tuple<bool, std::vector<int32_t>, std::vector<int32_t>,
                         double, fst::VectorFst<fst::LatticeArc>> {
         kaldi_decoder::LatticeSimpleDecoder decoder(*fst, config);
@@ -230,15 +252,31 @@ void PybindDecoderWrappers(py::module *m) {
       py::arg("config"), py::arg("fst"), py::arg("decodable"),
       py::arg("trans_model"), py::arg("utt"), py::arg("allow_partial"),
       py::arg("acoustic_scale"),
-      py::call_guard<py::gil_scoped_release>());
+      py::call_guard<py::gil_scoped_release>(),
+      R"doc(Decode one utterance with the lattice-simple decoder (kaldi's
+``gmm-latgen-simple`` output block).  The decoder is constructed inside this
+call; the graph ``fst`` is only borrowed for its duration.
+
+Returns ``(ok, alignment, words, like, lat)``; ``lat`` is the lattice exactly
+as kaldi writes it (acoustic costs divided by ``acoustic_scale``) -- feed it
+to :func:`lattice_best_path` for lmwt/wip scoring.
+
+:param config: Decoder options (:class:`LatticeSimpleDecoderConfig`).
+:param fst: Decoding graph (e.g. HCLG); borrowed, not mutated.
+:param decodable: Scores (:class:`DecodableInterface`).
+:param trans_model: Transition information (any
+   :class:`TransitionInformation`, e.g. :class:`TransitionModel`).
+:param utt: Utterance id (for log messages).
+:param allow_partial: Output partial results if no final state was reached.
+:param acoustic_scale: Acoustic scale used in the decode.)doc");
 
   m->def(
       "decode_utterance_lattice_faster",
       [](const kaldi_decoder::LatticeFasterDecoderConfig &config,
          fst::VectorFst<fst::StdArc> *fst,
          kaldi_decoder::DecodableInterface &decodable,
-         const TransitionModel &trans_model, const std::string &utt,
-         bool allow_partial, float acoustic_scale)
+         const kaldi_decoder::TransitionInformation &trans_model,
+         const std::string &utt, bool allow_partial, float acoustic_scale)
           -> std::tuple<bool, std::vector<int32_t>, std::vector<int32_t>,
                         double, fst::VectorFst<fst::LatticeArc>> {
         kaldi_decoder::LatticeFasterDecoder decoder(*fst, config);
@@ -254,7 +292,23 @@ void PybindDecoderWrappers(py::module *m) {
       py::arg("config"), py::arg("fst"), py::arg("decodable"),
       py::arg("trans_model"), py::arg("utt"), py::arg("allow_partial"),
       py::arg("acoustic_scale"),
-      py::call_guard<py::gil_scoped_release>());
+      py::call_guard<py::gil_scoped_release>(),
+      R"doc(Decode one utterance with the lattice-faster decoder (kaldi's
+``gmm-latgen-faster`` output block).  The decoder is constructed inside this
+call; the graph ``fst`` is only borrowed for its duration.
+
+Returns ``(ok, alignment, words, like, lat)``; ``lat`` is the lattice exactly
+as kaldi writes it (acoustic costs divided by ``acoustic_scale``) -- feed it
+to :func:`lattice_best_path` for lmwt/wip scoring.
+
+:param config: Decoder options (:class:`LatticeFasterDecoderConfig`).
+:param fst: Decoding graph (e.g. HCLG); borrowed, not mutated.
+:param decodable: Scores (:class:`DecodableInterface`).
+:param trans_model: Transition information (any
+   :class:`TransitionInformation`, e.g. :class:`TransitionModel`).
+:param utt: Utterance id (for log messages).
+:param allow_partial: Output partial results if no final state was reached.
+:param acoustic_scale: Acoustic scale used in the decode.)doc");
 }
 
 }  // namespace khg

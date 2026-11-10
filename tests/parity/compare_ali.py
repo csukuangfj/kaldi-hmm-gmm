@@ -15,7 +15,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "kaldi-hmm-gmm" / "python"))
+_src_python = Path(__file__).resolve().parents[2] / "kaldi-hmm-gmm" / "python"
+if list((_src_python / "kaldi_hmm_gmm" / "lib").glob("_kaldi_hmm_gmm.*")):
+    sys.path.insert(0, str(_src_python))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
 
 import kaldi_native_io  # noqa: E402
 
@@ -33,10 +36,11 @@ def get_args():
 
 
 def collapse(seq):
-    """Collapse a per-frame sequence to phone instances WITHOUT merging
-    adjacent instances of the same phone... (we cannot distinguish instances
-    from a per-frame sequence alone, so this yields phone runs; boundary
-    comparison is done frame-wise below.)"""
+    """Collapse a per-frame sequence to phone runs.
+
+    Adjacent equal frames merge into one run; note that two ADJACENT
+    INSTANCES of the same phone cannot be told apart from a per-frame
+    sequence alone, so boundary comparison is done frame-wise below."""
     out = []
     for s in seq:
         if not out or out[-1] != s:

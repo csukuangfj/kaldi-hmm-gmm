@@ -133,7 +133,7 @@ class TestLifetimeSafety(unittest.TestCase):
 
     def test_decode_with_temporary_graph(self):
         # The decode wrapper borrows the graph only for the duration of the
-        # call (the decoder is constructed internally -- plan-3 D2), so a
+        # call (the decoder is constructed internally), so a
         # temporary graph is safe.
         import kaldifst
 

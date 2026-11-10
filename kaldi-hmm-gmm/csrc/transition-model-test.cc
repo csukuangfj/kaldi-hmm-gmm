@@ -365,8 +365,11 @@ TEST(TransitionModel, WriteReadRoundTrip) {
                 trans_model->NumTransitionStates());
       EXPECT_EQ(trans_model2.NumPdfs(), trans_model->NumPdfs());
       for (int32_t tid = 1; tid <= trans_model->NumTransitionIds(); ++tid) {
-        EXPECT_FLOAT_EQ(trans_model2.GetTransitionLogProb(tid),
-                        trans_model->GetTransitionLogProb(tid));
+        // text-mode Write/Read serializes floats at ~6 significant digits,
+        // so compare with a relative tolerance instead of ULPs
+        float p1 = trans_model2.GetTransitionLogProb(tid);
+        float p2 = trans_model->GetTransitionLogProb(tid);
+        EXPECT_LE(std::fabs(p1 - p2), 1e-4f * (std::fabs(p2) + 1e-6f));
       }
       CheckMappings(trans_model2);
     }

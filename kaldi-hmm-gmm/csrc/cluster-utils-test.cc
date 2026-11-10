@@ -183,7 +183,7 @@ TEST(ClusterUtils, RefineClusters) {
     ClusterKMeansOptions kcfg;
     kcfg.refine_cfg.num_iters = 10000;  // very large.
     kcfg.refine_cfg.top_n = 2 + (Rand() % 20);
-    kcfg.num_tries = 1;  // a single run, as in kaldi's test.
+    kcfg.num_tries = 1;  // a single run keeps the check deterministic.
     kcfg.verbose = false;
 
     float impr = ClusterKMeans(points, n_clust, &clusters, &assignments, kcfg);

@@ -60,7 +60,8 @@ static void RandGauss2Local(float *a, float *b) {
 }
 
 float Randn(float mean /*= 0*/, float stddev /*= 1*/) {
-  float a, b;
+  float a = 0;
+  float b = 0;
   RandGauss2Local(&a, &b);
   return mean + stddev * a;
 }

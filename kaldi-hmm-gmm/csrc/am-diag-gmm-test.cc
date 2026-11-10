@@ -29,7 +29,8 @@ int32_t RandIntLocal(int32_t low, int32_t high) {
   return low + static_cast<int32_t>(RandUniform() * (high - low + 1));
 }
 
-// Random well-conditioned diagonal GMM (kaldi unittest::InitRandDiagGmm).
+// Random well-conditioned diagonal GMM (similar in spirit to kaldi's
+// unittest::InitRandDiagGmm, different parameterization).
 void InitRandDiagGmm(int32_t dim, int32_t num_comp, DiagGmm *gmm) {
   gmm->Resize(num_comp, dim);
   FloatVector weights(num_comp);

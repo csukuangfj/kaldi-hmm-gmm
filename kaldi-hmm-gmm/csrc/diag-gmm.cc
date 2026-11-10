@@ -422,14 +422,10 @@ void DiagGmm::Generate(FloatVector *output) const {
   int32_t i = 0;
   double sum = 0.0;
 
-  KHG_ASSERT(i < static_cast<int32_t>(weights_.size()));
   while (sum + weights_[i] < r) {
     sum += weights_[i];
     ++i;
-  }
-
-  if (i >= weights_.size()) {
-    i = weights_.size() - 1;
+    KHG_ASSERT(i < static_cast<int32_t>(weights_.size()));
   }
 
   // now i is the index of the Gaussian we chose.

@@ -24,7 +24,8 @@ namespace khg {
 
 namespace {
 
-// kaldi AssertEqual(a, b, tol) is relative: |a-b| <= 0.5 * tol * (|a| + |b|)
+// kaldi ApproxEqual(a, b, tol) is relative: |a-b| <= tol * (|a| + |b|);
+// we use the stricter |a-b| <= 0.5 * tol * (|a| + |b|)
 void ExpectEqual(double a, double b, double tol = 1.0e-6) {
   EXPECT_LE(std::fabs(a - b), 0.5 * tol * (std::fabs(a) + std::fabs(b)))
       << "a = " << a << ", b = " << b;

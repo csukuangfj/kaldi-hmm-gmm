@@ -303,7 +303,8 @@ TEST(EventMap, Prune) {
           event.push_back(std::make_pair(key, value));
         }
       }
-      EventAnswerType answer, answer2;
+      EventAnswerType answer = 0;
+      EventAnswerType answer2 = 0;
       if (em->Map(event, &answer)) {
         bool ret;
         if (pruned_em == nullptr) {
@@ -354,7 +355,8 @@ TEST(EventMap, MapValues) {
     EventMap *mapped_em = em->MapValues(mapped_keys, value_map);
 
     for (int32_t i = 0; i < 10; ++i) {
-      EventType event, mapped_event;
+      EventType event;
+      EventType mapped_event;
       for (int32_t key = 1; key <= 2; ++key) {
         if (Rand() % 2 == 0) {
           EventValueType value = Rand() % kMaxVal;
@@ -368,7 +370,8 @@ TEST(EventMap, MapValues) {
           mapped_event.push_back(std::make_pair(key, mapped_value));
         }
       }
-      EventAnswerType answer, answer2;
+      EventAnswerType answer = 0;
+      EventAnswerType answer2 = 0;
       if (em->Map(event, &answer)) {
         bool ret = mapped_em->Map(mapped_event, &answer2);
         EXPECT_TRUE(ret);

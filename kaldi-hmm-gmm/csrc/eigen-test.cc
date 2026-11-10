@@ -739,7 +739,9 @@ TEST(Eigen, LogSumExpAllTermsClose) {
   rel_eq(LogSumExp(v), expected, 1.0e-6);
 
   // no pruning (default) equals explicitly disabled pruning
-  EXPECT_FLOAT_EQ(LogSumExp(v, -1.0f), LogSumExp(v));
+  // all terms lie within kMinLogDiffFloat of the max, so even a zero
+  // prune keeps every term
+  EXPECT_FLOAT_EQ(LogSumExp(v, 0.0f), LogSumExp(v));
 }
 
 TEST(Eigen, LogSumExpFarTermDropped) {

@@ -3,7 +3,7 @@
 // Copyright 2009-2011  Microsoft Corporation
 // Copyright (c)  2026  Xiaomi Corporation
 //
-// This file is copied/modified from kaldi/src/tree/build-tree-utils.cc
+// New tests for GetStubMap (kaldi/src/tree/build-tree-utils.{h,cc} behavior).
 //
 // Tests for GetStubMap (../kaldi/src/tree/build-tree-utils.cc):
 //   - single phone set with shared roots -> one ConstantEventMap leaf

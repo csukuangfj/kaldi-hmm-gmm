@@ -74,7 +74,7 @@ static void PybindClusterable(py::module *m) {
       .def("type", &PyClass::Type)
       .def("objf_plus", &PyClass::ObjfPlus, py::arg("other"), py::call_guard<py::gil_scoped_release>())
       .def("objf_minus", &PyClass::ObjfMinus, py::arg("other"), py::call_guard<py::gil_scoped_release>())
-      .def("distance", &PyClass::Distance, py::arg("oter"), py::call_guard<py::gil_scoped_release>());
+      .def("distance", &PyClass::Distance, py::arg("other"), py::call_guard<py::gil_scoped_release>());
 }
 
 static void PybindScalarClusterable(py::module *m) {

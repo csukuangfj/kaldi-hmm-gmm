@@ -35,7 +35,9 @@ using FloatRowVector = Eigen::Matrix<float, 1, Eigen::Dynamic>;
 
 using DoubleRowVector = Eigen::Matrix<double, 1, Eigen::Dynamic>;
 
-/// Returns \f$\log \sum_i \exp(v_i)\f$; entries below \c prune are dropped.
+/// Returns \f$\log \sum_i \exp(v_i)\f$; when \c prune > 0, entries more
+/// than \c prune below the maximum are dropped (kaldi: exp of elements less
+/// than max - prune is pruned).
 float LogSumExp(const FloatVector &v, float prune = -1.0f);
 
 /// Returns the softmax of \c v; optionally outputs the log-sum-exp.

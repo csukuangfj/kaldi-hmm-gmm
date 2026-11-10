@@ -226,7 +226,6 @@ class TestSelfContained(unittest.TestCase):
                 self.assertEqual(
                     getattr(a, f), getattr(b, f), f"{ours.__name__}.{f}"
                 )
-                setattr(a, f, getattr(b, f))
 
     def test_dual_package_coexistence(self):
         """Both import orders are safe; objects do not cross."""
@@ -311,6 +310,74 @@ class TestSelfContained(unittest.TestCase):
         self.assertEqual(tm.transition_id_to_pdf(3), 1)
         self.assertEqual(tm.num_transition_ids(), 4)
         self.assertEqual(tm.num_pdfs(), 2)
+
+
+    def test_trampoline_dispatch_through_cxx(self):
+        """A Python decodable is actually called back from C++ dispatch."""
+        _hmm_topo, _ctx, tm, am_gmm, feats = build_mono_system()
+        phone2id = {p: p for p in _hmm_topo.phones}
+        phone2id["sil"] = max(phone2id.values()) + 1
+        lex_fst = build_lex_fst(phone2id, {1: [1, 2], 2: [2, 3]})
+        gc = khg.TrainingGraphCompiler(
+            trans_model=tm,
+            ctx_dep=_ctx,
+            lex_fst=lex_fst,
+            disambig_syms=[],
+            opts=khg.TrainingGraphCompilerOptions(
+                transition_scale=0.0, self_loop_scale=0.0
+            ),
+        )
+        graph = gc.compile_graph_from_text([1, 2])
+        inner = khg.DecodableAmDiagGmmScaled(
+            am=am_gmm, tm=tm, feats=feats, scale=0.1
+        )
+
+        class CountingDecodable(khg.DecodableInterface):
+            def __init__(self, wrapped):
+                super().__init__()
+                self.wrapped = wrapped
+                self.calls = 0
+
+            def log_likelihood(self, frame, index):
+                self.calls += 1
+                return self.wrapped.log_likelihood(frame, index)
+
+            def is_last_frame(self, frame):
+                return self.wrapped.is_last_frame(frame)
+
+            def num_frames_ready(self):
+                return self.wrapped.num_frames_ready()
+
+            def num_indices(self):
+                return self.wrapped.num_indices()
+
+        decodable = CountingDecodable(inner)
+        ok, _ali, words, like, _lat = khg.decode_utterance_lattice_faster(
+            config=khg.LatticeFasterDecoderConfig(),
+            fst=graph.copy(),
+            decodable=decodable,
+            trans_model=tm,
+            utt="test",
+            allow_partial=True,
+            acoustic_scale=0.1,
+        )
+        self.assertTrue(ok)
+        self.assertEqual(words, [1, 2])
+        self.assertGreater(decodable.calls, 0)  # C++ dispatched into Python
+
+        # Same decode with the pure C++ decodable must give the same answer.
+        ok2, _ali2, words2, like2, _lat2 = khg.decode_utterance_lattice_faster(
+            config=khg.LatticeFasterDecoderConfig(),
+            fst=graph.copy(),
+            decodable=inner,
+            trans_model=tm,
+            utt="test",
+            allow_partial=True,
+            acoustic_scale=0.1,
+        )
+        self.assertTrue(ok2)
+        self.assertEqual(words2, words)
+        self.assertAlmostEqual(like, like2, places=4)
 
 
 if __name__ == "__main__":

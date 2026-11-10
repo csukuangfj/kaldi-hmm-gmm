@@ -239,10 +239,6 @@ def load_dictionary(path):
 
 
 def build_textgrid(intervals, word_intervals, duration, out_path):
-    def tier(name, items):
-        s = f'    item []:\n        item [1] if false:\n'  # placeholder unused
-        return s
-
     lines = [
         'File type = "ooTextFile"',
         'Object class = "TextGrid"',
@@ -290,16 +286,44 @@ def main():
     meta = json.load(open(model_dir / "meta.json"))
     meta["lda"] = str(model_dir / "lda.mat")
 
-    # 1) features (kaldi-native-fbank; no kaldi binaries)
-    t0 = time.perf_counter()
+    # ---- initialization (excluded from the timing): model + dictionary ----
     if args.pitch:
         meta.setdefault("features", {})["use_pitch"] = True
-    samples, sample_rate = read_wave(str(Path(args.wav).resolve()))
+    lex = load_dictionary(args.dict)
+
+    # phones.txt table (symbol -> model phone id)
+    if args.phones_txt:
+        phone2id = {}
+        with open(args.phones_txt, encoding="utf-8") as f:
+            for line in f:
+                p, i = line.split()
+                phone2id[p] = int(i)
+    else:
+        phone2id = {p: i + 1 for i, p in enumerate(meta["phones"])}
+    sil = meta.get("optional_silence_phone", "sil")
+    sil_id = phone2id[sil]
+
+    tm, am = khg.read_model(str(model_dir / "final.alimdl"))
+    tree = khg.read_tree(str(model_dir / "tree"))
+
+    # Warm the resampler outside the timed region when the wav's sample rate
+    # differs from the model's (the librosa import would otherwise be
+    # charged to the pipeline).
+    import soundfile as sf
+
+    wav_path = str(Path(args.wav).resolve())
+    if sf.info(wav_path).samplerate != float(
+        meta.get("features", {}).get("sample_frequency", 16000)
+    ):
+        import librosa  # noqa: F401
+
+    # ---- timed pipeline: features -> graph -> alignment -> TextGrid ----
+    t0 = time.perf_counter()
+    samples, sample_rate = read_wave(wav_path)
     audio_seconds = len(samples) / float(sample_rate)
     feat = compute_model_features(samples, sample_rate, meta)
 
-    # 2) lexicon + word sequence
-    lex = load_dictionary(args.dict)
+    # lexicon + word sequence
     raw_text = args.text.strip()
     if args.tokenize == "pinyin":
         from pypinyin import lazy_pinyin, Style
@@ -310,7 +334,6 @@ def main():
         for c in chars:
             if _re.match(r"[\u4e00-\u9fff]", c):
                 plain = _re.sub(r"\d", "", lazy_pinyin(c)[0]).lower()
-                toned = lazy_pinyin(c, style=Style.TONE)[0]  # e.g. dui4 -> duì (tone marks)
                 toks.append(plain)
                 disp.append(c)  # hanzi only (pinyin used for lookup only)
     elif args.tokenize == "char":
@@ -338,27 +361,11 @@ def main():
         else:
             word_phones.append([meta.get("oov_phone", "spn")])
 
-    # 3) phones.txt table (symbol -> model phone id)
-    if args.phones_txt:
-        phone2id = {}
-        with open(args.phones_txt, encoding="utf-8") as f:
-            for line in f:
-                p, i = line.split()
-                phone2id[p] = int(i)
-    else:
-        phone2id = {p: i + 1 for i, p in enumerate(meta["phones"])}
-
-    sil = meta.get("optional_silence_phone", "sil")
     for p in set(sum(word_phones, [])):
         if p not in phone2id:
             raise SystemExit(f"phone {p!r} not in phone table (ids 1..{len(phone2id)})")
-    sil_id = phone2id[sil]
 
-    # 4) model + tree
-    tm, am = khg.read_model(str(model_dir / "final.alimdl"))
-    tree = khg.read_tree(str(model_dir / "tree"))
-
-    # 5) L.fst with MODEL phone ids (kaldi/MFA lexicon structure:
+    # L.fst with MODEL phone ids (kaldi/MFA lexicon structure:
     #    optional silence 'sil' at start/between words/end with sil_prob)
     import math
 
@@ -467,8 +474,8 @@ def main():
     word_intervals = []
     seg_i = 0
     for w, need in zip(words, n_phones):
-        # skip leading silence runs
-        while seg_i < len(intervals) and intervals[seg_i][2] == "sil":
+        # skip unattributed silence runs (the model's optional-silence phone)
+        while seg_i < len(intervals) and intervals[seg_i][2] == sil:
             seg_i += 1
         got = intervals[seg_i : seg_i + need]
         seg_i += need

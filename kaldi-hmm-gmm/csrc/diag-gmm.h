@@ -135,7 +135,8 @@ class DiagGmm {
 
   DiagGmm &operator=(const DiagGmm &other) = delete;  ///< Disallow assignment.
 
-  /// Resizes arrays to this dim. Does not initialize data.
+  /// Resizes arrays to this dim.  Weights are zeroed and vars set to one
+  /// (kaldi's kSetZero semantics).
   /// \param nMix  Number of mixture components.
   /// \param dim   Dimensionality of the feature vectors.
   void Resize(int32_t nMix, int32_t dim);

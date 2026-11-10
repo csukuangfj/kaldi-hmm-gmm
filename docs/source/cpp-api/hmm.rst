@@ -13,7 +13,7 @@ Headers: :khg:`kaldi-hmm-gmm/csrc/hmm-topology.h`,
    topo.Read(is);                       // kaldi topology text format
 
    khg::ContextDependency tree;
-   ReadKaldiObject("tree", &tree);
+   tree.Read(is, binary);               // kaldi tree format
 
    khg::TransitionModel trans_model(tree, topo);
    trans_model.TransitionIdToPhone(17);

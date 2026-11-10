@@ -50,7 +50,8 @@ TEST(Randn, MatchesKaldiRandGauss2Formula) {
 TEST(Randn, RoughlyStandardNormal) {
   srand(1);
   const int n = 20000;
-  double sum = 0.0, sumsq = 0.0;
+  double sum = 0.0;
+  double sumsq = 0.0;
   for (int i = 0; i < n; ++i) {
     float x = Randn(0.0f, 1.0f);
     sum += x;

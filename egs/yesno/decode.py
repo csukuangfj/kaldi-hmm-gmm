@@ -2,7 +2,7 @@
 """Decoding + scoring for the yesno recipe.
 
 Mirrors kaldi's steps/decode.sh + local/score.sh: decode the test set with
-HCLG (lattice-faster decoder, acoustic-scale 0.1) and report WER.
+HCLG (lattice-faster decoder, acoustic-scale 0.083333) and report WER.
 
 Writes:
   exp/mono0a/decode_test_yesno/text     (hypotheses)
@@ -107,7 +107,7 @@ def main():
     utts = sorted(feats.keys())
 
     print(f"local/score.sh --cmd utils/run.pl {args.data_dir} "
-          f"{args.lang_dir} {exp_dir / 'decode_test_yesno'}")
+          f"{graph_path.parent} {exp_dir / 'decode_test_yesno'}")
     print(f"local/score.sh: scoring with word insertion penalty="
           f"{args.word_ins_penalty}")
     best = None
@@ -118,7 +118,7 @@ def main():
         )
 
         # Decode each utterance ONCE per wip (the decoder is constructed
-        # inside the wrapper -- plan-3 D2); `lat` is the lattice exactly as
+        # inside the wrapper); `lat` is the lattice exactly as
         # kaldi writes it (acoustic costs / acoustic_scale).
         lats = {}
         for utt in utts:
@@ -151,8 +151,7 @@ def main():
             S, D, I, N = int(r["sub"]), int(r["del"]), int(r["ins"]), int(r["ref_len"])
             wer = 100.0 * (S + D + I) / max(N, 1)
             line = (
-                f"%WER {wer:.2f} [ {S + D + I} / {N}, {I} in, {D} del, {S} sub ] "
-                f"{out_dir}/wer_{int(lmwt)}_{wip}"
+                f"%WER {wer:.2f} [ {S + D + I} / {N}, {I} ins, {D} del, {S} sub ]"
             )
             with open(
                 out_dir / f"wer_{int(lmwt)}_{wip}", "w", encoding="utf-8", newline="\n"
@@ -165,11 +164,11 @@ def main():
     with open(out_dir / "text", "w", encoding="utf-8", newline="\n") as f:
         for utt, hyp in hyps.items():
             f.write(f"{utt} {' '.join(hyp)}\n")
-    line = (f"%WER {wer:.2f} [ {S + D + I} / {N}, {I} in , {D} del, {S} sub ] "
-            f"{out_dir}/wer_{int(lmwt)}_{wip}")
+    line = f"%WER {wer:.2f} [ {S + D + I} / {N}, {I} ins, {D} del, {S} sub ]"
     with open(out_dir / "wer", "w", encoding="utf-8", newline="\n") as f:
         f.write(line + "\n")
-    print(line)
+    # score.sh prints the best wer file after the summary line
+    print(f"{line} {out_dir}/wer_{int(lmwt)}_{wip}")
 
 
 if __name__ == "__main__":

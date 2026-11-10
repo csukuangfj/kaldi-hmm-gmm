@@ -5,8 +5,10 @@ Mirrors ../kaldi/steps/train_mono.sh step by step, using this repo's Python
 API (kaldi_hmm_gmm) instead of kaldi binaries.  The output layout under
 --exp-dir follows kaldi's, e.g. for --exp-dir exp/mono0a:
 
-  0.mdl, 1.mdl ... (intermediate mdls are removed like train_mono.sh does),
-  40.mdl, final.mdl, 40.occs, final.occs, tree, fsts.1.gz, ali.1.gz, log/
+  0.mdl, <num_iters>.mdl, final.mdl, <num_iters>.occs, final.occs,
+  tree, fsts.1.gz, ali.1.gz, phones.txt, log/
+  (intermediate per-iteration mdls/occs are removed like train_mono.sh does;
+  <num_iters> defaults to 40)
 
 Features come from a kaldi feats.scp (pre-computed, 39-dim); no lhotse.
 """
@@ -122,7 +124,7 @@ def write_fst_archive_gz(path: str, fsts: dict):
 
 def write_occs(path: str, pdf_occs):
     vec = kaldi_native_io.FloatVector(pdf_occs.copy())
-    vec.write(path, True)
+    vec.write(path, False)  # text format, like kaldi gmm-est --write-occs
 
 
 def main():
@@ -380,8 +382,6 @@ def main():
 
     shutil.copy(exp_dir / f"{args.num_iters}.mdl", exp_dir / "final.mdl")
     shutil.copy(exp_dir / f"{args.num_iters}.occs", exp_dir / "final.occs")
-    if (exp_dir / f"{args.num_iters}.occs").exists():
-        shutil.copy(exp_dir / f"{args.num_iters}.occs", exp_dir / "final.occs")
 
     lg = Logger(log_dir, "analyze_alignments")
     info = gmm_info(am, transition_model)

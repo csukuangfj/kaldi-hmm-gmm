@@ -79,8 +79,11 @@ def load_delta_feats(feats_scp: str, cmvn_scp: str = "") -> Dict[str, np.ndarray
 
       apply-cmvn --utt2spk=... cmvn.scp feats.scp | add-deltas
 
-    i.e. per-utterance CMVN with the speaker stats from cmvn.scp followed by
-    deltas (order 2, window 2) -> 39-dim features.
+    i.e. CMVN followed by deltas (order 2, window 2) -> 39-dim features.
+    NOTE: the first (and, in this recipe, only) stats entry of cmvn.scp is
+    applied to every utterance -- the yesno data is single-speaker
+    (utt2spk = "global"), so this equals per-utterance CMVN.  For
+    multi-speaker corpora the stats must be mapped per utt2spk first.
 
     Args:
       feats_scp: scp of the RAW MFCC (e.g. data/train_yesno/feats.scp).

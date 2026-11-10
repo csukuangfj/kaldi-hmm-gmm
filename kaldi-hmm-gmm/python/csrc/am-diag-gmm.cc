@@ -46,7 +46,7 @@ void PybindAmDiagGmm(py::module *m) {
           [](PyClass &self, int32_t pdf_index) -> DiagGmm & {
             return self.GetPdf(pdf_index);
           },
-          py::arg("pdf_index"), py::return_value_policy::reference)
+          py::arg("pdf_index"), py::return_value_policy::reference_internal)
       .def("get_gaussian_mean", &PyClass::GetGaussianMean, py::arg("pdf_index"),
            py::arg("gauss"),
            py::call_guard<py::gil_scoped_release>())
@@ -94,6 +94,7 @@ void PybindAmDiagGmm(py::module *m) {
       },
       py::arg("filename"), py::arg("trans_model"), py::arg("am_gmm"),
       py::arg("binary") = true,
+      py::call_guard<py::gil_scoped_release>(),
       "Writes a kaldi-compatible .mdl file (TransitionModel + AmDiagGmm).");
 
   m->def(
@@ -110,6 +111,7 @@ void PybindAmDiagGmm(py::module *m) {
         return std::make_tuple(std::move(trans_model), std::move(am_gmm));
       },
       py::arg("filename"),
+      py::call_guard<py::gil_scoped_release>(),
       "Reads a kaldi .mdl file; returns (TransitionModel, AmDiagGmm).");
 }
 

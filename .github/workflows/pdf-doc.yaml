@@ -1,0 +1,87 @@
+name: pdf-doc
+
+on:
+  push:
+    branches:
+      - master
+      - yesno
+    paths:
+      - 'docs/**'
+      - 'kaldi-hmm-gmm/**'
+      - '.github/workflows/pdf-doc.yaml'
+  pull_request:
+    branches:
+      - master
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: pdf-doc-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  pdf-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doxygen and TeX Live
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz \
+            texlive-latex-recommended texlive-fonts-recommended \
+            texlive-latex-extra latexmk texlive-xetex texlive-lang-chinese \
+            fonts-freefont-otf fonts-noto-cjk
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: docs-pdf
+
+      - name: Install doc dependencies
+        run: |
+          python3 -m pip install -U pip
+          python3 -m pip install -r docs/requirements.txt
+
+      - name: Build python module (autodoc imports it)
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DKHG_ENABLE_TESTS=OFF \
+            -DPYTHON_EXECUTABLE=$(which python3)
+          cmake --build build -j2
+
+      - name: Build PDF
+        run: |
+          cd docs
+          make latexpdf
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-pdf
+          path: docs/build/latex/kaldi-hmm-gmm.pdf
+
+      - name: Attach PDF to release
+        # PR builds have a read-only token and must not touch releases.
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: doc
+          name: Documentation
+          body: >
+            PDF of the C++ and Python API documentation, built from
+            ${{ github.sha }}.  Rebuilt and overwritten by every docs build.
+          files: docs/build/latex/kaldi-hmm-gmm.pdf
+          overwrite_files: true
+          fail_on_unmatched_files: true

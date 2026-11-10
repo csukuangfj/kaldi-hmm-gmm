@@ -709,6 +709,11 @@ class TestDiagGmm(unittest.TestCase):
         assert np.allclose(np.asarray(dgm.vars[nmix:]), var2)
 
     def test_interpolate(self):
+        # Deterministic inputs: the C++ results are float32 while the
+        # expectations below are computed in float64, so unseeded draws can
+        # occasionally cancel near zero and fail the default np.allclose
+        # tolerance.
+        np.random.seed(20230414)
         nmix = 24
         dim = 10
 

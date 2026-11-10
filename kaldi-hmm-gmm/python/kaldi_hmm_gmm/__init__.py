@@ -2,7 +2,7 @@
 #
 # kaldi_hmm_gmm: GMM/HMM/tree/training plus the GMM decodable and the
 # alignment/decoding convenience functions.  The package is SELF-CONTAINED
-# (plan-4.md): everything below comes from our own extension module -- there
+# at the Python level: everything below comes from our own extension module -- there
 # is no runtime dependency on the kaldi-decoder Python package.  The decoder
 # ENGINE (kaldi-decoder-core) is compiled in from C++; the interface and
 # option types (DecodableInterface, TransitionInformation, AlignConfig, ...)

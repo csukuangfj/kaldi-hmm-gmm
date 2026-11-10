@@ -3,7 +3,7 @@
 // Copyright 2009-2011  Microsoft Corporation
 // Copyright (c)  2026  Xiaomi Corporation
 //
-// This file is copied/modified from kaldi/src/tree/context-dep-test.cc (gtest-ified).  // Ported from ../kaldi/src/tree/context-dep-test.cc (gtest-ified), restricted
+// Ported from ../kaldi/src/tree/context-dep-test.cc (gtest-ified), restricted
 // to the APIs present in this repo (context-dep.h): MonophoneContextDependency,
 // Compute and GetPdfInfo, plus ContextDependency Write/Read.  kaldi's
 // TestContextDep (GaussClusterable statistics) is a clusterable-classes test,

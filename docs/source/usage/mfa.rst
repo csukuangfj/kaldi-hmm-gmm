@@ -1,7 +1,7 @@
 MFA-style forced alignment
 ==========================
 
-``tools/align_mfa.py`` force-aligns a single utterance to its known
+:khg:`tools/align_mfa.py` force-aligns a single utterance to its known
 transcript using **pretrained MFA acoustic models** (kaldi format) and writes
 a Praat **TextGrid** with phone and word tiers — no MFA installation and no
 kaldi binaries involved.  The pipeline reproduces MFA/kalpy conventions
@@ -74,8 +74,9 @@ Unknown words fall back to the model's OOV phone (``spn``); a phone missing
 from the phone table is an error.
 
 Every run prints a timing line — the audio duration, the wall-clock seconds
-of features + graph + alignment, and the real-time factor (RTF = elapsed /
-audio duration; lower is faster):
+of the pipeline (features + graph + alignment + TextGrid; one-time
+initialization such as model/dictionary loading is **not** counted), and the
+real-time factor (RTF = elapsed / audio duration; lower is faster):
 
 .. code-block:: text
 
@@ -101,14 +102,14 @@ How it works
 The tool chains these steps (each mirroring an MFA/kalpy stage):
 
 1. **Features** (``kaldi-native-fbank`` step operators, configured from
-   ``meta.json``): ``compute_model_features`` in ``tools/align_mfa.py``.
+   ``meta.json``): ``compute_model_features`` in :khg:`tools/align_mfa.py`.
 2. **Lexicon FST** from the dictionary, with optional silence ``sil`` at
    word boundaries (probability from the model's ``silence_probability``).
 3. **Training graph** — ``khg.TrainingGraphCompiler`` compiles the known
    word sequence into an alignment graph (transition probabilities are added
    once, at alignment time, exactly like kaldi's ``compile-train-graphs`` +
    ``gmm-align-compiled`` pair).
-4. **Alignment** — ``gmm_align_compiled`` (``tools/align.py``) with the
+4. **Alignment** — ``gmm_align_compiled`` (:khg:`tools/align.py`) with the
    kalpy/MFA defaults: ``transition_scale=1.0``, ``acoustic_scale=0.1``,
    ``self_loop_scale=0.1``, ``beam=10``, ``retry_beam=40``.
 5. **TextGrid** from the transition-id alignment via

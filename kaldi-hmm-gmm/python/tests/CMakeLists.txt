@@ -17,7 +17,7 @@ function(khg_add_py_test source)
   else()
     set(_pathsep ":")
   endif()
-  # kaldi_hmm_gmm is self-contained (plan-4.md): it does not import
+  # kaldi_hmm_gmm is self-contained: it does not import
   # kaldi_decoder, so no sibling-checkout python dir is needed here.
   set(_pythonpath
     "${khg_path}${_pathsep}${khg_path}/../../tools${_pathsep}$ENV{PYTHONPATH}"

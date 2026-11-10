@@ -7,7 +7,7 @@ gmm-align-compiled with the trained model, and export
   exp/mono0a/ali_phones.ark        per-frame phone-ids  (ark,t:, like
                                    `ali-to-phones --per-frame=true ... ark,t:-`)
   exp/mono0a/ali_phones_sym.txt    same with symbols (like utils/int2sym.pl)
-  exp/mono0a/ali_phones.ark        collapsed phone sequence
+  exp/mono0a/ali_seq.ark           collapsed phone sequence
   exp/mono0a/ali_full.ark          the transition-id alignment itself
   exp/mono0a/ali_stats.txt         log-like / error summary
 
@@ -157,7 +157,7 @@ def main():
     with open(exp_dir / "ali_stats.txt", "w", encoding="utf-8", newline="\n") as f:
         f.write(stats)
 
-    # head-style preview (as in todo.md)
+    # head-style preview
     print(f"{exp_dir}/ali_phones.ark (first 5 lines):")
     for i, (utt, phones) in enumerate(all_phones_pf.items()):
         if i >= 5:

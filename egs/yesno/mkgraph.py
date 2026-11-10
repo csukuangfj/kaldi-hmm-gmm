@@ -3,17 +3,23 @@
 
 Mirrors kaldi's utils/mkgraph.sh (the part visible in its log):
 
-  G = arpa2fst(task.arpabo)                       (kaldilm)
+  G = read(lang_dir/G.fst)                        (prepare_lang.py output)
   LG   = L_disambig . G                           (fsttablecompose)
   LG   = determinize_star(LG)                     (fstdeterminizestar)
   CLG  = compose_context(LG)                      (fstcomposecontext)
   Ha   = get_h_transducer(ilabels)                (make-h-transducer)
   HCLGa = Ha . CLG                                (fsttablecompose)
+  HCLGa = determinize_star(HCLGa)                 (fstdeterminizestar --use-log)
+  HCLGa = minimize_encoded(HCLGa)                 (fstminimizeencoded)
   HCLG = add_self_loops(0.1, reorder=True)        (add-self-loops)
 
 Notes:
-  * fstrmsymbols/fstrmepslocal are skipped: the yesno lexicon has no #N
+  * The printed command lines mirror kaldi's mkgraph.sh console log; the
+    steps listed under "Mirrors" are the ones actually executed.
+  * fstrmsymbols is a no-op here: the yesno lexicon has no #N
     disambiguation symbols on the L input side (same as the old recipe).
+    fstrmepslocal is skipped: kaldifst exposes no RmEpsilonLocal, and
+    determinize_star already removes the epsilons.
   * fstpushspecial is not available in kaldifst and is skipped.
 
 Writes: exp/mono0a/graph_tgpr/HCLG.fst
@@ -32,14 +38,12 @@ import kaldifst  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
 from fst_utils import fstis_stochastic  # noqa: E402
-import kaldilm  # noqa: E402
 
 
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--lang-dir", type=str, default="data/lang_test_tg")
     parser.add_argument("--exp-dir", type=str, default="exp/mono0a")
-    parser.add_argument("--arpa", type=str, default="input/task.arpabo")
     parser.add_argument("--out-dir", type=str, default="")
     return parser.parse_args()
 
@@ -115,18 +119,21 @@ def main():
           f"--transition-scale=1.0 {lang_dir}/tmp/ilabels_1_0 {exp_dir}/tree "
           f"{exp_dir}/final.mdl")
     hconfig = khg.HTransducerConfig(transition_scale=1.0)
-    print(f"fsttablecompose {out_dir}/Ha.fst {lang_dir}/tmp/CLG_1_0.fst")
-    print("fstdeterminizestar --use-log=true")
-    print("fstminimizeencoded")
-    print(f"fstrmsymbols {out_dir}/disambig_tid.int")
-    print("fstrmepslocal")
     Ha, _ = khg.get_h_transducer(
         ilabel_info=ilabels, ctx_dep=tree, trans_model=tm, config=hconfig
     )
     print("Ha: states", Ha.num_states)
 
-    # HCLGa -> HCLG
+    # HCLGa = Ha . CLG  (kaldi mkgraph.sh: tablecompose | fstdeterminizestar
+    # --use-log | fstrmsymbols | fstrmepslocal | fstminimizeencoded)
+    print(f"fsttablecompose {out_dir}/Ha.fst {lang_dir}/tmp/CLG_1_0.fst")
     HCLGa = kaldifst.compose(Ha, CLG)
+    print("fstdeterminizestar --use-log=true")
+    kaldifst.determinize_star(HCLGa, use_log=True)
+    print(f"fstrmsymbols {out_dir}/disambig_tid.int")
+    print("fstrmepslocal")
+    print("fstminimizeencoded")
+    kaldifst.minimize_encoded(HCLGa)
     print(f"fstisstochastic {out_dir}/HCLGa.fst")
     lo, hi = fstis_stochastic(HCLGa)
     print(f"{lo:.4g} {hi:.4g}")

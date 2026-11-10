@@ -290,10 +290,10 @@ class EventMap {
    * Child classes may override this for efficiency; here is the basic version.
    *
    * \return  The largest answer value, or a minimal (large-negative) value if
-   *          nothing was found (returns -1 if nothing found).
+   *          nothing was found (std::numeric_limits::min()).
    */
   virtual EventAnswerType MaxResult() const {
-    // returns -1 if nothing found.
+    // returns std::numeric_limits::min() if nothing found.
     std::vector<EventAnswerType> tmp;
     EventType empty_event;
     MultiMap(empty_event, &tmp);

@@ -144,7 +144,7 @@ def compute_part(part, data_dir, out_mfcc_dir, log_dir):
         log_dir / f"make_mfcc_{part}.1.log", "w", encoding="utf-8", newline="\n"
     ) as f:
         f.write(
-            f"# compute-mfcc-feats --config=conf/mfcc.conf scp:data/{part}_yesno/wav.scp\n"
+            f"# compute-mfcc-feats --config=conf/mfcc.conf scp:data/{part}/wav.scp\n"
             f"# (kaldi-native-fbank equivalent; wrote {raw_ark})\n"
             f"Processed {len(utts)} utterances\n")
 

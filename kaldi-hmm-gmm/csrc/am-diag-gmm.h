@@ -143,8 +143,9 @@ class AmDiagGmm {
   /// @param state_occs  1-D float tensor of shape (num_pdfs,)
   /// @param target_components  Expected sum of number of gaussians in all pdfs
   /// @param power  It is used to compute state_occs.pow(power)
-  /// @param min_count  Minimum occupancy per Gaussian below which a pdf is
-  ///                  not merged any further.
+  /// @param min_count  The per-pdf target is capped so that each Gaussian
+  ///                  retains at least this average occupancy (a LARGER
+  ///                  value forces MORE merging, never less).
   void MergeByCount(const FloatVector &state_occs,
                     int32_t target_components, float power, float min_count);
 

@@ -3,17 +3,17 @@ include_guard(GLOBAL)
 function(download_kaldifst)
   include(FetchContent)
 
-  set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.7.10.tar.gz")
-  set(kaldifst_HASH "SHA256=7f7b3173a6584a6b1987f65ae7af2ac453d66b845f875a9d31074b8d2cd0de54")
+  set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.9.0.tar.gz")
+  set(kaldifst_HASH "SHA256=225d8377d1d262e3aedab23558fead106b4cbc83462fb29f1c5e7d9e3b0c14dd")
 
   # If you don't have access to the Internet,
   # please pre-download kaldifst
   set(possible_file_locations
-    $ENV{HOME}/Downloads/kaldifst-1.7.10.tar.gz
-    ${CMAKE_SOURCE_DIR}/kaldifst-1.7.10.tar.gz
-    ${CMAKE_BINARY_DIR}/kaldifst-1.7.10.tar.gz
-    /tmp/kaldifst-1.7.10.tar.gz
-    /star-fj/fangjun/download/github/kaldifst-1.7.10.tar.gz
+    $ENV{HOME}/Downloads/kaldifst-1.9.0.tar.gz
+    ${CMAKE_SOURCE_DIR}/kaldifst-1.9.0.tar.gz
+    ${CMAKE_BINARY_DIR}/kaldifst-1.9.0.tar.gz
+    /tmp/kaldifst-1.9.0.tar.gz
+    /star-fj/fangjun/download/github/kaldifst-1.9.0.tar.gz
   )
 
   foreach(f IN LISTS possible_file_locations)
@@ -32,8 +32,8 @@ function(download_kaldifst)
   # (_vector_fst_addr/_borrow/_take) and a matching openfst.  Keep in sync with
   # the pip requirement `kaldifst>=1.9.0` in setup.py.
   FetchContent_Declare(kaldifst
-    URL               https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.9.0.tar.gz
-    URL_HASH          SHA256=225d8377d1d262e3aedab23558fead106b4cbc83462fb29f1c5e7d9e3b0c14dd
+    URL               ${kaldifst_URL}
+    URL_HASH          ${kaldifst_HASH}
   )
 
   # kaldifst's CMakeLists needs its own cmake/ dir on CMAKE_MODULE_PATH at

@@ -96,6 +96,20 @@ TEST(MleAmDiagGmm, AccumulateAndUpdate) {
   FloatVector check_feat = feats.row(check_frame).transpose();
   float loglike1 = am_updated.LogLikelihood(check_pdf, check_feat);
   EXPECT_TRUE(std::isfinite(loglike1));
+
+  // an identical second update must reproduce the same result (this fails
+  // for a no-op update, which would leave the likelihood at its pre-update
+  // value, and for any nondeterminism)
+  AmDiagGmm am_updated2;
+  am_updated2.CopyFromAmDiagGmm(am_gmm);
+  float obj2 = 0.0f;
+  float count2 = 0.0f;
+  MleAmDiagGmmUpdate(config, accs, flags, &am_updated2, &obj2, &count2);
+  float loglike2 = am_updated2.LogLikelihood(check_pdf, check_feat);
+  EXPECT_FLOAT_EQ(loglike1, loglike2);
+  EXPECT_FLOAT_EQ(obj, obj2);
+  // the ML objective must not decrease (kaldi's objf_improvement)
+  EXPECT_GE(obj, -1e-4f);
 }
 
 }  // namespace khg

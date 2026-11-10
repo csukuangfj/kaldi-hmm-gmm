@@ -45,7 +45,10 @@ void PybindMleAmDiagGmm(py::module *m) {
       .def_property_readonly("tot_count", &PyClass::TotCount)
       .def_property_readonly("tot_log_like", &PyClass::TotLogLike)
       .def("get_acc",
-           [](PyClass &self, int32_t index) { return self.GetAcc(index); },
+           [](PyClass &self, int32_t index) -> AccumDiagGmm & {
+             return self.GetAcc(index);
+           },
+           py::return_value_policy::reference_internal,
            py::call_guard<py::gil_scoped_release>())
       .def("add", &PyClass::Add, py::arg("scale"), py::arg("other"), py::call_guard<py::gil_scoped_release>())
       .def("scale", &PyClass::Scale, py::arg("scale"), py::call_guard<py::gil_scoped_release>())

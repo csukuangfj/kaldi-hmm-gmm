@@ -112,6 +112,6 @@ jobs:
           wer=$(awk '{print $2}' exp/mono0a/decode_test_yesno/wer)
           echo "best WER: ${wer}%"
           # 0.00 is kaldi's score; the small residual on some platforms is the
-          # float-noise training trajectory (see plan-2.md §8).  Tighten to
-          # 0.00 once training lands bit-exact.
+          # float-noise training trajectory.  Tighten to 0.00 once training
+          # lands bit-exact.
           python3 -c "import sys; w=float('${wer}'); sys.exit(0 if w <= 1.0 else 1)"

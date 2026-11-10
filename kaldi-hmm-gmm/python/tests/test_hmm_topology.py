@@ -18,7 +18,6 @@ import kaldi_hmm_gmm as khg
 from hmm_topo_utils import draw_hmm_topology
 
 
-@unittest.skipUnless(_HAS_GRAPHVIZ, "graphviz (with dot binary) not installed")
 class TestHmmTopology(unittest.TestCase):
     def test_simple(self):
         s = """
@@ -175,12 +174,13 @@ class TestHmmTopology(unittest.TestCase):
 
         assert str(topo) == str(topo2)
 
-        dot = draw_hmm_topology(topo, phone=1)
-        print(dot)
-        print("--------------------")
+        if _HAS_GRAPHVIZ:
+            dot = draw_hmm_topology(topo, phone=1)
+            print(dot)
+            print("--------------------")
 
-        dot = draw_hmm_topology(topo, phone=10)
-        print(dot)
+            dot = draw_hmm_topology(topo, phone=10)
+            print(dot)
 
 
 if __name__ == "__main__":

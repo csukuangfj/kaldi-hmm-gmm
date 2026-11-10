@@ -503,11 +503,11 @@ void AddTransitionProbs(
 static bool IsReordered(const TransitionModel &trans_model,
                         const std::vector<int32_t> &alignment) {
   for (size_t i = 0; i + 1 < alignment.size(); i++) {
-    int32_t tstate1 = trans_model.TransitionIdToTransitionState(alignment[i]),
-            tstate2 = trans_model.TransitionIdToTransitionState(alignment[i + 1]);
+    int32_t tstate1 = trans_model.TransitionIdToTransitionState(alignment[i]);
+    int32_t tstate2 = trans_model.TransitionIdToTransitionState(alignment[i + 1]);
     if (tstate1 != tstate2) {
-      bool is_loop_1 = trans_model.IsSelfLoop(alignment[i]),
-           is_loop_2 = trans_model.IsSelfLoop(alignment[i + 1]);
+      bool is_loop_1 = trans_model.IsSelfLoop(alignment[i]);
+      bool is_loop_2 = trans_model.IsSelfLoop(alignment[i + 1]);
       KHG_ASSERT(!(is_loop_1 && is_loop_2));  // Invalid.
       if (is_loop_1) return true;  // Reordered. self-loop is last.
       if (is_loop_2) return false;  // Not reordered.  self-loop is first.
@@ -518,8 +518,8 @@ static bool IsReordered(const TransitionModel &trans_model,
   if (alignment.empty())
     return false;
   else {
-    bool is_loop_front = trans_model.IsSelfLoop(alignment.front()),
-         is_loop_back = trans_model.IsSelfLoop(alignment.back());
+    bool is_loop_front = trans_model.IsSelfLoop(alignment.front());
+    bool is_loop_back = trans_model.IsSelfLoop(alignment.back());
     if (is_loop_front) return false;  // Not reordered.  Self-loop is first.
     if (is_loop_back) return true;  // Reordered.  Self-loop is last.
     return false;  // We really don't know in this case but calling code should
@@ -567,12 +567,12 @@ static bool SplitToPhonesInternal(const TransitionModel &trans_model,
       end_points.push_back(i + 1);
     } else {
       int32_t this_state =
-                  trans_model.TransitionIdToTransitionState(alignment[i]),
-              next_state =
-                  trans_model.TransitionIdToTransitionState(alignment[i + 1]);
+          trans_model.TransitionIdToTransitionState(alignment[i]);
+      int32_t next_state =
+          trans_model.TransitionIdToTransitionState(alignment[i + 1]);
       if (this_state == next_state) continue;  // optimization.
-      int32_t this_phone = trans_model.TransitionStateToPhone(this_state),
-              next_phone = trans_model.TransitionStateToPhone(next_state);
+      int32_t this_phone = trans_model.TransitionStateToPhone(this_state);
+      int32_t next_phone = trans_model.TransitionStateToPhone(next_state);
       if (this_phone != next_phone) {
         // The phone changed, but this is an error-- we should have detected
         // this via the IsFinal check.

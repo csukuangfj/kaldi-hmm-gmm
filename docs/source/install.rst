@@ -32,8 +32,8 @@ Build from source
    ctest --output-on-failure
 
 The Python extension module is built into the package tree
-(``kaldi-hmm-gmm/python/kaldi_hmm_gmm/lib/_kaldi_hmm_gmm.*``); add
-``kaldi-hmm-gmm/python`` to ``PYTHONPATH`` (the example scripts do this
+(:khg:`kaldi-hmm-gmm/python/kaldi_hmm_gmm/lib/_kaldi_hmm_gmm.* <kaldi-hmm-gmm/python/kaldi_hmm_gmm/lib>`); add
+:khg:`kaldi-hmm-gmm/python` to ``PYTHONPATH`` (the example scripts do this
 themselves), or build a wheel::
 
    python setup.py bdist_wheel
@@ -53,4 +53,4 @@ From the build directory::
 This runs the C++ gtests and the Python tests (``*_py``).  A single test can
 be run with::
 
-   ./check.sh <regexp>
+   ctest --output-on-failure -R <regexp>

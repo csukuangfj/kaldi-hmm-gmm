@@ -37,7 +37,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python3 -m pip install -U pip
-          python3 -m pip install numpy kaldifst kaldi-native-fbank librosa
+          python3 -m pip install numpy kaldifst kaldi-native-fbank librosa soundfile
 
       - name: Build kaldi-hmm-gmm
         run: |
@@ -65,13 +65,19 @@ jobs:
             --model-dir english/english_mfa --dict english/english_mfa.dict \
             --phones-txt english/english_mfa/phones.txt --out english/en.TextGrid
 
-      - name: Upload TextGrid and audio
+      - name: Extract per-word audio (TextGrid words tier)
+        run: |
+          python3 tools/textgrid_to_word_wavs.py --wav english/en.wav \
+            --textgrid english/en.TextGrid --out-dir english/en.words
+
+      - name: Upload TextGrid, audio and per-word clips
         uses: actions/upload-artifact@v4
         with:
           name: mfa-english
           path: |
             english/en.TextGrid
             english/en.wav
+            english/en.words
 
   mfa-mandarin:
     runs-on: ubuntu-latest
@@ -91,7 +97,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python3 -m pip install -U pip
-          python3 -m pip install numpy kaldifst kaldi-native-fbank librosa pypinyin
+          python3 -m pip install numpy kaldifst kaldi-native-fbank librosa soundfile pypinyin
 
       - name: Build kaldi-hmm-gmm
         run: |
@@ -105,12 +111,14 @@ jobs:
       - name: Download acoustic models and test audio
         run: |
           mkdir -p mandarin
-          wget -q https://github.com/lars76/forced-alignment-chinese/releases/download/model_files/aishell3_pinyin.zip
-          unzip -q aishell3_pinyin.zip
-          unzip -q aishell3_pinyin_acoustic.zip -d aishell3_pinyin
-          wget -q https://github.com/lars76/forced-alignment-chinese/releases/download/model_files/large_pinyin.zip
-          unzip -q large_pinyin.zip
-          unzip -q large_pinyin_acoustic.zip -d large_pinyin
+          for name in aishell3_pinyin large_pinyin; do
+            mkdir -p "$name"
+            wget -q "https://github.com/lars76/forced-alignment-chinese/releases/download/model_files/${name}.zip"
+            # the outer zip holds the pronunciation dictionary (.dict/.txt)
+            # and a nested acoustic-model zip
+            unzip -q "${name}.zip" -d "$name"
+            unzip -q "$name/${name}_acoustic.zip" -d "$name"
+          done
           wget -q -O mandarin/zh.wav \
             https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/zh.wav
 
@@ -132,7 +140,14 @@ jobs:
             --phones-txt large_pinyin/d_pinyin_acoustic/phones.txt \
             --tokenize pinyin --out mandarin/zh-large.TextGrid
 
-      - name: Upload TextGrid and audio
+      - name: Extract per-word audio (TextGrid words tier)
+        run: |
+          python3 tools/textgrid_to_word_wavs.py --wav mandarin/zh.wav \
+            --textgrid mandarin/zh-aishell3.TextGrid --out-dir mandarin/zh-aishell3.words
+          python3 tools/textgrid_to_word_wavs.py --wav mandarin/zh.wav \
+            --textgrid mandarin/zh-large.TextGrid --out-dir mandarin/zh-large.words
+
+      - name: Upload TextGrid, audio and per-word clips
         uses: actions/upload-artifact@v4
         with:
           name: mfa-mandarin
@@ -140,3 +155,5 @@ jobs:
             mandarin/zh-aishell3.TextGrid
             mandarin/zh-large.TextGrid
             mandarin/zh.wav
+            mandarin/zh-aishell3.words
+            mandarin/zh-large.words

@@ -95,9 +95,10 @@ functions.
 kaldi's `TransitionInformation
 <https://github.com/kaldi-asr/kaldi/blob/master/src/itf/transition-information.h>`_:
 provides the tid->pdf map and per-transition-id queries.  Implement it in
-Python to use :func:`align_utterance` / :func:`decode_utterance_lattice_faster`
-with any transition model; :class:`TransitionModel` implements the same
-interface in C++.
+Python to use :func:`decode_utterance_lattice_faster` /
+:func:`decode_utterance_lattice_simple` with an alternative transition model;
+:class:`TransitionModel` implements the same interface in C++ (and is what
+:func:`align_utterance` requires, for ``AddTransitionProbs``).
 
 **Note:** :meth:`transition_id_to_pdf_array` must return the whole map on
 every call (the trampoline caches it; that cached reference is what
