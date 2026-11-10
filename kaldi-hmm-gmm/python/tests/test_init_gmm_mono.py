@@ -91,15 +91,15 @@ class TestInitGmmMono(unittest.TestCase):
             )
 
         trans_model = khg.TransitionModel(ctx_dep, hmm_topo)
-        assert trans_model.num_pdfs == num_pdfs, (trans_model.num_pdfs, num_pdfs)
+        assert trans_model.num_pdfs() == num_pdfs, (trans_model.num_pdfs(), num_pdfs)
         print(trans_model.topo)
-        print(trans_model.num_transition_ids)
+        print(trans_model.num_transition_ids())
         # transition id starts from 1
-        for i in range(1, trans_model.num_transition_ids + 1):
+        for i in range(1, trans_model.num_transition_ids() + 1):
             print(
                 i,
                 trans_model.transition_id_to_phone(i),
-                trans_model.transition_ids_is_start_of_phone(i),
+                trans_model.transition_id_is_start_of_phone(i),
                 trans_model.is_final(i),
                 trans_model.is_self_loop(i),
                 trans_model.transition_id_to_pdf(i),

@@ -38,7 +38,7 @@ void PybindDiagGmm(py::module *m) {
             return ans;
           },
           py::arg("data"),
-          "Return the loglike of each component in a 1-D tensor")
+          "Return the loglike of each component in a 1-D tensor", py::call_guard<py::gil_scoped_release>())
       .def_property(
           "weights",
           [](PyClass &self) -> FloatVector & { return self.weights(); },
@@ -82,7 +82,7 @@ void PybindDiagGmm(py::module *m) {
             self.Split(target_components, perturb_factor, &history);
             return history;
           },
-          py::arg("target_components"), py::arg("perturb_factor"))
+          py::arg("target_components"), py::arg("perturb_factor"), py::call_guard<py::gil_scoped_release>())
       .def(
           "merge",
           [](PyClass &self, int32_t target_components) -> std::vector<int32_t> {
@@ -90,7 +90,7 @@ void PybindDiagGmm(py::module *m) {
             self.Merge(target_components, &history);
             return history;
           },
-          py::arg("target_components"))
+          py::arg("target_components"), py::call_guard<py::gil_scoped_release>())
       .def("merge_kmeans", &PyClass::MergeKmeans, py::arg("target_components"),
            py::arg("cfg") = ClusterKMeansOptions(),
            py::call_guard<py::gil_scoped_release>())
@@ -104,7 +104,7 @@ void PybindDiagGmm(py::module *m) {
           py::arg("data"),
           "data is a 2-D tensor of shape (N, dim);"
           "it returns a 2-D tensor of shape (N, nmix) containing the "
-          "loglike of each component")
+          "loglike of each component", py::call_guard<py::gil_scoped_release>())
       .def(
           "log_likelihoods_preselect",
           [](const PyClass &self, const FloatVector &data,
@@ -113,7 +113,7 @@ void PybindDiagGmm(py::module *m) {
             self.LogLikelihoodsPreselect(data, indices, &ans);
             return ans;
           },
-          py::arg("data"), py::arg("indices"))
+          py::arg("data"), py::arg("indices"), py::call_guard<py::gil_scoped_release>())
       .def(
           "gaussian_selection_1d",
           [](const PyClass &self, const FloatVector &data,
@@ -122,7 +122,7 @@ void PybindDiagGmm(py::module *m) {
             float f = self.GaussianSelection(data, num_gselect, &output);
             return std::make_pair(f, output);
           },
-          py::arg("data"), py::arg("num_gselect"))
+          py::arg("data"), py::arg("num_gselect"), py::call_guard<py::gil_scoped_release>())
       .def(
           "gaussian_selection_2d",
           [](const PyClass &self, const FloatMatrix &data, int32_t num_gselect)
@@ -131,7 +131,7 @@ void PybindDiagGmm(py::module *m) {
             float f = self.GaussianSelection(data, num_gselect, &output);
             return std::make_pair(f, output);
           },
-          py::arg("data"), py::arg("num_gselect"))
+          py::arg("data"), py::arg("num_gselect"), py::call_guard<py::gil_scoped_release>())
       .def(
           "gaussian_selection_preselect",
           [](const PyClass &self, const FloatVector &data,
@@ -142,7 +142,7 @@ void PybindDiagGmm(py::module *m) {
                                                       num_gselect, &output);
             return std::make_pair(f, output);
           },
-          py::arg("data"), py::arg("preselect"), py::arg("num_gselect"))
+          py::arg("data"), py::arg("preselect"), py::arg("num_gselect"), py::call_guard<py::gil_scoped_release>())
       .def(
           "component_posteriors",
           [](const PyClass &self,
@@ -151,7 +151,7 @@ void PybindDiagGmm(py::module *m) {
             float f = self.ComponentPosteriors(data, &posteriors);
             return std::make_pair(f, posteriors);
           },
-          py::arg("data"))
+          py::arg("data"), py::call_guard<py::gil_scoped_release>())
       .def("component_log_likelihood", &PyClass::ComponentLogLikelihood,
            py::arg("data"), py::arg("comp_id"),
            py::call_guard<py::gil_scoped_release>())

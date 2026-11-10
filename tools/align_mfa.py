@@ -18,10 +18,15 @@ Usage:
 import argparse
 import json
 import sys
+import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "kaldi-hmm-gmm" / "python"))
+# Prefer the pip-installed kaldi_hmm_gmm; only put the in-repo package tree
+# first when it contains a locally built extension (development layout).
+_src_python = REPO / "kaldi-hmm-gmm" / "python"
+if list((_src_python / "kaldi_hmm_gmm" / "lib").glob("_kaldi_hmm_gmm.*")):
+    sys.path.insert(0, str(_src_python))
 
 try:
     import kaldi_native_fbank as knf
@@ -38,21 +43,17 @@ import kaldifst  # noqa: E402
 
 
 def read_wave(path):
-    """Read a wav file the way kaldi does.
+    """Read a wav file the way kaldi does (via soundfile).
 
     Returns raw int16 amplitudes as float32 (NOT divided by 32768): kaldi's
     wav reader keeps the integer scale and all kaldi feature references are
     produced on that scale. Returns (samples, sample_rate).
     """
-    import wave
+    import soundfile as sf
 
-    with wave.open(path, "rb") as f:
-        if f.getnchannels() != 1:
-            raise ValueError(f"{path}: only mono wav is supported")
-        if f.getsampwidth() != 2:
-            raise ValueError(f"{path}: only 16-bit PCM wav is supported")
-        sample_rate = f.getframerate()
-        samples = np.frombuffer(f.readframes(f.getnframes()), dtype=np.int16)
+    samples, sample_rate = sf.read(path, dtype="int16", always_2d=False)
+    if samples.ndim != 1:
+        raise ValueError(f"{path}: only mono wav is supported")
     return samples.astype(np.float32), sample_rate
 
 
@@ -91,26 +92,56 @@ def pitch_options(feat):
     return opts
 
 
+def resample_wave(samples, sr_in, sr_out):
+    """Resample a waveform to sr_out Hz with librosa (soxr resampler).
+
+    Only used when the wav's sample rate differs from the model's, so
+    librosa is an optional dependency (pip install librosa).
+
+    Args:
+      samples: 1-D float32 waveform.
+      sr_in: Input sample rate in Hz.
+      sr_out: Output sample rate in Hz.
+
+    Returns:
+      1-D float32 waveform at sr_out (length ~ len(samples) * sr_out / sr_in).
+    """
+    if sr_in == sr_out:
+        return samples
+    try:
+        import librosa
+    except ImportError:
+        raise ImportError(
+            f"wav is {sr_in} Hz but the model expects {sr_out} Hz; "
+            "install librosa to resample: pip install librosa"
+        )
+    return librosa.resample(
+        samples.astype(np.float32), orig_sr=int(sr_in), target_sr=int(sr_out)
+    ).astype(np.float32)
+
+
 def compute_model_features(samples, sample_rate, meta):
     """Compute model features (e.g. 40-dim) for one utterance.
 
     Feature stage of MFA/kaldi forced alignment; the chain is selected by
     the model's meta.json ("features" section):
 
-    1. MFCC (kaldi compute-mfcc-feats semantics);
-    2. if use_pitch: processed pitch (kaldi
+    1. resample to the model's sample_frequency if needed (MFA semantics:
+       allow_downsample/allow_upsample, both default True);
+    2. MFCC (kaldi compute-mfcc-feats semantics);
+    3. if use_pitch: processed pitch (kaldi
        compute-and-process-kaldi-pitch-feats semantics; by default
        POV + normalized-log-pitch + delta-pitch) concatenated with the MFCCs;
-    3. if uses_cmvn: utterance-level CMVN (compute-cmvn-stats + apply-cmvn);
-    4. if meta["lda"] is set: splice +-splice_left/right_context frames
+    4. if uses_cmvn: utterance-level CMVN (compute-cmvn-stats + apply-cmvn);
+    5. if meta["lda"] is set: splice +-splice_left/right_context frames
        (default 3) and apply the transform (splice-feats + transform-feats);
        else if uses_deltas: delta features (add-deltas).
 
     Args:
       samples: 1-D raw waveform (kaldi scale: raw int16 amplitudes as
         float32, not divided by 32768; see read_wave()).
-      sample_rate: Sample rate of samples in Hz; must match the model's
-        features.sample_frequency.
+      sample_rate: Sample rate of samples in Hz; resampled to the model's
+        features.sample_frequency when they differ.
       meta: The model's meta.json content (a dict); meta["lda"] is the
         path of the LDA matrix file.
 
@@ -120,10 +151,18 @@ def compute_model_features(samples, sample_rate, meta):
     feat = meta.get("features", {})
     expected = float(feat.get("sample_frequency", 16000))
     if sample_rate != expected:
-        raise ValueError(
-            f"sample rate mismatch: wav is {sample_rate} Hz but the model "
-            f"expects {expected} Hz; resample the wav first"
-        )
+        if sample_rate > expected and not bool(feat.get("allow_downsample", True)):
+            raise ValueError(
+                f"sample rate mismatch: wav is {sample_rate} Hz but the model "
+                f"expects {expected} Hz and allow_downsample is false"
+            )
+        if sample_rate < expected and not bool(feat.get("allow_upsample", True)):
+            raise ValueError(
+                f"sample rate mismatch: wav is {sample_rate} Hz but the model "
+                f"expects {expected} Hz and allow_upsample is false"
+            )
+        samples = resample_wave(samples, int(sample_rate), int(expected))
+        sample_rate = expected
     samples = np.asarray(samples, dtype=np.float32)
     if samples.ndim != 1:
         raise ValueError(f"samples must be 1-D, got shape {samples.shape}")
@@ -252,9 +291,11 @@ def main():
     meta["lda"] = str(model_dir / "lda.mat")
 
     # 1) features (kaldi-native-fbank; no kaldi binaries)
+    t0 = time.perf_counter()
     if args.pitch:
         meta.setdefault("features", {})["use_pitch"] = True
     samples, sample_rate = read_wave(str(Path(args.wav).resolve()))
+    audio_seconds = len(samples) / float(sample_rate)
     feat = compute_model_features(samples, sample_rate, meta)
 
     # 2) lexicon + word sequence
@@ -359,12 +400,20 @@ def main():
         ctx_dep=tree,
         lex_fst=lex_fst,
         disambig_syms=disambig,
-        opts=khg.TrainingGraphCompilerOptions(),
+        # compile-train-graphs semantics: transition probs are baked with
+        # scale 0 here and added ONCE at alignment time (AddTransitionProbs
+        # inside gmm_align_compiled); kaldi src/bin/compile-train-graphs.cc
+        # sets both scales to 0.0 for the same reason.
+        opts=khg.TrainingGraphCompilerOptions(transition_scale=0.0, self_loop_scale=0.0),
     )
     wids = [word_ids[w] for w in words]
     graph = gc.compile_graph_from_text(wids)
 
-    # 5) align (MFA/kaldi-style opts: acoustic_scale=1.0 per kalpy GmmAligner)
+    # 5) align — follow MFA/kalpy exactly:
+    #    transition_scale=1.0, acoustic_scale=0.1, self_loop_scale=0.1,
+    #    boost_silence=1.0, beam=10, retry_beam=40, careful=False
+    #    (kalpy/kalpy/aligner.py GmmAligner defaults; MFA
+    #    montreal_forced_aligner/alignment/mixins.py AlignMixin same)
     from align import gmm_align_compiled
     from ali_to_phones import ali_to_phones
 
@@ -379,9 +428,9 @@ def main():
         fst=graph,
         feats=feat,
         align_config=cfg,
-        acoustic_scale=1.0,
+        acoustic_scale=0.1,
         transition_scale=1.0,
-        self_loop_scale=1.0,
+        self_loop_scale=0.1,
     )
     if ans["num_error"] != 0:
         raise SystemExit("alignment failed")
@@ -428,6 +477,11 @@ def main():
 
     build_textgrid(intervals, word_intervals, duration, args.out)
     print(f"OK: {args.out}  frames={n_frames} dur={duration:.2f}s phones={len(intervals)} words={len(word_intervals)}")
+    elapsed = time.perf_counter() - t0
+    print(
+        f"timing: audio duration {audio_seconds:.2f}s, "
+        f"elapsed {elapsed:.2f}s, RTF {elapsed / audio_seconds:.3f}"
+    )
 
 
 if __name__ == "__main__":

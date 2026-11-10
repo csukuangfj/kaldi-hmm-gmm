@@ -9,6 +9,8 @@
 #include <vector>
 
 #include "kaldi-hmm-gmm/csrc/transition-model.h"
+
+#include "kaldi-decoder/csrc/transition-information.h"
 #include "kaldi_native_io/csrc/kaldi-io.h"
 
 namespace khg {
@@ -17,7 +19,7 @@ static void PybindMleTransitionUpdateConfig(py::module *m) {
   using PyClass = MleTransitionUpdateConfig;
   py::class_<PyClass>(*m, "MleTransitionUpdateConfig")
       .def(py::init<float, float, bool>(), py::arg("floor") = 0.01,
-           py::arg("mincount") = 5.0, py::arg("share_for_pdfs") = false)
+           py::arg("mincount") = 5.0, py::arg("share_for_pdfs") = false, py::call_guard<py::gil_scoped_release>())
       .def_readwrite("floor", &PyClass::floor)
       .def_readwrite("mincount", &PyClass::mincount)
       .def_readwrite("share_for_pdfs", &PyClass::share_for_pdfs);
@@ -26,10 +28,10 @@ static void PybindMleTransitionUpdateConfig(py::module *m) {
 static void PybindMleTransitionModelTuple(py::module *m) {
   using PyClass = TransitionModel::Tuple;
   py::class_<PyClass>(*m, "TransitionModelTuple")
-      .def(py::init<>())
+      .def(py::init<>(), py::call_guard<py::gil_scoped_release>())
       .def(py::init<int32_t, int32_t, int32_t, int32_t>(), py::arg("phone"),
            py::arg("hmm_state"), py::arg("forward_pdf"),
-           py::arg("self_loop_pdf"))
+           py::arg("self_loop_pdf"), py::call_guard<py::gil_scoped_release>())
       .def("__str__",
            [](const PyClass &self) -> std::string {
              std::ostringstream os;
@@ -66,10 +68,14 @@ void PybindTransitionModel(py::module *m) {
   PybindMleTransitionModelTuple(m);
 
   using PyClass = TransitionModel;
-  py::class_<PyClass, TransitionInformation>(*m, "TransitionModel")
-      .def(py::init<>())
+  // module_local: the TransitionInformation base is registered module_local
+  // in this module; a module_local base requires module_local derived
+  // classes.
+  py::class_<PyClass, kaldi_decoder::TransitionInformation>(
+      *m, "TransitionModel", py::module_local())
+      .def(py::init<>(), py::call_guard<py::gil_scoped_release>())
       .def(py::init<const ContextDependencyInterface &, const HmmTopology &>(),
-           py::arg("ctx_dep"), py::arg("hmm_topo"))
+           py::arg("ctx_dep"), py::arg("hmm_topo"), py::call_guard<py::gil_scoped_release>())
       .def_property_readonly("topo", &PyClass::GetTopo)
       .def_property_readonly("tuples", &PyClass::GetTuples)
       .def_property_readonly("state2id", &PyClass::GetState2Id)
@@ -139,7 +145,7 @@ void PybindTransitionModel(py::module *m) {
           py::arg("filename"),
           "Reads the TransitionModel from a kaldi-format file (binary or "
           "text). The stream starts at the <TransitionModel> token, e.g. the "
-          "beginning of a kaldi .mdl file.")
+          "beginning of a kaldi .mdl file.", py::call_guard<py::gil_scoped_release>())
       .def(
           "write",
           [](const PyClass &self, const std::string &filename, bool binary) {
@@ -147,7 +153,7 @@ void PybindTransitionModel(py::module *m) {
             self.Write(ko.Stream(), binary);
           },
           py::arg("filename"), py::arg("binary") = true,
-          "Writes the TransitionModel to a kaldi-format file.")
+          "Writes the TransitionModel to a kaldi-format file.", py::call_guard<py::gil_scoped_release>())
       .def(py::pickle(
           [](const PyClass &self) -> py::tuple {
             std::vector<float> log_probs{

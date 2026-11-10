@@ -54,7 +54,7 @@ void PybindHmmTopology(py::module *m) {
   PybindHmmTopologyHmmState(m);
   using PyClass = HmmTopology;
   py::class_<PyClass>(*m, "HmmTopology")
-      .def(py::init<>())
+      .def(py::init<>(), py::call_guard<py::gil_scoped_release>())
       .def("check", &PyClass::Check, py::call_guard<py::gil_scoped_release>())
       .def("topology_for_phone", &PyClass::TopologyForPhone, py::arg("phone"), py::call_guard<py::gil_scoped_release>())
       .def("num_pdf_classes", &PyClass::NumPdfClasses, py::arg("phone"))

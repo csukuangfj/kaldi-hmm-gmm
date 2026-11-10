@@ -13,7 +13,9 @@ import argparse
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "kaldi-hmm-gmm" / "python"))
+_src_python = Path(__file__).resolve().parents[2] / "kaldi-hmm-gmm" / "python"
+if list((_src_python / "kaldi_hmm_gmm" / "lib").glob("_kaldi_hmm_gmm.*")):
+    sys.path.insert(0, str(_src_python))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
 
 import kaldialign  # noqa: E402
@@ -61,6 +63,14 @@ def add_word_ins_penalty(fst, wip: float):
             if ol != "0":
                 w = repr(float(w) + wip)
             lines.append(f"{s} {d} {il} {ol} {w}")
+        elif len(parts) == 4:
+            # weight omitted when exactly 0 (openfst FstPrinter); a
+            # word-emitting arc must still get the penalty.
+            s, d, il, ol = parts
+            if ol != "0":
+                lines.append(f"{s} {d} {il} {ol} {repr(float(wip))}")
+            else:
+                lines.append(line)
         else:
             lines.append(line)
     import kaldifst
@@ -101,39 +111,55 @@ def main():
     print(f"local/score.sh: scoring with word insertion penalty="
           f"{args.word_ins_penalty}")
     best = None
-    for lmwt in [float(x) for x in args.lmwt.split(",")]:
-     for wip in [float(x) for x in args.word_ins_penalty.split(",")]:
+    for wip in [float(x) for x in args.word_ins_penalty.split(",")]:
         g = add_word_ins_penalty(graph.copy(), wip)
         config = khg.LatticeFasterDecoderConfig(
             max_active=args.max_active, beam=args.beam, lattice_beam=args.lattice_beam
         )
-        decoder = khg.LatticeFasterDecoder(g, config)
 
-        hyps = {}
+        # Decode each utterance ONCE per wip (the decoder is constructed
+        # inside the wrapper -- plan-3 D2); `lat` is the lattice exactly as
+        # kaldi writes it (acoustic costs / acoustic_scale).
+        lats = {}
         for utt in utts:
             decodable = khg.DecodableAmDiagGmmScaled(
                 am=am, tm=tm, feats=feats[utt], scale=args.acoustic_scale
             )
-            succeeded, _ali, word_ids, _ll = khg.decode_utterance_lattice_faster(
-                decoder=decoder, decodable=decodable, trans_model=tm,
+            succeeded, _ali, _w, _ll, lat = khg.decode_utterance_lattice_faster(
+                config=config, fst=g, decodable=decodable, trans_model=tm,
                 utt=utt, allow_partial=True, acoustic_scale=args.acoustic_scale,
-                    lm_scale=lmwt,
             )
-            hyps[utt] = [id2word[w] for w in word_ids if w != 0] if succeeded else []
+            lats[utt] = (succeeded, lat)
 
-        r = kaldialign.batch_error_rate([text[u] for u in utts], [hyps[u] for u in utts])
-        S, D, I, N = int(r["sub"]), int(r["del"]), int(r["ins"]), int(r["ref_len"])
-        wer = 100.0 * (S + D + I) / max(N, 1)
-        line = (
-            f"%WER {wer:.2f} [ {S + D + I} / {N}, {I} in, {D} del, {S} sub ] "
-            f"{out_dir}/wer_{int(lmwt)}_{wip}"
-        )
-        with open(
-            out_dir / f"wer_{int(lmwt)}_{wip}", "w", encoding="utf-8", newline="\n"
-        ) as f:
-            f.write(line + "\n")
-        if best is None or wer < best[0]:
-            best = (wer, wip, lmwt, S, D, I, N, hyps)
+        for lmwt in [float(x) for x in args.lmwt.split(",")]:
+            # kaldi's local/score.sh: lattice-best-path with --lm-scale on the
+            # written lattice.  Math: argmin(lmwt*V1 + V2) with V2 already
+            # scaled by 1/acoustic_scale -- identical to the previous
+            # argmin(lmwt*V1 + V2/acoustic_scale) sweep on the raw lattice.
+            hyps = {}
+            for utt in utts:
+                succeeded, lat = lats[utt]
+                if not succeeded:
+                    hyps[utt] = []
+                    continue
+                ok, _ali, word_ids, _ll = khg.lattice_best_path(
+                    lat, lm_scale=lmwt, acoustic_scale=1.0
+                )
+                hyps[utt] = [id2word[w] for w in word_ids if w != 0] if ok else []
+
+            r = kaldialign.batch_error_rate([text[u] for u in utts], [hyps[u] for u in utts])
+            S, D, I, N = int(r["sub"]), int(r["del"]), int(r["ins"]), int(r["ref_len"])
+            wer = 100.0 * (S + D + I) / max(N, 1)
+            line = (
+                f"%WER {wer:.2f} [ {S + D + I} / {N}, {I} in, {D} del, {S} sub ] "
+                f"{out_dir}/wer_{int(lmwt)}_{wip}"
+            )
+            with open(
+                out_dir / f"wer_{int(lmwt)}_{wip}", "w", encoding="utf-8", newline="\n"
+            ) as f:
+                f.write(line + "\n")
+            if best is None or wer < best[0]:
+                best = (wer, wip, lmwt, S, D, I, N, hyps)
 
     wer, wip, lmwt, S, D, I, N, hyps = best
     with open(out_dir / "text", "w", encoding="utf-8", newline="\n") as f:

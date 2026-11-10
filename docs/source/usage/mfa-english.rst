@@ -1,0 +1,81 @@
+MFA alignment — English
+=======================
+
+A complete, copy-paste runnable English example.  See :doc:`mfa` for how
+the pipeline works and :doc:`setup` for installing the dependencies.
+
+Test audio
+----------
+
+.. raw:: html
+
+   <audio controls src="https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav">
+     Your browser does not support the audio element.
+   </audio>
+
+Download it with:
+
+.. code-block:: bash
+
+   wget https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav
+
+- file: ``en.wav`` (mono, 16-bit PCM, **24 kHz**, 3.85 s)
+- transcript: *Ask not what your country can do for you, ask what you can
+  do for your country.*
+
+Step 1: download the acoustic model and the dictionary
+------------------------------------------------------
+
+The `english_mfa <https://github.com/MontrealCorpusTools/mfa-models/releases/tag/acoustic-english_mfa-v3.1.0>`_
+model (MFA v3.1.0), the matching
+`english_mfa dictionary <https://github.com/MontrealCorpusTools/mfa-models/releases/tag/dictionary-english_mfa-v3.1.0>`_,
+and the test audio:
+
+.. code-block:: bash
+
+   mkdir -p english && cd english
+   wget https://github.com/MontrealCorpusTools/mfa-models/releases/download/acoustic-english_mfa-v3.1.0/english_mfa.zip
+   unzip english_mfa.zip        # -> english_mfa/ (final.alimdl, final.mdl, tree,
+                                #    lda.mat, meta.json, phones.txt, ...)
+   wget https://github.com/MontrealCorpusTools/mfa-models/releases/download/dictionary-english_mfa-v3.1.0/english_mfa.dict
+   wget https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav
+   cd ..
+
+Step 2: run the alignment
+-------------------------
+
+From the repository root:
+
+.. code-block:: bash
+
+   python3 tools/align_mfa.py --wav english/en.wav \
+     --text "Ask not what your country can do for you, ask what you can do for your country." \
+     --model-dir english/english_mfa --dict english/english_mfa.dict \
+     --phones-txt english/english_mfa/phones.txt --out english/en.TextGrid
+
+Expected output
+---------------
+
+Measured on an Apple M-series laptop (the timing line shows the audio
+duration, the wall-clock time of features+graph+alignment, and the
+real-time factor — lower is faster):
+
+.. code-block:: text
+
+   OK: english/en.TextGrid  frames=385 dur=3.85s phones=54 words=17
+   timing: audio duration 3.85s, elapsed 1.16s, RTF 0.301
+
+The wav is 24 kHz while the model expects 16 kHz; the tool resamples
+automatically (librosa, MFA's ``allow_downsample`` semantics).
+
+Step 3: inspect the result
+--------------------------
+
+``english/en.TextGrid`` has two tiers (phones and words).  Open it in
+`Praat <https://praat.org/>`_ together with ``english/en.wav`` to inspect
+the alignment; the word tier contains the 17 words of the transcript:
+
+.. code-block:: text
+
+   ask  not  what  your  country  can  do  for  you  ask
+   what  you  can  do  for  your  country

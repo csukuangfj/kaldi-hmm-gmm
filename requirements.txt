@@ -5,3 +5,7 @@ kaldi_native_io
 kaldi-native-fbank
 kaldilm
 numpy
+soundfile
+# optional: waveform resampling when a wav's sample rate differs from the
+# model's (tools/align_mfa.py)
+# librosa

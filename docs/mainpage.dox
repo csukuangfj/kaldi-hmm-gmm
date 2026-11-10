@@ -1,0 +1,18 @@
+/**
+ * @mainpage kaldi-hmm-gmm C++ API
+ *
+ * Kaldi's HMM-GMM reimplementation with Eigen: GMMs (diagonal covariance),
+ * HMM topology and transition model, decision trees / context-dependency,
+ * training-graph compilation, MLE/MAP updates, and GMM decodables for
+ * forced alignment and decoding.
+ *
+ * Headers live in kaldi-hmm-gmm/csrc/ and are copied/modified from
+ * kaldi/src/{gmm,hmm,tree,itf,...}.  The decoding engine (decoders,
+ * decoder-wrappers, lattice best path) lives in the sibling project
+ * kaldi-decoder (https://github.com/k2-fsa/kaldi-decoder); this library
+ * links `kaldi-decoder-core` and implements its `DecodableInterface` /
+ * `TransitionInformation`.
+ *
+ * See also the Python API documentation (package `kaldi_hmm_gmm`) and the
+ * usage guides for the yesno recipe and MFA forced alignment.
+ */

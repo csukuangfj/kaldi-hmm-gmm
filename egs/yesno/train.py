@@ -19,7 +19,9 @@ import sys
 import time
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "kaldi-hmm-gmm" / "python"))
+_src_python = Path(__file__).resolve().parents[2] / "kaldi-hmm-gmm" / "python"
+if list((_src_python / "kaldi_hmm_gmm" / "lib").glob("_kaldi_hmm_gmm.*")):
+    sys.path.insert(0, str(_src_python))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
 
 import kaldi_hmm_gmm as khg  # noqa: E402

@@ -5,6 +5,19 @@
 
 // This file is copied/modified from kaldi/src/util/stl-utils.h
 
+/**
+ * \file stl-utils.h
+ * \brief Small generic STL container utilities ported from
+ *        kaldi/src/util/stl-utils.h.
+ *
+ * It provides sortedness checks (\c IsSorted, \c IsSortedAndUniq), the
+ * sort-and-unique helper \c SortAndUniq, kaldi-format binary/text I/O for
+ * integer vectors (\c WriteIntegerVector, \c ReadIntegerVector), pointer
+ * vector helpers (\c DeletePointers, \c ContainsNullPointers), and hashing
+ * function objects for pairs and vectors (\c PairHasher, \c VectorHasher).
+ * These are used throughout the tree/event-map code.
+ */
+
 #ifndef KALDI_HMM_GMM_CSRC_STL_UTILS_H_
 #define KALDI_HMM_GMM_CSRC_STL_UTILS_H_
 #include <algorithm>
@@ -53,6 +66,8 @@ inline bool IsSortedAndUniq(const std::vector<T> &vec) {
   }
 }
 
+/// Writes a vector of integers to a stream in kaldi binary or text ("[ ... ]")
+/// format.
 template <class T>
 inline void WriteIntegerVector(std::ostream &os, bool binary,
                                const std::vector<T> &v) {
@@ -88,6 +103,8 @@ inline void WriteIntegerVector(std::ostream &os, bool binary,
   }
 }
 
+/// Reads a vector of integers written by WriteIntegerVector (binary or text
+/// form); throws on failure.
 template <class T>
 inline void ReadIntegerVector(std::istream &is, bool binary,
                               std::vector<T> *v) {

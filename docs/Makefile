@@ -1,20 +1,29 @@
-# Minimal makefile for Sphinx documentation
-#
-
-# You can set these variables from the command line, and also
-# from the environment for the first two.
+# Minimal Sphinx + Doxygen Makefile.
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = source
 BUILDDIR      = build
+DOXYGEN       ?= doxygen
 
-# Put it first so that "make" without argument is like "make help".
+.PHONY: help html latexpdf clean doxygen
+
 help:
-	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
 
-.PHONY: help Makefile
+doxygen:
+	@mkdir -p "$(BUILDDIR)/doxygen"
+	@$(DOXYGEN) Doxyfile
 
-# Catch-all target: route all unknown targets to Sphinx using the new
-# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
-%: Makefile
-	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+html: doxygen
+	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
+	# Copy the doxygen HTML tree into the sphinx output. Remove any previous
+	# copy first: plain `cp -r` would nest it as cpp-api-doxygen/html/ when
+	# the target already exists, leaving stale files behind.
+	rm -rf "$(BUILDDIR)/html/cpp-api-doxygen"
+	cp -r "$(BUILDDIR)/doxygen/html" "$(BUILDDIR)/html/cpp-api-doxygen"
+
+latexpdf: doxygen
+	@$(SPHINXBUILD) -M latexpdf "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
+
+clean:
+	rm -rf $(BUILDDIR)

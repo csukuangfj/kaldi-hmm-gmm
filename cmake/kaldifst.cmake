@@ -1,8 +1,9 @@
+include_guard(GLOBAL)
+
 function(download_kaldifst)
   include(FetchContent)
 
   set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.7.10.tar.gz")
-  set(kaldifst_URL2 "https://huggingface.co/csukuangfj/kaldi-hmm-gmm-cmake-deps/resolve/main/kaldifst-1.7.10.tar.gz")
   set(kaldifst_HASH "SHA256=7f7b3173a6584a6b1987f65ae7af2ac453d66b845f875a9d31074b8d2cd0de54")
 
   # If you don't have access to the Internet,
@@ -20,7 +21,6 @@ function(download_kaldifst)
       set(kaldifst_URL  "${f}")
       file(TO_CMAKE_PATH "${kaldifst_URL}" kaldifst_URL)
       message(STATUS "Found local downloaded kaldifst: ${kaldifst_URL}")
-      set(kaldifst_URL2)
       break()
     endif()
   endforeach()

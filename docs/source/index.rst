@@ -1,14 +1,20 @@
-.. kaldi-hmm-gmm documentation master file, created by
-   sphinx-quickstart on Fri Apr 14 20:12:04 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+kaldi-hmm-gmm documentation
+===========================
 
-Documentation for kaldi-hmm-gmm
-===============================
+kaldi-hmm-gmm is a reimplementation of `kaldi <https://github.com/kaldi-asr/kaldi>`_'s
+HMM-GMM with `Eigen <https://eigen.tuxfamily.org/>`_: diagonal-covariance GMMs,
+HMM topology and transition model, decision trees / context dependency,
+training-graph compilation, MLE/MAP estimation, and GMM decodables for
+**forced alignment** and **decoding**.  It ships C++ and Python APIs and does
+not shell out to kaldi binaries.
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 2
    :caption: Contents:
 
-   ./tutorials/index
-   ./python-api/index
+   intro
+   install
+   usage/index
+   python-api/index
+   cpp-api/index
+   tutorials/index

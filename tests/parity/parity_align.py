@@ -44,7 +44,10 @@ def main():
 
     gc = khg.TrainingGraphCompiler(
         trans_model=tm, ctx_dep=tree, lex_fst=lex,
-        disambig_syms=disambig_ids, opts=khg.TrainingGraphCompilerOptions(),
+        disambig_syms=disambig_ids,
+        # compile-train-graphs semantics (kaldi src/bin/compile-train-graphs.cc
+        # sets both scales to 0.0); transition probs are added at alignment.
+        opts=khg.TrainingGraphCompilerOptions(transition_scale=0.0, self_loop_scale=0.0),
     )
     text = load_text("data/train_yesno/text")
     feats = load_delta_feats("data/train_yesno/feats.scp")

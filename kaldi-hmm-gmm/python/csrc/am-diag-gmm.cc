@@ -17,7 +17,7 @@ namespace khg {
 void PybindAmDiagGmm(py::module *m) {
   using PyClass = AmDiagGmm;
   py::class_<PyClass>(*m, "AmDiagGmm")
-      .def(py::init<>())
+      .def(py::init<>(), py::call_guard<py::gil_scoped_release>())
       .def_property_readonly("dim", &PyClass::Dim)
       .def_property_readonly("num_pdfs", &PyClass::NumPdfs)
       .def_property_readonly("num_gauss", &PyClass::NumGauss)

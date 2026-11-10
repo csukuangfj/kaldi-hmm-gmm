@@ -1,26 +1,15 @@
 Python API
 ==========
 
-This section lists Python APIs in `kaldi-hmm-gmm`_.
+The Python package ``kaldi_hmm_gmm`` exposes the C++ API through pybind11
+bindings.  It is self-contained: the decoding engine is compiled in, so no
+other kaldi packages need to be installed at runtime.
 
-.. currentmodule:: kaldi_hmm_gmm
+.. toctree::
+   :maxdepth: 2
 
-DiagGmm
--------
-
-.. autoclass:: DiagGmm
-   :members:
-
-
-ScalarClusterable
------------------
-
-.. autoclass:: ScalarClusterable
-   :members:
-   :show-inheritance:
-
-GaussClusterable
------------------
-
-.. autoclass:: GaussClusterable
-   :members:
+   model
+   gmm
+   graph
+   align-decode
+   reference

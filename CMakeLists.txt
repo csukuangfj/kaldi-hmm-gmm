@@ -9,10 +9,14 @@ if(POLICY CMP0077)
 endif()
 # kaldifst.cmake calls FetchContent_Populate directly (it must set
 # CMAKE_MODULE_PATH between populate and add_subdirectory); allow it
-# without the CMP0169 deprecation warning.
+# without the CMP0169 deprecation warning.  CMAKE_POLICY_DEFAULT_CMP0169
+# covers the same pattern inside fetched subprojects (kaldifst's
+# cmake/openfst.cmake), whose own cmake_minimum_required() would reset the
+# policy to WARN.
 if(POLICY CMP0169)
   cmake_policy(SET CMP0169 OLD)
 endif()
+set(CMAKE_POLICY_DEFAULT_CMP0169 OLD)
 project(kaldi-hmm-gmm)
 
 # Dependency builds (eigen/googletest/kaldi_native_io) still use old
@@ -98,6 +102,7 @@ include(eigen)
 
 include(kaldi-native-io)
 include(kaldifst)
+include(kaldi-decoder)
 if(KHG_ENABLE_TESTS)
   enable_testing()
   include(googletest)

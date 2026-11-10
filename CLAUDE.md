@@ -26,13 +26,34 @@ ctest --output-on-failure     # runs both gtest and python tests (python tests a
 
 ## Architecture map
 
-- `kaldi-hmm-gmm/csrc/` — C++ core, mirrors `../kaldi/src/{hmm,gmm,decoder,tree,itf,...}` (e.g. `transition-model`, `hmm-topology`, `hmm-utils`, `diag-gmm`, `mle-diag-gmm`, `training-graph-compiler`, `decoder-wrappers`, `lattice-faster-decoder`). Keep file/function names and semantics aligned with kaldi.
+- **Decoding lives in the sibling repo `../kaldi-decoder`**: decoders,
+  decoder-wrappers, lattice best path, decodable-itf / transition-information
+  interfaces. This repo links `kaldi-decoder-core` built from the **v0.4.0
+  release tarball** (see `cmake/kaldi-decoder.cmake`;
+  `KALDI_DECODER_SOURCE_DIR` overrides for development) and keeps only the
+  GMM/HMM/tree/training side. The python package `kaldi_hmm_gmm` is
+  **self-contained (2026-11-10)**: no runtime dependency on the
+  `kaldi-decoder` python package — it registers the interface/option types
+  (`DecodableInterface`, `TransitionInformation`, `AlignConfig`,
+  `*DecoderConfig`, `lattice_best_path`) itself as `py::module_local` types.
+  A co-installed `kaldi-decoder` package never collides with it (any import
+  order is safe), but the two packages' objects are intentionally NOT
+  interchangeable. Hot path stays in C++ (`align_utterance` /
+  `decode_utterance_lattice_*` are one-C++-call thin wrappers).
+- `kaldi-hmm-gmm/csrc/` — C++ core, mirrors `../kaldi/src/{hmm,gmm,tree,itf,...}`
+  (e.g. `transition-model`, `hmm-topology`, `hmm-utils`, `diag-gmm`,
+  `mle-diag-gmm`, `training-graph-compiler`, `decodable-am-diag-gmm`).
+  Keep file/function names and semantics aligned with kaldi.
 - `kaldi-hmm-gmm/python/csrc/` — pybind11 bindings, one `Pybind*.cc`-style file per C++ module, aggregated in `kaldi-hmm-gmm.cc`. The extension module is built **into the package**: `kaldi_hmm_gmm/lib/_kaldi_hmm_gmm.*` (self-contained: `kaldi-hmm-gmm-core` is always built STATIC and linked in). `kaldi_hmm_gmm/__init__.py` re-exports from `kaldi_hmm_gmm.lib._kaldi_hmm_gmm`.
 - `scripts/` — Python equivalents of kaldi binaries (`gmm_init_mono.py`, `gmm_align_compiled.py`, `gmm_acc_stats_ali.py`, `gmm_est.py`, `gmm_boost_silence.py`, `prepare_lang.py`). **Being dissolved** (plan.md §4.0): library code moves into the `kaldi_hmm_gmm` package, tests into `python/tests/`, bash helpers into `egs/utils/`; its current content is NOT authoritative — per user instruction it may be deleted or rewritten freely (e.g. drop lhotse from signatures).
 - `egs/yesno/` — recipe: `run.sh` stages drive `train.py` (mono GMM training loop: compile graphs → equal-align / re-align → acc-stats → gmm-est with mixup) and `decode.py` (L·G→CLG→HCLG + lattice-faster decode). Model persists as kaldi-format `final.mdl` (`AmDiagGmm` + `TransitionModel` + `ContextDependency` via the kaldi-compatible Read/Write).
 - Training graph pipeline (both kaldi and here): graph compiles WITH transition probs baked, then `AddTransitionProbs` is applied again before alignment — do not "fix" this double application; it matches kaldi.
 
 ## Standing working rules (user's instructions)
+
+- **C++ declaration style**: initialize with `Type x = 0;` — NEVER brace
+  style (`Type x{0};` / `Type x{};`); one declarator per line — NEVER
+  `Type x, y;`.
 
 1. **Fill gaps from kaldi**: if C++ is missing functionality, port it from `../kaldi`'s corresponding source. If the Python API is missing something, add pybind bindings against the C++. Never work around a C++ gap in Python.
 2. **Verify every step early — never batch tests to the end.** After each C++ module **and after each pipeline stage**: (a) line-compare the C++ with `../kaldi` source; (b) add gtest in this repo; (c) **numerically compare this repo's output vs kaldi's on identical input** (kaldi binaries are the oracle here; exchange data via `kaldi_native_io`; parity artifacts under `exp/parity/`). **For stages with randomness, use stage-substitution**: inject kaldi-generated artifacts as that stage's output (features/text/alignments are directly readable; models need `DiagGmm`/`AmDiagGmm` Read/Write ported+bound), verify downstream deterministic stages on identical input, then swap back to our own outputs one stage at a time (ratchet). Checklists in `plan.md` §4.7–4.9 (§4.9 is the per-step gate: gtest green + kaldi parity + discrepancies resolved + no batching — all must pass before the next step). Fix or report discrepancies before proceeding to the next step.

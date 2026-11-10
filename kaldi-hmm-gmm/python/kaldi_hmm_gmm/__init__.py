@@ -1,3 +1,15 @@
+# Copyright (c)  2026  Xiaomi Corporation
+#
+# kaldi_hmm_gmm: GMM/HMM/tree/training plus the GMM decodable and the
+# alignment/decoding convenience functions.  The package is SELF-CONTAINED
+# (plan-4.md): everything below comes from our own extension module -- there
+# is no runtime dependency on the kaldi-decoder Python package.  The decoder
+# ENGINE (kaldi-decoder-core) is compiled in from C++; the interface and
+# option types (DecodableInterface, TransitionInformation, AlignConfig, ...)
+# are registered here as py::module_local types, so a co-installed
+# kaldi-decoder package never collides with this one (their objects are
+# intentionally not interchangeable).
+
 from kaldi_hmm_gmm.lib._kaldi_hmm_gmm import (
     AccumAmDiagGmm,
     AccumDiagGmm,
@@ -10,23 +22,15 @@ from kaldi_hmm_gmm.lib._kaldi_hmm_gmm import (
     ContextDependencyInterface,
     DecodableAmDiagGmmScaled,
     DecodableAmDiagGmmUnmapped,
-    DecodableCtc,
     DecodableInterface,
-    DeterminizeLatticePhonePrunedOptions,
     DiagGmm,
     EventMap,
-    FasterDecoder,
-    FasterDecoderOptions,
     GaussClusterable,
     GmmUpdateFlags,
     HTransducerConfig,
     HmmState,
     HmmTopology,
-    LatticeFasterDecoder,
     LatticeFasterDecoderConfig,
-    LatticeFasterDecoderStdConstFst,
-    LatticeFasterDecoderStdVectorFst,
-    LatticeSimpleDecoder,
     LatticeSimpleDecoderConfig,
     MapDiagGmmOptions,
     MleDiagGmmOptions,
@@ -41,7 +45,6 @@ from kaldi_hmm_gmm.lib._kaldi_hmm_gmm import (
     add_self_loops,
     add_transition_probs,
     align_utterance,
-    align_utterance_wrapper,
     decode_utterance_lattice_faster,
     decode_utterance_lattice_simple,
     draw_tree,
@@ -54,6 +57,7 @@ from kaldi_hmm_gmm.lib._kaldi_hmm_gmm import (
     kGmmTransitions,
     kGmmVariances,
     kGmmWeights,
+    lattice_best_path,
     map_am_diag_gmm_update,
     map_diag_gmm_update,
     ml_objective,
@@ -83,23 +87,15 @@ __all__ = [
     "ContextDependencyInterface",
     "DecodableAmDiagGmmScaled",
     "DecodableAmDiagGmmUnmapped",
-    "DecodableCtc",
     "DecodableInterface",
-    "DeterminizeLatticePhonePrunedOptions",
     "DiagGmm",
     "EventMap",
-    "FasterDecoder",
-    "FasterDecoderOptions",
     "GaussClusterable",
     "GmmUpdateFlags",
     "HTransducerConfig",
     "HmmState",
     "HmmTopology",
-    "LatticeFasterDecoder",
     "LatticeFasterDecoderConfig",
-    "LatticeFasterDecoderStdConstFst",
-    "LatticeFasterDecoderStdVectorFst",
-    "LatticeSimpleDecoder",
     "LatticeSimpleDecoderConfig",
     "MapDiagGmmOptions",
     "MleDiagGmmOptions",
@@ -114,7 +110,6 @@ __all__ = [
     "add_self_loops",
     "add_transition_probs",
     "align_utterance",
-    "align_utterance_wrapper",
     "decode_utterance_lattice_faster",
     "decode_utterance_lattice_simple",
     "draw_tree",
@@ -127,6 +122,7 @@ __all__ = [
     "kGmmTransitions",
     "kGmmVariances",
     "kGmmWeights",
+    "lattice_best_path",
     "map_am_diag_gmm_update",
     "map_diag_gmm_update",
     "ml_objective",

@@ -49,14 +49,15 @@ def gmm_align_compiled(
     )
 
     # NOTE: AddTransitionProbs + alignment run in ONE C++ call on purpose:
-    # FSTs cross the python boundary via a copy (see fst-caster.h), so
-    # mutating the FST in a separate call would not be visible here.
+    # AlignUtteranceWrapper mutates the graph (adds transition probs, and in
+    # careful mode appends the careful loop), so the two steps belong in the
+    # same call.
     (
-        num_done,
-        num_error,
-        num_retried,
-        tot_like,
-        frame_count,
+        utt_done,
+        utt_error,
+        utt_retried,
+        utt_like,
+        utt_frames,
         alignment,
         words,
     ) = khg.align_utterance(
@@ -70,12 +71,15 @@ def gmm_align_compiled(
         decodable=gmm_decodable,
     )
 
+    # khg.align_utterance reports THIS utterance's counters (it starts at
+    # zero internally); the parameters above are the caller's running totals
+    # and must accumulate, exactly like kaldi's gmm-align-compiled writers.
     return {
-        "num_done": num_done,
-        "num_error": num_error,
-        "num_retried": num_retried,
-        "tot_like": tot_like,
-        "frame_count": frame_count,
+        "num_done": num_done + utt_done,
+        "num_error": num_error + utt_error,
+        "num_retried": num_retried + utt_retried,
+        "tot_like": tot_like + utt_like,
+        "frame_count": frame_count + utt_frames,
         "alignment": alignment,
         "words": words,
     }

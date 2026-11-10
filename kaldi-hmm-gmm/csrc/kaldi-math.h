@@ -5,6 +5,19 @@
 //                2023  Xiaomi Corporation
 
 // This file is copied/modified from kaldi/src/base/kaldi-math.h
+
+/**
+ * \file kaldi-math.h
+ * \brief Small math helpers ported from kaldi/src/base/kaldi-math.h.
+ *
+ * This file is copied/modified from kaldi/src/base/kaldi-math.h.
+ *
+ * It provides the constants \c kMinLogDiffDouble / \c kMinLogDiffFloat and
+ * \c kPi, the log-domain addition helpers \c LogAdd and \c Log1p, the
+ * comparison helper \c ApproxEqual, and simple random number generation
+ * (\c RandomState, \c Rand, \c RandUniform) plus \c Gcd.
+ */
+
 #ifndef KALDI_HMM_GMM_CSRC_KALDI_MATH_H_
 #define KALDI_HMM_GMM_CSRC_KALDI_MATH_H_
 
@@ -58,7 +71,7 @@ inline float Log1p(float x) {
 }
 #endif
 
-// returns log(exp(x) + exp(y)).
+/// returns log(exp(x) + exp(y)).
 inline float LogAdd(float x, float y) {
   float diff;
 
@@ -79,7 +92,7 @@ inline float LogAdd(float x, float y) {
   }
 }
 
-// returns log(exp(x) + exp(y)).
+/// returns log(exp(x) + exp(y)).
 inline double LogAdd(double x, double y) {
   double diff;
 
@@ -111,20 +124,21 @@ static inline bool ApproxEqual(float a, float b,
   return (diff <= relative_tolerance * (std::abs(a) + std::abs(b)));
 }
 
-// State for thread-safe random number generator
+/// State for thread-safe random number generator
 struct RandomState {
   RandomState();
   unsigned seed;
 };
 
-// Returns a random integer between 0 and RAND_MAX, inclusive
+/// Returns a random integer between 0 and RAND_MAX, inclusive
 int32_t Rand(struct RandomState *state = nullptr);
 
-// Ported from ../kaldi/src/base/kaldi-math.h (RandUniform).
+/// Ported from ../kaldi/src/base/kaldi-math.h (RandUniform).
 inline float RandUniform(RandomState *state = nullptr) {
   return static_cast<float>(Rand(state) + 1.0) / (RAND_MAX + 2.0);
 }
 
+/// Returns the greatest common divisor of m and n (error if both are zero).
 template <class I>
 I Gcd(I m, I n) {
   if (m == 0 || n == 0) {

@@ -7,10 +7,14 @@
 #               train_yesno_wav.scp,test_yesno_wav.scp,lm_tg.arpa}
 #   data/{train,test}_yesno/{wav.scp,text,utt2spk,spk2utt}
 #
-# The corpus is downloaded like ../kaldi/egs/yesno/s5/run.sh does (openslr 1)
-# if the waves dir is missing.  The train/test split reproduces
-# create_yesno_waves_test_train.pl: sorted listing of the waves dir; first
-# half = train, rest = test; *.wav only.
+# The corpus is downloaded if the waves dir is missing.  Original source
+# (what ../kaldi/egs/yesno/s5/run.sh uses): openslr 1,
+#   http://www.openslr.org/resources/1/waves_yesno.tar.gz
+# We fetch the same tarball from a github.com release mirror to reduce CI
+# download time:
+#   https://github.com/csukuangfj/kaldi-hmm-gmm/releases/download/v1.1.4/waves_yesno.tar.gz
+# The train/test split reproduces create_yesno_waves_test_train.pl: sorted
+# listing of the waves dir; first half = train, rest = test; *.wav only.
 
 set -eo pipefail
 
@@ -24,12 +28,13 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ ! -d "$waves_dir" ]; then
-  echo "$0: downloading waves_yesno corpus (openslr.org/resources/1)"
+  echo "$0: downloading waves_yesno corpus (github.com mirror of openslr 1)"
   tarball=waves_yesno.tar.gz
+  url=https://github.com/csukuangfj/kaldi-hmm-gmm/releases/download/v1.1.4/waves_yesno.tar.gz
   if command -v wget > /dev/null 2>&1; then
-    wget -O "$tarball" http://www.openslr.org/resources/1/waves_yesno.tar.gz || exit 1
+    wget -O "$tarball" "$url" || exit 1
   else
-    curl -L -o "$tarball" http://www.openslr.org/resources/1/waves_yesno.tar.gz || exit 1
+    curl -L -o "$tarball" "$url" || exit 1
   fi
   tar -xzf "$tarball" || exit 1
   rm -f "$tarball"

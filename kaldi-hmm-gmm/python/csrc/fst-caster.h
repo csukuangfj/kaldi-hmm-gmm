@@ -52,6 +52,7 @@ struct type_caster<fst::VectorFst<fst::StdArc>> {
   bool load(handle src, bool) {
     if (src.is_none()) return false;
     try {
+      pybind11::gil_scoped_acquire gil;  // safe if already held
       uint64_t addr =
           khg_kaldifst_module().attr("_vector_fst_addr")(src).cast<uint64_t>();
       held_ = reinterpret_cast<fst::VectorFst<fst::StdArc> *>(addr);
@@ -91,9 +92,13 @@ struct type_caster<fst::VectorFst<fst::StdArc>> {
 
  private:
   static handle wrap(fst::VectorFst<fst::StdArc> *p, bool owning) {
+    // The python API needs the GIL; acquire is reentrant so this is safe
+    // regardless of caller context (bindings may release the GIL via
+    // call_guard<gil_scoped_release>).
+    pybind11::gil_scoped_acquire gil;
+    (void)owning;  // ownership always transfers (see the SAFETY CONTRACT)
     uint64_t addr = reinterpret_cast<uint64_t>(p);
     return khg_kaldifst_module().attr("_vector_fst_take")(addr).release();
-    (void)owning;
   }
 
   fst::VectorFst<fst::StdArc> *held_ = nullptr;
@@ -108,6 +113,7 @@ struct type_caster<fst::Fst<fst::StdArc>> {
   bool load(handle src, bool) {
     if (src.is_none()) return false;
     try {
+      pybind11::gil_scoped_acquire gil;  // safe if already held
       uint64_t addr =
           khg_kaldifst_module().attr("_vector_fst_addr")(src).cast<uint64_t>();
       held_ = reinterpret_cast<fst::VectorFst<fst::StdArc> *>(addr);

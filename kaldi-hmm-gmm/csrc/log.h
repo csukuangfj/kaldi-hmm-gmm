@@ -10,6 +10,22 @@
 // This file is copied/modified from kaldi/src/base/kaldi-error.h
 //
 
+/**
+ * \file log.h
+ * \brief Logging and assertion macros used throughout the library.
+ *
+ * This file is copied/modified from kaldi/src/base/kaldi-error.h.
+ *
+ * It provides the \c Logger stream-style logging class and the macros
+ * \c KHG_LOG (info), \c KHG_WARN (warning) and \c KHG_ERR (error; throws
+ * std::runtime_error when the message is flushed), the assertion macros
+ * \c KHG_ASSERT and \c KHG_PARANOID_ASSERT (the latter active only when
+ * \c KHG_PARANOID is defined), and the convenience macro
+ * \c KHG_DISALLOW_COPY_AND_ASSIGN.  Usage is like kaldi's
+ * \c KALDI_LOG / \c KALDI_WARN / \c KALDI_ERR, e.g.
+ * <tt>KHG_ASSERT(x); KHG_ERR &lt;&lt; "bad value: " &lt;&lt; v;</tt>.
+ */
+
 #ifndef KALDI_HMM_GMM_CSRC_LOG_H_
 #define KALDI_HMM_GMM_CSRC_LOG_H_
 
