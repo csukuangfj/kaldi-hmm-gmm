@@ -1,0 +1,36 @@
+<map id="eigen.h" name="eigen.h">
+<area shape="rect" id="Node000001" title="Eigen typedefs matching kaldi&#39;s Matrix layout, plus small vector math and random helpers." alt="" coords="356,5,425,33"/>
+<area shape="rect" id="Node000002" href="$am-diag-gmm_8h.html" title="Acoustic model of diagonal&#45;covariance GMMs (AmDiagGmm)." alt="" coords="502,308,629,336"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="440,29,484,48,504,62,521,79,539,108,552,140,567,206,571,266,569,309,565,306,566,266,562,206,547,141,534,111,517,83,500,66,481,53,440,35"/>
+<area shape="rect" id="Node000004" href="$mle-am-diag-gmm_8h.html" title="ML/MAP estimation for whole acoustic models of diagonal GMMs." alt="" coords="386,384,542,411"/>
+<area shape="poly" id="edge12_Node000001_Node000004" title=" " alt="" coords="419,41,437,59,449,80,464,123,473,168,479,257,475,333,468,385,464,382,470,333,474,257,468,168,459,124,444,82,432,62,419,46"/>
+<area shape="rect" id="Node000005" href="$clusterable-classes_8h.html" title="Concrete Clusterable classes holding scalar and Gaussian statistics." alt="" coords="254,81,413,109"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="373,43,346,82,342,79,369,47"/>
+<area shape="rect" id="Node000007" href="$diag-gmm_8h.html" title="Diagonal&#45;covariance Gaussian mixture models (DiagGmm) stored in exponential form." alt="" coords="307,232,408,260"/>
+<area shape="poly" id="edge11_Node000001_Node000007" title=" " alt="" coords="409,44,427,80,438,133,436,157,426,186,406,214,381,234,378,230,402,210,422,183,431,156,433,134,422,82,408,49"/>
+<area shape="rect" id="Node000008" href="$mle-diag-gmm_8h.html" title="Maximum&#45;likelihood and MAP estimation for diagonal&#45;covariance GMMs." alt="" coords="142,308,272,336"/>
+<area shape="poly" id="edge13_Node000001_Node000008" title=" " alt="" coords="338,23,258,27,163,37,77,55,45,67,25,83,15,98,9,114,8,130,11,146,28,178,54,210,87,240,122,266,185,306,180,308,119,271,84,244,50,214,23,181,6,147,3,130,4,113,10,96,21,79,43,63,76,49,162,32,257,22,342,20"/>
+<area shape="rect" id="Node000009" href="$diag-gmm-normal_8h.html" title="Normal (mean/variance) representation of diagonal GMMs (DiagGmmNormal)." alt="" coords="127,157,278,184"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="339,33,291,52,267,66,245,83,231,100,220,120,208,157,203,155,215,118,226,97,241,79,264,61,289,47,343,29"/>
+<area shape="rect" id="Node000010" href="$model-common_8h.html" title="GMM update flags and mixture&#45;splitting targets." alt="" coords="35,81,171,109"/>
+<area shape="poly" id="edge14_Node000001_Node000010" title=" " alt="" coords="339,35,156,83,153,78,342,31"/>
+<area shape="rect" id="Node000011" href="$transition-model_8h.html" title="Transition probabilities and integer&#45;id mappings for HMM&#45;GMM models." alt="" coords="632,81,773,109"/>
+<area shape="poly" id="edge18_Node000001_Node000011" title=" " alt="" coords="441,30,649,79,644,81,441,35"/>
+<area shape="rect" id="Node000003" href="$decodable-am-diag-gmm_8h.html" title="Decodable objects for AmDiagGmm acoustic models." alt="" coords="566,384,765,411"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="596,343,650,384,645,383,595,348"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="538,344,483,386,481,381,532,346"/>
+<area shape="rect" id="Node000006" href="$cluster-utils_8h.html" title="K&#45;means&#45;like clustering of Clusterable statistics." alt="" coords="302,157,413,184"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="343,121,356,157,351,156,342,126"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="359,198,360,233,355,231,356,202"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="409,263,531,307,526,308,408,268"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="319,266,235,310,232,305,315,268"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="267,338,421,382,415,384,267,343"/>
+<area shape="poly" id="edge16_Node000010_Node000007" title=" " alt="" coords="99,121,104,155,108,170,117,183,129,192,148,201,197,216,309,238,305,240,196,222,146,206,126,197,113,186,104,172,98,156,99,126"/>
+<area shape="poly" id="edge17_Node000010_Node000008" title=" " alt="" coords="96,121,94,153,99,184,117,222,143,256,193,307,188,308,139,259,113,224,94,185,89,153,94,126"/>
+<area shape="poly" id="edge15_Node000010_Node000009" title=" " alt="" coords="133,115,188,155,183,157,133,121"/>
+<area shape="poly" id="edge19_Node000011_Node000003" title=" " alt="" coords="698,122,693,157,677,289,668,385,664,381,672,288,688,156,695,126"/>
+<area shape="rect" id="Node000012" href="$hmm-utils_8h.html" title="Building FSTs from context&#45;dependent HMMs, and alignment utilities." alt="" coords="703,157,804,184"/>
+<area shape="poly" id="edge20_Node000011_Node000012" title=" " alt="" coords="721,119,747,157,742,156,720,124"/>
+<area shape="rect" id="Node000013" href="$training-graph-compiler_8h.html" title="Compilation of training graphs (per&#45;utterance FSTs labeled with transition&#45;ids)." alt="" coords="828,157,1015,184"/>
+<area shape="poly" id="edge21_Node000011_Node000013" title=" " alt="" coords="756,111,885,156,880,156,756,117"/>
+</map>

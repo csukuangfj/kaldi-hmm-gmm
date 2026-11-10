@@ -1,0 +1,351 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alignment and decoding &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Full reference" href="reference.html" />
+    <link rel="prev" title="Graphs, HMM utilities and trees" href="graph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Python API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="model.html">Models, topology and trees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gmm.html">GMMs and MLE/MAP estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html">Graphs, HMM utilities and trees</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Alignment and decoding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#forced-alignment-kaldi-gmm-align-compiled">Forced alignment (kaldi <code class="docutils literal notranslate"><span class="pre">gmm-align-compiled</span></code>)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.AlignConfig"><code class="docutils literal notranslate"><span class="pre">AlignConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.align_utterance"><code class="docutils literal notranslate"><span class="pre">align_utterance()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#decoding-kaldi-gmm-latgen">Decoding (kaldi <code class="docutils literal notranslate"><span class="pre">gmm-latgen-*</span></code>)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.LatticeFasterDecoderConfig"><code class="docutils literal notranslate"><span class="pre">LatticeFasterDecoderConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.LatticeSimpleDecoderConfig"><code class="docutils literal notranslate"><span class="pre">LatticeSimpleDecoderConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.decode_utterance_lattice_faster"><code class="docutils literal notranslate"><span class="pre">decode_utterance_lattice_faster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.decode_utterance_lattice_simple"><code class="docutils literal notranslate"><span class="pre">decode_utterance_lattice_simple()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.lattice_best_path"><code class="docutils literal notranslate"><span class="pre">lattice_best_path()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#decodables">Decodables</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.DecodableAmDiagGmmScaled"><code class="docutils literal notranslate"><span class="pre">DecodableAmDiagGmmScaled</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.DecodableAmDiagGmmUnmapped"><code class="docutils literal notranslate"><span class="pre">DecodableAmDiagGmmUnmapped</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.DecodableInterface"><code class="docutils literal notranslate"><span class="pre">DecodableInterface</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionInformation"><code class="docutils literal notranslate"><span class="pre">TransitionInformation</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Full reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp-api/index.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Python API</a></li>
+      <li class="breadcrumb-item active">Alignment and decoding</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/python-api/align-decode.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="alignment-and-decoding">
+<h1>Alignment and decoding<a class="headerlink" href="#alignment-and-decoding" title="Link to this heading"></a></h1>
+<section id="forced-alignment-kaldi-gmm-align-compiled">
+<h2>Forced alignment (kaldi <code class="docutils literal notranslate"><span class="pre">gmm-align-compiled</span></code>)<a class="headerlink" href="#forced-alignment-kaldi-gmm-align-compiled" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.AlignConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">AlignConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.AlignConfig" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AlignConfig"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AlignConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_beam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">careful</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kaldi_hmm_gmm.AlignConfig" title="Link to this definition"></a></dt>
+<dd><p>Alignment beam settings (kaldi's <code class="docutils literal notranslate"><span class="pre">gmm-align-compiled</span></code> flags).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.align_utterance">
+<span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">align_utterance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.AlignConfig" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AlignConfig"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AlignConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">utt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acoustic_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transition_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_loop_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="model.html#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">fst::VectorFst&lt;fst::StdArc&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decodable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.DecodableInterface" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableInterface"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableInterface</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_done</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_retried</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tot_like</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.align_utterance" title="Link to this definition"></a></dt>
+<dd><p>Force-align one utterance (kaldi's <code class="docutils literal notranslate"><span class="pre">gmm-align-compiled</span></code> core).</p>
+<p>Adds the transition probabilities to the training graph (<code class="docutils literal notranslate"><span class="pre">AddTransitionProbs</span></code>
+with <code class="docutils literal notranslate"><span class="pre">transition_scale</span></code>/<code class="docutils literal notranslate"><span class="pre">self_loop_scale</span></code>) and runs the Viterbi alignment
+in a single C++ call.  <strong>Mutates</strong> the graph in place (same as kaldi's
+<code class="docutils literal notranslate"><span class="pre">gmm-align-compiled</span></code>); pass a copy to reuse it afterwards.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(num_done,</span> <span class="pre">num_error,</span> <span class="pre">num_retried,</span> <span class="pre">tot_like,</span> <span class="pre">frame_count,</span>
+<span class="pre">alignment,</span> <span class="pre">words)</span></code>: the five counters are INPUTS that get incremented
+(kaldi's accumulating-table semantics) -- omit them to get this utterance's
+contributions only, or thread running totals through a loop.  <code class="docutils literal notranslate"><span class="pre">alignment</span></code>
+is transition-ids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> -- Alignment beams (<a class="reference internal" href="#kaldi_hmm_gmm.AlignConfig" title="kaldi_hmm_gmm.AlignConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AlignConfig</span></code></a>).</p></li>
+<li><p><strong>utt</strong> -- Utterance id (for log messages).</p></li>
+<li><p><strong>acoustic_scale</strong> -- Acoustic scale used in the alignment.</p></li>
+<li><p><strong>transition_scale</strong> -- Transition-probability scale.</p></li>
+<li><p><strong>self_loop_scale</strong> -- Self-loop versus non-self-loop log-prob scale.</p></li>
+<li><p><strong>trans_model</strong> -- Transition model (<a class="reference internal" href="model.html#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.TransitionModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransitionModel</span></code></a>; needed for
+<code class="docutils literal notranslate"><span class="pre">AddTransitionProbs</span></code>).</p></li>
+<li><p><strong>fst</strong> -- Per-utterance training graph; mutated in place.</p></li>
+<li><p><strong>decodable</strong> -- Scores (<a class="reference internal" href="#kaldi_hmm_gmm.DecodableInterface" title="kaldi_hmm_gmm.DecodableInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">DecodableInterface</span></code></a>).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">align_utterance</span></code> adds the transition probabilities to the training graph
+(<code class="docutils literal notranslate"><span class="pre">AddTransitionProbs</span></code>) and runs the Viterbi alignment in a single C++ call.
+It mutates the graph in place (same as kaldi's <code class="docutils literal notranslate"><span class="pre">gmm-align-compiled</span></code>) and
+returns <code class="docutils literal notranslate"><span class="pre">(num_done,</span> <span class="pre">num_error,</span> <span class="pre">num_retried,</span> <span class="pre">tot_like,</span> <span class="pre">frame_count,</span>
+<span class="pre">alignment,</span> <span class="pre">words)</span></code>; <code class="docutils literal notranslate"><span class="pre">alignment</span></code> holds transition-ids.</p>
+<p>Typical use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span> <span class="o">=</span> <span class="n">khg</span><span class="o">.</span><span class="n">AlignConfig</span><span class="p">(</span><span class="n">beam</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">retry_beam</span><span class="o">=</span><span class="mf">40.0</span><span class="p">)</span>
+<span class="n">num_done</span><span class="p">,</span> <span class="n">num_error</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">frames</span><span class="p">,</span> <span class="n">alignment</span><span class="p">,</span> <span class="n">words</span> <span class="o">=</span> <span class="n">khg</span><span class="o">.</span><span class="n">align_utterance</span><span class="p">(</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">utt</span><span class="o">=</span><span class="s2">"utt"</span><span class="p">,</span> <span class="n">acoustic_scale</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">transition_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">self_loop_scale</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">trans_model</span><span class="o">=</span><span class="n">tm</span><span class="p">,</span> <span class="n">fst</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span> <span class="n">decodable</span><span class="o">=</span><span class="n">decodable</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="decoding-kaldi-gmm-latgen">
+<h2>Decoding (kaldi <code class="docutils literal notranslate"><span class="pre">gmm-latgen-*</span></code>)<a class="headerlink" href="#decoding-kaldi-gmm-latgen" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.LatticeFasterDecoderConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">LatticeFasterDecoderConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.LatticeFasterDecoderConfig" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.LatticeFasterDecoderConfig"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.LatticeFasterDecoderConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2147483647</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lattice_beam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">determinize_lattice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hash_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_pool_tokens_block_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_pool_links_block_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kaldi_hmm_gmm.LatticeFasterDecoderConfig" title="Link to this definition"></a></dt>
+<dd><p>Options for the lattice-faster decoder (kaldi's
+<a class="reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/decoder/lattice-faster-decoder.h">LatticeFasterDecoderConfig</a>).
+All fields writable; defaults match kaldi's exactly.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.LatticeSimpleDecoderConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">LatticeSimpleDecoderConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.LatticeSimpleDecoderConfig" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.LatticeSimpleDecoderConfig"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.LatticeSimpleDecoderConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lattice_beam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">determinize_lattice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_lattice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kaldi_hmm_gmm.LatticeSimpleDecoderConfig" title="Link to this definition"></a></dt>
+<dd><p>Options for the lattice-simple decoder (kaldi's
+<a class="reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/decoder/lattice-simple-decoder.h">LatticeSimpleDecoderConfig</a>).
+All fields writable; defaults match kaldi's.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.decode_utterance_lattice_faster">
+<span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">decode_utterance_lattice_faster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.LatticeFasterDecoderConfig" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.LatticeFasterDecoderConfig"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.LatticeFasterDecoderConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">fst::VectorFst&lt;fst::StdArc&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decodable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.DecodableInterface" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableInterface"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableInterface</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionInformation" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionInformation"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionInformation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">utt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_partial</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acoustic_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple[bool,</span> <span class="pre">list[int],</span> <span class="pre">list[int],</span> <span class="pre">float,</span> <span class="pre">fst::VectorFst&lt;fst::ArcTpl&lt;fst::LatticeWeightTpl&lt;float&gt;,</span> <span class="pre">int,</span> <span class="pre">int&gt;,</span> <span class="pre">fst::VectorState&lt;fst::ArcTpl&lt;fst::LatticeWeightTpl&lt;float&gt;,</span> <span class="pre">int,</span> <span class="pre">int&gt;,</span> <span class="pre">std::allocator&lt;fst::ArcTpl&lt;fst::LatticeWeightTpl&lt;float&gt;,</span> <span class="pre">int,</span> <span class="pre">int&gt;</span> <span class="pre">&gt;</span> <span class="pre">&gt;</span> <span class="pre">&gt;]</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.decode_utterance_lattice_faster" title="Link to this definition"></a></dt>
+<dd><p>Decode one utterance with the lattice-faster decoder (kaldi's
+<code class="docutils literal notranslate"><span class="pre">gmm-latgen-faster</span></code> output block).  The decoder is constructed inside this
+call; the graph <code class="docutils literal notranslate"><span class="pre">fst</span></code> is only borrowed for its duration.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(ok,</span> <span class="pre">alignment,</span> <span class="pre">words,</span> <span class="pre">like,</span> <span class="pre">lat)</span></code>; <code class="docutils literal notranslate"><span class="pre">lat</span></code> is the lattice exactly
+as kaldi writes it (acoustic costs divided by <code class="docutils literal notranslate"><span class="pre">acoustic_scale</span></code>) -- feed it
+to <a class="reference internal" href="#kaldi_hmm_gmm.lattice_best_path" title="kaldi_hmm_gmm.lattice_best_path"><code class="xref py py-func docutils literal notranslate"><span class="pre">lattice_best_path()</span></code></a> for lmwt/wip scoring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> -- Decoder options (<a class="reference internal" href="#kaldi_hmm_gmm.LatticeFasterDecoderConfig" title="kaldi_hmm_gmm.LatticeFasterDecoderConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">LatticeFasterDecoderConfig</span></code></a>).</p></li>
+<li><p><strong>fst</strong> -- Decoding graph (e.g. HCLG); borrowed, not mutated.</p></li>
+<li><p><strong>decodable</strong> -- Scores (<a class="reference internal" href="#kaldi_hmm_gmm.DecodableInterface" title="kaldi_hmm_gmm.DecodableInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">DecodableInterface</span></code></a>).</p></li>
+<li><p><strong>trans_model</strong> -- Transition information (any
+<a class="reference internal" href="#kaldi_hmm_gmm.TransitionInformation" title="kaldi_hmm_gmm.TransitionInformation"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransitionInformation</span></code></a>, e.g. <a class="reference internal" href="model.html#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.TransitionModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransitionModel</span></code></a>).</p></li>
+<li><p><strong>utt</strong> -- Utterance id (for log messages).</p></li>
+<li><p><strong>allow_partial</strong> -- Output partial results if no final state was reached.</p></li>
+<li><p><strong>acoustic_scale</strong> -- Acoustic scale used in the decode.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.decode_utterance_lattice_simple">
+<span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">decode_utterance_lattice_simple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.LatticeSimpleDecoderConfig" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.LatticeSimpleDecoderConfig"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.LatticeSimpleDecoderConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">fst::VectorFst&lt;fst::StdArc&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decodable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.DecodableInterface" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableInterface"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableInterface</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionInformation" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionInformation"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionInformation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">utt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_partial</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acoustic_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple[bool,</span> <span class="pre">list[int],</span> <span class="pre">list[int],</span> <span class="pre">float,</span> <span class="pre">fst::VectorFst&lt;fst::ArcTpl&lt;fst::LatticeWeightTpl&lt;float&gt;,</span> <span class="pre">int,</span> <span class="pre">int&gt;,</span> <span class="pre">fst::VectorState&lt;fst::ArcTpl&lt;fst::LatticeWeightTpl&lt;float&gt;,</span> <span class="pre">int,</span> <span class="pre">int&gt;,</span> <span class="pre">std::allocator&lt;fst::ArcTpl&lt;fst::LatticeWeightTpl&lt;float&gt;,</span> <span class="pre">int,</span> <span class="pre">int&gt;</span> <span class="pre">&gt;</span> <span class="pre">&gt;</span> <span class="pre">&gt;]</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.decode_utterance_lattice_simple" title="Link to this definition"></a></dt>
+<dd><p>Decode one utterance with the lattice-simple decoder (kaldi's
+<code class="docutils literal notranslate"><span class="pre">gmm-latgen-simple</span></code> output block).  The decoder is constructed inside this
+call; the graph <code class="docutils literal notranslate"><span class="pre">fst</span></code> is only borrowed for its duration.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(ok,</span> <span class="pre">alignment,</span> <span class="pre">words,</span> <span class="pre">like,</span> <span class="pre">lat)</span></code>; <code class="docutils literal notranslate"><span class="pre">lat</span></code> is the lattice exactly
+as kaldi writes it (acoustic costs divided by <code class="docutils literal notranslate"><span class="pre">acoustic_scale</span></code>) -- feed it
+to <a class="reference internal" href="#kaldi_hmm_gmm.lattice_best_path" title="kaldi_hmm_gmm.lattice_best_path"><code class="xref py py-func docutils literal notranslate"><span class="pre">lattice_best_path()</span></code></a> for lmwt/wip scoring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> -- Decoder options (<a class="reference internal" href="#kaldi_hmm_gmm.LatticeSimpleDecoderConfig" title="kaldi_hmm_gmm.LatticeSimpleDecoderConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">LatticeSimpleDecoderConfig</span></code></a>).</p></li>
+<li><p><strong>fst</strong> -- Decoding graph (e.g. HCLG); borrowed, not mutated.</p></li>
+<li><p><strong>decodable</strong> -- Scores (<a class="reference internal" href="#kaldi_hmm_gmm.DecodableInterface" title="kaldi_hmm_gmm.DecodableInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">DecodableInterface</span></code></a>).</p></li>
+<li><p><strong>trans_model</strong> -- Transition information (any
+<a class="reference internal" href="#kaldi_hmm_gmm.TransitionInformation" title="kaldi_hmm_gmm.TransitionInformation"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransitionInformation</span></code></a>, e.g. <a class="reference internal" href="model.html#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.TransitionModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransitionModel</span></code></a>).</p></li>
+<li><p><strong>utt</strong> -- Utterance id (for log messages).</p></li>
+<li><p><strong>allow_partial</strong> -- Output partial results if no final state was reached.</p></li>
+<li><p><strong>acoustic_scale</strong> -- Acoustic scale used in the decode.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.lattice_best_path">
+<span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">lattice_best_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">fst::VectorFst&lt;fst::ArcTpl&lt;fst::LatticeWeightTpl&lt;float&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">:VectorState&lt;fst::ArcTpl&lt;fst::LatticeWeightTpl&lt;float&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">:allocator&lt;fst::ArcTpl&lt;fst::LatticeWeightTpl&lt;float&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int&gt;</span> <span class="pre">&gt;</span> <span class="pre">&gt;</span> <span class="pre">&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lm_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acoustic_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.lattice_best_path" title="Link to this definition"></a></dt>
+<dd><p>1-best of a lattice under lm/acoustic scaling (kaldi's
+<a class="reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/latbin/lattice-best-path.cc">lattice-best-path</a>).</p>
+<p>Minimizes <code class="docutils literal notranslate"><span class="pre">lm_scale</span> <span class="pre">*</span> <span class="pre">graph_cost</span> <span class="pre">+</span> <span class="pre">acoustic_scale</span> <span class="pre">*</span> <span class="pre">acoustic_cost</span></code>.
+On the lattices returned by <a class="reference internal" href="#kaldi_hmm_gmm.decode_utterance_lattice_faster" title="kaldi_hmm_gmm.decode_utterance_lattice_faster"><code class="xref py py-func docutils literal notranslate"><span class="pre">decode_utterance_lattice_faster()</span></code></a> (acoustic
+costs already divided by the decode acoustic scale), use
+<code class="docutils literal notranslate"><span class="pre">acoustic_scale=1.0</span></code> and sweep <code class="docutils literal notranslate"><span class="pre">lm_scale</span></code> for lmwt scoring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> -- Input lattice (<code class="docutils literal notranslate"><span class="pre">kaldifst.Lattice</span></code>).</p></li>
+<li><p><strong>lm_scale</strong> -- Weight of the graph cost (kaldi <code class="docutils literal notranslate"><span class="pre">--lm-scale</span></code>).</p></li>
+<li><p><strong>acoustic_scale</strong> -- Weight of the acoustic cost
+(kaldi <code class="docutils literal notranslate"><span class="pre">--acoustic-scale</span></code>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(ok,</span> <span class="pre">alignment,</span> <span class="pre">words,</span> <span class="pre">like)</span></code>; <code class="docutils literal notranslate"><span class="pre">ok</span></code> is False when the
+lattice has no complete path (outputs empty).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">decode_utterance_*</span></code> returns <code class="docutils literal notranslate"><span class="pre">(ok,</span> <span class="pre">alignment,</span> <span class="pre">words,</span> <span class="pre">like,</span> <span class="pre">lat)</span></code> where
+<code class="docutils literal notranslate"><span class="pre">lat</span></code> is the lattice exactly as kaldi writes it (acoustic costs divided by
+the acoustic scale); feed it to <code class="docutils literal notranslate"><span class="pre">lattice_best_path</span></code> for 1-best under
+lm/acoustic scaling (kaldi's <code class="docutils literal notranslate"><span class="pre">lattice-best-path</span></code>).</p>
+</section>
+<section id="decodables">
+<h2>Decodables<a class="headerlink" href="#decodables" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.DecodableAmDiagGmmScaled">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">DecodableAmDiagGmmScaled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.DecodableAmDiagGmmScaled" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableAmDiagGmmScaled"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableAmDiagGmmScaled</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">am</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="gmm.html#kaldi_hmm_gmm.AmDiagGmm" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AmDiagGmm"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AmDiagGmm</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="model.html#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.ArrayLike</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.float32</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">n]'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_sum_exp_prune</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kaldi_hmm_gmm.DecodableAmDiagGmmScaled" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.DecodableAmDiagGmmUnmapped">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">DecodableAmDiagGmmUnmapped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.DecodableAmDiagGmmUnmapped" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableAmDiagGmmUnmapped"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableAmDiagGmmUnmapped</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">am</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="gmm.html#kaldi_hmm_gmm.AmDiagGmm" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AmDiagGmm"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AmDiagGmm</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.ArrayLike</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.float32</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">n]'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_sum_exp_prune</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kaldi_hmm_gmm.DecodableAmDiagGmmUnmapped" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.DecodableInterface">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">DecodableInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.DecodableInterface" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableInterface"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.DecodableInterface</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kaldi_hmm_gmm.DecodableInterface" title="Link to this definition"></a></dt>
+<dd><p>Scoring interface every decoder consumes.</p>
+<p>This is kaldi's <a class="reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/itf/decodable-itf.h">DecodableInterface</a>.
+It answers one question: <em>how likely is transition-id ``index`` at frame
+``frame``?</em>  Implement it in Python to plug any acoustic model into
+kaldi_hmm_gmm's alignment/decoding functions (a pybind11 trampoline keeps
+virtual dispatch on the Python side).</p>
+<p>Indices are <strong>one-based</strong> (openfst convention, 0 is epsilon).</p>
+<p><strong>Lifetime:</strong> decoders borrow the decodable without owning it -- keep the
+Python object alive for the whole decode.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#kaldi_hmm_gmm.DecodableAmDiagGmmScaled" title="kaldi_hmm_gmm.DecodableAmDiagGmmScaled"><code class="xref py py-class docutils literal notranslate"><span class="pre">DecodableAmDiagGmmScaled</span></code></a>
+The GMM-backed implementation for kaldi-format acoustic models.</p>
+</div>
+<p>Construct a decodable; implement the four methods below.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionInformation">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">TransitionInformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionInformation" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionInformation"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionInformation</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionInformation" title="Link to this definition"></a></dt>
+<dd><p>Transition-model interface used by the alignment/decoding
+functions.</p>
+<p>kaldi's <a class="reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/itf/transition-information.h">TransitionInformation</a>:
+provides the tid-&gt;pdf map and per-transition-id queries.  Implement it in
+Python to use <a class="reference internal" href="#kaldi_hmm_gmm.decode_utterance_lattice_faster" title="kaldi_hmm_gmm.decode_utterance_lattice_faster"><code class="xref py py-func docutils literal notranslate"><span class="pre">decode_utterance_lattice_faster()</span></code></a> /
+<a class="reference internal" href="#kaldi_hmm_gmm.decode_utterance_lattice_simple" title="kaldi_hmm_gmm.decode_utterance_lattice_simple"><code class="xref py py-func docutils literal notranslate"><span class="pre">decode_utterance_lattice_simple()</span></code></a> with an alternative transition model;
+<a class="reference internal" href="model.html#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.TransitionModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransitionModel</span></code></a> implements the same interface in C++ (and is what
+<a class="reference internal" href="#kaldi_hmm_gmm.align_utterance" title="kaldi_hmm_gmm.align_utterance"><code class="xref py py-func docutils literal notranslate"><span class="pre">align_utterance()</span></code></a> requires, for <code class="docutils literal notranslate"><span class="pre">AddTransitionProbs</span></code>).</p>
+<p><strong>Note:</strong> <code class="xref py py-meth docutils literal notranslate"><span class="pre">transition_id_to_pdf_array()</span></code> must return the whole map on
+every call (the trampoline caches it; that cached reference is what
+decodables keep).</p>
+<p>Implement the pure virtual methods in a subclass.</p>
+</dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">DecodableInterface</span></code> and <code class="docutils literal notranslate"><span class="pre">TransitionInformation</span></code> accept Python
+subclasses (a pybind11 trampoline keeps virtual dispatch on the Python
+side), so custom acoustic scorers or transition models can be plugged into
+the alignment/decoding functions.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="graph.html" class="btn btn-neutral float-left" title="Graphs, HMM utilities and trees" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reference.html" class="btn btn-neutral float-right" title="Full reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

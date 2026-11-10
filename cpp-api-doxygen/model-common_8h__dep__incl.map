@@ -1,0 +1,17 @@
+<map id="model&#45;common.h" name="model&#45;common.h">
+<area shape="rect" id="Node000001" title="GMM update flags and mixture&#45;splitting targets." alt="" coords="162,5,298,33"/>
+<area shape="rect" id="Node000002" href="$diag-gmm-normal_8h.html" title="Normal (mean/variance) representation of diagonal GMMs (DiagGmmNormal)." alt="" coords="5,81,157,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,42,109,83,106,78,191,38"/>
+<area shape="rect" id="Node000003" href="$diag-gmm_8h.html" title="Diagonal&#45;covariance Gaussian mixture models (DiagGmm) stored in exponential form." alt="" coords="180,81,280,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="232,46,233,82,228,80,229,51"/>
+<area shape="rect" id="Node000007" href="$mle-diag-gmm_8h.html" title="Maximum&#45;likelihood and MAP estimation for diagonal&#45;covariance GMMs." alt="" coords="253,157,384,184"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="260,41,280,59,295,80,312,120,319,157,314,155,307,122,291,82,276,62,260,46"/>
+<area shape="rect" id="Node000004" href="$am-diag-gmm_8h.html" title="Acoustic model of diagonal&#45;covariance GMMs (AmDiagGmm)." alt="" coords="103,157,230,184"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="211,119,179,158,176,154,207,122"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="258,116,305,156,300,156,257,121"/>
+<area shape="rect" id="Node000005" href="$decodable-am-diag-gmm_8h.html" title="Decodable objects for AmDiagGmm acoustic models." alt="" coords="18,232,216,260"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="151,196,128,234,124,230,147,199"/>
+<area shape="rect" id="Node000006" href="$mle-am-diag-gmm_8h.html" title="ML/MAP estimation for whole acoustic models of diagonal GMMs." alt="" coords="240,232,396,260"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="208,189,294,231,289,232,206,194"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="320,198,320,233,316,230,316,202"/>
+</map>

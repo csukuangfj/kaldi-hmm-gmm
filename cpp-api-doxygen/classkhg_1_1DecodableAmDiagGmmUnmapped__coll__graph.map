@@ -1,0 +1,7 @@
+<map id="khg::DecodableAmDiagGmmUnmapped" name="khg::DecodableAmDiagGmmUnmapped">
+<area shape="rect" id="Node000001" title="DecodableAmDiagGmmUnmapped is a decodable object that takes indices that correspond to pdf&#45;id&#39;s plus ..." alt="" coords="54,123,335,151"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,194,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,60,185,122,180,123,128,64"/>
+<area shape="rect" id="Node000003" href="$classkhg_1_1AmDiagGmm.html" title="Acoustic model: a collection of diagonal&#45;covariance GMMs, one per pdf, indexed by pdf&#45;id." alt="" coords="218,14,360,42"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="270,53,208,124,204,120,265,54"/>
+</map>

@@ -1,0 +1,160 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python API &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Models, topology and trees" href="model.html" />
+    <link rel="prev" title="MFA alignment — Mandarin" href="../usage/mfa-mandarin.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Python API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.html">Models, topology and trees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gmm.html">GMMs and MLE/MAP estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html">Graphs, HMM utilities and trees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="align-decode.html">Alignment and decoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Full reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp-api/index.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Python API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/python-api/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="python-api">
+<h1>Python API<a class="headerlink" href="#python-api" title="Link to this heading"></a></h1>
+<p>The Python package <code class="docutils literal notranslate"><span class="pre">kaldi_hmm_gmm</span></code> exposes the C++ API through pybind11
+bindings.  It is self-contained: the decoding engine is compiled in, so no
+other kaldi packages need to be installed at runtime.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Models, topology and trees</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.html#reading-and-writing-kaldi-format-models">Reading and writing kaldi-format models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#transition-model">Transition model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#hmm-topology">HMM topology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#tree-rendering">Tree rendering</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gmm.html">GMMs and MLE/MAP estimation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gmm.html#diagonal-covariance-gmm">Diagonal-covariance GMM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gmm.html#acoustic-model-collection-of-pdfs">Acoustic model (collection of pdfs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gmm.html#accumulators-and-updates">Accumulators and updates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gmm.html#update-flags">Update flags</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">Graphs, HMM utilities and trees</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="graph.html#training-graph-compiler">Training-graph compiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html#hmm-utilities-kaldi-hmm-utils-h">HMM utilities (kaldi <code class="docutils literal notranslate"><span class="pre">hmm-utils.h</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html#decision-trees-context-dependency">Decision trees / context dependency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html#event-maps">Event maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html#clusterable-objects-used-by-tree-building">Clusterable objects (used by tree building)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="align-decode.html">Alignment and decoding</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="align-decode.html#forced-alignment-kaldi-gmm-align-compiled">Forced alignment (kaldi <code class="docutils literal notranslate"><span class="pre">gmm-align-compiled</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="align-decode.html#decoding-kaldi-gmm-latgen">Decoding (kaldi <code class="docutils literal notranslate"><span class="pre">gmm-latgen-*</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="align-decode.html#decodables">Decodables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Full reference</a></li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../usage/mfa-mandarin.html" class="btn btn-neutral float-left" title="MFA alignment — Mandarin" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="model.html" class="btn btn-neutral float-right" title="Models, topology and trees" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

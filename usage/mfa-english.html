@@ -1,0 +1,204 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MFA alignment — English &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MFA alignment — Mandarin" href="mfa-mandarin.html" />
+    <link rel="prev" title="MFA-style forced alignment" href="mfa.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="setup.html">Environment setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yesno.html">The yesno recipe — train a monophone GMM</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="mfa.html">MFA-style forced alignment</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">MFA alignment — English</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#test-audio">Test audio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#step-1-download-the-acoustic-model-and-the-dictionary">Step 1: download the acoustic model and the dictionary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#step-2-run-the-alignment">Step 2: run the alignment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#expected-output">Expected output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#step-3-inspect-the-result">Step 3: inspect the result</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mfa-mandarin.html">MFA alignment — Mandarin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mfa.html#what-a-model-directory-contains">What a model directory contains</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mfa.html#command-line-options">Command-line options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mfa.html#the-textgrid-output">The TextGrid output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mfa.html#how-it-works">How it works</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../python-api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp-api/index.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Usage</a></li>
+          <li class="breadcrumb-item"><a href="mfa.html">MFA-style forced alignment</a></li>
+      <li class="breadcrumb-item active">MFA alignment — English</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/mfa-english.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mfa-alignment-english">
+<h1>MFA alignment — English<a class="headerlink" href="#mfa-alignment-english" title="Link to this heading"></a></h1>
+<p>A complete, copy-paste runnable English example.  See <a class="reference internal" href="mfa.html"><span class="doc">MFA-style forced alignment</span></a> for how
+the pipeline works and <a class="reference internal" href="setup.html"><span class="doc">Environment setup</span></a> for installing the dependencies.</p>
+<section id="test-audio">
+<h2>Test audio<a class="headerlink" href="#test-audio" title="Link to this heading"></a></h2>
+<audio controls src="https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav">
+  Your browser does not support the audio element.
+</audio><p>Download it with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>file: <code class="docutils literal notranslate"><span class="pre">en.wav</span></code> (mono, 16-bit PCM, <strong>24 kHz</strong>, 3.85 s)</p></li>
+<li><p>transcript: <em>Ask not what your country can do for you, ask what you can
+do for your country.</em></p></li>
+</ul>
+</section>
+<section id="step-1-download-the-acoustic-model-and-the-dictionary">
+<h2>Step 1: download the acoustic model and the dictionary<a class="headerlink" href="#step-1-download-the-acoustic-model-and-the-dictionary" title="Link to this heading"></a></h2>
+<p>The <a class="reference external" href="https://github.com/MontrealCorpusTools/mfa-models/releases/tag/acoustic-english_mfa-v3.1.0">english_mfa</a>
+model (MFA v3.1.0), the matching
+<a class="reference external" href="https://github.com/MontrealCorpusTools/mfa-models/releases/tag/dictionary-english_mfa-v3.1.0">english_mfa dictionary</a>,
+and the test audio:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>english<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>english
+wget<span class="w"> </span>https://github.com/MontrealCorpusTools/mfa-models/releases/download/acoustic-english_mfa-v3.1.0/english_mfa.zip
+unzip<span class="w"> </span>english_mfa.zip<span class="w">        </span><span class="c1"># -&gt; english_mfa/ (final.alimdl, final.mdl, tree,</span>
+<span class="w">                             </span><span class="c1">#    lda.mat, meta.json, phones.txt, ...)</span>
+wget<span class="w"> </span>https://github.com/MontrealCorpusTools/mfa-models/releases/download/dictionary-english_mfa-v3.1.0/english_mfa.dict
+wget<span class="w"> </span>https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav
+<span class="nb">cd</span><span class="w"> </span>..
+</pre></div>
+</div>
+</section>
+<section id="step-2-run-the-alignment">
+<h2>Step 2: run the alignment<a class="headerlink" href="#step-2-run-the-alignment" title="Link to this heading"></a></h2>
+<p>From the repository root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tools/align_mfa.py<span class="w"> </span>--wav<span class="w"> </span>english/en.wav<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--text<span class="w"> </span><span class="s2">"Ask not what your country can do for you, ask what you can do for your country."</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model-dir<span class="w"> </span>english/english_mfa<span class="w"> </span>--dict<span class="w"> </span>english/english_mfa.dict<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--phones-txt<span class="w"> </span>english/english_mfa/phones.txt<span class="w"> </span>--out<span class="w"> </span>english/en.TextGrid
+</pre></div>
+</div>
+</section>
+<section id="expected-output">
+<h2>Expected output<a class="headerlink" href="#expected-output" title="Link to this heading"></a></h2>
+<p>Measured on an Apple M-series laptop (the timing line shows the audio
+duration, the wall-clock time of the pipeline — features + graph +
+alignment + TextGrid, <strong>excluding one-time initialization</strong> such as
+model/dictionary loading — and the real-time factor, lower is faster):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>OK: english/en.TextGrid  frames=385 dur=3.85s phones=54 words=17
+timing: audio duration 3.85s, elapsed 0.60s, RTF 0.156
+</pre></div>
+</div>
+<p>The wav is 24 kHz while the model expects 16 kHz; the tool resamples
+automatically (librosa, MFA's <code class="docutils literal notranslate"><span class="pre">allow_downsample</span></code> semantics).</p>
+</section>
+<section id="step-3-inspect-the-result">
+<h2>Step 3: inspect the result<a class="headerlink" href="#step-3-inspect-the-result" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">english/en.TextGrid</span></code> has two tiers (phones and words).  Open it in
+<a class="reference external" href="https://praat.org/">Praat</a> together with <code class="docutils literal notranslate"><span class="pre">english/en.wav</span></code> to inspect
+the alignment; the word tier contains the 17 words of the transcript:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ask  not  what  your  country  can  do  for  you  ask
+what  you  can  do  for  your  country
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mfa.html" class="btn btn-neutral float-left" title="MFA-style forced alignment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mfa-mandarin.html" class="btn btn-neutral float-right" title="MFA alignment — Mandarin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

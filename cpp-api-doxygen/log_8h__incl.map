@@ -1,0 +1,11 @@
+<map id="log.h" name="log.h">
+<area shape="rect" id="Node000001" title="Logging and assertion macros used throughout the library." alt="" coords="158,5,211,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,71,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,36,79,76,76,71,157,31"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="94,81,174,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="178,32,154,70,150,66,173,35"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="198,81,272,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="195,31,220,68,215,67,193,36"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="297,81,382,109"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="213,31,301,74,295,74,211,36"/>
+</map>

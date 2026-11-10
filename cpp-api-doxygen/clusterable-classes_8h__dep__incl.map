@@ -1,0 +1,16 @@
+<map id="clusterable&#45;classes.h" name="clusterable&#45;classes.h">
+<area shape="rect" id="Node000001" title="Concrete Clusterable classes holding scalar and Gaussian statistics." alt="" coords="151,5,309,33"/>
+<area shape="rect" id="Node000002" href="$cluster-utils_8h.html" title="K&#45;means&#45;like clustering of Clusterable statistics." alt="" coords="175,81,285,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,46,232,81,227,80,229,51"/>
+<area shape="rect" id="Node000003" href="$diag-gmm_8h.html" title="Diagonal&#45;covariance Gaussian mixture models (DiagGmm) stored in exponential form." alt="" coords="180,157,280,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="231,122,232,157,227,155,229,127"/>
+<area shape="rect" id="Node000004" href="$am-diag-gmm_8h.html" title="Acoustic model of diagonal&#45;covariance GMMs (AmDiagGmm)." alt="" coords="91,232,217,260"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="208,194,169,234,166,230,203,197"/>
+<area shape="rect" id="Node000007" href="$mle-diag-gmm_8h.html" title="Maximum&#45;likelihood and MAP estimation for diagonal&#45;covariance GMMs." alt="" coords="241,232,371,260"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="255,193,295,232,290,232,253,198"/>
+<area shape="rect" id="Node000005" href="$decodable-am-diag-gmm_8h.html" title="Decodable objects for AmDiagGmm acoustic models." alt="" coords="5,308,204,336"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="139,272,115,309,111,306,134,274"/>
+<area shape="rect" id="Node000006" href="$mle-am-diag-gmm_8h.html" title="ML/MAP estimation for whole acoustic models of diagonal GMMs." alt="" coords="228,308,384,336"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="195,264,282,307,276,308,194,270"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="308,274,308,309,304,306,304,278"/>
+</map>

@@ -1,0 +1,54 @@
+<map id="build&#45;tree&#45;utils.h" name="build&#45;tree&#45;utils.h">
+<area shape="rect" id="Node000001" title="Helpers for building decision trees from statistics." alt="" coords="619,5,748,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="773,368,836,395"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="694,31,724,69,760,125,795,192,808,229,818,266,820,312,814,354,810,350,815,311,813,267,803,230,790,194,755,127,720,72,693,36"/>
+<area shape="rect" id="Node000003" href="$event-map_8h.html" title="Generic mapping from integer events to integer answers (decision trees)." alt="" coords="443,81,603,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="655,35,581,76,578,71,660,32"/>
+<area shape="poly" id="edge10_Node000003_Node000002" title=" " alt="" coords="603,108,641,116,679,129,715,147,746,172,763,192,776,215,794,264,804,312,807,354,802,351,798,313,789,266,772,217,759,195,743,176,712,151,677,134,640,121,604,114"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="839,452,904,479"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="603,106,648,113,694,125,740,144,780,172,806,201,827,234,844,271,856,308,869,380,873,438,869,434,864,381,850,310,839,273,823,237,802,204,776,176,737,149,693,130,647,118,604,111"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="34,275,92,302"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="440,106,342,112,230,123,178,132,132,143,95,158,71,175,60,194,55,216,58,260,53,260,50,216,55,192,67,172,92,153,130,138,177,126,229,118,341,107,445,104"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="81,182,131,210"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="440,113,301,135,222,153,144,176,142,177,138,173,142,171,220,147,300,130,445,110"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="155,182,214,210"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="441,119,339,143,227,176,223,178,220,173,225,171,338,138,445,116"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="238,182,361,210"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="467,128,347,178,344,174,472,125"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="385,182,499,210"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="506,124,466,172,462,168,502,128"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="75,368,134,395"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="440,107,338,114,222,125,117,145,77,159,49,176,22,206,10,237,11,271,24,310,43,336,69,358,64,360,39,340,20,312,6,272,5,236,18,203,45,172,75,154,116,140,221,120,338,108,445,105"/>
+<area shape="rect" id="Node000011" href="$const-integer-set_8h.html" title="Immutable integer set with fast membership tests." alt="" coords="523,174,683,218"/>
+<area shape="poly" id="edge11_Node000003_Node000011" title=" " alt="" coords="543,123,577,162,572,162,542,129"/>
+<area shape="rect" id="Node000015" href="$stl-utils_8h.html" title="Small generic STL container utilities ported from kaldi/src/util/stl&#45;utils.h." alt="" coords="523,266,683,311"/>
+<area shape="poly" id="edge30_Node000003_Node000015" title=" " alt="" coords="604,114,656,135,679,151,698,172,705,195,698,220,682,242,662,260,659,255,678,238,693,217,700,196,693,175,675,155,653,140,604,119"/>
+<area shape="rect" id="Node000018" href="$log_8h.html" title="Logging and assertion macros used throughout the library." alt="" coords="588,359,749,404"/>
+<area shape="poly" id="edge29_Node000003_Node000018" title=" " alt="" coords="603,109,636,117,668,130,697,148,720,172,731,193,736,216,736,240,731,264,715,309,694,348,690,344,710,307,726,262,730,239,731,217,726,195,716,175,693,152,665,134,634,122,604,114"/>
+<area shape="poly" id="edge16_Node000011_Node000002" title=" " alt="" coords="635,216,697,264,746,311,786,357,781,355,742,315,693,268,634,221"/>
+<area shape="poly" id="edge14_Node000011_Node000005" title=" " alt="" coords="520,217,512,221,400,235,312,240,225,247,116,269,108,271,104,267,115,264,225,242,312,234,400,230,511,216,525,215"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="181,368,265,395"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="520,217,512,221,431,226,326,228,273,231,226,238,187,250,161,268,155,278,153,289,160,312,176,335,197,357,192,357,172,338,155,314,148,289,150,276,157,265,185,245,225,233,273,226,325,223,431,221,511,216,525,215"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="172,275,240,302"/>
+<area shape="poly" id="edge13_Node000011_Node000013" title=" " alt="" coords="520,217,512,221,439,234,381,241,324,250,253,269,247,271,245,266,252,264,323,245,380,235,438,228,511,216,525,215"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="264,275,305,302"/>
+<area shape="poly" id="edge15_Node000011_Node000014" title=" " alt="" coords="520,218,319,269,318,269,315,265,317,264,525,215"/>
+<area shape="poly" id="edge17_Node000011_Node000015" title=" " alt="" coords="605,217,605,252,601,250,602,221"/>
+<area shape="rect" id="Node000022" href="$const-integer-set-inl_8h.html" title="Inline/templated implementations of ConstIntegerSet." alt="" coords="329,266,499,311"/>
+<area shape="poly" id="edge28_Node000011_Node000022" title=" " alt="" coords="560,218,474,262,472,257,555,220"/>
+<area shape="poly" id="edge22_Node000015_Node000002" title=" " alt="" coords="654,309,762,357,767,361,762,360,759,361,653,314"/>
+<area shape="poly" id="edge21_Node000015_Node000010" title=" " alt="" coords="520,310,512,314,415,328,340,335,264,343,169,362,150,367,148,362,168,356,264,338,339,330,415,323,511,308,525,308"/>
+<area shape="poly" id="edge18_Node000015_Node000012" title=" " alt="" coords="520,311,281,369,280,364,525,308"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="378,368,450,395"/>
+<area shape="poly" id="edge19_Node000015_Node000016" title=" " alt="" coords="560,311,456,363,454,358,555,312"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="474,368,565,395"/>
+<area shape="poly" id="edge20_Node000015_Node000017" title=" " alt="" coords="586,310,543,358,540,354,581,313"/>
+<area shape="poly" id="edge23_Node000015_Node000018" title=" " alt="" coords="620,309,647,347,642,346,618,314"/>
+<area shape="poly" id="edge24_Node000018_Node000004" title=" " alt="" coords="723,402,827,446,822,445,722,407"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="736,452,815,479"/>
+<area shape="poly" id="edge25_Node000018_Node000019" title=" " alt="" coords="697,402,749,443,743,441,696,407"/>
+<area shape="rect" id="Node000020" title=" " alt="" coords="527,452,602,479"/>
+<area shape="poly" id="edge26_Node000018_Node000020" title=" " alt="" coords="644,403,594,444,592,439,639,405"/>
+<area shape="rect" id="Node000021" title=" " alt="" coords="626,452,711,479"/>
+<area shape="poly" id="edge27_Node000018_Node000021" title=" " alt="" coords="670,402,671,438,667,434,667,406"/>
+</map>

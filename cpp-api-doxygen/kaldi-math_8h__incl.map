@@ -1,0 +1,17 @@
+<map id="kaldi&#45;math.h" name="kaldi&#45;math.h">
+<area shape="rect" id="Node000001" title="Small math helpers ported from kaldi/src/base/kaldi&#45;math.h." alt="" coords="69,5,172,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,90,68,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,36,62,81,58,77,108,31"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="91,90,150,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="122,31,123,75,118,73,119,36"/>
+<area shape="rect" id="Node000004" href="$log_8h.html" title="Logging and assertion macros used throughout the library." alt="" coords="174,81,334,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="142,31,208,72,203,74,142,36"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="74,174,140,201"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="218,126,145,168,143,163,212,127"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="164,174,243,201"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="243,125,221,162,218,158,238,127"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="267,174,342,201"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="268,124,291,161,286,160,266,128"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="366,174,451,201"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="296,124,373,166,368,166,294,129"/>
+</map>

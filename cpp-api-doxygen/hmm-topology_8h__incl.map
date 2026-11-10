@@ -1,0 +1,13 @@
+<map id="hmm&#45;topology.h" name="hmm&#45;topology.h">
+<area shape="rect" id="Node000001" title="Per&#45;phone HMM topology: states, pdf&#45;classes, transitions and final probabilities." alt="" coords="164,5,291,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,71,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,36,86,78,84,73,193,31"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="95,81,168,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="213,33,162,74,159,69,208,34"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="192,81,263,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="229,32,230,67,225,64,225,35"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="287,81,346,109"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="244,31,292,71,286,71,242,36"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="371,81,433,109"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="259,31,360,74,355,75,258,36"/>
+</map>

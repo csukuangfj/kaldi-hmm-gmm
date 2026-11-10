@@ -1,0 +1,5 @@
+<map id="khg::ConstantEventMap" name="khg::ConstantEventMap">
+<area shape="rect" id="Node000001" title="A leaf of an EventMap: returns a constant answer for any event." alt="" coords="5,81,182,109"/>
+<area shape="rect" id="Node000002" href="$classkhg_1_1EventMap.html" title="A class that is capable of representing a generic mapping from EventType (which is a vector of (key,..." alt="" coords="34,5,153,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,47,96,82,91,80,92,51"/>
+</map>

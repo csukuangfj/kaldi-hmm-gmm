@@ -1,0 +1,28 @@
+<map id="cluster&#45;utils.h" name="cluster&#45;utils.h">
+<area shape="rect" id="Node000001" title="K&#45;means&#45;like clustering of Clusterable statistics." alt="" coords="76,5,186,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,90,76,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,36,68,81,64,78,118,31"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="100,90,162,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="132,31,134,74,129,74,131,36"/>
+<area shape="rect" id="Node000004" href="$clusterable-classes_8h.html" title="Concrete Clusterable classes holding scalar and Gaussian statistics." alt="" coords="186,81,348,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="153,31,221,72,216,74,153,36"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="121,275,179,302"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="225,128,201,149,177,175,167,195,160,218,153,260,148,258,155,216,162,193,173,172,197,145,228,124"/>
+<area shape="rect" id="Node000006" href="$clusterable-itf_8h.html" title="Abstract interface for statistics that can be clustered." alt="" coords="187,174,347,218"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="268,124,270,159,265,157,266,128"/>
+<area shape="rect" id="Node000012" href="$eigen_8h.html" title="Eigen typedefs matching kaldi&#39;s Matrix layout, plus small vector math and random helpers." alt="" coords="371,174,531,218"/>
+<area shape="poly" id="edge12_Node000004_Node000012" title=" " alt="" coords="311,124,397,166,391,167,311,129"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="242,217,180,267,177,263,237,220"/>
+<area shape="rect" id="Node000007" href="$log_8h.html" title="Logging and assertion macros used throughout the library." alt="" coords="203,266,363,311"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="272,216,279,252,274,250,270,221"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="104,359,169,387"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="247,311,174,353,172,349,242,312"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="193,359,272,387"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="272,310,250,348,247,344,268,313"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="297,359,371,387"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="298,309,320,346,315,345,295,314"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="395,359,480,387"/>
+<area shape="poly" id="edge11_Node000007_Node000011" title=" " alt="" coords="325,309,402,351,397,351,324,314"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="400,275,502,302"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="453,217,453,261,449,258,449,221"/>
+</map>

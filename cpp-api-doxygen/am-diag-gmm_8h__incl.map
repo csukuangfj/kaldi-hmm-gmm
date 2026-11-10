@@ -1,0 +1,44 @@
+<map id="am&#45;diag&#45;gmm.h" name="am&#45;diag&#45;gmm.h">
+<area shape="rect" id="Node000001" title="Acoustic model of diagonal&#45;covariance GMMs (AmDiagGmm)." alt="" coords="257,5,383,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="290,275,353,302"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="352,31,386,51,414,79,426,104,430,125,431,173,435,197,435,207,430,220,403,245,362,269,359,265,400,240,426,217,430,206,430,197,426,174,425,125,421,105,410,83,383,55,353,36"/>
+<area shape="rect" id="Node000003" href="$diag-gmm_8h.html" title="Diagonal&#45;covariance Gaussian mixture models (DiagGmm) stored in exponential form." alt="" coords="240,81,400,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="321,31,323,66,318,64,319,36"/>
+<area shape="rect" id="Node000015" href="$eigen_8h.html" title="Eigen typedefs matching kaldi&#39;s Matrix layout, plus small vector math and random helpers." alt="" coords="5,359,166,404"/>
+<area shape="poly" id="edge25_Node000001_Node000015" title=" " alt="" coords="280,36,235,56,181,86,128,125,105,149,85,175,75,195,69,216,64,262,68,306,77,344,71,344,63,307,59,262,63,215,70,193,81,172,101,145,124,121,178,81,233,51,283,32"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="322,124,324,260,319,258,319,128"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="357,182,416,210"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="336,123,371,169,366,170,336,129"/>
+<area shape="rect" id="Node000005" href="$cluster-utils_8h.html" title="K&#45;means&#45;like clustering of Clusterable statistics." alt="" coords="491,174,651,218"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="380,124,499,167,494,169,380,129"/>
+<area shape="poly" id="edge19_Node000003_Node000015" title=" " alt="" coords="238,112,206,121,171,133,139,151,113,175,100,194,91,215,81,260,79,304,82,344,77,343,74,305,75,259,86,213,96,192,109,172,136,147,169,128,204,116,242,109"/>
+<area shape="rect" id="Node000017" href="$model-common_8h.html" title="GMM update flags and mixture&#45;splitting targets." alt="" coords="123,174,283,218"/>
+<area shape="poly" id="edge20_Node000003_Node000017" title=" " alt="" coords="291,128,245,166,241,162,294,124"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="496,220,365,269,362,270,359,266,363,264,500,217"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="562,275,633,302"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="578,216,592,261,587,259,576,221"/>
+<area shape="rect" id="Node000007" href="$clusterable-classes_8h.html" title="Concrete Clusterable classes holding scalar and Gaussian statistics." alt="" coords="376,266,539,311"/>
+<area shape="poly" id="edge8_Node000005_Node000007" title=" " alt="" coords="546,217,498,258,495,254,542,220"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="284,460,343,488"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="415,310,384,334,357,361,334,403,321,446,316,443,329,401,353,357,381,330,411,313"/>
+<area shape="rect" id="Node000009" href="$clusterable-itf_8h.html" title="Abstract interface for statistics that can be clustered." alt="" coords="367,359,527,404"/>
+<area shape="poly" id="edge10_Node000007_Node000009" title=" " alt="" coords="457,309,453,345,449,342,453,313"/>
+<area shape="poly" id="edge17_Node000007_Node000015" title=" " alt="" coords="374,312,182,359,180,354,377,308"/>
+<area shape="poly" id="edge11_Node000009_Node000008" title=" " alt="" coords="417,403,346,454,344,449,412,405"/>
+<area shape="rect" id="Node000010" href="$log_8h.html" title="Logging and assertion macros used throughout the library." alt="" coords="367,452,527,496"/>
+<area shape="poly" id="edge12_Node000009_Node000010" title=" " alt="" coords="448,402,449,438,445,435,445,406"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="194,544,260,572"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="391,497,275,542,273,537,386,497"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="306,544,385,572"/>
+<area shape="poly" id="edge14_Node000010_Node000012" title=" " alt="" coords="423,496,375,537,372,532,418,498"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="410,544,484,572"/>
+<area shape="poly" id="edge15_Node000010_Node000013" title=" " alt="" coords="449,495,449,530,445,527,445,499"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="508,544,594,572"/>
+<area shape="poly" id="edge16_Node000010_Node000014" title=" " alt="" coords="475,494,525,535,520,534,473,499"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="34,460,137,488"/>
+<area shape="poly" id="edge18_Node000015_Node000016" title=" " alt="" coords="86,402,88,445,83,444,85,406"/>
+<area shape="poly" id="edge23_Node000017_Node000002" title=" " alt="" coords="231,216,295,264,290,266,231,221"/>
+<area shape="poly" id="edge22_Node000017_Node000008" title=" " alt="" coords="213,217,305,446,300,446,210,221"/>
+<area shape="poly" id="edge21_Node000017_Node000011" title=" " alt="" coords="207,218,228,529,222,528,202,220"/>
+<area shape="poly" id="edge24_Node000017_Node000015" title=" " alt="" coords="188,221,110,348,105,345,190,216"/>
+</map>

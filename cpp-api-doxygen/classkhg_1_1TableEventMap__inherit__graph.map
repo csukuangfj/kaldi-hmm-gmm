@@ -1,0 +1,5 @@
+<map id="khg::TableEventMap" name="khg::TableEventMap">
+<area shape="rect" id="Node000001" title="An EventMap node that splits on the value of a single key by looking up a table of children." alt="" coords="5,81,158,109"/>
+<area shape="rect" id="Node000002" href="$classkhg_1_1EventMap.html" title="A class that is capable of representing a generic mapping from EventType (which is a vector of (key,..." alt="" coords="22,5,141,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,47,84,81,79,80,80,51"/>
+</map>

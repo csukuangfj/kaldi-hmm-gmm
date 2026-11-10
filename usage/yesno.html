@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The yesno recipe — train a monophone GMM &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MFA-style forced alignment" href="mfa.html" />
+    <link rel="prev" title="Environment setup" href="setup.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="setup.html">Environment setup</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">The yesno recipe — train a monophone GMM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-everything">Run everything</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stage-by-stage">Stage by stage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#expected-result">Expected result</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#main-outputs">Main outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mfa.html">MFA-style forced alignment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../python-api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp-api/index.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Usage</a></li>
+      <li class="breadcrumb-item active">The yesno recipe — train a monophone GMM</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/yesno.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-yesno-recipe-train-a-monophone-gmm">
+<h1>The yesno recipe — train a monophone GMM<a class="headerlink" href="#the-yesno-recipe-train-a-monophone-gmm" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">egs/yesno</span></code> mirrors kaldi's <a class="reference external" href="https://github.com/kaldi-asr/kaldi/tree/master/egs/yesno/s5">egs/yesno/s5</a> stage by
+stage: it trains a monophone GMM on the &quot;yesno&quot; corpus (60 recordings of
+8-digit sequences), builds an HCLG decoding graph, decodes the test set and
+reports WER — using only the <code class="docutils literal notranslate"><span class="pre">kaldi_hmm_gmm</span></code> Python API, <strong>no kaldi
+binaries</strong>.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p><a class="reference internal" href="../install.html"><span class="doc">Build kaldi-hmm-gmm</span></a> (cmake build with tests passing).</p></li>
+<li><p>Install the Python dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+<p>(<code class="docutils literal notranslate"><span class="pre">kaldifst</span></code>, <code class="docutils literal notranslate"><span class="pre">kaldi_native_io</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">kaldilm</span></code>, <code class="docutils literal notranslate"><span class="pre">kaldialign</span></code>)</p>
+</li>
+</ol>
+</section>
+<section id="run-everything">
+<h2>Run everything<a class="headerlink" href="#run-everything" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">egs</span><span class="o">/</span><span class="n">yesno</span>
+<span class="o">./</span><span class="n">run</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>This runs stages 0–6 in order and prints kaldi-style log lines.  The final
+lines look like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">local</span><span class="o">/</span><span class="n">score</span><span class="o">.</span><span class="n">sh</span> <span class="o">--</span><span class="n">cmd</span> <span class="n">utils</span><span class="o">/</span><span class="n">run</span><span class="o">.</span><span class="n">pl</span> <span class="n">data</span><span class="o">/</span><span class="n">test_yesno</span> <span class="n">exp</span><span class="o">/</span><span class="n">mono0a</span><span class="o">/</span><span class="n">graph_tgpr</span> <span class="n">exp</span><span class="o">/</span><span class="n">mono0a</span><span class="o">/</span><span class="n">decode_test_yesno</span>
+<span class="n">local</span><span class="o">/</span><span class="n">score</span><span class="o">.</span><span class="n">sh</span><span class="p">:</span> <span class="n">scoring</span> <span class="k">with</span> <span class="n">word</span> <span class="n">insertion</span> <span class="n">penalty</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.0</span>
+<span class="o">%</span><span class="n">WER</span> <span class="mf">0.43</span> <span class="p">[</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">232</span><span class="p">,</span> <span class="mi">1</span> <span class="n">ins</span><span class="p">,</span> <span class="mi">0</span> <span class="k">del</span><span class="p">,</span> <span class="mi">0</span> <span class="n">sub</span> <span class="p">]</span> <span class="n">exp</span><span class="o">/</span><span class="n">mono0a</span><span class="o">/</span><span class="n">decode_test_yesno</span><span class="o">/</span><span class="n">wer_7_0</span><span class="mf">.0</span>
+</pre></div>
+</div>
+<p>To run a single stage or a range:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">run</span><span class="o">.</span><span class="n">sh</span> <span class="o">--</span><span class="n">stage</span> <span class="mi">3</span> <span class="o">--</span><span class="n">stop</span><span class="o">-</span><span class="n">stage</span> <span class="mi">3</span>     <span class="c1"># only the training loop</span>
+<span class="o">./</span><span class="n">run</span><span class="o">.</span><span class="n">sh</span> <span class="o">--</span><span class="n">stage</span> <span class="mi">6</span>                    <span class="c1"># only decoding + scoring</span>
+</pre></div>
+</div>
+</section>
+<section id="stage-by-stage">
+<h2>Stage by stage<a class="headerlink" href="#stage-by-stage" title="Link to this heading"></a></h2>
+<p><strong>Stage 0 — prepare the data</strong> (<code class="docutils literal notranslate"><span class="pre">local/prepare_data.sh</span></code>).
+Downloads the &quot;yesno&quot; corpus if <code class="docutils literal notranslate"><span class="pre">waves_yesno/</span></code> is missing, then splits it
+into <code class="docutils literal notranslate"><span class="pre">data/train_yesno</span></code> (31 utterances) and <code class="docutils literal notranslate"><span class="pre">data/test_yesno</span></code> (29
+utterances) with kaldi-style <code class="docutils literal notranslate"><span class="pre">wav.scp</span></code> / <code class="docutils literal notranslate"><span class="pre">text</span></code> / <code class="docutils literal notranslate"><span class="pre">utt2spk</span></code> /
+<code class="docutils literal notranslate"><span class="pre">spk2utt</span></code>.  The wav file names encode the transcripts
+(e.g. <code class="docutils literal notranslate"><span class="pre">0_0_0_1_0_1_1_0.wav</span></code> is the digit sequence <code class="docutils literal notranslate"><span class="pre">zero</span> <span class="pre">zero</span> <span class="pre">zero</span> <span class="pre">one</span> <span class="pre">...</span></code>).</p>
+<p>The corpus is the OpenSLR &quot;waves_yesno&quot; release (the same one kaldi's
+<code class="docutils literal notranslate"><span class="pre">egs/yesno/s5/run.sh</span></code> downloads):</p>
+<ul class="simple">
+<li><p>original URL (OpenSLR resource 1):
+<a class="reference external" href="http://www.openslr.org/resources/1/waves_yesno.tar.gz">http://www.openslr.org/resources/1/waves_yesno.tar.gz</a></p></li>
+<li><p>mirror actually fetched by the script (same tarball, hosted on github.com
+to reduce CI download time):
+<a class="reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/releases/download/v1.1.4/waves_yesno.tar.gz">https://github.com/csukuangfj/kaldi-hmm-gmm/releases/download/v1.1.4/waves_yesno.tar.gz</a></p></li>
+</ul>
+<p><strong>Stage 1 — prepare the lang directory</strong> (<code class="docutils literal notranslate"><span class="pre">prepare_lang.py</span></code>).
+Builds <code class="docutils literal notranslate"><span class="pre">data/lang</span></code>: the phone/word symbol tables (<code class="docutils literal notranslate"><span class="pre">phones.txt</span></code>,
+<code class="docutils literal notranslate"><span class="pre">words.txt</span></code>), the lexicon FST <code class="docutils literal notranslate"><span class="pre">L.fst</span></code> with optional silence, its
+disambiguated counterpart <code class="docutils literal notranslate"><span class="pre">L_disambig.fst</span></code>, and the test-language G.fst
+(<code class="docutils literal notranslate"><span class="pre">data/lang_test_tg</span></code>).  This is the kaldi <code class="docutils literal notranslate"><span class="pre">utils/prepare_lang.sh</span></code>
+equivalent.</p>
+<p><strong>Stage 2 — compute features</strong> (<code class="docutils literal notranslate"><span class="pre">local/compute_feats.py</span></code>).
+Raw 13-dim MFCC (kaldi-compatible, <code class="docutils literal notranslate"><span class="pre">mfcc/raw_mfcc_{train,test}_yesno.1.ark</span></code>)
+plus per-speaker CMVN stats; <code class="docutils literal notranslate"><span class="pre">data/{train,test}_yesno/feats.scp</span></code> points at
+the MFCC arks.  CMVN + deltas (→ 39-dim) are applied at load time
+(<code class="docutils literal notranslate"><span class="pre">tools/read_feats.load_delta_feats</span></code>), mirroring kaldi's
+<code class="docutils literal notranslate"><span class="pre">apply-cmvn</span> <span class="pre">|</span> <span class="pre">add-deltas</span></code> use-time pipeline.  The training/decoding code
+itself is feature-agnostic — it just reads <code class="docutils literal notranslate"><span class="pre">feats.scp</span></code>.</p>
+<p><strong>Stage 3 — train the monophone GMM</strong> (<code class="docutils literal notranslate"><span class="pre">train.py</span></code>).
+The kaldi <code class="docutils literal notranslate"><span class="pre">steps/train_mono.sh</span></code> equivalent (40 iterations, <code class="docutils literal notranslate"><span class="pre">--totgauss</span>
+<span class="pre">400</span></code>, power 0.25): initialize the GMM from global stats, <strong>align equally</strong>
+(kaldi <code class="docutils literal notranslate"><span class="pre">align-equal-compiled</span></code> semantics), then per iteration accumulate
+statistics (<code class="docutils literal notranslate"><span class="pre">gmm-acc-stats-ali</span></code>), update (<code class="docutils literal notranslate"><span class="pre">gmm-est</span></code>), and realign on the
+schedule used by kaldi.  Each iteration's model is written to
+<code class="docutils literal notranslate"><span class="pre">exp/mono0a/&lt;n&gt;.mdl</span></code> (kaldi model format: <code class="docutils literal notranslate"><span class="pre">AmDiagGmm</span></code> +
+<code class="docutils literal notranslate"><span class="pre">TransitionModel</span></code> + <code class="docutils literal notranslate"><span class="pre">ContextDependency</span></code>) together with per-iteration
+alignments <code class="docutils literal notranslate"><span class="pre">ali.1.gz</span></code> and Gaussian occupancies <code class="docutils literal notranslate"><span class="pre">*.occs</span></code>.</p>
+<p><strong>Stage 4 — final alignment</strong> (<code class="docutils literal notranslate"><span class="pre">ali.py</span></code>).
+Re-aligns the training set with the final model and exports the
+&quot;ali-to-phones&quot; deliverables into <code class="docutils literal notranslate"><span class="pre">exp/mono0a</span></code>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Content</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ali_full.ark</span></code></p></td>
+<td><p>the transition-id alignment itself</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ali_phones.ark</span></code></p></td>
+<td><p>per-frame phone-ids (<code class="docutils literal notranslate"><span class="pre">ark,t:</span></code> format)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ali_seq.ark</span></code></p></td>
+<td><p>collapsed phone sequence per utterance</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ali_phones_sym.txt</span></code></p></td>
+<td><p>per-frame phones with symbols (<code class="docutils literal notranslate"><span class="pre">SIL</span> <span class="pre">N</span> <span class="pre">Y</span> <span class="pre">...</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ali_stats.txt</span></code></p></td>
+<td><p>log-likelihood / error summary</p></td>
+</tr>
+</tbody>
+</table>
+<p>These match what kaldi produces with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ali</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">phones</span> <span class="o">--</span><span class="n">per</span><span class="o">-</span><span class="n">frame</span><span class="o">=</span><span class="n">true</span> <span class="n">exp</span><span class="o">/</span><span class="n">mono0a</span><span class="o">/</span><span class="n">final</span><span class="o">.</span><span class="n">mdl</span> \
+    <span class="s2">"ark:gunzip -c exp/mono0a/ali.1.gz|"</span> <span class="n">ark</span><span class="p">,</span><span class="n">t</span><span class="p">:</span><span class="o">-</span> <span class="o">|</span> <span class="n">utils</span><span class="o">/</span><span class="n">int2sym</span><span class="o">.</span><span class="n">pl</span> <span class="o">-</span><span class="n">f</span> <span class="mi">2</span><span class="o">-</span>
+</pre></div>
+</div>
+<p><strong>Stage 5 — build the decoding graph</strong> (<code class="docutils literal notranslate"><span class="pre">mkgraph.py</span></code>).
+The kaldi <code class="docutils literal notranslate"><span class="pre">utils/mkgraph.sh</span></code> equivalent: compose the lexicon with the test
+grammar (<code class="docutils literal notranslate"><span class="pre">L·G</span></code>), expand context (<code class="docutils literal notranslate"><span class="pre">CLG</span></code>), compose with the HMM transducer
+(<code class="docutils literal notranslate"><span class="pre">Ha</span></code>, transition probabilities baked), determinize (log) and minimize,
+then add self-loops to obtain <code class="docutils literal notranslate"><span class="pre">exp/mono0a/graph_tgpr/HCLG.fst</span></code> — the same
+chain kaldi's <code class="docutils literal notranslate"><span class="pre">utils/mkgraph.sh</span></code> runs.</p>
+<p><strong>Stage 6 — decode and score</strong> (<code class="docutils literal notranslate"><span class="pre">decode.py</span></code>).
+Lattice-faster decoding (kaldi <code class="docutils literal notranslate"><span class="pre">steps/decode.sh</span></code> semantics, acoustic scale
+0.083333 = kaldi's default acwt) of <code class="docutils literal notranslate"><span class="pre">data/test_yesno</span></code> with <code class="docutils literal notranslate"><span class="pre">HCLG.fst</span></code>; the 1-best word sequence per
+utterance is written to <code class="docutils literal notranslate"><span class="pre">exp/mono0a/decode_test_yesno/text</span></code> and scored
+against the reference with <code class="docutils literal notranslate"><span class="pre">kaldialign</span></code>.  The sweep over
+word-insertion-penalties <code class="docutils literal notranslate"><span class="pre">0,0.5,1.0</span></code> (and lmwt) reproduces kaldi's
+<code class="docutils literal notranslate"><span class="pre">local/score.sh</span></code>; the best result lands in <code class="docutils literal notranslate"><span class="pre">exp/mono0a/decode_test_yesno/wer</span></code>.</p>
+</section>
+<section id="expected-result">
+<h2>Expected result<a class="headerlink" href="#expected-result" title="Link to this heading"></a></h2>
+<p>%WER 0.43 (1 insertion out of 232 words).  For reference, kaldi's own
+recipe scores %WER 0.00 on this data; the residual error comes from
+floating-point drift accumulated over the 40-iteration training loop (the
+decode path itself is numerically exact: feeding kaldi's model, graph and
+features through the decoders in this repo reproduces kaldi's output
+exactly).  The recorded baseline
+<code class="docutils literal notranslate"><span class="pre">egs/yesno/exp/parity/baseline-2026-11-07</span></code> (kept locally; <code class="docutils literal notranslate"><span class="pre">exp/</span></code> is
+git-ignored) holds the exact artifacts of this run for regression
+comparisons.</p>
+</section>
+<section id="main-outputs">
+<h2>Main outputs<a class="headerlink" href="#main-outputs" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Content</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">exp/mono0a/final.mdl</span></code></p></td>
+<td><p>transition model + trained GMM</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exp/mono0a/tree</span></code></p></td>
+<td><p>context-dependency tree</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">exp/mono0a/graph_tgpr/HCLG.fst</span></code></p></td>
+<td><p>decoding graph</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exp/mono0a/ali.1.gz</span></code></p></td>
+<td><p>final transition-id alignments</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">exp/mono0a/ali_phones.ark</span></code></p></td>
+<td><p>per-frame phone alignments</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exp/mono0a/decode_test_yesno/text</span></code></p></td>
+<td><p>decoded transcripts</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">exp/mono0a/decode_test_yesno/wer</span></code></p></td>
+<td><p>WER summary</p></td>
+</tr>
+</tbody>
+</table>
+<p>All of these are standard kaldi artifacts — <code class="docutils literal notranslate"><span class="pre">final.mdl</span></code> and <code class="docutils literal notranslate"><span class="pre">HCLG.fst</span></code>
+can be consumed by kaldi tools and by other kaldi-compatible libraries.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="setup.html" class="btn btn-neutral float-left" title="Environment setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mfa.html" class="btn btn-neutral float-right" title="MFA-style forced alignment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

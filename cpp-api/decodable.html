@@ -1,0 +1,297 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GMM decodables &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Topic notes" href="../tutorials/index.html" />
+    <link rel="prev" title="Trees and training graphs" href="graph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python-api/index.html">Python API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">C++ API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="hmm.html">HMM topology and transition model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gmm.html">GMMs and MLE/MAP estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html">Trees and training graphs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">GMM decodables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-doxygen">API (doxygen)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg24DecodableAmDiagGmmScaledE"><code class="docutils literal notranslate"><span class="pre">khg::DecodableAmDiagGmmScaled</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg26DecodableAmDiagGmmUnmappedE"><code class="docutils literal notranslate"><span class="pre">khg::DecodableAmDiagGmmUnmapped</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">C++ API</a></li>
+      <li class="breadcrumb-item active">GMM decodables</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cpp-api/decodable.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gmm-decodables">
+<h1>GMM decodables<a class="headerlink" href="#gmm-decodables" title="Link to this heading"></a></h1>
+<p>Header: <a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/decodable-am-diag-gmm.h">kaldi-hmm-gmm/csrc/decodable-am-diag-gmm.h</a> — kaldi's
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/gmm/decodable-am-diag-gmm.h">src/gmm/decodable-am-diag-gmm.h</a> port.  Both classes implement
+<code class="docutils literal notranslate"><span class="pre">kaldi_decoder::DecodableInterface</span></code> and can be passed directly to
+kaldi-decoder's alignment/decoding functions.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">khg</span><span class="o">::</span><span class="n">DecodableAmDiagGmmScaled</span><span class="w"> </span><span class="nf">decodable</span><span class="p">(</span><span class="n">am</span><span class="p">,</span><span class="w"> </span><span class="n">trans_model</span><span class="p">,</span><span class="w"> </span><span class="n">feats</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">);</span>
+
+<span class="n">kaldi_decoder</span><span class="o">::</span><span class="n">LatticeFasterDecoder</span><span class="w"> </span><span class="nf">decoder</span><span class="p">(</span><span class="n">fst</span><span class="p">,</span><span class="w"> </span><span class="n">config</span><span class="p">);</span>
+<span class="n">kaldi_decoder</span><span class="o">::</span><span class="n">DecodeUtteranceLatticeFaster</span><span class="p">(</span>
+<span class="w">    </span><span class="n">decoder</span><span class="p">,</span><span class="w"> </span><span class="n">decodable</span><span class="p">,</span><span class="w"> </span><span class="n">trans_model</span><span class="p">,</span><span class="w"> </span><span class="n">utt</span><span class="p">,</span><span class="w"> </span><span class="cm">/*allow_partial=*/</span><span class="nb">false</span><span class="p">,</span>
+<span class="w">    </span><span class="cm">/*acoustic_scale=*/</span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">alignment</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">words</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">log_like</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">lat</span><span class="p">);</span>
+</pre></div>
+</div>
+<section id="api-doxygen">
+<h2>API (doxygen)<a class="headerlink" href="#api-doxygen" title="Link to this heading"></a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg24DecodableAmDiagGmmScaledE">
+<span id="_CPPv3N3khg24DecodableAmDiagGmmScaledE"></span><span id="_CPPv2N3khg24DecodableAmDiagGmmScaledE"></span><span id="khg::DecodableAmDiagGmmScaled"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmScaled"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecodableAmDiagGmmScaled</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">khg</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3khg26DecodableAmDiagGmmUnmappedE" title="khg::DecodableAmDiagGmmUnmapped"><span class="n"><span class="pre">DecodableAmDiagGmmUnmapped</span></span></a><a class="headerlink" href="#_CPPv4N3khg24DecodableAmDiagGmmScaledE" title="Link to this definition"></a><br /></dt>
+<dd><p>Decodable for an <a class="reference internal" href="gmm.html#classkhg_1_1AmDiagGmm"><span class="std std-ref">AmDiagGmm</span></a> whose indices are transition-ids, with acoustic scaling. </p>
+<p>This is the decodable used by kaldi's alignment and decoding tools (e.g. gmm-align-compiled). It maps the transition-id to its pdf via the <a class="reference internal" href="hmm.html#classkhg_1_1TransitionModel"><span class="std std-ref">TransitionModel</span></a> (the self-loop pdf for self-loops, the forward pdf otherwise) and returns the GMM log-likelihood of that pdf, multiplied by the acoustic scale <span class="math notranslate nohighlight">\(s\)</span>:    <div class="math notranslate nohighlight">
+\[  \mathrm{LogLikelihood}(t, \mathrm{tid}) \;=\; s \cdot
+  \log p\!\left(\mathbf{x}_t \mid \mathrm{pdf}(\mathrm{tid})\right).
+\]</div>
+ The acoustic scale weights the acoustic log-likelihoods relative to the graph scores (transition and language-model probabilities live on the graph arcs and are not included in these scores). Frames are numbered from zero but transition-ids from one. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg24DecodableAmDiagGmmScaled24DecodableAmDiagGmmScaledERK9AmDiagGmmRK15TransitionModelRK11FloatMatrixff">
+<span id="_CPPv3N3khg24DecodableAmDiagGmmScaled24DecodableAmDiagGmmScaledERK9AmDiagGmmRK15TransitionModelRK11FloatMatrixff"></span><span id="_CPPv2N3khg24DecodableAmDiagGmmScaled24DecodableAmDiagGmmScaledERK9AmDiagGmmRK15TransitionModelRK11FloatMatrixff"></span><span id="khg::DecodableAmDiagGmmScaled::DecodableAmDiagGmmScaled__AmDiagGmmCR.TransitionModelCR.FloatMatrixCR.float.float"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmScaled_1a35af4053e3fa194fa5d82014339ca093"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecodableAmDiagGmmScaled</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="gmm.html#_CPPv4N3khg9AmDiagGmmE" title="khg::AmDiagGmm"><span class="n"><span class="pre">AmDiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">am</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="hmm.html#_CPPv4N3khg15TransitionModelE" title="khg::TransitionModel"><span class="n"><span class="pre">TransitionModel</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tm</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">feats</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scale</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_sum_exp_prune</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1.0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg24DecodableAmDiagGmmScaled24DecodableAmDiagGmmScaledERK9AmDiagGmmRK15TransitionModelRK11FloatMatrixff" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>am</strong> -- The acoustic model (not owned). </p></li>
+<li><p><strong>tm</strong> -- The transition model (not owned); used for the transition-id to pdf-id mapping. </p></li>
+<li><p><strong>feats</strong> -- 2-D feature matrix, (num_frames, feature_dim). </p></li>
+<li><p><strong>scale</strong> -- The acoustic scale <span class="math notranslate nohighlight">\(s\)</span> applied to all log-likelihoods. </p></li>
+<li><p><strong>log_sum_exp_prune</strong> -- Pruning threshold for the LogSumExp over mixture components (see the base class); negative disables pruning. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg24DecodableAmDiagGmmScaled13LogLikelihoodE7int32_t7int32_t">
+<span id="_CPPv3N3khg24DecodableAmDiagGmmScaled13LogLikelihoodE7int32_t7int32_t"></span><span id="_CPPv2N3khg24DecodableAmDiagGmmScaled13LogLikelihoodE7int32_t7int32_t"></span><span id="khg::DecodableAmDiagGmmScaled::LogLikelihood__int32_t.int32_t"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmScaled_1a2d1fc17b4c122b154482fb0b6d79ac2b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogLikelihood</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">frame</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N3khg24DecodableAmDiagGmmScaled13LogLikelihoodE7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Note, frames are numbered from zero but transition-ids from one. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> -- Frame index (zero-based). </p></li>
+<li><p><strong>tid</strong> -- Transition-id (one-based). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The scaled log-likelihood of the pdf of <code class="docutils literal notranslate"><span class="pre">tid</span></code> at <code class="docutils literal notranslate"><span class="pre">frame</span></code>, i.e. <span class="math notranslate nohighlight">\(s \cdot \log p(\mathbf{x}_t \mid \mathrm{pdf})\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg24DecodableAmDiagGmmScaled10NumIndicesEv">
+<span id="_CPPv3NK3khg24DecodableAmDiagGmmScaled10NumIndicesEv"></span><span id="_CPPv2NK3khg24DecodableAmDiagGmmScaled10NumIndicesEv"></span><span id="khg::DecodableAmDiagGmmScaled::NumIndicesC"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmScaled_1a0614d1be0a0d92a5ba5515bca914cc8d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumIndices</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg24DecodableAmDiagGmmScaled10NumIndicesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Indices are one-based! </p>
+<p>This is for compatibility with OpenFst. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of transition-ids in the transition model. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg24DecodableAmDiagGmmScaled10TransModelEv">
+<span id="_CPPv3N3khg24DecodableAmDiagGmmScaled10TransModelEv"></span><span id="_CPPv2N3khg24DecodableAmDiagGmmScaled10TransModelEv"></span><span id="khg::DecodableAmDiagGmmScaled::TransModel"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmScaled_1aca51bb39b218f8677ba9793ba900c7be"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="hmm.html#_CPPv4N3khg15TransitionModelE" title="khg::TransitionModel"><span class="n"><span class="pre">TransitionModel</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">TransModel</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg24DecodableAmDiagGmmScaled10TransModelEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The transition model (not owned). </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg26DecodableAmDiagGmmUnmappedE">
+<span id="_CPPv3N3khg26DecodableAmDiagGmmUnmappedE"></span><span id="_CPPv2N3khg26DecodableAmDiagGmmUnmappedE"></span><span id="khg::DecodableAmDiagGmmUnmapped"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmUnmapped"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecodableAmDiagGmmUnmapped</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">kaldi_decoder</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">DecodableInterface</span></span><a class="headerlink" href="#_CPPv4N3khg26DecodableAmDiagGmmUnmappedE" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classkhg_1_1DecodableAmDiagGmmUnmapped"><span class="std std-ref">DecodableAmDiagGmmUnmapped</span></a> is a decodable object that takes indices that correspond to pdf-id's plus one. </p>
+<p>This may be used in future in a decoder that doesn't need to output alignments, if we create FSTs that have the pdf-ids plus one as the input labels (we couldn't use the pdf-ids themselves because they start from zero, and the graph might have epsilon transitions). </p>
+<p>Subclassed by <a class="reference internal" href="#classkhg_1_1DecodableAmDiagGmmScaled"><span class="std std-ref">khg::DecodableAmDiagGmmScaled</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg26DecodableAmDiagGmmUnmapped26DecodableAmDiagGmmUnmappedERK9AmDiagGmmRK11FloatMatrixf">
+<span id="_CPPv3N3khg26DecodableAmDiagGmmUnmapped26DecodableAmDiagGmmUnmappedERK9AmDiagGmmRK11FloatMatrixf"></span><span id="_CPPv2N3khg26DecodableAmDiagGmmUnmapped26DecodableAmDiagGmmUnmappedERK9AmDiagGmmRK11FloatMatrixf"></span><span id="khg::DecodableAmDiagGmmUnmapped::DecodableAmDiagGmmUnmapped__AmDiagGmmCR.FloatMatrixCR.float"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmUnmapped_1a25b0e63032fc426eaf719492c2e3b528"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecodableAmDiagGmmUnmapped</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="gmm.html#_CPPv4N3khg9AmDiagGmmE" title="khg::AmDiagGmm"><span class="n"><span class="pre">AmDiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">am</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">feats</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_sum_exp_prune</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1.0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg26DecodableAmDiagGmmUnmapped26DecodableAmDiagGmmUnmappedERK9AmDiagGmmRK11FloatMatrixf" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor. </p>
+<p>If you set log_sum_exp_prune to a value greater than 0 it will prune in the LogSumExp operation (larger = more exact); I suggest 5. This is advisable if it's spending a long time doing exp operations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>am</strong> -- The acoustic model (not owned; must outlive this object). </p></li>
+<li><p><strong>feats</strong> -- 2-D feature matrix, (num_frames, feature_dim). </p></li>
+<li><p><strong>log_sum_exp_prune</strong> -- Pruning threshold for the LogSumExp over mixture components; negative disables pruning. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg26DecodableAmDiagGmmUnmapped13LogLikelihoodE7int32_t7int32_t">
+<span id="_CPPv3N3khg26DecodableAmDiagGmmUnmapped13LogLikelihoodE7int32_t7int32_t"></span><span id="_CPPv2N3khg26DecodableAmDiagGmmUnmapped13LogLikelihoodE7int32_t7int32_t"></span><span id="khg::DecodableAmDiagGmmUnmapped::LogLikelihood__int32_t.int32_t"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmUnmapped_1a820991075829f8b6606a404c53ccce51"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogLikelihood</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">frame</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">state_index</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N3khg26DecodableAmDiagGmmUnmapped13LogLikelihoodE7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Note, frames are numbered from zero. </p>
+<p>But state_index is numbered from one (this routine is called by FSTs). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> -- Frame index (zero-based). </p></li>
+<li><p><strong>state_index</strong> -- Pdf-id plus one (one-based). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The log-likelihood <span class="math notranslate nohighlight">\(\log p(\mathbf{x}_t \mid \mathrm{pdf})\)</span> of the given pdf at the given frame. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg26DecodableAmDiagGmmUnmapped14NumFramesReadyEv">
+<span id="_CPPv3NK3khg26DecodableAmDiagGmmUnmapped14NumFramesReadyEv"></span><span id="_CPPv2NK3khg26DecodableAmDiagGmmUnmapped14NumFramesReadyEv"></span><span id="khg::DecodableAmDiagGmmUnmapped::NumFramesReadyC"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmUnmapped_1a2e7d5cc4569a019d6e1a8e115a3b4328"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumFramesReady</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg26DecodableAmDiagGmmUnmapped14NumFramesReadyEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of frames available, i.e. the number of rows of the feature matrix. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg26DecodableAmDiagGmmUnmapped10NumIndicesEv">
+<span id="_CPPv3NK3khg26DecodableAmDiagGmmUnmapped10NumIndicesEv"></span><span id="_CPPv2NK3khg26DecodableAmDiagGmmUnmapped10NumIndicesEv"></span><span id="khg::DecodableAmDiagGmmUnmapped::NumIndicesC"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmUnmapped_1ad748a7811c2218421593906f40377eff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumIndices</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg26DecodableAmDiagGmmUnmapped10NumIndicesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Indices are one-based! </p>
+<p>This is for compatibility with OpenFst. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of pdfs in the acoustic model. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg26DecodableAmDiagGmmUnmapped11IsLastFrameE7int32_t">
+<span id="_CPPv3NK3khg26DecodableAmDiagGmmUnmapped11IsLastFrameE7int32_t"></span><span id="_CPPv2NK3khg26DecodableAmDiagGmmUnmapped11IsLastFrameE7int32_t"></span><span id="khg::DecodableAmDiagGmmUnmapped::IsLastFrame__int32_tC"></span><span class="target" id="classkhg_1_1DecodableAmDiagGmmUnmapped_1a032c6a8e6fc424209395c9f0d8664230"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsLastFrame</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">frame</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg26DecodableAmDiagGmmUnmapped11IsLastFrameE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> -- Frame index (zero-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if <code class="docutils literal notranslate"><span class="pre">frame</span></code> is the last frame of the utterance. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="graph.html" class="btn btn-neutral float-left" title="Trees and training graphs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tutorials/index.html" class="btn btn-neutral float-right" title="Topic notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

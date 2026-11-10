@@ -1,0 +1,1451 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GMMs and MLE/MAP estimation &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Trees and training graphs" href="graph.html" />
+    <link rel="prev" title="HMM topology and transition model" href="hmm.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python-api/index.html">Python API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">C++ API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="hmm.html">HMM topology and transition model</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">GMMs and MLE/MAP estimation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-doxygen">API (doxygen)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE"><code class="docutils literal notranslate"><span class="pre">khg::DiagGmm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg9AmDiagGmmE"><code class="docutils literal notranslate"><span class="pre">khg::AmDiagGmm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg17MleDiagGmmOptionsE"><code class="docutils literal notranslate"><span class="pre">khg::MleDiagGmmOptions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg12AccumDiagGmmE"><code class="docutils literal notranslate"><span class="pre">khg::AccumDiagGmm</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html">Trees and training graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decodable.html">GMM decodables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">C++ API</a></li>
+      <li class="breadcrumb-item active">GMMs and MLE/MAP estimation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cpp-api/gmm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gmms-and-mle-map-estimation">
+<h1>GMMs and MLE/MAP estimation<a class="headerlink" href="#gmms-and-mle-map-estimation" title="Link to this heading"></a></h1>
+<p>Headers: <a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/diag-gmm.h">kaldi-hmm-gmm/csrc/diag-gmm.h</a>,
+<a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/am-diag-gmm.h">kaldi-hmm-gmm/csrc/am-diag-gmm.h</a>,
+<a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/mle-diag-gmm.h">kaldi-hmm-gmm/csrc/mle-diag-gmm.h</a>,
+<a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/mle-am-diag-gmm.h">kaldi-hmm-gmm/csrc/mle-am-diag-gmm.h</a> — kaldi's
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/gmm">src/gmm/</a> port.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">khg</span><span class="o">::</span><span class="n">DiagGmm</span><span class="w"> </span><span class="n">gmm</span><span class="p">;</span>
+<span class="n">gmm</span><span class="p">.</span><span class="n">Read</span><span class="p">(</span><span class="n">is</span><span class="p">);</span>
+<span class="kt">float</span><span class="w"> </span><span class="n">log_like</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gmm</span><span class="p">.</span><span class="n">LogLikelihood</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+
+<span class="n">khg</span><span class="o">::</span><span class="n">AmDiagGmm</span><span class="w"> </span><span class="n">am</span><span class="p">;</span>
+<span class="n">am</span><span class="p">.</span><span class="n">AddPdf</span><span class="p">(</span><span class="n">gmm</span><span class="p">);</span>
+
+<span class="n">khg</span><span class="o">::</span><span class="n">MleDiagGmmOptions</span><span class="w"> </span><span class="n">opts</span><span class="p">;</span>
+<span class="n">opts</span><span class="p">.</span><span class="n">min_variance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01</span><span class="p">;</span>
+<span class="n">khg</span><span class="o">::</span><span class="n">AccumDiagGmm</span><span class="w"> </span><span class="nf">acc</span><span class="p">(</span><span class="n">gmm</span><span class="p">,</span><span class="w"> </span><span class="n">kGmmAll</span><span class="p">);</span>
+<span class="c1">// ... acc.Accumulate(...) ...</span>
+<span class="kt">float</span><span class="w"> </span><span class="n">objf</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">;</span>
+<span class="n">khg</span><span class="o">::</span><span class="n">MleDiagGmmUpdate</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span><span class="w"> </span><span class="n">acc</span><span class="p">,</span><span class="w"> </span><span class="n">kGmmAll</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">gmm</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">objf</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
+</pre></div>
+</div>
+<section id="api-doxygen">
+<h2>API (doxygen)<a class="headerlink" href="#api-doxygen" title="Link to this heading"></a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmmE">
+<span id="_CPPv3N3khg7DiagGmmE"></span><span id="_CPPv2N3khg7DiagGmmE"></span><span id="khg::DiagGmm"></span><span class="target" id="classkhg_1_1DiagGmm"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiagGmm</span></span></span><a class="headerlink" href="#_CPPv4N3khg7DiagGmmE" title="Link to this definition"></a><br /></dt>
+<dd><p>Definition for Gaussian Mixture Model with diagonal covariances. </p>
+<p>Stores <span class="math notranslate nohighlight">\(M\)</span> diagonal-covariance Gaussian components in exponential form: <code class="docutils literal notranslate"><span class="pre">weights_</span></code> holds the linear mixture weights <span class="math notranslate nohighlight">\(w_j\)</span>, <code class="docutils literal notranslate"><span class="pre">inv_vars_</span></code> holds the inverse variances <span class="math notranslate nohighlight">\(\sigma_j^{-2}\)</span> (one row per component), and <code class="docutils literal notranslate"><span class="pre">means_invvars_</span></code> holds the means times inverse variances <span class="math notranslate nohighlight">\(\mu_j \odot \sigma_j^{-2}\)</span>. The cached per-component gconsts are    <div class="math notranslate nohighlight">
+\[ g_j = \log w_j - \frac{1}{2} \Big( D \log 2\pi
+     + \sum_{d} \log \sigma_{jd}^{2}
+     + \sum_{d} \frac{\mu_{jd}^{2}}{\sigma_{jd}^{2}} \Big)
+     = \log w_j + \log \mathcal{N}(0; \mu_j, \mathrm{diag}(\sigma_j^2)), \]</div>
+ so that  <span class="math notranslate nohighlight">\(\ell_j(x) = g_j + (\mu_j \odot \sigma_j^{-2})^{\top} x
+- \tfrac{1}{2} (\sigma_j^{-2})^{\top} (x \odot x)\)</span>. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm7DiagGmmEv">
+<span id="_CPPv3N3khg7DiagGmm7DiagGmmEv"></span><span id="_CPPv2N3khg7DiagGmm7DiagGmmEv"></span><span id="khg::DiagGmm::DiagGmm"></span><span class="target" id="classkhg_1_1DiagGmm_1a315c7872fa294e920630a55aa89baa29"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiagGmm</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm7DiagGmmEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Empty constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm7DiagGmmERK7DiagGmm">
+<span id="_CPPv3N3khg7DiagGmm7DiagGmmERK7DiagGmm"></span><span id="_CPPv2N3khg7DiagGmm7DiagGmmERK7DiagGmm"></span><span id="khg::DiagGmm::DiagGmm__DiagGmmCR"></span><span class="target" id="classkhg_1_1DiagGmm_1af662fe88cca9331c4d38adbcaa3f8936"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiagGmm</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmm7DiagGmmERK7DiagGmm" title="khg::DiagGmm::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">gmm</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm7DiagGmmERK7DiagGmm" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy constructor; copies the parameters and the cached gconsts (the copy keeps the validity state of the source's gconsts). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm7DiagGmmERK11FloatVectorRK11FloatMatrixRK11FloatMatrix">
+<span id="_CPPv3N3khg7DiagGmm7DiagGmmERK11FloatVectorRK11FloatMatrixRK11FloatMatrix"></span><span id="_CPPv2N3khg7DiagGmm7DiagGmmERK11FloatVectorRK11FloatMatrixRK11FloatMatrix"></span><span id="khg::DiagGmm::DiagGmm__FloatVectorCR.FloatMatrixCR.FloatMatrixCR"></span><span class="target" id="classkhg_1_1DiagGmm_1a1ab1d12476d6c68d3313e49648c90c14"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiagGmm</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">weights</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inv_vars</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">means_invvars</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm7DiagGmmERK11FloatVectorRK11FloatMatrixRK11FloatMatrix" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor from parameters in exponential form. </p>
+<p>Computes the gconsts immediately. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> -- 1-D tensor of shape (nmix,); the mixture weights <span class="math notranslate nohighlight">\(w_j\)</span> (linear, not log). </p></li>
+<li><p><strong>inv_vars</strong> -- 2-D tensor of shape (nmix, dim); the inverse variances <span class="math notranslate nohighlight">\(\sigma_j^{-2}\)</span>. </p></li>
+<li><p><strong>means_invvars</strong> -- 2-D tensor of shape (nmix, dim); the means times inverse variances <span class="math notranslate nohighlight">\(\mu_j \odot \sigma_j^{-2}\)</span>. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmmaSERK7DiagGmm">
+<span id="_CPPv3N3khg7DiagGmmaSERK7DiagGmm"></span><span id="_CPPv2N3khg7DiagGmmaSERK7DiagGmm"></span><span id="khg::DiagGmm::assign-operator__DiagGmmCR"></span><span class="target" id="classkhg_1_1DiagGmm_1af22fb8fd71c2c8971addb1d26bea1649"></span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N3khg7DiagGmmaSERK7DiagGmm" title="Link to this definition"></a><br /></dt>
+<dd><p>Disallow assignment. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm6ResizeE7int32_t7int32_t">
+<span id="_CPPv3N3khg7DiagGmm6ResizeE7int32_t7int32_t"></span><span id="_CPPv2N3khg7DiagGmm6ResizeE7int32_t7int32_t"></span><span id="khg::DiagGmm::Resize__int32_t.int32_t"></span><span class="target" id="classkhg_1_1DiagGmm_1abe8ce157c6b0253f737e1692aa2695f8"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nMix</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dim</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm6ResizeE7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Resizes arrays to this dim. </p>
+<p>Weights are zeroed and vars set to one (kaldi's kSetZero semantics). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nMix</strong> -- Number of mixture components. </p></li>
+<li><p><strong>dim</strong> -- Dimensionality of the feature vectors. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm8NumGaussEv">
+<span id="_CPPv3NK3khg7DiagGmm8NumGaussEv"></span><span id="_CPPv2NK3khg7DiagGmm8NumGaussEv"></span><span id="khg::DiagGmm::NumGaussC"></span><span class="target" id="classkhg_1_1DiagGmm_1ae391055e3c1653cc481cd1e28ae205f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumGauss</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm8NumGaussEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the number of mixture components in the GMM. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of components <span class="math notranslate nohighlight">\(M\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm3DimEv">
+<span id="_CPPv3NK3khg7DiagGmm3DimEv"></span><span id="_CPPv2NK3khg7DiagGmm3DimEv"></span><span id="khg::DiagGmm::DimC"></span><span class="target" id="classkhg_1_1DiagGmm_1adb7464896d2b10e0d3c5e6332e13dbf8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dim</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm3DimEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the dimensionality of the Gaussian mean vectors. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The feature dimension <span class="math notranslate nohighlight">\(D\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm15CopyFromDiagGmmERK7DiagGmm">
+<span id="_CPPv3N3khg7DiagGmm15CopyFromDiagGmmERK7DiagGmm"></span><span id="_CPPv2N3khg7DiagGmm15CopyFromDiagGmmERK7DiagGmm"></span><span id="khg::DiagGmm::CopyFromDiagGmm__DiagGmmCR"></span><span class="target" id="classkhg_1_1DiagGmm_1ada95e047b3bb94744db2737137df77e7"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CopyFromDiagGmm</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">diaggmm</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm15CopyFromDiagGmmERK7DiagGmm" title="Link to this definition"></a><br /></dt>
+<dd><p>Copies from given <a class="reference internal" href="#classkhg_1_1DiagGmm"><span class="std std-ref">DiagGmm</span></a>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>diaggmm</strong> -- The model to copy from, including its cached gconsts and their validity state. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm7DiagGmmE7int32_t7int32_t">
+<span id="_CPPv3N3khg7DiagGmm7DiagGmmE7int32_t7int32_t"></span><span id="_CPPv2N3khg7DiagGmm7DiagGmmE7int32_t7int32_t"></span><span id="khg::DiagGmm::DiagGmm__int32_t.int32_t"></span><span class="target" id="classkhg_1_1DiagGmm_1af630a563b31ecb106bb2009537801927"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiagGmm</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nMix</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dim</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm7DiagGmmE7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor that only sizes the model; the parameters are left uninitialized (see <a class="reference internal" href="#classkhg_1_1DiagGmm_1abe8ce157c6b0253f737e1692aa2695f8"><span class="std std-ref">Resize()</span></a>). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nMix</strong> -- Number of mixture components. </p></li>
+<li><p><strong>dim</strong> -- Dimensionality of the feature vectors. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm7DiagGmmERKNSt6vectorINSt4pairIfPK7DiagGmmEEEE">
+<span id="_CPPv3N3khg7DiagGmm7DiagGmmERKNSt6vectorINSt4pairIfPK7DiagGmmEEEE"></span><span id="_CPPv2N3khg7DiagGmm7DiagGmmERKNSt6vectorINSt4pairIfPK7DiagGmmEEEE"></span><span id="khg::DiagGmm::DiagGmm__std::vector:std::pair:float.DiagGmmCP::CR"></span><span class="target" id="classkhg_1_1DiagGmm_1ae261ae14a00e24bc85995a7023fc7469"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiagGmm</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmm7DiagGmmERKNSt6vectorINSt4pairIfPK7DiagGmmEEEE" title="khg::DiagGmm::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">gmms</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm7DiagGmmERKNSt6vectorINSt4pairIfPK7DiagGmmEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor that allows us to merge GMMs with weights. </p>
+<p>Weights must sum to one, or this GMM will not be properly normalized (we don't check this). Weights must be positive (we check this). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gmms</strong> -- Vector of (weight, GMM) pairs; the resulting model contains the components of all input GMMs, each scaled by its weight. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm14ComputeGconstsEv">
+<span id="_CPPv3N3khg7DiagGmm14ComputeGconstsEv"></span><span id="_CPPv2N3khg7DiagGmm14ComputeGconstsEv"></span><span id="khg::DiagGmm::ComputeGconsts"></span><span class="target" id="classkhg_1_1DiagGmm_1ac96ae2e39607ad85ebc6275bbda96eb2"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ComputeGconsts</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm14ComputeGconstsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets the gconsts. </p>
+<p>Returns the number that are &quot;invalid&quot; e.g. because of zero weights or variances. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of components whose gconst is <span class="math notranslate nohighlight">\(\pm\infty\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm13LogLikelihoodERK11FloatVector">
+<span id="_CPPv3NK3khg7DiagGmm13LogLikelihoodERK11FloatVector"></span><span id="_CPPv2NK3khg7DiagGmm13LogLikelihoodERK11FloatVector"></span><span id="khg::DiagGmm::LogLikelihood__FloatVectorCRC"></span><span class="target" id="classkhg_1_1DiagGmm_1ae706b8f1888f29f7c261448c114a5891"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogLikelihood</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm13LogLikelihoodERK11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the log-likelihood of a data point (vector) given the GMM. </p>
+<p><div class="math notranslate nohighlight">
+\[ \log p(x) = \log \sum_j w_j \, \mathcal{N}(x; \mu_j,
+    \mathrm{diag}(\sigma_j^2)). \]</div>
+ Requires valid gconsts (<a class="reference internal" href="#classkhg_1_1DiagGmm_1ac96ae2e39607ad85ebc6275bbda96eb2"><span class="std std-ref">ComputeGconsts()</span></a> must have been called after the last parameter change). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> -- A 1-D tensor of shape (dim,) </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(\log p(\mathrm{data})\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm14LogLikelihoodsERK11FloatVectorP11FloatVector">
+<span id="_CPPv3NK3khg7DiagGmm14LogLikelihoodsERK11FloatVectorP11FloatVector"></span><span id="_CPPv2NK3khg7DiagGmm14LogLikelihoodsERK11FloatVectorP11FloatVector"></span><span id="khg::DiagGmm::LogLikelihoods__FloatVectorCR.FloatVectorPC"></span><span class="target" id="classkhg_1_1DiagGmm_1a2d0ecc6e2d9e78f3835d910f6d4fbd47"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogLikelihoods</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">loglikes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm14LogLikelihoodsERK11FloatVectorP11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Outputs the per-component log-likelihoods  <span class="math notranslate nohighlight">\(\ell_j(x) = \log w_j + \log \mathcal{N}(x; \mu_j,
+\mathrm{diag}(\sigma_j^2))\)</span>, i.e. </p>
+<p>each value includes the mixture weight of its component. Requires valid gconsts. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- 1-D tensor of shape (dim,) </p></li>
+<li><p><strong>loglikes</strong> -- On return, 1-D tensor of shape (nmix,) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm7weightsEv">
+<span id="_CPPv3NK3khg7DiagGmm7weightsEv"></span><span id="_CPPv2NK3khg7DiagGmm7weightsEv"></span><span id="khg::DiagGmm::weightsC"></span><span class="target" id="classkhg_1_1DiagGmm_1a148dee516189929f68046a0925c89da7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">weights</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm7weightsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Const accessor for the mixture weights. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1-D tensor of shape (nmix,); linear weights (not log). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm7weightsEv">
+<span id="_CPPv3N3khg7DiagGmm7weightsEv"></span><span id="_CPPv2N3khg7DiagGmm7weightsEv"></span><span id="khg::DiagGmm::weights"></span><span class="target" id="classkhg_1_1DiagGmm_1a30a455c460896485fe4de61eda19ba3e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">weights</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm7weightsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Mutable accessor for the mixture weights. </p>
+<p>Note: changing the weights invalidates the gconsts; call <a class="reference internal" href="#classkhg_1_1DiagGmm_1ac96ae2e39607ad85ebc6275bbda96eb2"><span class="std std-ref">ComputeGconsts()</span></a> afterwards. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Reference to the 1-D weight tensor of shape (nmix,). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm13valid_gconstsEv">
+<span id="_CPPv3NK3khg7DiagGmm13valid_gconstsEv"></span><span id="_CPPv2NK3khg7DiagGmm13valid_gconstsEv"></span><span id="khg::DiagGmm::valid_gconstsC"></span><span class="target" id="classkhg_1_1DiagGmm_1a65ccc745a412e36f8dd984183f8003a1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">valid_gconsts</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm13valid_gconstsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Tells whether the cached gconsts are up to date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if <a class="reference internal" href="#classkhg_1_1DiagGmm_1ac96ae2e39607ad85ebc6275bbda96eb2"><span class="std std-ref">ComputeGconsts()</span></a> has been called after the last parameter change. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm7gconstsEv">
+<span id="_CPPv3NK3khg7DiagGmm7gconstsEv"></span><span id="_CPPv2NK3khg7DiagGmm7gconstsEv"></span><span id="khg::DiagGmm::gconstsC"></span><span class="target" id="classkhg_1_1DiagGmm_1a550ca2ec36ee881d89614d958c65aa3b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">gconsts</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm7gconstsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Const accessors. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1-D tensor of shape (nmix,) with the per-component gconsts <span class="math notranslate nohighlight">\(g_j\)</span> (see the class docs). Aborts if the gconsts are not valid. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm13means_invvarsEv">
+<span id="_CPPv3NK3khg7DiagGmm13means_invvarsEv"></span><span id="_CPPv2NK3khg7DiagGmm13means_invvarsEv"></span><span id="khg::DiagGmm::means_invvarsC"></span><span class="target" id="classkhg_1_1DiagGmm_1af3817ef4f66feb15cf27cf7436dbbfc1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">means_invvars</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm13means_invvarsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Const accessor for the means times inverse variances. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2-D tensor of shape (nmix, dim),  <span class="math notranslate nohighlight">\(\mu_j \odot
+        \sigma_j^{-2}\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm8inv_varsEv">
+<span id="_CPPv3NK3khg7DiagGmm8inv_varsEv"></span><span id="_CPPv2NK3khg7DiagGmm8inv_varsEv"></span><span id="khg::DiagGmm::inv_varsC"></span><span class="target" id="classkhg_1_1DiagGmm_1a652c69dad6724699a746ef969695a772"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">inv_vars</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm8inv_varsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Const accessor for the inverse variances. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2-D tensor of shape (nmix, dim), <span class="math notranslate nohighlight">\(\sigma_j^{-2}\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm20LogLikelihoodsMatrixERK11FloatMatrixP11FloatMatrix">
+<span id="_CPPv3NK3khg7DiagGmm20LogLikelihoodsMatrixERK11FloatMatrixP11FloatMatrix"></span><span id="_CPPv2NK3khg7DiagGmm20LogLikelihoodsMatrixERK11FloatMatrixP11FloatMatrix"></span><span id="khg::DiagGmm::LogLikelihoodsMatrix__FloatMatrixCR.FloatMatrixPC"></span><span class="target" id="classkhg_1_1DiagGmm_1a77a04f80650fde1a507d146ac0a84c93"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogLikelihoodsMatrix</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">loglikes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm20LogLikelihoodsMatrixERK11FloatMatrixP11FloatMatrix" title="Link to this definition"></a><br /></dt>
+<dd><p>This version of the LogLikelihoods function operates on a sequence of frames simultaneously; the row index of both &quot;data&quot; and &quot;loglikes&quot; is the frame index. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- 2-D matrix of (num-frames, dim) </p></li>
+<li><p><strong>loglikes</strong> -- On ouput, it contains a 2-D matrix of (num_frames, nmix) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm23LogLikelihoodsPreselectERK11FloatVectorRKNSt6vectorI7int32_tEEP11FloatVector">
+<span id="_CPPv3NK3khg7DiagGmm23LogLikelihoodsPreselectERK11FloatVectorRKNSt6vectorI7int32_tEEP11FloatVector"></span><span id="_CPPv2NK3khg7DiagGmm23LogLikelihoodsPreselectERK11FloatVectorRKNSt6vectorI7int32_tEEP11FloatVector"></span><span id="khg::DiagGmm::LogLikelihoodsPreselect__FloatVectorCR.std::vector:int32_t:CR.FloatVectorPC"></span><span class="target" id="classkhg_1_1DiagGmm_1a22db782ab659ab814088b19a3ae25586"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogLikelihoodsPreselect</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">indices</span></span>, <span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">loglikes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm23LogLikelihoodsPreselectERK11FloatVectorRKNSt6vectorI7int32_tEEP11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Outputs the per-component log-likelihoods of a subset of mixture components. </p>
+<p>Note: at output, loglikes-&gt;<a class="reference internal" href="#classkhg_1_1DiagGmm_1adb7464896d2b10e0d3c5e6332e13dbf8"><span class="std std-ref">Dim()</span></a> will equal indices.size(). loglikes[i] will correspond to the log-likelihood of the Gaussian indexed indices[i], including the mixture weight.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- 1-D tensor of shape (dim,) </p></li>
+<li><p><strong>indices</strong> -- The indices of the selected mixture components. </p></li>
+<li><p><strong>loglikes</strong> -- On return, 1-D tensor of shape (indices.size(),) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm17GaussianSelectionERK11FloatVector7int32_tPNSt6vectorI7int32_tEE">
+<span id="_CPPv3NK3khg7DiagGmm17GaussianSelectionERK11FloatVector7int32_tPNSt6vectorI7int32_tEE"></span><span id="_CPPv2NK3khg7DiagGmm17GaussianSelectionERK11FloatVector7int32_tPNSt6vectorI7int32_tEE"></span><span id="khg::DiagGmm::GaussianSelection__FloatVectorCR.int32_t.std::vector:int32_t:PC"></span><span class="target" id="classkhg_1_1DiagGmm_1a5b281d8431729d90e36ade224cb5e492"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GaussianSelection</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_gselect</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm17GaussianSelectionERK11FloatVector7int32_tPNSt6vectorI7int32_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get gaussian selection information for one frame. </p>
+<p>Returns log-like for this frame. Output is the best &quot;num_gselect&quot; indices, sorted from best to worst likelihood. If &quot;num_gselect&quot; &gt; <a class="reference internal" href="#classkhg_1_1DiagGmm_1ae391055e3c1653cc481cd1e28ae205f6"><span class="std std-ref">NumGauss()</span></a>, sets it to <a class="reference internal" href="#classkhg_1_1DiagGmm_1ae391055e3c1653cc481cd1e28ae205f6"><span class="std std-ref">NumGauss()</span></a>. The returned value is the total log-likelihood of the <em>selected</em> components (their log-likes combined with LogAdd).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- 1-D tensor of shape (dim,) </p></li>
+<li><p><strong>num_gselect</strong> -- How many Gaussians to select; clamped to <a class="reference internal" href="#classkhg_1_1DiagGmm_1ae391055e3c1653cc481cd1e28ae205f6"><span class="std std-ref">NumGauss()</span></a>. </p></li>
+<li><p><strong>output</strong> -- On return, the selected component indices, sorted from best to worst likelihood. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return the total loglike of the selected gaussian </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm17GaussianSelectionERK11FloatMatrix7int32_tPNSt6vectorINSt6vectorI7int32_tEEEE">
+<span id="_CPPv3NK3khg7DiagGmm17GaussianSelectionERK11FloatMatrix7int32_tPNSt6vectorINSt6vectorI7int32_tEEEE"></span><span id="_CPPv2NK3khg7DiagGmm17GaussianSelectionERK11FloatMatrix7int32_tPNSt6vectorINSt6vectorI7int32_tEEEE"></span><span id="khg::DiagGmm::GaussianSelection__FloatMatrixCR.int32_t.std::vector:std::vector:int32_t::PC"></span><span class="target" id="classkhg_1_1DiagGmm_1a0fc0cebeae19b24217674c5e90b5610e"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GaussianSelection</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_gselect</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm17GaussianSelectionERK11FloatMatrix7int32_tPNSt6vectorINSt6vectorI7int32_tEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>This version of the Gaussian selection function works for a sequence of frames rather than just a single frame. </p>
+<p>Returns sum of the log-likes over all frames. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- 2-D tensor of shape (num_frames, dim) </p></li>
+<li><p><strong>num_gselect</strong> -- How many Gaussians to select per frame. </p></li>
+<li><p><strong>output</strong> -- On return, one vector of selected component indices per frame (sorted from best to worst likelihood). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The sum over frames of the per-frame selected log-likes. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm26GaussianSelectionPreselectERK11FloatVectorRKNSt6vectorI7int32_tEE7int32_tPNSt6vectorI7int32_tEE">
+<span id="_CPPv3NK3khg7DiagGmm26GaussianSelectionPreselectERK11FloatVectorRKNSt6vectorI7int32_tEE7int32_tPNSt6vectorI7int32_tEE"></span><span id="_CPPv2NK3khg7DiagGmm26GaussianSelectionPreselectERK11FloatVectorRKNSt6vectorI7int32_tEE7int32_tPNSt6vectorI7int32_tEE"></span><span id="khg::DiagGmm::GaussianSelectionPreselect__FloatVectorCR.std::vector:int32_t:CR.int32_t.std::vector:int32_t:PC"></span><span class="target" id="classkhg_1_1DiagGmm_1a170ed56332bbe7ed5e4289df6cffadb9"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GaussianSelectionPreselect</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">preselect</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_gselect</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm26GaussianSelectionPreselectERK11FloatVectorRKNSt6vectorI7int32_tEE7int32_tPNSt6vectorI7int32_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get gaussian selection information for one frame. </p>
+<p>Returns log-like for this frame. Output is the best &quot;num_gselect&quot; indices that were preselected, sorted from best to worst likelihood. If &quot;num_gselect&quot; &gt; <a class="reference internal" href="#classkhg_1_1DiagGmm_1ae391055e3c1653cc481cd1e28ae205f6"><span class="std std-ref">NumGauss()</span></a>, sets it to <a class="reference internal" href="#classkhg_1_1DiagGmm_1ae391055e3c1653cc481cd1e28ae205f6"><span class="std std-ref">NumGauss()</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- 1-D tensor of shape (dim,) </p></li>
+<li><p><strong>preselect</strong> -- The candidate component indices to select from. </p></li>
+<li><p><strong>num_gselect</strong> -- How many components to select. </p></li>
+<li><p><strong>output</strong> -- On return, the selected component indices, sorted from best to worst likelihood. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The total log-likelihood of the selected components. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm19ComponentPosteriorsERK11FloatVectorP11FloatVector">
+<span id="_CPPv3NK3khg7DiagGmm19ComponentPosteriorsERK11FloatVectorP11FloatVector"></span><span id="_CPPv2NK3khg7DiagGmm19ComponentPosteriorsERK11FloatVectorP11FloatVector"></span><span id="khg::DiagGmm::ComponentPosteriors__FloatVectorCR.FloatVectorPC"></span><span class="target" id="classkhg_1_1DiagGmm_1a022487b0a36c8f9dcd3d03fc96745c14"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ComponentPosteriors</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">posteriors</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm19ComponentPosteriorsERK11FloatVectorP11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Computes the posterior probabilities of all Gaussian components given a data point. </p>
+<p>Returns the log-likehood of the data given the GMM. The posteriors are  <span class="math notranslate nohighlight">\( \gamma_j = w_j \mathcal{N}(x; \mu_j, \mathrm{diag}(\sigma_j^2)) /
+p(x) \)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- 1-D tensor of shape (dim,) </p></li>
+<li><p><strong>posteriors</strong> -- On return, it is a 1-D tensor of shape (nmix,) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(\log p(\mathrm{data})\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm22ComponentLogLikelihoodERK11FloatVector7int32_t">
+<span id="_CPPv3NK3khg7DiagGmm22ComponentLogLikelihoodERK11FloatVector7int32_t"></span><span id="_CPPv2NK3khg7DiagGmm22ComponentLogLikelihoodERK11FloatVector7int32_t"></span><span id="khg::DiagGmm::ComponentLogLikelihood__FloatVectorCR.int32_tC"></span><span class="target" id="classkhg_1_1DiagGmm_1a4e554a35c2c272fc0ebd5154db843cbb"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ComponentLogLikelihood</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">comp_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm22ComponentLogLikelihoodERK11FloatVector7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Computes the log-likelihood of a data point given a single Gaussian component. </p>
+<p>NOTE: Currently we make no guarantees about what happens if one of the variances is zero. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- 1-D tensor of shape (dim,) </p></li>
+<li><p><strong>comp_id</strong> -- Index of the mixture component (0-based). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(\log w_{\mathrm{comp\_id}} +
+        \log \mathcal{N}(\mathrm{data}; \mu, \mathrm{diag}(\sigma^2))\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm8GenerateEP11FloatVector">
+<span id="_CPPv3NK3khg7DiagGmm8GenerateEP11FloatVector"></span><span id="_CPPv2NK3khg7DiagGmm8GenerateEP11FloatVector"></span><span id="khg::DiagGmm::Generate__FloatVectorPC"></span><span class="target" id="classkhg_1_1DiagGmm_1a7f9463ce95964905c1d27412eca575db"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Generate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm8GenerateEP11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Generates a random data-point from this distribution. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output</strong> -- 1-D tensor of shape (dim,). Must be pre-allocated </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm7PerturbEf">
+<span id="_CPPv3N3khg7DiagGmm7PerturbEf"></span><span id="_CPPv2N3khg7DiagGmm7PerturbEf"></span><span id="khg::DiagGmm::Perturb__float"></span><span class="target" id="classkhg_1_1DiagGmm_1aca06eaa495febe613e673da63ab9ae2d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Perturb</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">perturb_factor</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm7PerturbEf" title="Link to this definition"></a><br /></dt>
+<dd><p>Perturbs the component means with a random vector multiplied by the perturb factor. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>perturb_factor</strong> -- Scale of the random perturbation. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm11InterpolateEfRK7DiagGmm12GmmFlagsType">
+<span id="_CPPv3N3khg7DiagGmm11InterpolateEfRK7DiagGmm12GmmFlagsType"></span><span id="_CPPv2N3khg7DiagGmm11InterpolateEfRK7DiagGmm12GmmFlagsType"></span><span id="khg::DiagGmm::Interpolate__float.DiagGmmCR.GmmFlagsType"></span><span class="target" id="classkhg_1_1DiagGmm_1ae356f62dd71819356157acc00b2db577"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Interpolate</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rho</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">source</span></span>, <span class="n"><span class="pre">GmmFlagsType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flags</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">kGmmAll</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm11InterpolateEfRK7DiagGmm12GmmFlagsType" title="Link to this definition"></a><br /></dt>
+<dd><p>this = rho x source + (1-rho) x this </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho</strong> -- Interpolation weight of <code class="docutils literal notranslate"><span class="pre">source</span></code>, in <span class="math notranslate nohighlight">\([0, 1]\)</span>. </p></li>
+<li><p><strong>source</strong> -- The model to interpolate with; must have the same number of components and the same dimension. </p></li>
+<li><p><strong>flags</strong> -- Which parameter groups to interpolate (default: all). Weights are re-normalized after interpolation. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm11MergeKmeansE7int32_tRK20ClusterKMeansOptions">
+<span id="_CPPv3N3khg7DiagGmm11MergeKmeansE7int32_tRK20ClusterKMeansOptions"></span><span id="_CPPv2N3khg7DiagGmm11MergeKmeansE7int32_tRK20ClusterKMeansOptions"></span><span id="khg::DiagGmm::MergeKmeans__int32_t.ClusterKMeansOptionsCR"></span><span class="target" id="classkhg_1_1DiagGmm_1aebbd7a2bceb8d8a12e4324c24fe32ace"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MergeKmeans</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target_components</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">ClusterKMeansOptions</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cfg</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">ClusterKMeansOptions</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm11MergeKmeansE7int32_tRK20ClusterKMeansOptions" title="Link to this definition"></a><br /></dt>
+<dd><p>Merge the components to a specified target <code class="docutils literal notranslate"><span class="pre">components:</span></code> this version uses a different approach based on K-means. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_components</strong> -- Desired number of components after merging. </p></li>
+<li><p><strong>cfg</strong> -- K-means configuration. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm5MergeE7int32_tPNSt6vectorI7int32_tEE">
+<span id="_CPPv3N3khg7DiagGmm5MergeE7int32_tPNSt6vectorI7int32_tEE"></span><span id="_CPPv2N3khg7DiagGmm5MergeE7int32_tPNSt6vectorI7int32_tEE"></span><span id="khg::DiagGmm::Merge__int32_t.std::vector:int32_t:P"></span><span class="target" id="classkhg_1_1DiagGmm_1a8a1f6d1d813a8929f9cc41afa943d907"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Merge</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target_components</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">history</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm5MergeE7int32_tPNSt6vectorI7int32_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Merge the components and remember the order in which the components were merged (flat list of pairs). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_components</strong> -- Desired number of components after merging. </p></li>
+<li><p><strong>history</strong> -- If non-NULL, on return holds the merge history as a flat list of pairs. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm5SplitE7int32_tfPNSt6vectorI7int32_tEE">
+<span id="_CPPv3N3khg7DiagGmm5SplitE7int32_tfPNSt6vectorI7int32_tEE"></span><span id="_CPPv2N3khg7DiagGmm5SplitE7int32_tfPNSt6vectorI7int32_tEE"></span><span id="khg::DiagGmm::Split__int32_t.float.std::vector:int32_t:P"></span><span class="target" id="classkhg_1_1DiagGmm_1a8a7bfbbf4f4288c483ca2fe328445a11"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Split</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target_components</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">perturb_factor</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">history</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm5SplitE7int32_tfPNSt6vectorI7int32_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Split the components and remember the order in which the components were split. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_components</strong> -- Desired number of components after splitting. </p></li>
+<li><p><strong>perturb_factor</strong> -- Scale of the random perturbation used to differentiate the two halves of a split component. </p></li>
+<li><p><strong>history</strong> -- If non-NULL, on return holds the split history as a flat list of pairs. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm15RemoveComponentE7int32_tb">
+<span id="_CPPv3N3khg7DiagGmm15RemoveComponentE7int32_tb"></span><span id="_CPPv2N3khg7DiagGmm15RemoveComponentE7int32_tb"></span><span id="khg::DiagGmm::RemoveComponent__int32_t.b"></span><span class="target" id="classkhg_1_1DiagGmm_1a696be58ca043a333878b3e17ee36a709"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RemoveComponent</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gauss</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">renorm_weights</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm15RemoveComponentE7int32_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Removes single component from model. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gauss</strong> -- Index of the component to remove. </p></li>
+<li><p><strong>renorm_weights</strong> -- If true, re-normalize the remaining weights to sum to one. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm16RemoveComponentsERKNSt6vectorI7int32_tEEb">
+<span id="_CPPv3N3khg7DiagGmm16RemoveComponentsERKNSt6vectorI7int32_tEEb"></span><span id="_CPPv2N3khg7DiagGmm16RemoveComponentsERKNSt6vectorI7int32_tEEb"></span><span id="khg::DiagGmm::RemoveComponents__std::vector:int32_t:CR.b"></span><span class="target" id="classkhg_1_1DiagGmm_1a9d0ca32031a393de6e0429f1fbadc99b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RemoveComponents</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">gauss</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">renorm_weights</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm16RemoveComponentsERKNSt6vectorI7int32_tEEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Removes multiple components from model; &quot;gauss&quot; must not have dups. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gauss</strong> -- Indices of the components to remove (no duplicates). </p></li>
+<li><p><strong>renorm_weights</strong> -- If true, re-normalize the remaining weights to sum to one. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm10SetWeightsERK11FloatVector">
+<span id="_CPPv3N3khg7DiagGmm10SetWeightsERK11FloatVector"></span><span id="_CPPv2N3khg7DiagGmm10SetWeightsERK11FloatVector"></span><span id="khg::DiagGmm::SetWeights__FloatVectorCR"></span><span class="target" id="classkhg_1_1DiagGmm_1a3465225adfd4aa54a89dcac2eddfa8f5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetWeights</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">w</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm10SetWeightsERK11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Set mixture weights. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>w</strong> -- 1-D tensor of shape (num_mix,) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm8SetMeansERK11FloatMatrix">
+<span id="_CPPv3N3khg7DiagGmm8SetMeansERK11FloatMatrix"></span><span id="_CPPv2N3khg7DiagGmm8SetMeansERK11FloatMatrix"></span><span id="khg::DiagGmm::SetMeans__FloatMatrixCR"></span><span class="target" id="classkhg_1_1DiagGmm_1abdf2e99faa46f47f59fe9d7328da0f77"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMeans</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">m</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm8SetMeansERK11FloatMatrix" title="Link to this definition"></a><br /></dt>
+<dd><p>Use SetMeans to update only the Gaussian means (and not variances). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>m</strong> -- 2-D tensor of shape (num_mix, dim) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm8GetMeansEv">
+<span id="_CPPv3NK3khg7DiagGmm8GetMeansEv"></span><span id="_CPPv2NK3khg7DiagGmm8GetMeansEv"></span><span id="khg::DiagGmm::GetMeansC"></span><span class="target" id="classkhg_1_1DiagGmm_1a0118f37988ab484a966f3590649137a6"></span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMeans</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm8GetMeansEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Accessor for means. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2-D tensor of shape (num_mix, dim) with the plain means <span class="math notranslate nohighlight">\(\mu_j\)</span> (computed from means_invvars_ / inv_vars_). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm10SetInvVarsERK11FloatMatrix">
+<span id="_CPPv3N3khg7DiagGmm10SetInvVarsERK11FloatMatrix"></span><span id="_CPPv2N3khg7DiagGmm10SetInvVarsERK11FloatMatrix"></span><span id="khg::DiagGmm::SetInvVars__FloatMatrixCR"></span><span class="target" id="classkhg_1_1DiagGmm_1a9962978f30f81ac8f2ef9a141a120739"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetInvVars</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm10SetInvVarsERK11FloatMatrix" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the (inverse) variances and recompute means_invvars_. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>v</strong> -- 2-D matrix of shape (num_mix, dim) with the inverse variances <span class="math notranslate nohighlight">\(\sigma_j^{-2}\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm7GetVarsEv">
+<span id="_CPPv3NK3khg7DiagGmm7GetVarsEv"></span><span id="_CPPv2NK3khg7DiagGmm7GetVarsEv"></span><span id="khg::DiagGmm::GetVarsC"></span><span class="target" id="classkhg_1_1DiagGmm_1a2aae6c7537752c576bc7da44088a10b7"></span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetVars</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm7GetVarsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Accessor for covariances. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2-D tensor of shape (num_mix, dim) with the diagonal variances <span class="math notranslate nohighlight">\(\sigma_j^2\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm18SetComponentWeightE7int32_tf">
+<span id="_CPPv3N3khg7DiagGmm18SetComponentWeightE7int32_tf"></span><span id="_CPPv2N3khg7DiagGmm18SetComponentWeightE7int32_tf"></span><span id="khg::DiagGmm::SetComponentWeight__int32_t.float"></span><span class="target" id="classkhg_1_1DiagGmm_1a9a8a0ff4d20a56f00885cb642b5e2e9a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetComponentWeight</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gauss</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm18SetComponentWeightE7int32_tf" title="Link to this definition"></a><br /></dt>
+<dd><p>Set weight for single component. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gauss</strong> -- Component index. </p></li>
+<li><p><strong>weight</strong> -- The new (linear) mixture weight. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm16SetComponentMeanE7int32_tRK11FloatVector">
+<span id="_CPPv3N3khg7DiagGmm16SetComponentMeanE7int32_tRK11FloatVector"></span><span id="_CPPv2N3khg7DiagGmm16SetComponentMeanE7int32_tRK11FloatVector"></span><span id="khg::DiagGmm::SetComponentMean__int32_t.FloatVectorCR"></span><span class="target" id="classkhg_1_1DiagGmm_1a82fa8159d1db950e2e1afcf66556b1b8"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetComponentMean</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gauss</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm16SetComponentMeanE7int32_tRK11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Mutators for single component, supports float or double Set mean for a single component - internally multiplies with inv(var). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gauss</strong> -- Component index. </p></li>
+<li><p><strong>in</strong> -- 1-D tensor of shape (dim,) with the plain mean. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm18SetInvVarsAndMeansERK11FloatMatrixRK11FloatMatrix">
+<span id="_CPPv3N3khg7DiagGmm18SetInvVarsAndMeansERK11FloatMatrixRK11FloatMatrix"></span><span id="_CPPv2N3khg7DiagGmm18SetInvVarsAndMeansERK11FloatMatrixRK11FloatMatrix"></span><span id="khg::DiagGmm::SetInvVarsAndMeans__FloatMatrixCR.FloatMatrixCR"></span><span class="target" id="classkhg_1_1DiagGmm_1adea3f8e5637428a5eb407c3706139b91"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetInvVarsAndMeans</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">invvars</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">means</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm18SetInvVarsAndMeansERK11FloatMatrixRK11FloatMatrix" title="Link to this definition"></a><br /></dt>
+<dd><p>Use SetInvVarsAndMeans if updating both means and (inverse) variances. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>invvars</strong> -- 2-D tensor of shape (num_mix, dim), inverse variances. </p></li>
+<li><p><strong>means</strong> -- 2-D tensor of shape (num_mix, dim), plain means. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm18SetComponentInvVarE7int32_tRK11FloatVector">
+<span id="_CPPv3N3khg7DiagGmm18SetComponentInvVarE7int32_tRK11FloatVector"></span><span id="_CPPv2N3khg7DiagGmm18SetComponentInvVarE7int32_tRK11FloatVector"></span><span id="khg::DiagGmm::SetComponentInvVar__int32_t.FloatVectorCR"></span><span class="target" id="classkhg_1_1DiagGmm_1a85ce4ecce144f2edc8d7141b6b1fb27b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetComponentInvVar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gauss</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm18SetComponentInvVarE7int32_tRK11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Set inv-var for single component (recommend to do this before setting the mean, if doing both, for numerical reasons). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gauss</strong> -- Component index. </p></li>
+<li><p><strong>in</strong> -- 1-D tensor of shape (dim,) with the inverse variances. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm16GetComponentMeanE7int32_t">
+<span id="_CPPv3NK3khg7DiagGmm16GetComponentMeanE7int32_t"></span><span id="_CPPv2NK3khg7DiagGmm16GetComponentMeanE7int32_t"></span><span id="khg::DiagGmm::GetComponentMean__int32_tC"></span><span class="target" id="classkhg_1_1DiagGmm_1a9fe5f1ba79f21e78a0f94846515f557e"></span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetComponentMean</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gauss</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm16GetComponentMeanE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Accessor for single component mean. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gauss</strong> -- Component index. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1-D tensor of shape (dim,) with the plain mean. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm20GetComponentVarianceE7int32_t">
+<span id="_CPPv3NK3khg7DiagGmm20GetComponentVarianceE7int32_t"></span><span id="_CPPv2NK3khg7DiagGmm20GetComponentVarianceE7int32_t"></span><span id="khg::DiagGmm::GetComponentVariance__int32_tC"></span><span class="target" id="classkhg_1_1DiagGmm_1a06e57f0400af711ccfa36278c1c02d60"></span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetComponentVariance</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gauss</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm20GetComponentVarianceE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Accessor for single component variance. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gauss</strong> -- Component index. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1-D tensor of shape (dim,) with the diagonal variance. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg7DiagGmm4ReadERNSt7istreamEb">
+<span id="_CPPv3N3khg7DiagGmm4ReadERNSt7istreamEb"></span><span id="_CPPv2N3khg7DiagGmm4ReadERNSt7istreamEb"></span><span id="khg::DiagGmm::Read__isR.b"></span><span class="target" id="classkhg_1_1DiagGmm_1ad05ed95a5fd9553f019d53a884a2b76c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Read</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">is</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg7DiagGmm4ReadERNSt7istreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Reads from a kaldi-format stream (ported from ../kaldi/src/gmm/diag-gmm.cc; file format is identical). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is</strong> -- The input stream to read from. </p></li>
+<li><p><strong>binary</strong> -- true for binary mode, false for text mode. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg7DiagGmm5WriteERNSt7ostreamEb">
+<span id="_CPPv3NK3khg7DiagGmm5WriteERNSt7ostreamEb"></span><span id="_CPPv2NK3khg7DiagGmm5WriteERNSt7ostreamEb"></span><span id="khg::DiagGmm::Write__osR.bC"></span><span class="target" id="classkhg_1_1DiagGmm_1ab9ebe4ac715ee4c72a30c564e2ad410e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Write</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg7DiagGmm5WriteERNSt7ostreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Writes to a kaldi-format stream (ported from ../kaldi/src/gmm/diag-gmm.cc; file format is identical). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>os</strong> -- The output stream to write to. </p></li>
+<li><p><strong>binary</strong> -- true for binary mode, false for text mode. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-friends">Friends</p>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="property"><span class="pre">friend</span> <span class="pre">class</span></span> <span class="pre">DiagGmmNormal</span></dt>
+</dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmmE">
+<span id="_CPPv3N3khg9AmDiagGmmE"></span><span id="_CPPv2N3khg9AmDiagGmmE"></span><span id="khg::AmDiagGmm"></span><span class="target" id="classkhg_1_1AmDiagGmm"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AmDiagGmm</span></span></span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmmE" title="Link to this definition"></a><br /></dt>
+<dd><p>Acoustic model: a collection of diagonal-covariance GMMs, one per pdf, indexed by pdf-id. </p>
+<p>Each pdf is a <code class="docutils literal notranslate"><a class="reference internal" href="#classkhg_1_1DiagGmm"><span class="std std-ref"><span class="pre">DiagGmm</span></span></a></code> owned by this object; the pdf-ids are zero-based indices into the internal list (see the file docs). The model owns its GMMs and frees them in the destructor; copying is disabled. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm9AmDiagGmmEv">
+<span id="_CPPv3N3khg9AmDiagGmm9AmDiagGmmEv"></span><span id="_CPPv2N3khg9AmDiagGmm9AmDiagGmmEv"></span><span id="khg::AmDiagGmm::AmDiagGmm"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a3dbe015d26fcd9128f794b4eb9fde92a"></span><span class="sig-name descname"><span class="n"><span class="pre">AmDiagGmm</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm9AmDiagGmmEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Empty constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmmD0Ev">
+<span id="_CPPv3N3khg9AmDiagGmmD0Ev"></span><span id="_CPPv2N3khg9AmDiagGmmD0Ev"></span><span id="khg::AmDiagGmm::~AmDiagGmm"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a8793a03dcd56899cc5e00757cdc2ee8f"></span><span class="sig-name descname"><span class="n"><span class="pre">~AmDiagGmm</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmmD0Ev" title="Link to this definition"></a><br /></dt>
+<dd><p>Destructor; frees the owned GMMs. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm9AmDiagGmmERK9AmDiagGmm">
+<span id="_CPPv3N3khg9AmDiagGmm9AmDiagGmmERK9AmDiagGmm"></span><span id="_CPPv2N3khg9AmDiagGmm9AmDiagGmmERK9AmDiagGmm"></span><span id="khg::AmDiagGmm::AmDiagGmm__AmDiagGmmCR"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a51a4b93bfbc0857cc6d2d994410a69d6"></span><span class="sig-name descname"><span class="n"><span class="pre">AmDiagGmm</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg9AmDiagGmm9AmDiagGmmERK9AmDiagGmm" title="khg::AmDiagGmm::AmDiagGmm"><span class="n"><span class="pre">AmDiagGmm</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm9AmDiagGmmERK9AmDiagGmm" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy construction is not allowed. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmmaSERK9AmDiagGmm">
+<span id="_CPPv3N3khg9AmDiagGmmaSERK9AmDiagGmm"></span><span id="_CPPv2N3khg9AmDiagGmmaSERK9AmDiagGmm"></span><span id="khg::AmDiagGmm::assign-operator__AmDiagGmmCR"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a1033ccb3951fc0a5e66bcd730dd46103"></span><a class="reference internal" href="#_CPPv4N3khg9AmDiagGmmE" title="khg::AmDiagGmm"><span class="n"><span class="pre">AmDiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg9AmDiagGmmE" title="khg::AmDiagGmm"><span class="n"><span class="pre">AmDiagGmm</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmmaSERK9AmDiagGmm" title="Link to this definition"></a><br /></dt>
+<dd><p>Assignment is not allowed. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg9AmDiagGmm3DimEv">
+<span id="_CPPv3NK3khg9AmDiagGmm3DimEv"></span><span id="_CPPv2NK3khg9AmDiagGmm3DimEv"></span><span id="khg::AmDiagGmm::DimC"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a1a5054cba9155dd7ee0a36006b360cfd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dim</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg9AmDiagGmm3DimEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The dimensionality of the feature vectors, taken from the first pdf (0 if the model is empty). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg9AmDiagGmm7NumPdfsEv">
+<span id="_CPPv3NK3khg9AmDiagGmm7NumPdfsEv"></span><span id="_CPPv2NK3khg9AmDiagGmm7NumPdfsEv"></span><span id="khg::AmDiagGmm::NumPdfsC"></span><span class="target" id="classkhg_1_1AmDiagGmm_1aef11c1a504539ce04de7e70d42e8ef14"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumPdfs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg9AmDiagGmm7NumPdfsEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of pdfs (emission densities) in the model. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg9AmDiagGmm8NumGaussEv">
+<span id="_CPPv3NK3khg9AmDiagGmm8NumGaussEv"></span><span id="_CPPv2NK3khg9AmDiagGmm8NumGaussEv"></span><span id="khg::AmDiagGmm::NumGaussC"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a684ae68c9f374e30ff227bbdbdf7debb"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumGauss</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg9AmDiagGmm8NumGaussEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The total number of Gaussian components over all pdfs. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg9AmDiagGmm13NumGaussInPdfE7int32_t">
+<span id="_CPPv3NK3khg9AmDiagGmm13NumGaussInPdfE7int32_t"></span><span id="_CPPv2NK3khg9AmDiagGmm13NumGaussInPdfE7int32_t"></span><span id="khg::AmDiagGmm::NumGaussInPdf__int32_tC"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a4a8b882d1da513a3c824c4c84c5e9e01"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumGaussInPdf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pdf_index</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg9AmDiagGmm13NumGaussInPdfE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pdf_index</strong> -- Zero-based pdf-id. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of mixture components of the given pdf. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm4InitERK7DiagGmm7int32_t">
+<span id="_CPPv3N3khg9AmDiagGmm4InitERK7DiagGmm7int32_t"></span><span id="_CPPv2N3khg9AmDiagGmm4InitERK7DiagGmm7int32_t"></span><span id="khg::AmDiagGmm::Init__DiagGmmCR.int32_t"></span><span class="target" id="classkhg_1_1AmDiagGmm_1abea7ffaf54df5af212f884cc429675a6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">proto</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_pdfs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm4InitERK7DiagGmm7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Initializes with a single &quot;prototype&quot; GMM. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>proto</strong> -- The prototype GMM; every pdf starts as a copy of it. </p></li>
+<li><p><strong>num_pdfs</strong> -- Number of pdfs to create (typically the number of tree leaves, i.e. <a class="reference internal" href="hmm.html#classkhg_1_1TransitionModel_1aa4a7f67814f01845325f490ed33e0796"><span class="std std-ref">TransitionModel::NumPdfs()</span></a>). </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm6AddPdfERK7DiagGmm">
+<span id="_CPPv3N3khg9AmDiagGmm6AddPdfERK7DiagGmm"></span><span id="_CPPv2N3khg9AmDiagGmm6AddPdfERK7DiagGmm"></span><span id="khg::AmDiagGmm::AddPdf__DiagGmmCR"></span><span class="target" id="classkhg_1_1AmDiagGmm_1afdc6b097e75bf34ba74bf57c70a5757c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddPdf</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">gmm</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm6AddPdfERK7DiagGmm" title="Link to this definition"></a><br /></dt>
+<dd><p>Adds a GMM to the model, and increments the total number of PDFs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gmm</strong> -- The GMM to append as the next pdf; it is copied. Its dimension must match the existing pdfs (except for the first one). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm17CopyFromAmDiagGmmERK9AmDiagGmm">
+<span id="_CPPv3N3khg9AmDiagGmm17CopyFromAmDiagGmmERK9AmDiagGmm"></span><span id="_CPPv2N3khg9AmDiagGmm17CopyFromAmDiagGmmERK9AmDiagGmm"></span><span id="khg::AmDiagGmm::CopyFromAmDiagGmm__AmDiagGmmCR"></span><span class="target" id="classkhg_1_1AmDiagGmm_1abd2e7cb32a8bc6baccd01b147a9c5bbe"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CopyFromAmDiagGmm</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg9AmDiagGmmE" title="khg::AmDiagGmm"><span class="n"><span class="pre">AmDiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm17CopyFromAmDiagGmmERK9AmDiagGmm" title="Link to this definition"></a><br /></dt>
+<dd><p>Copies the parameters from another model. </p>
+<p>Allocates necessary memory. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> -- The model to copy from. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm8SplitPdfE7int32_t7int32_tf">
+<span id="_CPPv3N3khg9AmDiagGmm8SplitPdfE7int32_t7int32_tf"></span><span id="_CPPv2N3khg9AmDiagGmm8SplitPdfE7int32_t7int32_tf"></span><span id="khg::AmDiagGmm::SplitPdf__int32_t.int32_t.float"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a86932caa15c79bfede0e4357687113cc"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SplitPdf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target_components</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">perturb_factor</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm8SplitPdfE7int32_t7int32_tf" title="Link to this definition"></a><br /></dt>
+<dd><p>Splits the components of a single pdf towards a target count. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idx</strong> -- Zero-based pdf-id of the pdf to split. </p></li>
+<li><p><strong>target_components</strong> -- Desired number of components of this pdf after splitting. </p></li>
+<li><p><strong>perturb_factor</strong> -- Scale of the random perturbation used to differentiate the split halves. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm12SplitByCountERK11FloatVector7int32_tfff">
+<span id="_CPPv3N3khg9AmDiagGmm12SplitByCountERK11FloatVector7int32_tfff"></span><span id="_CPPv2N3khg9AmDiagGmm12SplitByCountERK11FloatVector7int32_tfff"></span><span id="khg::AmDiagGmm::SplitByCount__FloatVectorCR.int32_t.float.float.float"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a92383d00ea15633d1108bb3136d19d3a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SplitByCount</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">state_occs</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target_components</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">perturb_factor</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">power</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm12SplitByCountERK11FloatVector7int32_tfff" title="Link to this definition"></a><br /></dt>
+<dd><p>In SplitByCount we use the &quot;target_components&quot; and &quot;power&quot; to work out targets for each state (according to power-of-occupancy rule), and any state less than its target gets mixed up. </p>
+<p>If some states were over their target, this may take the <code class="docutils literal notranslate"><span class="pre">Gauss</span></code> over the target. we enforce a min-count on Gaussians while splitting (don't split if it would take it below min-count).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_occs</strong> -- A 1-D float tensor of shape (num_pdfs,) </p></li>
+<li><p><strong>target_components</strong> -- Expected sum of number of gaussian in all pdfs </p></li>
+<li><p><strong>perturb_factor</strong> -- to use when splitting a GMM </p></li>
+<li><p><strong>power</strong> -- It is used to compute state_occs.pow(power) </p></li>
+<li><p><strong>min_count</strong> -- If the average of occupancy of gaussians in a pdf is less than this number, then we won't split this pdf any more </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm12MergeByCountERK11FloatVector7int32_tff">
+<span id="_CPPv3N3khg9AmDiagGmm12MergeByCountERK11FloatVector7int32_tff"></span><span id="_CPPv2N3khg9AmDiagGmm12MergeByCountERK11FloatVector7int32_tff"></span><span id="khg::AmDiagGmm::MergeByCount__FloatVectorCR.int32_t.float.float"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a8e884c31d583db643708656d24de877b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MergeByCount</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">state_occs</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target_components</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">power</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm12MergeByCountERK11FloatVector7int32_tff" title="Link to this definition"></a><br /></dt>
+<dd><p>In MergeByCount we use the &quot;target_components&quot; and &quot;power&quot; to work out targets for each state (according to power-of-occupancy rule), and any state over its target gets mixed down. </p>
+<p>If some states were under their target, this may take the <code class="docutils literal notranslate"><span class="pre">Gauss</span></code> below the target. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_occs</strong> -- 1-D float tensor of shape (num_pdfs,) </p></li>
+<li><p><strong>target_components</strong> -- Expected sum of number of gaussians in all pdfs </p></li>
+<li><p><strong>power</strong> -- It is used to compute state_occs.pow(power) </p></li>
+<li><p><strong>min_count</strong> -- The per-pdf target is capped so that each Gaussian retains at least this average occupancy (a LARGER value forces MORE merging, never less). </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg9AmDiagGmm14ComputeGconstsEv">
+<span id="_CPPv3NK3khg9AmDiagGmm14ComputeGconstsEv"></span><span id="_CPPv2NK3khg9AmDiagGmm14ComputeGconstsEv"></span><span id="khg::AmDiagGmm::ComputeGconstsC"></span><span class="target" id="classkhg_1_1AmDiagGmm_1aa4c0afc1c3332b98cb1561da1a93fc08"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ComputeGconsts</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg9AmDiagGmm14ComputeGconstsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets the gconsts for all the PDFs. </p>
+<p>Returns the total number of Gaussians over all PDFs that are &quot;invalid&quot; e.g. due to zero weights or variances. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of invalid Gaussians over all pdfs. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg9AmDiagGmm13LogLikelihoodE7int32_tRK11FloatVector">
+<span id="_CPPv3NK3khg9AmDiagGmm13LogLikelihoodE7int32_tRK11FloatVector"></span><span id="_CPPv2NK3khg9AmDiagGmm13LogLikelihoodE7int32_tRK11FloatVector"></span><span id="khg::AmDiagGmm::LogLikelihood__int32_t.FloatVectorCRC"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a5226a5de19908639d2188d59636064dd"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogLikelihood</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pdf_index</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg9AmDiagGmm13LogLikelihoodE7int32_tRK11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Computes the log-likelihood of a frame under one pdf of the model. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdf_index</strong> -- Zero-based pdf-id. </p></li>
+<li><p><strong>data</strong> -- 1-D float tensor of shape (dim,) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return the total loglike of the specified pdf </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm6GetPdfE7int32_t">
+<span id="_CPPv3N3khg9AmDiagGmm6GetPdfE7int32_t"></span><span id="_CPPv2N3khg9AmDiagGmm6GetPdfE7int32_t"></span><span id="khg::AmDiagGmm::GetPdf__int32_t"></span><span class="target" id="classkhg_1_1AmDiagGmm_1aedce26b1f89b65ac4bc859204d53edcc"></span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetPdf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pdf_index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm6GetPdfE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Mutable accessor for a pdf. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pdf_index</strong> -- Zero-based pdf-id. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Reference to the <code class="docutils literal notranslate"><a class="reference internal" href="#classkhg_1_1DiagGmm"><span class="std std-ref"><span class="pre">DiagGmm</span></span></a></code> of the given pdf. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg9AmDiagGmm6GetPdfE7int32_t">
+<span id="_CPPv3NK3khg9AmDiagGmm6GetPdfE7int32_t"></span><span id="_CPPv2NK3khg9AmDiagGmm6GetPdfE7int32_t"></span><span id="khg::AmDiagGmm::GetPdf__int32_tC"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a0a6ec4908cc72a04b235a116dd2a6b28"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetPdf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pdf_index</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg9AmDiagGmm6GetPdfE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Const accessor for a pdf. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pdf_index</strong> -- Zero-based pdf-id. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Const reference to the <code class="docutils literal notranslate"><a class="reference internal" href="#classkhg_1_1DiagGmm"><span class="std std-ref"><span class="pre">DiagGmm</span></span></a></code> of the given pdf. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg9AmDiagGmm15GetGaussianMeanE7int32_t7int32_t">
+<span id="_CPPv3NK3khg9AmDiagGmm15GetGaussianMeanE7int32_t7int32_t"></span><span id="_CPPv2NK3khg9AmDiagGmm15GetGaussianMeanE7int32_t7int32_t"></span><span id="khg::AmDiagGmm::GetGaussianMean__int32_t.int32_tC"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a1c841735108a593de4df13a0f35e755a"></span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetGaussianMean</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pdf_index</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gauss</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg9AmDiagGmm15GetGaussianMeanE7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Accessor for the mean of a single Gaussian component of a pdf. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdf_index</strong> -- Zero-based pdf-id. </p></li>
+<li><p><strong>gauss</strong> -- Index of the mixture component within the pdf. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return a 1-D float tensor of shape (dim,) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg9AmDiagGmm19GetGaussianVarianceE7int32_t7int32_t">
+<span id="_CPPv3NK3khg9AmDiagGmm19GetGaussianVarianceE7int32_t7int32_t"></span><span id="_CPPv2NK3khg9AmDiagGmm19GetGaussianVarianceE7int32_t7int32_t"></span><span id="khg::AmDiagGmm::GetGaussianVariance__int32_t.int32_tC"></span><span class="target" id="classkhg_1_1AmDiagGmm_1ad7414c1ec56ef0d3f6faea2371067756"></span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetGaussianVariance</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pdf_index</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gauss</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg9AmDiagGmm19GetGaussianVarianceE7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Accessor for the variance of a single Gaussian component of a pdf. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdf_index</strong> -- Zero-based pdf-id. </p></li>
+<li><p><strong>gauss</strong> -- Index of the mixture component within the pdf. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return a 1-D float tensor of shape (dim,) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm15SetGaussianMeanE7int32_t7int32_tRK11FloatVector">
+<span id="_CPPv3N3khg9AmDiagGmm15SetGaussianMeanE7int32_t7int32_tRK11FloatVector"></span><span id="_CPPv2N3khg9AmDiagGmm15SetGaussianMeanE7int32_t7int32_tRK11FloatVector"></span><span id="khg::AmDiagGmm::SetGaussianMean__int32_t.int32_t.FloatVectorCR"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a11a2d8a526992d98db6a0532b684f238"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetGaussianMean</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pdf_index</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gauss_index</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm15SetGaussianMeanE7int32_t7int32_tRK11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Mutators Sets the mean of a single Gaussian component of a pdf. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdf_index</strong> -- Zero-based pdf-id. </p></li>
+<li><p><strong>gauss_index</strong> -- Index of the mixture component within the pdf. </p></li>
+<li><p><strong>in</strong> -- 1-D float tensor of shape (dim,) with the new mean. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg9AmDiagGmm4ReadERNSt7istreamEb">
+<span id="_CPPv3N3khg9AmDiagGmm4ReadERNSt7istreamEb"></span><span id="_CPPv2N3khg9AmDiagGmm4ReadERNSt7istreamEb"></span><span id="khg::AmDiagGmm::Read__isR.b"></span><span class="target" id="classkhg_1_1AmDiagGmm_1a1969a14428613c5835dc086d00487d37"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Read</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">is</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg9AmDiagGmm4ReadERNSt7istreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Reads/writes in kaldi's format (ported from ../kaldi/src/gmm/am-diag-gmm.cc; file format is identical). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is</strong> -- The stream to read from / write to. </p></li>
+<li><p><strong>binary</strong> -- true for binary mode, false for text mode. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17MleDiagGmmOptionsE">
+<span id="_CPPv3N3khg17MleDiagGmmOptionsE"></span><span id="_CPPv2N3khg17MleDiagGmmOptionsE"></span><span id="khg::MleDiagGmmOptions"></span><span class="target" id="structkhg_1_1MleDiagGmmOptions"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MleDiagGmmOptions</span></span></span><a class="headerlink" href="#_CPPv4N3khg17MleDiagGmmOptionsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Configuration variables like variance floor, minimum occupancy, etc. </p>
+<p>needed in the estimation process.</p>
+<p>The defaults match kaldi's (they are registered by kaldi's <code class="docutils literal notranslate"><span class="pre">gmm-est</span></code> under the same flag names). </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17MleDiagGmmOptions8ToStringEv">
+<span id="_CPPv3NK3khg17MleDiagGmmOptions8ToStringEv"></span><span id="_CPPv2NK3khg17MleDiagGmmOptions8ToStringEv"></span><span id="khg::MleDiagGmmOptions::ToStringC"></span><span class="target" id="structkhg_1_1MleDiagGmmOptions_1a53ab0c27fea68bc1d748a82e18535bf2"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg17MleDiagGmmOptions8ToStringEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A human-readable summary of the options. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17MleDiagGmmOptions21variance_floor_vectorE">
+<span id="_CPPv3N3khg17MleDiagGmmOptions21variance_floor_vectorE"></span><span id="_CPPv2N3khg17MleDiagGmmOptions21variance_floor_vectorE"></span><span id="khg::MleDiagGmmOptions::variance_floor_vector__DoubleVector"></span><span class="target" id="structkhg_1_1MleDiagGmmOptions_1a133ee0bc0bea78f4aa5c3b9ecfeb5316"></span><span class="n"><span class="pre">DoubleVector</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">variance_floor_vector</span></span></span><a class="headerlink" href="#_CPPv4N3khg17MleDiagGmmOptions21variance_floor_vectorE" title="Link to this definition"></a><br /></dt>
+<dd><p>Variance floor for each dimension [empty if not supplied]. </p>
+<p>It is in double since the variance is computed in double precision. When non-empty it takes precedence over <code class="docutils literal notranslate"><span class="pre">min_variance</span></code>. There is no kaldi command-line flag for it; it is set programmatically (kaldi only registers the four options below). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17MleDiagGmmOptions19min_gaussian_weightE">
+<span id="_CPPv3N3khg17MleDiagGmmOptions19min_gaussian_weightE"></span><span id="_CPPv2N3khg17MleDiagGmmOptions19min_gaussian_weightE"></span><span id="khg::MleDiagGmmOptions::min_gaussian_weight__float"></span><span class="target" id="structkhg_1_1MleDiagGmmOptions_1a28630bac2b1c63c3b92e9a453e922cc2"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min_gaussian_weight</span></span></span><a class="headerlink" href="#_CPPv4N3khg17MleDiagGmmOptions19min_gaussian_weightE" title="Link to this definition"></a><br /></dt>
+<dd><p>Minimum weight below which a Gaussian is not updated (and is removed, if remove_low_count_gaussians == true); kaldi flag <code class="docutils literal notranslate"><span class="pre">--min-gaussian-weight</span></code>; default 1.0e-05. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17MleDiagGmmOptions22min_gaussian_occupancyE">
+<span id="_CPPv3N3khg17MleDiagGmmOptions22min_gaussian_occupancyE"></span><span id="_CPPv2N3khg17MleDiagGmmOptions22min_gaussian_occupancyE"></span><span id="khg::MleDiagGmmOptions::min_gaussian_occupancy__float"></span><span class="target" id="structkhg_1_1MleDiagGmmOptions_1ab2b5a6bb9d61c585cc2d32a651370b8c"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min_gaussian_occupancy</span></span></span><a class="headerlink" href="#_CPPv4N3khg17MleDiagGmmOptions22min_gaussian_occupancyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Minimum count below which a Gaussian is not updated (and is removed, if remove_low_count_gaussians == true). </p>
+<p>kaldi flag <code class="docutils literal notranslate"><span class="pre">--min-gaussian-occupancy</span></code>; default 10.0. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17MleDiagGmmOptions12min_varianceE">
+<span id="_CPPv3N3khg17MleDiagGmmOptions12min_varianceE"></span><span id="_CPPv2N3khg17MleDiagGmmOptions12min_varianceE"></span><span id="khg::MleDiagGmmOptions::min_variance__double"></span><span class="target" id="structkhg_1_1MleDiagGmmOptions_1a0172d14f1e4773af9a7d0fac44ed71e6"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min_variance</span></span></span><a class="headerlink" href="#_CPPv4N3khg17MleDiagGmmOptions12min_varianceE" title="Link to this definition"></a><br /></dt>
+<dd><p>Minimum allowed variance in any dimension (if no variance floor) It is in double since the variance is computed in double precision. </p>
+<p>kaldi flag <code class="docutils literal notranslate"><span class="pre">--min-variance</span></code>; default 0.001. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17MleDiagGmmOptions26remove_low_count_gaussiansE">
+<span id="_CPPv3N3khg17MleDiagGmmOptions26remove_low_count_gaussiansE"></span><span id="_CPPv2N3khg17MleDiagGmmOptions26remove_low_count_gaussiansE"></span><span id="khg::MleDiagGmmOptions::remove_low_count_gaussians__b"></span><span class="target" id="structkhg_1_1MleDiagGmmOptions_1a8b1633c66ef05eb2f0075e07a86e8674"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">remove_low_count_gaussians</span></span></span><a class="headerlink" href="#_CPPv4N3khg17MleDiagGmmOptions26remove_low_count_gaussiansE" title="Link to this definition"></a><br /></dt>
+<dd><p>If true, remove Gaussians whose occupancy or weight falls below the floors above (the last remaining Gaussian is never removed). </p>
+<p>kaldi flag <code class="docutils literal notranslate"><span class="pre">--remove-low-count-gaussians</span></code>; default true. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmmE">
+<span id="_CPPv3N3khg12AccumDiagGmmE"></span><span id="_CPPv2N3khg12AccumDiagGmmE"></span><span id="khg::AccumDiagGmm"></span><span class="target" id="classkhg_1_1AccumDiagGmm"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AccumDiagGmm</span></span></span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmmE" title="Link to this definition"></a><br /></dt>
+<dd><p>Statistics accumulator for one <code class="docutils literal notranslate"><a class="reference internal" href="#classkhg_1_1DiagGmm"><span class="std std-ref"><span class="pre">DiagGmm</span></span></a></code>. </p>
+<p>Holds the zero-order (occupancy), first-order (mean) and second-order (variance) accumulators for each mixture component, in double precision. The accumulators that are actually stored are controlled by the flags given at construction: occupancy is stored for <code class="docutils literal notranslate"><span class="pre">kGmmWeights</span></code>, the mean accumulator for <code class="docutils literal notranslate"><span class="pre">kGmmMeans</span></code>, and the variance accumulator for <code class="docutils literal notranslate"><span class="pre">kGmmVariances</span></code> (which implies <code class="docutils literal notranslate"><span class="pre">kGmmMeans</span></code>; see AugmentGmmFlags()). </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm12AccumDiagGmmEv">
+<span id="_CPPv3N3khg12AccumDiagGmm12AccumDiagGmmEv"></span><span id="_CPPv2N3khg12AccumDiagGmm12AccumDiagGmmEv"></span><span id="khg::AccumDiagGmm::AccumDiagGmm"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1ae09ed38bf6ad1ad42babd227b27b59ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AccumDiagGmm</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm12AccumDiagGmmEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Empty constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm12AccumDiagGmmERK7DiagGmm12GmmFlagsType">
+<span id="_CPPv3N3khg12AccumDiagGmm12AccumDiagGmmERK7DiagGmm12GmmFlagsType"></span><span id="_CPPv2N3khg12AccumDiagGmm12AccumDiagGmmERK7DiagGmm12GmmFlagsType"></span><span id="khg::AccumDiagGmm::AccumDiagGmm__DiagGmmCR.GmmFlagsType"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a8b3a31c3c7f4e25003137abf4177896c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AccumDiagGmm</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">gmm</span></span>, <span class="n"><span class="pre">GmmFlagsType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flags</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm12AccumDiagGmmERK7DiagGmm12GmmFlagsType" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor that sizes the accumulators from a model. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gmm</strong> -- The model the statistics will be accumulated for. </p></li>
+<li><p><strong>flags</strong> -- Which accumulators to allocate. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm6ResizeERK7DiagGmm12GmmFlagsType">
+<span id="_CPPv3N3khg12AccumDiagGmm6ResizeERK7DiagGmm12GmmFlagsType"></span><span id="_CPPv2N3khg12AccumDiagGmm6ResizeERK7DiagGmm12GmmFlagsType"></span><span id="khg::AccumDiagGmm::Resize__DiagGmmCR.GmmFlagsType"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a08a1129f32cba5951314af6de1662fe7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Resize</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">gmm</span></span>, <span class="n"><span class="pre">GmmFlagsType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flags</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm6ResizeERK7DiagGmm12GmmFlagsType" title="Link to this definition"></a><br /></dt>
+<dd><p>Calls ResizeAccumulators with arguments based on gmm. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gmm</strong> -- The model the statistics will be accumulated for. </p></li>
+<li><p><strong>flags</strong> -- Which accumulators to allocate. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm6ResizeE7int32_t7int32_t12GmmFlagsType">
+<span id="_CPPv3N3khg12AccumDiagGmm6ResizeE7int32_t7int32_t12GmmFlagsType"></span><span id="_CPPv2N3khg12AccumDiagGmm6ResizeE7int32_t7int32_t12GmmFlagsType"></span><span id="khg::AccumDiagGmm::Resize__int32_t.int32_t.GmmFlagsType"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1ac81f4e3121b7862531092c95ee514cfb"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_gauss</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dim</span></span>, <span class="n"><span class="pre">GmmFlagsType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flags</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm6ResizeE7int32_t7int32_t12GmmFlagsType" title="Link to this definition"></a><br /></dt>
+<dd><p>Allocates memory for accumulators. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_gauss</strong> -- Number of gaussians, i.e., number of components/mixtures </p></li>
+<li><p><strong>dim</strong> -- Dimension of each gaussian </p></li>
+<li><p><strong>flags</strong> -- Which accumulators to allocate (they are zeroed). </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg12AccumDiagGmm8NumGaussEv">
+<span id="_CPPv3NK3khg12AccumDiagGmm8NumGaussEv"></span><span id="_CPPv2NK3khg12AccumDiagGmm8NumGaussEv"></span><span id="khg::AccumDiagGmm::NumGaussC"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a609b58585a17573c08c251c4a319edae"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumGauss</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg12AccumDiagGmm8NumGaussEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the number of mixture components. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of components the accumulators are sized for. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg12AccumDiagGmm3DimEv">
+<span id="_CPPv3NK3khg12AccumDiagGmm3DimEv"></span><span id="_CPPv2NK3khg12AccumDiagGmm3DimEv"></span><span id="khg::AccumDiagGmm::DimC"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a35e92e436cda8c6fed0c6486ec8d02e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dim</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg12AccumDiagGmm3DimEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the dimensionality of the feature vectors. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The feature dimension. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm7SetZeroE12GmmFlagsType">
+<span id="_CPPv3N3khg12AccumDiagGmm7SetZeroE12GmmFlagsType"></span><span id="_CPPv2N3khg12AccumDiagGmm7SetZeroE12GmmFlagsType"></span><span id="khg::AccumDiagGmm::SetZero__GmmFlagsType"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a84242a160929bfc819085d86c0551755"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetZero</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">GmmFlagsType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flags</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm7SetZeroE12GmmFlagsType" title="Link to this definition"></a><br /></dt>
+<dd><p>Zeros the accumulators selected by <code class="docutils literal notranslate"><span class="pre">flags</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flags</strong> -- Which accumulators to zero; must be a subset of the flags the accumulator was created with. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm5ScaleEf12GmmFlagsType">
+<span id="_CPPv3N3khg12AccumDiagGmm5ScaleEf12GmmFlagsType"></span><span id="_CPPv2N3khg12AccumDiagGmm5ScaleEf12GmmFlagsType"></span><span id="khg::AccumDiagGmm::Scale__float.GmmFlagsType"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a8925568d632380a465d3cd2677a64871"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Scale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">f</span></span>, <span class="n"><span class="pre">GmmFlagsType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flags</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm5ScaleEf12GmmFlagsType" title="Link to this definition"></a><br /></dt>
+<dd><p>Multiplies the accumulators selected by <code class="docutils literal notranslate"><span class="pre">flags</span></code> by a scalar. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> -- The scale factor. </p></li>
+<li><p><strong>flags</strong> -- Which accumulators to scale; must be a subset of the flags the accumulator was created with. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm22AccumulateForComponentERK11FloatVector7int32_tf">
+<span id="_CPPv3N3khg12AccumDiagGmm22AccumulateForComponentERK11FloatVector7int32_tf"></span><span id="_CPPv2N3khg12AccumDiagGmm22AccumulateForComponentERK11FloatVector7int32_tf"></span><span id="khg::AccumDiagGmm::AccumulateForComponent__FloatVectorCR.int32_t.float"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1aa236d64161f54ecc05584773cb16c5d5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AccumulateForComponent</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">comp_index</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm22AccumulateForComponentERK11FloatVector7int32_tf" title="Link to this definition"></a><br /></dt>
+<dd><p>Accumulate for a single component, given the posterior. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- A 1-D float tensor of shape (dim_,). Used only if we are going to update the mean and the variance </p></li>
+<li><p><strong>comp_index</strong> -- Only mean_accumulator_[comp_index] and variance_accumulator_[comp_index] are updated if flags_ is kGmmAll </p></li>
+<li><p><strong>weight</strong> -- mean_accumulator_[comp_index] += data * weight variance_accumulator_[comp_index] + data.square() * weight occupancy_[comp_index] += weight </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm24AccumulateFromPosteriorsERK11FloatVectorRK11FloatVector">
+<span id="_CPPv3N3khg12AccumDiagGmm24AccumulateFromPosteriorsERK11FloatVectorRK11FloatVector"></span><span id="_CPPv2N3khg12AccumDiagGmm24AccumulateFromPosteriorsERK11FloatVectorRK11FloatVector"></span><span id="khg::AccumDiagGmm::AccumulateFromPosteriors__FloatVectorCR.FloatVectorCR"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1ad44e4930863b4e730de5e0399f9666c5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AccumulateFromPosteriors</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">gauss_posteriors</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm24AccumulateFromPosteriorsERK11FloatVectorRK11FloatVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Accumulate for all components, given the posteriors. </p>
+<p>
+occupancy_ += posteriors mean_accumulator_ += gauss_posteriors.unsqueeze(1) * data variance_accumulator_ += gauss_posteriors.unsqueeze(1) * data.square() </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> -- 1-D float tensor of shape (dim,) </p></li>
+<li><p><strong>gauss_posteriors</strong> -- 1-D float tensor of shape (num_comp,)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm18AccumulateFromDiagERK7DiagGmmRK11FloatVectorf">
+<span id="_CPPv3N3khg12AccumDiagGmm18AccumulateFromDiagERK7DiagGmmRK11FloatVectorf"></span><span id="_CPPv2N3khg12AccumDiagGmm18AccumulateFromDiagERK7DiagGmmRK11FloatVectorf"></span><span id="khg::AccumDiagGmm::AccumulateFromDiag__DiagGmmCR.FloatVectorCR.float"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1ac9d9229a17cf1a703399ff722b5f7254"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AccumulateFromDiag</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">gmm</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FloatVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm18AccumulateFromDiagERK7DiagGmmRK11FloatVectorf" title="Link to this definition"></a><br /></dt>
+<dd><p>Accumulate for all components given a diagonal-covariance GMM. </p>
+<p>Computes posteriors and returns log-likelihood</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gmm</strong> -- The model that generates the posteriors (must have the same number of components and dimension as this accumulator). </p></li>
+<li><p><strong>data</strong> -- 1-D float tensor of shape (dim,) </p></li>
+<li><p><strong>weight</strong> -- Scale applied to the posteriors before accumulating. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The log-likelihood <span class="math notranslate nohighlight">\(\log p(\mathrm{data})\)</span> under <code class="docutils literal notranslate"><span class="pre">gmm</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm20AddStatsForComponentE7int32_tdRK12DoubleVectorRK12DoubleVector">
+<span id="_CPPv3N3khg12AccumDiagGmm20AddStatsForComponentE7int32_tdRK12DoubleVectorRK12DoubleVector"></span><span id="_CPPv2N3khg12AccumDiagGmm20AddStatsForComponentE7int32_tdRK12DoubleVectorRK12DoubleVector"></span><span id="khg::AccumDiagGmm::AddStatsForComponent__int32_t.double.DoubleVectorCR.DoubleVectorCR"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1aba8453828581cd508995a910d443115b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddStatsForComponent</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">comp_id</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">occ</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">DoubleVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x_stats</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">DoubleVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x2_stats</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm20AddStatsForComponentE7int32_tdRK12DoubleVectorRK12DoubleVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Increment the stats for this component by the specified amount (not all parts may be taken, depending on flags). </p>
+<p>Note: x_stats and x2_stats are assumed to already be multiplied by &quot;occ&quot;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comp_id</strong> -- Index of the mixture component. </p></li>
+<li><p><strong>occ</strong> -- Zero-order statistic to add. </p></li>
+<li><p><strong>x_stats</strong> -- 1-D double tensor of shape (dim,) </p></li>
+<li><p><strong>x2_stats</strong> -- 1-D double tensor of shape (dim,) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm3AddEfRK12AccumDiagGmm">
+<span id="_CPPv3N3khg12AccumDiagGmm3AddEfRK12AccumDiagGmm"></span><span id="_CPPv2N3khg12AccumDiagGmm3AddEfRK12AccumDiagGmm"></span><span id="khg::AccumDiagGmm::Add__float.AccumDiagGmmCR"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a3efc29b7434d40f759c70c675afadc1e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Add</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scale</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg12AccumDiagGmmE" title="khg::AccumDiagGmm"><span class="n"><span class="pre">AccumDiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">acc</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm3AddEfRK12AccumDiagGmm" title="Link to this definition"></a><br /></dt>
+<dd><p>Increment with stats from this other accumulator (times scale). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scale</strong> -- Scale applied to <code class="docutils literal notranslate"><span class="pre">acc</span></code> before adding. </p></li>
+<li><p><strong>acc</strong> -- The accumulator to add; must have the same dimension, number of components and flags. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm11SmoothStatsEf">
+<span id="_CPPv3N3khg12AccumDiagGmm11SmoothStatsEf"></span><span id="_CPPv2N3khg12AccumDiagGmm11SmoothStatsEf"></span><span id="khg::AccumDiagGmm::SmoothStats__float"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1ac5f9dafa01fb8181f70b6119e4909b2b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SmoothStats</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tau</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm11SmoothStatsEf" title="Link to this definition"></a><br /></dt>
+<dd><p>Smooths the accumulated counts by adding 'tau' extra frames. </p>
+<p>An example use for this is I-smoothing for MMIE. Calls SmoothWithAccum. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tau</strong> -- Number of extra (self-smoothing) frames per component. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm15SmoothWithAccumEfRK12AccumDiagGmm">
+<span id="_CPPv3N3khg12AccumDiagGmm15SmoothWithAccumEfRK12AccumDiagGmm"></span><span id="_CPPv2N3khg12AccumDiagGmm15SmoothWithAccumEfRK12AccumDiagGmm"></span><span id="khg::AccumDiagGmm::SmoothWithAccum__float.AccumDiagGmmCR"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a663cfe1ffc6f55269d0dcaededf957a0"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SmoothWithAccum</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tau</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg12AccumDiagGmmE" title="khg::AccumDiagGmm"><span class="n"><span class="pre">AccumDiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">src_acc</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm15SmoothWithAccumEfRK12AccumDiagGmm" title="Link to this definition"></a><br /></dt>
+<dd><p>Smooths the accumulated counts using some other accumulator. </p>
+<p>Performs a weighted sum of the current accumulator with the given one. An example use for this is I-smoothing for MMI and MPE. Both accumulators must have the same dimension and number of components. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau</strong> -- Strength of the smoothing. </p></li>
+<li><p><strong>src_acc</strong> -- The accumulator providing the smoothing stats. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm15SmoothWithModelEfRK7DiagGmm">
+<span id="_CPPv3N3khg12AccumDiagGmm15SmoothWithModelEfRK7DiagGmm"></span><span id="_CPPv2N3khg12AccumDiagGmm15SmoothWithModelEfRK7DiagGmm"></span><span id="khg::AccumDiagGmm::SmoothWithModel__float.DiagGmmCR"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a39a41ae42a7bfc456613cb1d8b2a780e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SmoothWithModel</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tau</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg7DiagGmmE" title="khg::DiagGmm"><span class="n"><span class="pre">DiagGmm</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">src_gmm</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm15SmoothWithModelEfRK7DiagGmm" title="Link to this definition"></a><br /></dt>
+<dd><p>Smooths the accumulated counts using the parameters of a given model. </p>
+<p>An example use of this is MAP-adaptation. The model must have the same dimension and number of components as the current accumulator. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau</strong> -- Strength of the smoothing. </p></li>
+<li><p><strong>src_gmm</strong> -- The model providing the smoothing stats. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg12AccumDiagGmm5FlagsEv">
+<span id="_CPPv3NK3khg12AccumDiagGmm5FlagsEv"></span><span id="_CPPv2NK3khg12AccumDiagGmm5FlagsEv"></span><span id="khg::AccumDiagGmm::FlagsC"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1aa31d28757ec0207caaaab79d9ac0e09b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">GmmFlagsType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Flags</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg12AccumDiagGmm5FlagsEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The flags the accumulator was created with (which accumulators are stored). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg12AccumDiagGmm9occupancyEv">
+<span id="_CPPv3NK3khg12AccumDiagGmm9occupancyEv"></span><span id="_CPPv2NK3khg12AccumDiagGmm9occupancyEv"></span><span id="khg::AccumDiagGmm::occupancyC"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a79dc64f1aecc321cdb3ace569c5ed63b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">DoubleVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">occupancy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg12AccumDiagGmm9occupancyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Const accessor for the zero-order statistics. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1-D double tensor of shape (num_comp_,). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm9occupancyEv">
+<span id="_CPPv3N3khg12AccumDiagGmm9occupancyEv"></span><span id="_CPPv2N3khg12AccumDiagGmm9occupancyEv"></span><span id="khg::AccumDiagGmm::occupancy"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1ad25d9b2917dd8976fdcdde530244638e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">DoubleVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">occupancy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm9occupancyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Mutable accessor for the zero-order statistics. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1-D double tensor of shape (num_comp_,). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg12AccumDiagGmm16mean_accumulatorEv">
+<span id="_CPPv3NK3khg12AccumDiagGmm16mean_accumulatorEv"></span><span id="_CPPv2NK3khg12AccumDiagGmm16mean_accumulatorEv"></span><span id="khg::AccumDiagGmm::mean_accumulatorC"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1ad2248722782c797fea3d222fca2a63db"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">DoubleMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">mean_accumulator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg12AccumDiagGmm16mean_accumulatorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Const accessor for the first-order statistics. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2-D double tensor of shape (num_comp_, dim). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm16mean_accumulatorEv">
+<span id="_CPPv3N3khg12AccumDiagGmm16mean_accumulatorEv"></span><span id="_CPPv2N3khg12AccumDiagGmm16mean_accumulatorEv"></span><span id="khg::AccumDiagGmm::mean_accumulator"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a58482e1788ce8f7b8e8c3a06e41341dc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">DoubleMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">mean_accumulator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm16mean_accumulatorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Mutable accessor for the first-order statistics. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2-D double tensor of shape (num_comp_, dim). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg12AccumDiagGmm20variance_accumulatorEv">
+<span id="_CPPv3NK3khg12AccumDiagGmm20variance_accumulatorEv"></span><span id="_CPPv2NK3khg12AccumDiagGmm20variance_accumulatorEv"></span><span id="khg::AccumDiagGmm::variance_accumulatorC"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a20acc9e301a5133a193d2a523e2c5e8f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">DoubleMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">variance_accumulator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg12AccumDiagGmm20variance_accumulatorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Const accessor for the second-order statistics. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2-D double tensor of shape (num_comp_, dim). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AccumDiagGmm20variance_accumulatorEv">
+<span id="_CPPv3N3khg12AccumDiagGmm20variance_accumulatorEv"></span><span id="_CPPv2N3khg12AccumDiagGmm20variance_accumulatorEv"></span><span id="khg::AccumDiagGmm::variance_accumulator"></span><span class="target" id="classkhg_1_1AccumDiagGmm_1a656ca1b7c774af89c6c50e03b92106f4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">DoubleMatrix</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">variance_accumulator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AccumDiagGmm20variance_accumulatorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Mutable accessor for the second-order statistics. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2-D double tensor of shape (num_comp_, dim). </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="hmm.html" class="btn btn-neutral float-left" title="HMM topology and transition model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="graph.html" class="btn btn-neutral float-right" title="Trees and training graphs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+<map id="stl&#45;utils.h" name="stl&#45;utils.h">
+<area shape="rect" id="Node000001" title="Small generic STL container utilities ported from kaldi/src/util/stl&#45;utils.h." alt="" coords="301,5,383,33"/>
+<area shape="rect" id="Node000002" href="$const-integer-set_8h.html" title="Immutable integer set with fast membership tests." alt="" coords="135,81,280,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="303,42,233,83,230,78,307,39"/>
+<area shape="rect" id="Node000003" href="$event-map_8h.html" title="Generic mapping from integer events to integer answers (decision trees)." alt="" coords="166,157,270,184"/>
+<area shape="poly" id="edge9_Node000001_Node000003" title=" " alt="" coords="332,45,315,79,293,110,266,137,239,158,235,154,262,133,289,107,311,76,328,49"/>
+<area shape="rect" id="Node000005" href="$context-dep_8h.html" title="Decision&#45;tree based implementation of context dependency." alt="" coords="301,232,412,260"/>
+<area shape="poly" id="edge8_Node000001_Node000005" title=" " alt="" coords="346,46,358,232,353,231,342,50"/>
+<area shape="rect" id="Node000006" href="$hmm-utils_8h.html" title="Building FSTs from context&#45;dependent HMMs, and alignment utilities." alt="" coords="400,308,500,336"/>
+<area shape="poly" id="edge10_Node000001_Node000006" title=" " alt="" coords="354,45,368,80,399,155,427,231,449,309,444,307,422,233,394,157,364,82,352,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="212,122,219,157,214,156,210,127"/>
+<area shape="rect" id="Node000004" href="$build-tree-utils_8h.html" title="Helpers for building decision trees from statistics." alt="" coords="5,232,135,260"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="176,194,98,234,95,230,180,189"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="257,189,335,231,329,232,256,195"/>
+<area shape="rect" id="Node000008" href="$tree-renderer_8h.html" title="Renders a decision tree (EventMap) in GraphViz (dot) format." alt="" coords="159,232,277,260"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="220,198,220,233,216,231,216,202"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="386,267,436,308,431,307,384,272"/>
+<area shape="rect" id="Node000007" href="$training-graph-compiler_8h.html" title="Compilation of training graphs (per&#45;utterance FSTs labeled with transition&#45;ids)." alt="" coords="189,308,375,336"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="335,270,297,310,294,305,330,272"/>
+</map>

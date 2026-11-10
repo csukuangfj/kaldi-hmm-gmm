@@ -1,0 +1,7 @@
+<map id="khg::DecodableAmDiagGmmUnmapped" name="khg::DecodableAmDiagGmmUnmapped">
+<area shape="rect" id="Node000001" title="DecodableAmDiagGmmUnmapped is a decodable object that takes indices that correspond to pdf&#45;id&#39;s plus ..." alt="" coords="5,98,287,126"/>
+<area shape="rect" id="Node000003" href="$classkhg_1_1DecodableAmDiagGmmScaled.html" title="Decodable for an AmDiagGmm whose indices are transition&#45;ids, with acoustic scaling." alt="" coords="19,174,273,201"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="148,140,148,174,144,172,144,143"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="52,5,240,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,63,149,98,143,96,145,68"/>
+</map>

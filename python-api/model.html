@@ -1,0 +1,287 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Models, topology and trees &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="GMMs and MLE/MAP estimation" href="gmm.html" />
+    <link rel="prev" title="Python API" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Python API</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Models, topology and trees</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#reading-and-writing-kaldi-format-models">Reading and writing kaldi-format models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.read_model"><code class="docutils literal notranslate"><span class="pre">read_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.write_model"><code class="docutils literal notranslate"><span class="pre">write_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.read_tree"><code class="docutils literal notranslate"><span class="pre">read_tree()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#transition-model">Transition model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModel"><code class="docutils literal notranslate"><span class="pre">TransitionModel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModelTuple"><code class="docutils literal notranslate"><span class="pre">TransitionModelTuple</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#hmm-topology">HMM topology</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.HmmTopology"><code class="docutils literal notranslate"><span class="pre">HmmTopology</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tree-rendering">Tree rendering</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#kaldi_hmm_gmm.draw_tree"><code class="docutils literal notranslate"><span class="pre">draw_tree()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gmm.html">GMMs and MLE/MAP estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html">Graphs, HMM utilities and trees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="align-decode.html">Alignment and decoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Full reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp-api/index.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Python API</a></li>
+      <li class="breadcrumb-item active">Models, topology and trees</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/python-api/model.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="models-topology-and-trees">
+<h1>Models, topology and trees<a class="headerlink" href="#models-topology-and-trees" title="Link to this heading"></a></h1>
+<section id="reading-and-writing-kaldi-format-models">
+<h2>Reading and writing kaldi-format models<a class="headerlink" href="#reading-and-writing-kaldi-format-models" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.read_model">
+<span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">read_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple[khg::TransitionModel,</span> <span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AmDiagGmm]</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.read_model" title="Link to this definition"></a></dt>
+<dd><p>Reads a kaldi .mdl file; returns (TransitionModel, AmDiagGmm).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.write_model">
+<span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">write_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">khg::TransitionModel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">am_gmm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="gmm.html#kaldi_hmm_gmm.AmDiagGmm" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AmDiagGmm"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.AmDiagGmm</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.write_model" title="Link to this definition"></a></dt>
+<dd><p>Writes a kaldi-compatible .mdl file (TransitionModel + AmDiagGmm).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.read_tree">
+<span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">read_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="graph.html#kaldi_hmm_gmm.ContextDependency" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.ContextDependency"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.ContextDependency</span></a></span></span><a class="headerlink" href="#kaldi_hmm_gmm.read_tree" title="Link to this definition"></a></dt>
+<dd><p>Reads a ContextDependency (tree) from a kaldi-format file.</p>
+</dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">read_model</span></code> returns a <code class="docutils literal notranslate"><span class="pre">(TransitionModel,</span> <span class="pre">AmDiagGmm)</span></code> tuple — the same
+two objects kaldi stores in <code class="docutils literal notranslate"><span class="pre">final.mdl</span></code>.</p>
+</section>
+<section id="transition-model">
+<h2>Transition model<a class="headerlink" href="#transition-model" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">TransitionModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModel" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>__init__(self: kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel) -&gt; None</p></li>
+<li><p>__init__(self: kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel, ctx_dep: kaldi_hmm_gmm.lib._kaldi_hmm_gmm.ContextDependencyInterface, hmm_topo: kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology) -&gt; None</p></li>
+</ol>
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModel.accumulate">
+<span class="sig-name descname"><span class="pre">accumulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.ArrayLike</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.float64</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModel.accumulate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModel.init_stats">
+<span class="sig-name descname"><span class="pre">init_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModel.init_stats" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModel.mle_update">
+<span class="sig-name descname"><span class="pre">mle_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.ArrayLike</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.float64</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'[m,</span> <span class="pre">1]'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="gmm.html#kaldi_hmm_gmm.MleTransitionUpdateConfig" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.MleTransitionUpdateConfig"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.MleTransitionUpdateConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModel.mle_update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModel.pair_to_transition_id">
+<span class="sig-name descname"><span class="pre">pair_to_transition_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModel.pair_to_transition_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModel.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModel.read" title="Link to this definition"></a></dt>
+<dd><p>Reads the TransitionModel from a kaldi-format file (binary or text). The stream starts at the &lt;TransitionModel&gt; token, e.g. the beginning of a kaldi .mdl file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModel.self_loop_of">
+<span class="sig-name descname"><span class="pre">self_loop_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModel.self_loop_of" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModel.transition_state_to_hmm_state">
+<span class="sig-name descname"><span class="pre">transition_state_to_hmm_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModel.transition_state_to_hmm_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModel.transition_state_to_phone">
+<span class="sig-name descname"><span class="pre">transition_state_to_phone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModel.transition_state_to_phone" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModel.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.TransitionModel" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModel.write" title="Link to this definition"></a></dt>
+<dd><p>Writes the TransitionModel to a kaldi-format file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.TransitionModelTuple">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">TransitionModelTuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kaldi_hmm_gmm.TransitionModelTuple" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>__init__(self: kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModelTuple) -&gt; None</p></li>
+<li><p>__init__(self: kaldi_hmm_gmm.lib._kaldi_hmm_gmm.TransitionModelTuple, phone: typing.SupportsInt, hmm_state: typing.SupportsInt, forward_pdf: typing.SupportsInt, self_loop_pdf: typing.SupportsInt) -&gt; None</p></li>
+</ol>
+</dd></dl>
+
+</section>
+<section id="hmm-topology">
+<h2>HMM topology<a class="headerlink" href="#hmm-topology" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.HmmTopology">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">HmmTopology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.HmmTopology" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kaldi_hmm_gmm.HmmTopology" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.HmmTopology.check">
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.HmmTopology" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.HmmTopology.check" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.HmmTopology.get_phone_to_num_pdf_classes">
+<span class="sig-name descname"><span class="pre">get_phone_to_num_pdf_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.HmmTopology" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.HmmTopology.get_phone_to_num_pdf_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.HmmTopology.min_length">
+<span class="sig-name descname"><span class="pre">min_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.HmmTopology" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">phone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.HmmTopology.min_length" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.HmmTopology.num_pdf_classes">
+<span class="sig-name descname"><span class="pre">num_pdf_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.HmmTopology" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">phone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.HmmTopology.num_pdf_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.HmmTopology.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.HmmTopology" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.HmmTopology.read" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.HmmTopology.topology_for_phone">
+<span class="sig-name descname"><span class="pre">topology_for_phone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#kaldi_hmm_gmm.HmmTopology" title="kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology"><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmTopology</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">phone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsInt</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">kaldi_hmm_gmm.lib._kaldi_hmm_gmm.HmmState</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.HmmTopology.topology_for_phone" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="tree-rendering">
+<h2>Tree rendering<a class="headerlink" href="#tree-rendering" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="kaldi_hmm_gmm.draw_tree">
+<span class="sig-prename descclassname"><span class="pre">kaldi_hmm_gmm.</span></span><span class="sig-name descname"><span class="pre">draw_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phones_txt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tooltips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#kaldi_hmm_gmm.draw_tree" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">draw_tree</span></code> renders a <code class="docutils literal notranslate"><span class="pre">ContextDependency</span></code> tree as graphviz dot text
+(kaldi's <code class="docutils literal notranslate"><span class="pre">draw-tree</span></code>).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Python API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gmm.html" class="btn btn-neutral float-right" title="GMMs and MLE/MAP estimation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

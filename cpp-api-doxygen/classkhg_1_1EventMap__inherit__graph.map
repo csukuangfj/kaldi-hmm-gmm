@@ -1,0 +1,9 @@
+<map id="khg::EventMap" name="khg::EventMap">
+<area shape="rect" id="Node000001" title="A class that is capable of representing a generic mapping from EventType (which is a vector of (key,..." alt="" coords="220,5,338,33"/>
+<area shape="rect" id="Node000002" href="$classkhg_1_1ConstantEventMap.html" title="A leaf of an EventMap: returns a constant answer for any event." alt="" coords="5,81,182,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,39,127,83,125,78,229,39"/>
+<area shape="rect" id="Node000003" href="$classkhg_1_1SplitEventMap.html" title="A decision tree [non&#45;leaf] node: a binary yes/no question about one event key." alt="" coords="205,81,352,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="281,47,281,82,277,79,277,51"/>
+<area shape="rect" id="Node000004" href="$classkhg_1_1TableEventMap.html" title="An EventMap node that splits on the value of a single key by looking up a table of children." alt="" coords="376,81,528,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="324,37,424,80,419,81,323,42"/>
+</map>

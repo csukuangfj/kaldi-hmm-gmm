@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['kaldi_20hmm_20gmm_20c_20api_0',['kaldi-hmm-gmm C++ API',['../index.html',1,'']]],
+  ['kaldi_2dmath_2eh_1',['kaldi-math.h',['../kaldi-math_8h.html',1,'']]],
+  ['kaldi_5fisinf_2',['KALDI_ISINF',['../kaldi-math_8h.html#a413ed0dfd2a3120883355aa486da3742',1,'kaldi-math.h']]],
+  ['kaldi_5fisnan_3',['KALDI_ISNAN',['../kaldi-math_8h.html#a784e8ae012c86a36a1f764b8ed829746',1,'kaldi-math.h']]],
+  ['kedgecolor_4',['kEdgeColor',['../classkhg_1_1TreeRenderer.html#a193d5ee93d1031dcf358b854fe67ffd8',1,'khg::TreeRenderer']]],
+  ['kedgecolorquery_5',['kEdgeColorQuery',['../classkhg_1_1TreeRenderer.html#ab27c8dcb4ab4949cc6ef1e985a6622a6',1,'khg::TreeRenderer']]],
+  ['kedgewidth_6',['kEdgeWidth',['../classkhg_1_1TreeRenderer.html#a19812428016fd97ba7311ce4c565b075',1,'khg::TreeRenderer']]],
+  ['kedgewidthquery_7',['kEdgeWidthQuery',['../classkhg_1_1TreeRenderer.html#ad2a31b9cc9619865485bd1a5d8af822f',1,'khg::TreeRenderer']]],
+  ['kerror_8',['kError',['../namespacekhg.html#a5e250463670eaf68e34db060e3566283ae3587c730cc1aa530fa4ddc9c4204e97',1,'khg']]],
+  ['kgmmall_9',['kGmmAll',['../namespacekhg.html#afc5f91e75676c6f58b5fdea9e6f7983ea80f1cc0fb8143b75384ca09885dbf819',1,'khg']]],
+  ['kgmmmeans_10',['kGmmMeans',['../namespacekhg.html#afc5f91e75676c6f58b5fdea9e6f7983ea669868495f6dd5af65ea7fa2ae7ea6f1',1,'khg']]],
+  ['kgmmtransitions_11',['kGmmTransitions',['../namespacekhg.html#afc5f91e75676c6f58b5fdea9e6f7983ea3807b758feb567a010d7d5e6b8d69edd',1,'khg']]],
+  ['kgmmvariances_12',['kGmmVariances',['../namespacekhg.html#afc5f91e75676c6f58b5fdea9e6f7983eaea076c71baaab79b5f1c82a5708d0c38',1,'khg']]],
+  ['kgmmweights_13',['kGmmWeights',['../namespacekhg.html#afc5f91e75676c6f58b5fdea9e6f7983eae91d743d3f32975ecd399bd80b00e50f',1,'khg']]],
+  ['khg_14',['khg',['../namespacekhg.html',1,'']]],
+  ['khg_5fassert_15',['KHG_ASSERT',['../log_8h.html#afba747201b3011b091b601faf3bf0cc5',1,'log.h']]],
+  ['khg_5fdisallow_5fcopy_5fand_5fassign_16',['KHG_DISALLOW_COPY_AND_ASSIGN',['../log_8h.html#a70f303714a40c4d7f49732990feb4cd2',1,'log.h']]],
+  ['khg_5ferr_17',['KHG_ERR',['../log_8h.html#a5cd323389fbf36c3604291e3c711437c',1,'log.h']]],
+  ['khg_5ffunc_18',['KHG_FUNC',['../log_8h.html#ae3edcea0b68c127f23577187ad0f1629',1,'log.h']]],
+  ['khg_5flog_19',['KHG_LOG',['../log_8h.html#a229cb53e526707fbd7b171814981c96c',1,'log.h']]],
+  ['khg_5fparanoid_5fassert_20',['KHG_PARANOID_ASSERT',['../log_8h.html#a0a0893c711fa7f5b1b0cdc7fead87056',1,'log.h']]],
+  ['khg_5fwarn_21',['KHG_WARN',['../log_8h.html#a77c3d68b3d29d2f269d889db831c1ab0',1,'log.h']]],
+  ['kinfo_22',['kInfo',['../namespacekhg.html#a5e250463670eaf68e34db060e3566283a176a473e63c17ccdac91640c67f149bf',1,'khg']]],
+  ['kpi_23',['kPi',['../namespacekhg.html#aa674a5ee5c3992e30c27320556a28786',1,'khg']]],
+  ['kwarn_24',['kWarn',['../namespacekhg.html#a5e250463670eaf68e34db060e3566283a61a920eb4a24199ec6a36dd90f2a30b7',1,'khg']]]
+];

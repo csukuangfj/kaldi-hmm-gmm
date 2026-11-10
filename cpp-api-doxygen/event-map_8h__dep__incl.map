@@ -1,0 +1,13 @@
+<map id="event&#45;map.h" name="event&#45;map.h">
+<area shape="rect" id="Node000001" title="Generic mapping from integer events to integer answers (decision trees)." alt="" coords="162,5,266,33"/>
+<area shape="rect" id="Node000002" href="$build-tree-utils_8h.html" title="Helpers for building decision trees from statistics." alt="" coords="5,81,135,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,43,97,83,94,78,176,38"/>
+<area shape="rect" id="Node000003" href="$context-dep_8h.html" title="Decision&#45;tree based implementation of context dependency." alt="" coords="158,81,270,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="216,47,216,82,212,79,212,51"/>
+<area shape="rect" id="Node000006" href="$tree-renderer_8h.html" title="Renders a decision tree (EventMap) in GraphViz (dot) format." alt="" coords="294,81,412,109"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="253,38,331,80,325,81,252,43"/>
+<area shape="rect" id="Node000004" href="$hmm-utils_8h.html" title="Building FSTs from context&#45;dependent HMMs, and alignment utilities." alt="" coords="80,157,180,184"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="190,118,146,158,143,154,185,120"/>
+<area shape="rect" id="Node000005" href="$training-graph-compiler_8h.html" title="Compilation of training graphs (per&#45;utterance FSTs labeled with transition&#45;ids)." alt="" coords="205,157,391,184"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="241,117,286,157,280,156,240,122"/>
+</map>

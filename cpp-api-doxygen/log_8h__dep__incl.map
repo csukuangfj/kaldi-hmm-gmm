@@ -1,0 +1,48 @@
+<map id="log.h" name="log.h">
+<area shape="rect" id="Node000001" title="Logging and assertion macros used throughout the library." alt="" coords="440,5,493,33"/>
+<area shape="rect" id="Node000002" href="$clusterable-itf_8h.html" title="Abstract interface for statistics that can be clustered." alt="" coords="154,81,278,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="423,35,262,83,260,78,427,31"/>
+<area shape="rect" id="Node000007" href="$decodable-am-diag-gmm_8h.html" title="Decodable objects for AmDiagGmm acoustic models." alt="" coords="223,459,422,487"/>
+<area shape="poly" id="edge10_Node000001_Node000007" title=" " alt="" coords="424,42,394,64,360,93,335,128,328,148,325,169,325,323,325,460,320,458,320,323,320,169,323,147,330,126,356,89,391,60,428,38"/>
+<area shape="rect" id="Node000010" href="$event-map_8h.html" title="Generic mapping from integer events to integer answers (decision trees)." alt="" coords="668,232,772,260"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="480,44,521,113,550,150,583,182,628,210,676,232,671,232,625,215,580,186,546,153,517,116,478,49"/>
+<area shape="rect" id="Node000016" href="$kaldi-math_8h.html" title="Small math helpers ported from kaldi/src/base/kaldi&#45;math.h." alt="" coords="786,81,889,109"/>
+<area shape="poly" id="edge17_Node000001_Node000016" title=" " alt="" coords="509,26,787,82,783,84,509,31"/>
+<area shape="rect" id="Node000017" href="$stl-utils_8h.html" title="Small generic STL container utilities ported from kaldi/src/util/stl&#45;utils.h." alt="" coords="679,81,761,109"/>
+<area shape="poly" id="edge18_Node000001_Node000017" title=" " alt="" coords="508,30,681,81,676,82,508,35"/>
+<area shape="rect" id="Node000019" href="$transition-model_8h.html" title="Transition probabilities and integer&#45;id mappings for HMM&#45;GMM models." alt="" coords="360,308,501,336"/>
+<area shape="poly" id="edge24_Node000001_Node000019" title=" " alt="" coords="465,47,435,309,430,307,461,50"/>
+<area shape="rect" id="Node000003" href="$clusterable-classes_8h.html" title="Concrete Clusterable classes holding scalar and Gaussian statistics." alt="" coords="127,157,286,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="213,122,211,157,206,155,211,127"/>
+<area shape="rect" id="Node000004" href="$cluster-utils_8h.html" title="K&#45;means&#45;like clustering of Clusterable statistics." alt="" coords="151,232,262,260"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="207,198,209,233,204,231,206,203"/>
+<area shape="rect" id="Node000005" href="$diag-gmm_8h.html" title="Diagonal&#45;covariance Gaussian mixture models (DiagGmm) stored in exponential form." alt="" coords="156,308,257,336"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="208,273,209,308,204,307,205,278"/>
+<area shape="rect" id="Node000006" href="$am-diag-gmm_8h.html" title="Acoustic model of diagonal&#45;covariance GMMs (AmDiagGmm)." alt="" coords="159,384,286,411"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="214,349,222,384,217,382,211,353"/>
+<area shape="rect" id="Node000009" href="$mle-diag-gmm_8h.html" title="Maximum&#45;likelihood and MAP estimation for diagonal&#45;covariance GMMs." alt="" coords="5,384,136,411"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="167,346,96,385,93,381,170,341"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="253,418,307,459,302,459,252,423"/>
+<area shape="rect" id="Node000008" href="$mle-am-diag-gmm_8h.html" title="ML/MAP estimation for whole acoustic models of diagonal GMMs." alt="" coords="18,459,174,487"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="190,419,119,461,117,457,184,420"/>
+<area shape="poly" id="edge9_Node000009_Node000008" title=" " alt="" coords="82,424,94,459,89,459,78,428"/>
+<area shape="rect" id="Node000011" href="$build-tree-utils_8h.html" title="Helpers for building decision trees from statistics." alt="" coords="667,308,796,336"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="726,273,732,309,727,306,723,278"/>
+<area shape="rect" id="Node000012" href="$context-dep_8h.html" title="Decision&#45;tree based implementation of context dependency." alt="" coords="820,308,932,336"/>
+<area shape="poly" id="edge13_Node000010_Node000012" title=" " alt="" coords="762,264,851,308,846,307,761,270"/>
+<area shape="rect" id="Node000015" href="$tree-renderer_8h.html" title="Renders a decision tree (EventMap) in GraphViz (dot) format." alt="" coords="525,308,643,336"/>
+<area shape="poly" id="edge16_Node000010_Node000015" title=" " alt="" coords="685,267,609,310,607,305,680,269"/>
+<area shape="rect" id="Node000013" href="$hmm-utils_8h.html" title="Building FSTs from context&#45;dependent HMMs, and alignment utilities." alt="" coords="826,384,926,411"/>
+<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="878,350,878,385,874,382,874,353"/>
+<area shape="rect" id="Node000014" href="$training-graph-compiler_8h.html" title="Compilation of training graphs (per&#45;utterance FSTs labeled with transition&#45;ids)." alt="" coords="541,384,728,411"/>
+<area shape="poly" id="edge15_Node000012_Node000014" title=" " alt="" coords="821,340,678,386,677,381,815,341"/>
+<area shape="poly" id="edge22_Node000017_Node000010" title=" " alt="" coords="737,120,752,156,754,170,752,185,742,211,730,234,726,230,737,209,747,184,749,170,747,157,735,125"/>
+<area shape="poly" id="edge21_Node000017_Node000012" title=" " alt="" coords="742,118,771,155,829,240,871,308,865,307,825,243,767,158,740,123"/>
+<area shape="poly" id="edge23_Node000017_Node000013" title=" " alt="" coords="757,114,805,146,859,189,909,243,930,274,946,307,950,322,946,337,926,365,900,385,898,381,922,361,941,335,945,322,941,309,925,277,905,246,855,193,802,150,756,119"/>
+<area shape="rect" id="Node000018" href="$const-integer-set_8h.html" title="Immutable integer set with fast membership tests." alt="" coords="593,157,737,184"/>
+<area shape="poly" id="edge19_Node000017_Node000018" title=" " alt="" coords="703,120,677,158,673,154,699,123"/>
+<area shape="poly" id="edge20_Node000018_Node000010" title=" " alt="" coords="685,195,713,233,708,231,683,200"/>
+<area shape="poly" id="edge25_Node000019_Node000007" title=" " alt="" coords="415,347,334,461,330,457,410,349"/>
+<area shape="poly" id="edge26_Node000019_Node000013" title=" " alt="" coords="517,335,828,387,823,389,516,340"/>
+<area shape="poly" id="edge27_Node000019_Node000014" title=" " alt="" coords="482,339,601,383,595,383,481,344"/>
+</map>

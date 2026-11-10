@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classkhg_1_1Clusterable.html" title="A virtual class for clusterable objects." alt="" coords="5,32,133,60"/>
+<area shape="rect" id="Node000001" href="$classkhg_1_1GaussClusterable.html" title="GaussClusterable wraps Gaussian statistics in a form accessible to generic clustering algorithms." alt="" coords="181,5,348,33"/>
+<area shape="poly" id="edge4_Node000000_Node000001" title=" " alt="" coords="148,32,183,30,177,31,149,38"/>
+<area shape="rect" id="Node000002" href="$classkhg_1_1ScalarClusterable.html" title="ScalarClusterable clusters scalars with x^2 loss." alt="" coords="181,57,348,85"/>
+<area shape="poly" id="edge5_Node000000_Node000002" title=" " alt="" coords="148,53,183,60,177,60,148,59"/>
+</map>

@@ -1,0 +1,642 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trees and training graphs &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="GMM decodables" href="decodable.html" />
+    <link rel="prev" title="GMMs and MLE/MAP estimation" href="gmm.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python-api/index.html">Python API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">C++ API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="hmm.html">HMM topology and transition model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gmm.html">GMMs and MLE/MAP estimation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Trees and training graphs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-doxygen">API (doxygen)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg21TrainingGraphCompilerE"><code class="docutils literal notranslate"><span class="pre">khg::TrainingGraphCompiler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg17ContextDependencyE"><code class="docutils literal notranslate"><span class="pre">khg::ContextDependency</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg8EventMapE"><code class="docutils literal notranslate"><span class="pre">khg::EventMap</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="decodable.html">GMM decodables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">C++ API</a></li>
+      <li class="breadcrumb-item active">Trees and training graphs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cpp-api/graph.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="trees-and-training-graphs">
+<h1>Trees and training graphs<a class="headerlink" href="#trees-and-training-graphs" title="Link to this heading"></a></h1>
+<p>Headers: <a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/context-dep.h">kaldi-hmm-gmm/csrc/context-dep.h</a>,
+<a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/event-map.h">kaldi-hmm-gmm/csrc/event-map.h</a>,
+<a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/training-graph-compiler.h">kaldi-hmm-gmm/csrc/training-graph-compiler.h</a> — kaldi's
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/tree">src/tree/</a> and
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/decoder/training-graph-compiler.h">src/decoder/training-graph-compiler.h</a> port.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">khg</span><span class="o">::</span><span class="n">TrainingGraphCompilerOptions</span><span class="w"> </span><span class="n">opts</span><span class="p">;</span><span class="w">   </span><span class="c1">// scales 0.0: add transition</span>
+<span class="n">opts</span><span class="p">.</span><span class="n">transition_scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w">              </span><span class="c1">// probs at alignment time</span>
+<span class="n">opts</span><span class="p">.</span><span class="n">self_loop_scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+
+<span class="n">khg</span><span class="o">::</span><span class="n">TrainingGraphCompiler</span><span class="w"> </span><span class="nf">gc</span><span class="p">(</span><span class="n">trans_model</span><span class="p">,</span><span class="w"> </span><span class="n">tree</span><span class="p">,</span><span class="w"> </span><span class="n">lex_fst</span><span class="p">,</span>
+<span class="w">                              </span><span class="n">disambig_syms</span><span class="p">,</span><span class="w"> </span><span class="n">opts</span><span class="p">);</span>
+<span class="n">fst</span><span class="o">::</span><span class="n">VectorFst</span><span class="o">&lt;</span><span class="n">fst</span><span class="o">::</span><span class="n">StdArc</span><span class="o">&gt;</span><span class="w"> </span><span class="n">graph</span><span class="p">;</span>
+<span class="n">gc</span><span class="p">.</span><span class="n">CompileGraphFromText</span><span class="p">(</span><span class="n">word_ids</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">graph</span><span class="p">);</span>
+</pre></div>
+</div>
+<section id="api-doxygen">
+<h2>API (doxygen)<a class="headerlink" href="#api-doxygen" title="Link to this heading"></a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg21TrainingGraphCompilerE">
+<span id="_CPPv3N3khg21TrainingGraphCompilerE"></span><span id="_CPPv2N3khg21TrainingGraphCompilerE"></span><span id="khg::TrainingGraphCompiler"></span><span class="target" id="classkhg_1_1TrainingGraphCompiler"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TrainingGraphCompiler</span></span></span><a class="headerlink" href="#_CPPv4N3khg21TrainingGraphCompilerE" title="Link to this definition"></a><br /></dt>
+<dd><p>Compiles per-utterance training graphs labeled with transition-ids. </p>
+<p>A <a class="reference internal" href="#classkhg_1_1TrainingGraphCompiler"><span class="std std-ref">TrainingGraphCompiler</span></a> assembles HCLG-style graphs for training: the lexicon fst (L) is composed with the utterance's grammar/acceptor (G), the result is expanded to phone context (C) via the InverseContextFst, the H transducer is built by <a class="reference internal" href="hmm.html#namespacekhg_1ab9471e1d51644bfacc9fd4755022a79e"><span class="std std-ref">GetHTransducer()</span></a> and composed in, the result is determinized and minimized, and finally <a class="reference internal" href="hmm.html#namespacekhg_1afbbac97d06a5e4cae21b34befa3cb050"><span class="std std-ref">AddSelfLoops()</span></a> adds the self-loops. The transition/self-loop probabilities are baked in at the scales configured in TrainingGraphCompilerOptions (the compile-train-graphs convention is to use scales 0 and apply <a class="reference internal" href="hmm.html#namespacekhg_1a80c65c596d36f0b76c4f57bf658b2be3"><span class="std std-ref">AddTransitionProbs()</span></a> at alignment time; see the file documentation).</p>
+<p>The compiler keeps (and modifies) the lexicon fst it was given and caches matcher state between compilations, so compiling many graphs at once is faster than compiling them one at a time. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg21TrainingGraphCompiler21TrainingGraphCompilerERK15TransitionModelRK17ContextDependencyPN3fst9VectorFstIN3fst6StdArcEEERKNSt6vectorI7int32_tEERK28TrainingGraphCompilerOptions">
+<span id="_CPPv3N3khg21TrainingGraphCompiler21TrainingGraphCompilerERK15TransitionModelRK17ContextDependencyPN3fst9VectorFstIN3fst6StdArcEEERKNSt6vectorI7int32_tEERK28TrainingGraphCompilerOptions"></span><span id="_CPPv2N3khg21TrainingGraphCompiler21TrainingGraphCompilerERK15TransitionModelRK17ContextDependencyPN3fst9VectorFstIN3fst6StdArcEEERKNSt6vectorI7int32_tEERK28TrainingGraphCompilerOptions"></span><span id="khg::TrainingGraphCompiler::TrainingGraphCompiler__TransitionModelCR.ContextDependencyCR.fst::VectorFst:fst::StdArc:P.std::vector:int32_t:CR.TrainingGraphCompilerOptionsCR"></span><span class="target" id="classkhg_1_1TrainingGraphCompiler_1ae91feaf0a0197950e67ebdc2b6492998"></span><span class="sig-name descname"><span class="n"><span class="pre">TrainingGraphCompiler</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="hmm.html#_CPPv4N3khg15TransitionModelE" title="khg::TransitionModel"><span class="n"><span class="pre">TransitionModel</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">trans_model</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg17ContextDependencyE" title="khg::ContextDependency"><span class="n"><span class="pre">ContextDependency</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ctx_dep</span></span>, <span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">lex_fst</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">disambig_syms</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">TrainingGraphCompilerOptions</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">opts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg21TrainingGraphCompiler21TrainingGraphCompilerERK15TransitionModelRK17ContextDependencyPN3fst9VectorFstIN3fst6StdArcEEERKNSt6vectorI7int32_tEERK28TrainingGraphCompilerOptions" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trans_model</strong> -- Maintains reference to this object. (Not owned.) </p></li>
+<li><p><strong>ctx_dep</strong> -- Maintains reference to this object. (Not owned.) </p></li>
+<li><p><strong>lex_fst</strong> -- Takes ownership of this object. It should not contain disambiguation symbols or subsequential symbol, but it should contain optional silence. </p></li>
+<li><p><strong>disambig_syms</strong> -- Disambig symbols in phone symbol table. </p></li>
+<li><p><strong>opts</strong> -- Compilation options; see TrainingGraphCompilerOptions. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg21TrainingGraphCompilerD0Ev">
+<span id="_CPPv3N3khg21TrainingGraphCompilerD0Ev"></span><span id="_CPPv2N3khg21TrainingGraphCompilerD0Ev"></span><span id="khg::TrainingGraphCompiler::~TrainingGraphCompiler"></span><span class="target" id="classkhg_1_1TrainingGraphCompiler_1a8378c14a962548e480bec45efb30181b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~TrainingGraphCompiler</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg21TrainingGraphCompilerD0Ev" title="Link to this definition"></a><br /></dt>
+<dd><p>Destructor; deletes the lexicon fst (which this object owns). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg21TrainingGraphCompiler20CompileGraphFromTextERKNSt6vectorI7int32_tEEPN3fst9VectorFstIN3fst6StdArcEEE">
+<span id="_CPPv3N3khg21TrainingGraphCompiler20CompileGraphFromTextERKNSt6vectorI7int32_tEEPN3fst9VectorFstIN3fst6StdArcEEE"></span><span id="_CPPv2N3khg21TrainingGraphCompiler20CompileGraphFromTextERKNSt6vectorI7int32_tEEPN3fst9VectorFstIN3fst6StdArcEEE"></span><span id="khg::TrainingGraphCompiler::CompileGraphFromText__std::vector:int32_t:CR.fst::VectorFst:fst::StdArc:P"></span><span class="target" id="classkhg_1_1TrainingGraphCompiler_1aa5013f09e0ae1b5cf66d3ad10ada71b9"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompileGraphFromText</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">transcript</span></span>, <span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">out_fst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg21TrainingGraphCompiler20CompileGraphFromTextERKNSt6vectorI7int32_tEEPN3fst9VectorFstIN3fst6StdArcEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>This version creates an FST from the text and calls CompileGraph. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transcript</strong> -- The utterance's transcript as a sequence of word-ids. </p></li>
+<li><p><strong>out_fst</strong> -- [out] The compiled training graph (transition-id to word transducer). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True on success; false if the graph could not be compiled. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg21TrainingGraphCompiler12CompileGraphERKN3fst9VectorFstIN3fst6StdArcEEEPN3fst9VectorFstIN3fst6StdArcEEE">
+<span id="_CPPv3N3khg21TrainingGraphCompiler12CompileGraphERKN3fst9VectorFstIN3fst6StdArcEEEPN3fst9VectorFstIN3fst6StdArcEEE"></span><span id="_CPPv2N3khg21TrainingGraphCompiler12CompileGraphERKN3fst9VectorFstIN3fst6StdArcEEEPN3fst9VectorFstIN3fst6StdArcEEE"></span><span id="khg::TrainingGraphCompiler::CompileGraph__fst::VectorFst:fst::StdArc:CR.fst::VectorFst:fst::StdArc:P"></span><span class="target" id="classkhg_1_1TrainingGraphCompiler_1a5c59bb8c9ee495da127222b4f433ab3f"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompileGraph</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">word_grammar</span></span>, <span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">out_fst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg21TrainingGraphCompiler12CompileGraphERKN3fst9VectorFstIN3fst6StdArcEEEPN3fst9VectorFstIN3fst6StdArcEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>CompileGraph compiles a single training graph its input is a weighted acceptor (G) at the word level, its output is HCLG. </p>
+<p>Note: G could actually be a transducer, it would also work. This function is not const for technical reasons involving the cache. if not for &quot;table_compose&quot; we could make it const. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>word_grammar</strong> -- [in] The utterance's grammar at the word level. </p></li>
+<li><p><strong>out_fst</strong> -- [out] The compiled training graph (transition-id to word transducer). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True on success; false if the graph could not be compiled. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg21TrainingGraphCompiler18CompileGraphFromLGERKN3fst9VectorFstIN3fst6StdArcEEEPN3fst9VectorFstIN3fst6StdArcEEE">
+<span id="_CPPv3N3khg21TrainingGraphCompiler18CompileGraphFromLGERKN3fst9VectorFstIN3fst6StdArcEEEPN3fst9VectorFstIN3fst6StdArcEEE"></span><span id="_CPPv2N3khg21TrainingGraphCompiler18CompileGraphFromLGERKN3fst9VectorFstIN3fst6StdArcEEEPN3fst9VectorFstIN3fst6StdArcEEE"></span><span id="khg::TrainingGraphCompiler::CompileGraphFromLG__fst::VectorFst:fst::StdArc:CR.fst::VectorFst:fst::StdArc:P"></span><span class="target" id="classkhg_1_1TrainingGraphCompiler_1abfcd89dd2462424a18e9883ebe819802"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompileGraphFromLG</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">phone2word_fst</span></span>, <span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">out_fst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg21TrainingGraphCompiler18CompileGraphFromLGERKN3fst9VectorFstIN3fst6StdArcEEEPN3fst9VectorFstIN3fst6StdArcEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Same as <code class="docutils literal notranslate"><a class="reference internal" href="#classkhg_1_1TrainingGraphCompiler_1a5c59bb8c9ee495da127222b4f433ab3f"><span class="std std-ref"><span class="pre">CompileGraph</span></span></a></code>, but uses an external LG fst. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phone2word_fst</strong> -- [in] The LG fst (phones to words), e.g. built by composing the lexicon with the grammar outside this class. </p></li>
+<li><p><strong>out_fst</strong> -- [out] The compiled training graph. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True on success; false if the graph could not be compiled. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg21TrainingGraphCompiler13CompileGraphsERKNSt6vectorIPKN3fst9VectorFstIN3fst6StdArcEEEEEPNSt6vectorIPN3fst9VectorFstIN3fst6StdArcEEEEE">
+<span id="_CPPv3N3khg21TrainingGraphCompiler13CompileGraphsERKNSt6vectorIPKN3fst9VectorFstIN3fst6StdArcEEEEEPNSt6vectorIPN3fst9VectorFstIN3fst6StdArcEEEEE"></span><span id="_CPPv2N3khg21TrainingGraphCompiler13CompileGraphsERKNSt6vectorIPKN3fst9VectorFstIN3fst6StdArcEEEEEPNSt6vectorIPN3fst9VectorFstIN3fst6StdArcEEEEE"></span><span id="khg::TrainingGraphCompiler::CompileGraphs__std::vector:fst::VectorFst:fst::StdArc:CP:CR.std::vector:fst::VectorFst:fst::StdArc:P:P"></span><span class="target" id="classkhg_1_1TrainingGraphCompiler_1aff8ece305f19359c554a6c7fc26700aa"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompileGraphs</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">word_fsts</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">out_fsts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg21TrainingGraphCompiler13CompileGraphsERKNSt6vectorIPKN3fst9VectorFstIN3fst6StdArcEEEEEPNSt6vectorIPN3fst9VectorFstIN3fst6StdArcEEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>CompileGraphs allows you to compile a number of graphs at the same time. </p>
+<p>This consumes more memory but is faster. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>word_fsts</strong> -- [in] The word-level grammars, one per utterance. </p></li>
+<li><p><strong>out_fsts</strong> -- [out] The compiled training graphs, one per input (owned by the caller). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True on success; false if any of the graphs could not be compiled. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg21TrainingGraphCompiler21CompileGraphsFromTextERKNSt6vectorINSt6vectorI7int32_tEEEEPNSt6vectorIPN3fst9VectorFstIN3fst6StdArcEEEEE">
+<span id="_CPPv3N3khg21TrainingGraphCompiler21CompileGraphsFromTextERKNSt6vectorINSt6vectorI7int32_tEEEEPNSt6vectorIPN3fst9VectorFstIN3fst6StdArcEEEEE"></span><span id="_CPPv2N3khg21TrainingGraphCompiler21CompileGraphsFromTextERKNSt6vectorINSt6vectorI7int32_tEEEEPNSt6vectorIPN3fst9VectorFstIN3fst6StdArcEEEEE"></span><span id="khg::TrainingGraphCompiler::CompileGraphsFromText__std::vector:std::vector:int32_t::CR.std::vector:fst::VectorFst:fst::StdArc:P:P"></span><span class="target" id="classkhg_1_1TrainingGraphCompiler_1a365634ce638a923596955300ceed4b72"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompileGraphsFromText</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">word_grammar</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">out_fsts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg21TrainingGraphCompiler21CompileGraphsFromTextERKNSt6vectorINSt6vectorI7int32_tEEEEPNSt6vectorIPN3fst9VectorFstIN3fst6StdArcEEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>This function creates FSTs from the text and calls CompileGraphs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>word_grammar</strong> -- [in] The utterance transcripts (sequences of word-ids), one per utterance. </p></li>
+<li><p><strong>out_fsts</strong> -- [out] The compiled training graphs (owned by the caller). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True on success; false if any of the graphs could not be compiled. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17ContextDependencyE">
+<span id="_CPPv3N3khg17ContextDependencyE"></span><span id="_CPPv2N3khg17ContextDependencyE"></span><span id="khg::ContextDependency"></span><span class="target" id="classkhg_1_1ContextDependency"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContextDependency</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">khg</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ContextDependencyInterface</span></span><a class="headerlink" href="#_CPPv4N3khg17ContextDependencyE" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classkhg_1_1ContextDependency"><span class="std std-ref">ContextDependency</span></a> is quite a generic decision tree. </p>
+<p>It does not actually do very much– all the magic is in the <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> object. All this class does is to encode the phone context as a sequence of events, and pass this to the <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> object to turn into what it will interpret as a vector of pdfs.</p>
+<p>Different versions of the <a class="reference internal" href="#classkhg_1_1ContextDependency"><span class="std std-ref">ContextDependency</span></a> class that are written in the future may have slightly different interfaces and pass more stuff in as events, to the <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> object.</p>
+<p>In order to separate the process of training decision trees from the process of actually using them, we do not put any training code into the <a class="reference internal" href="#classkhg_1_1ContextDependency"><span class="std std-ref">ContextDependency</span></a> class. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17ContextDependency12ContextWidthEv">
+<span id="_CPPv3NK3khg17ContextDependency12ContextWidthEv"></span><span id="_CPPv2NK3khg17ContextDependency12ContextWidthEv"></span><span id="khg::ContextDependency::ContextWidthC"></span><span class="target" id="classkhg_1_1ContextDependency_1a09b5d4da50a95e353310e6d3b9e09e9b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContextWidth</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg17ContextDependency12ContextWidthEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the context width used to compute context. </p>
+<p><a class="reference internal" href="#classkhg_1_1ContextDependency_1a09b5d4da50a95e353310e6d3b9e09e9b"><span class="std std-ref">ContextWidth()</span></a> returns the value N (e.g. 3 for triphone models) that says how many phones are considered for computing context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of phones in the context window. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17ContextDependency15CentralPositionEv">
+<span id="_CPPv3NK3khg17ContextDependency15CentralPositionEv"></span><span id="_CPPv2NK3khg17ContextDependency15CentralPositionEv"></span><span id="khg::ContextDependency::CentralPositionC"></span><span class="target" id="classkhg_1_1ContextDependency_1aacf4fb70735de9c0ee840be9c6f629aa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CentralPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg17ContextDependency15CentralPositionEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the central position P of the phone context. </p>
+<p>Central position P of the phone context, in 0-based numbering, e.g. P = 1 for typical triphone system. We have to see if we can do without this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The 0-based index of the central phone within the context window. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17ContextDependency7ComputeERKNSt6vectorI7int32_tEE7int32_tP7int32_t">
+<span id="_CPPv3NK3khg17ContextDependency7ComputeERKNSt6vectorI7int32_tEE7int32_tP7int32_t"></span><span id="_CPPv2NK3khg17ContextDependency7ComputeERKNSt6vectorI7int32_tEE7int32_tP7int32_t"></span><span id="khg::ContextDependency::Compute__std::vector:int32_t:CR.int32_t.int32_tPC"></span><span class="target" id="classkhg_1_1ContextDependency_1a64c3803ac52d4987cf324c5f1f7efafa"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Compute</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">phoneseq</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pdf_class</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pdf_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg17ContextDependency7ComputeERKNSt6vectorI7int32_tEE7int32_tP7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Maps a phone context and pdf-class to a pdf-id. </p>
+<p>Returns success or failure; outputs pdf to pdf_id. For positions that were outside the sequence (due to end effects), put zero. Naturally <code class="docutils literal notranslate"><span class="pre">phoneseq</span></code>[<a class="reference internal" href="#classkhg_1_1ContextDependency_1aacf4fb70735de9c0ee840be9c6f629aa"><span class="std std-ref">CentralPosition()</span></a>] must be nonzero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phoneseq</strong> -- The context window of phones, of length N = <code class="docutils literal notranslate"><span class="pre">N_</span></code>; use zero at positions outside the sequence (end effects). </p></li>
+<li><p><strong>pdf_class</strong> -- The pdf-class (position within the HMM, zero-based). </p></li>
+<li><p><strong>pdf_id</strong> -- [out] On success, the pdf-id. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns success or failure; outputs the pdf-id. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17ContextDependency7NumPdfsEv">
+<span id="_CPPv3NK3khg17ContextDependency7NumPdfsEv"></span><span id="_CPPv2NK3khg17ContextDependency7NumPdfsEv"></span><span id="khg::ContextDependency::NumPdfsC"></span><span class="target" id="classkhg_1_1ContextDependency_1a5394f9890f6be42b5dfb6060d089ebba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumPdfs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg17ContextDependency7NumPdfsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the number of acoustic pdfs (numbered 0..<a class="reference internal" href="#classkhg_1_1ContextDependency_1a5394f9890f6be42b5dfb6060d089ebba"><span class="std std-ref">NumPdfs()</span></a>-1). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of pdfs; 0 if the to-pdf map is empty. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17ContextDependency4CopyEv">
+<span id="_CPPv3NK3khg17ContextDependency4CopyEv"></span><span id="_CPPv2NK3khg17ContextDependency4CopyEv"></span><span id="khg::ContextDependency::CopyC"></span><span class="target" id="classkhg_1_1ContextDependency_1acf177bcc704b09aa681cba251643a1e6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">ContextDependencyInterface</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Copy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg17ContextDependency4CopyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns a new object which is a deep copy of the current one. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A newly allocated copy (including a copy of the to-pdf map); the caller owns it. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17ContextDependency5WriteERNSt7ostreamEb">
+<span id="_CPPv3NK3khg17ContextDependency5WriteERNSt7ostreamEb"></span><span id="_CPPv2NK3khg17ContextDependency5WriteERNSt7ostreamEb"></span><span id="khg::ContextDependency::Write__osR.bC"></span><span class="target" id="classkhg_1_1ContextDependency_1ad94f057bf5533e8f8344d95168cf7e98"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Write</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg17ContextDependency5WriteERNSt7ostreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Writes the context-dependency object to a stream. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>os</strong> -- The stream to write to. </p></li>
+<li><p><strong>binary</strong> -- Whether to write in binary (<code class="docutils literal notranslate"><span class="pre">true</span></code>) or text (<code class="docutils literal notranslate"><span class="pre">false</span></code>) form. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17ContextDependency4ReadERNSt7istreamEb">
+<span id="_CPPv3N3khg17ContextDependency4ReadERNSt7istreamEb"></span><span id="_CPPv2N3khg17ContextDependency4ReadERNSt7istreamEb"></span><span id="khg::ContextDependency::Read__isR.b"></span><span class="target" id="classkhg_1_1ContextDependency_1ac611a2aa0cfdb9102435ef49b12b9cbb"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Read</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">is</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg17ContextDependency4ReadERNSt7istreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Reads a context-dependency object from a stream; throws on error. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is</strong> -- The stream to read from. </p></li>
+<li><p><strong>binary</strong> -- Whether the stream is in binary (<code class="docutils literal notranslate"><span class="pre">true</span></code>) or text (<code class="docutils literal notranslate"><span class="pre">false</span></code>) form. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17ContextDependency17ContextDependencyEv">
+<span id="_CPPv3N3khg17ContextDependency17ContextDependencyEv"></span><span id="_CPPv2N3khg17ContextDependency17ContextDependencyEv"></span><span id="khg::ContextDependency::ContextDependency"></span><span class="target" id="classkhg_1_1ContextDependency_1a3f349a9631f7e0c76184720f6d4f7919"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContextDependency</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg17ContextDependency17ContextDependencyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor with no arguments; will normally be called prior to <a class="reference internal" href="#classkhg_1_1ContextDependency_1ac611a2aa0cfdb9102435ef49b12b9cbb"><span class="std std-ref">Read()</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17ContextDependency17ContextDependencyE7int32_t7int32_tP8EventMap">
+<span id="_CPPv3N3khg17ContextDependency17ContextDependencyE7int32_t7int32_tP8EventMap"></span><span id="_CPPv2N3khg17ContextDependency17ContextDependencyE7int32_t7int32_tP8EventMap"></span><span id="khg::ContextDependency::ContextDependency__int32_t.int32_t.EventMapP"></span><span class="target" id="classkhg_1_1ContextDependency_1a67b53e2f11636730f0124462fa4d6068"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContextDependency</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">N</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">P</span></span>, <a class="reference internal" href="#_CPPv4N3khg8EventMapE" title="khg::EventMap"><span class="n"><span class="pre">EventMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">to_pdf</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg17ContextDependency17ContextDependencyE7int32_t7int32_tP8EventMap" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor taking ownership of the supplied to-pdf map. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N</strong> -- The context width (number of phones considered). </p></li>
+<li><p><strong>P</strong> -- The central position within the context window (0-based). </p></li>
+<li><p><strong>to_pdf</strong> -- The to-pdf <code class="docutils literal notranslate"><a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref"><span class="pre">EventMap</span></span></a></code>; ownership is transferred to this object. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17ContextDependency8ToPdfMapEv">
+<span id="_CPPv3NK3khg17ContextDependency8ToPdfMapEv"></span><span id="_CPPv2NK3khg17ContextDependency8ToPdfMapEv"></span><span id="khg::ContextDependency::ToPdfMapC"></span><span class="target" id="classkhg_1_1ContextDependency_1ac1d87b0ea6f4d05bbddf59ff9f147c39"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg8EventMapE" title="khg::EventMap"><span class="n"><span class="pre">EventMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ToPdfMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg17ContextDependency8ToPdfMapEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the underlying to-pdf <code class="docutils literal notranslate"><a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref"><span class="pre">EventMap</span></span></a></code> (not owned by caller). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17ContextDependency10GetPdfInfoERKNSt6vectorI7int32_tEERKNSt6vectorI7int32_tEEPNSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEE">
+<span id="_CPPv3NK3khg17ContextDependency10GetPdfInfoERKNSt6vectorI7int32_tEERKNSt6vectorI7int32_tEEPNSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEE"></span><span id="_CPPv2NK3khg17ContextDependency10GetPdfInfoERKNSt6vectorI7int32_tEERKNSt6vectorI7int32_tEEPNSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEE"></span><span id="khg::ContextDependency::GetPdfInfo__std::vector:int32_t:CR.std::vector:int32_t:CR.std::vector:std::vector:std::pair:int32_t.int32_t:::PC"></span><span class="target" id="classkhg_1_1ContextDependency_1aecd9c9c826e4066bdf9d2cc6f0ff6910"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPdfInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">phones</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">num_pdf_classes</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pdf_info</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg17ContextDependency10GetPdfInfoERKNSt6vectorI7int32_tEERKNSt6vectorI7int32_tEEPNSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns, for each pdf-id, the (phone, pdf-class) pairs it can correspond to. </p>
+<p>GetPdfInfo returns a vector indexed by pdf-id, saying for each pdf which pairs of (phone, pdf-class) it can correspond to. (Usually just one). c.f. hmm/hmm-topology.h for meaning of pdf-class. This is the old, simpler interface of <a class="reference internal" href="#classkhg_1_1ContextDependency_1aecd9c9c826e4066bdf9d2cc6f0ff6910"><span class="std std-ref">GetPdfInfo()</span></a>, and that this one can only be called if the <a class="reference internal" href="hmm.html#classkhg_1_1HmmTopology"><span class="std std-ref">HmmTopology</span></a> object's IsHmm() function call returns true.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phones</strong> -- [in] List of phones. </p></li>
+<li><p><strong>num_pdf_classes</strong> -- [in] Indexed by phone. </p></li>
+<li><p><strong>pdf_info</strong> -- [out] Indexed by pdf-id; each element is the list of (phone, pdf_class) pairs the pdf can correspond to. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17ContextDependency10GetPdfInfoERKNSt6vectorI7int32_tEERKNSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEEPNSt6vectorINSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEEEE">
+<span id="_CPPv3NK3khg17ContextDependency10GetPdfInfoERKNSt6vectorI7int32_tEERKNSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEEPNSt6vectorINSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEEEE"></span><span id="_CPPv2NK3khg17ContextDependency10GetPdfInfoERKNSt6vectorI7int32_tEERKNSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEEPNSt6vectorINSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEEEE"></span><span id="khg::ContextDependency::GetPdfInfo__std::vector:int32_t:CR.std::vector:std::vector:std::pair:int32_t.int32_t:::CR.std::vector:std::vector:std::vector:std::pair:int32_t.int32_t::::PC"></span><span class="target" id="classkhg_1_1ContextDependency_1ae5f813c09a92bec05791c5cfe897d95a"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPdfInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">phones</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pdf_class_pairs</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pdf_info</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg17ContextDependency10GetPdfInfoERKNSt6vectorI7int32_tEERKNSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEEPNSt6vectorINSt6vectorINSt6vectorINSt4pairI7int32_t7int32_tEEEEEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns, for each (phone, pdf-class pair), the possible (forward-transition-pdf, self-loop-pdf) id pairs. </p>
+<p>This function outputs information about what possible pdf-ids can be generated for HMM-states; it covers the general case where the self-loop pdf-class may be different from the forward-transition pdf-class, so we are asking not about the set of possible pdf-ids for a given (phone, pdf-class), but the set of possible ordered pairs (forward-transition-pdf, self-loop-pdf) for a given (phone, forward-transition-pdf-class, self-loop-pdf-class).</p>
+<p>
+This is less efficient than the other version of <a class="reference internal" href="#classkhg_1_1ContextDependency_1aecd9c9c826e4066bdf9d2cc6f0ff6910"><span class="std std-ref">GetPdfInfo()</span></a>. Note: if there is no self-loop, the corresponding entry (.second) in <code class="docutils literal notranslate"><span class="pre">pdf_class_pairs</span></code> and the output <code class="docutils literal notranslate"><span class="pre">pdf_info</span></code> would be -1. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phones</strong> -- [in] A list of integer ids of phones. </p></li>
+<li><p><strong>pdf_class_pairs</strong> -- [in] Indexed by phone; a list of pairs (forward-transition-pdf-class, self-loop-pdf-class) that we can have for that phone. </p></li>
+<li><p><strong>pdf_info</strong> -- [out] Indexed first by phone and then by the same index that indexes each element of <code class="docutils literal notranslate"><span class="pre">pdf_class_pairs</span></code>, and tells us for each pair in <code class="docutils literal notranslate"><span class="pre">pdf_class_pairs</span></code>, what is the list of possible (forward-transition-pdf-id, self-loop-pdf-id) that we can have.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg8EventMapE">
+<span id="_CPPv3N3khg8EventMapE"></span><span id="_CPPv2N3khg8EventMapE"></span><span id="khg::EventMap"></span><span class="target" id="classkhg_1_1EventMap"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EventMap</span></span></span><a class="headerlink" href="#_CPPv4N3khg8EventMapE" title="Link to this definition"></a><br /></dt>
+<dd><p>A class that is capable of representing a generic mapping from EventType (which is a vector of (key, value) pairs) to EventAnswerType which is just an integer. </p>
+<p>See kaldi's <code class="docutils literal notranslate"><span class="pre">tree_internals</span></code> documentation for an overview. </p>
+<p>Subclassed by khg::ConstantEventMap, khg::SplitEventMap, khg::TableEventMap</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg8EventMap3MapERK9EventTypeP15EventAnswerType">
+<span id="_CPPv3NK3khg8EventMap3MapERK9EventTypeP15EventAnswerType"></span><span id="_CPPv2NK3khg8EventMap3MapERK9EventTypeP15EventAnswerType"></span><span id="khg::EventMap::Map__EventTypeCR.EventAnswerTypePC"></span><span class="target" id="classkhg_1_1EventMap_1a1cb2318d1b42aec533a7c0b3c8bf61bb"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Map</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">EventType</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">event</span></span>, <span class="n"><span class="pre">EventAnswerType</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ans</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK3khg8EventMap3MapERK9EventTypeP15EventAnswerType" title="Link to this definition"></a><br /></dt>
+<dd><p>Maps an event to the answer type. </p>
+<p>Maps events to the answer type; input must be sorted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> -- The (fully or partially specified) event; must be sorted. </p></li>
+<li><p><strong>ans</strong> -- [out] The answer this event maps to. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success; <code class="docutils literal notranslate"><span class="pre">false</span></code> if the event does not determine an answer. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg8EventMap8MultiMapERK9EventTypePNSt6vectorI15EventAnswerTypeEE">
+<span id="_CPPv3NK3khg8EventMap8MultiMapERK9EventTypePNSt6vectorI15EventAnswerTypeEE"></span><span id="_CPPv2NK3khg8EventMap8MultiMapERK9EventTypePNSt6vectorI15EventAnswerTypeEE"></span><span id="khg::EventMap::MultiMap__EventTypeCR.std::vector:EventAnswerType:PC"></span><span class="target" id="classkhg_1_1EventMap_1a7b1769106444d288f98ab22cdf43b6ce"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultiMap</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">EventType</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">event</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">EventAnswerType</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ans</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK3khg8EventMap8MultiMapERK9EventTypePNSt6vectorI15EventAnswerTypeEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Maps a partially specified event to the set of answers it might map to. </p>
+<p>MultiMap maps a partially specified set of events to the set of answers it might map to. It appends these to &quot;ans&quot;. &quot;ans&quot; is <strong>not guaranteed unique at output</strong> if the tree contains duplicate answers at leaves – you should sort &amp; uniq afterwards. e.g.: SortAndUniq(ans).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> -- The (possibly partially specified) event; must be sorted. </p></li>
+<li><p><strong>ans</strong> -- [out] The possible answers are appended to this vector (not guaranteed unique at output). </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg8EventMap11GetChildrenEPNSt6vectorIP8EventMapEE">
+<span id="_CPPv3NK3khg8EventMap11GetChildrenEPNSt6vectorIP8EventMapEE"></span><span id="_CPPv2NK3khg8EventMap11GetChildrenEPNSt6vectorIP8EventMapEE"></span><span id="khg::EventMap::GetChildren__std::vector:EventMapP:PC"></span><span class="target" id="classkhg_1_1EventMap_1a5edf02680979d596aec7a7ef7ce5a8ee"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetChildren</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3khg8EventMapE" title="khg::EventMap"><span class="n"><span class="pre">EventMap</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK3khg8EventMap11GetChildrenEPNSt6vectorIP8EventMapEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the immediate children of this <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> (if they exist). </p>
+<p><a class="reference internal" href="#classkhg_1_1EventMap_1a5edf02680979d596aec7a7ef7ce5a8ee"><span class="std std-ref">GetChildren()</span></a> returns the EventMaps that are immediate children of this <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> (if they exist), by putting them in *out. Useful for determining the structure of the event map.</p>
+<p>The returned pointer in out are borrowed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>out</strong> -- [out] Cleared, then filled with the borrowed pointers to the immediate children. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg8EventMap4CopyERKNSt6vectorIP8EventMapEE">
+<span id="_CPPv3NK3khg8EventMap4CopyERKNSt6vectorIP8EventMapEE"></span><span id="_CPPv2NK3khg8EventMap4CopyERKNSt6vectorIP8EventMapEE"></span><span id="khg::EventMap::Copy__std::vector:EventMapP:CRC"></span><span class="target" id="classkhg_1_1EventMap_1aba399e6d272dea6e961141eced6d4491"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg8EventMapE" title="khg::EventMap"><span class="n"><span class="pre">EventMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Copy</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3khg8EventMapE" title="khg::EventMap"><span class="n"><span class="pre">EventMap</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">new_leaves</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK3khg8EventMap4CopyERKNSt6vectorIP8EventMapEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns a deep copy of this <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a>, optionally replacing leaves. </p>
+<p>This <a class="reference internal" href="#classkhg_1_1EventMap_1a37b94f029cb4435ae0c2cbab9885657a"><span class="std std-ref">Copy()</span></a> does a deep copy of the event map. If new_leaves is nonempty when it reaches a leaf with value l s.t. new_leaves[l] != NULL, it replaces it with a copy of that <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a>. This makes it possible to extend and modify It's the way we do splits of trees, and clustering of trees. Think about this carefully, because the <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> structure does not support modification of an existing tree. Do not be tempted to do this differently, because other kinds of mechanisms would get very messy and unextensible. <a class="reference internal" href="#classkhg_1_1EventMap_1a37b94f029cb4435ae0c2cbab9885657a"><span class="std std-ref">Copy()</span></a> is the only mechanism to modify a tree. It's similar to a kind of function composition. <a class="reference internal" href="#classkhg_1_1EventMap_1a37b94f029cb4435ae0c2cbab9885657a"><span class="std std-ref">Copy()</span></a> does not take ownership of the pointers in new_leaves (it uses the <a class="reference internal" href="#classkhg_1_1EventMap_1a37b94f029cb4435ae0c2cbab9885657a"><span class="std std-ref">Copy()</span></a> function of those EventMaps).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_leaves</strong> -- If nonempty, leaf value <code class="docutils literal notranslate"><span class="pre">l</span></code> is replaced by a copy of <code class="docutils literal notranslate"><span class="pre">new_leaves</span></code>[l] where that pointer is non-NULL. Not owned by the result. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A newly allocated deep copy; the caller owns it. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg8EventMap4CopyEv">
+<span id="_CPPv3NK3khg8EventMap4CopyEv"></span><span id="_CPPv2NK3khg8EventMap4CopyEv"></span><span id="khg::EventMap::CopyC"></span><span class="target" id="classkhg_1_1EventMap_1a37b94f029cb4435ae0c2cbab9885657a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg8EventMapE" title="khg::EventMap"><span class="n"><span class="pre">EventMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Copy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg8EventMap4CopyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns a deep copy of this <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> with its leaves unchanged. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A newly allocated deep copy; the caller owns it. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg8EventMap9MapValuesERKNSt13unordered_setI12EventKeyTypeEERKNSt13unordered_mapI14EventValueType14EventValueTypeEE">
+<span id="_CPPv3NK3khg8EventMap9MapValuesERKNSt13unordered_setI12EventKeyTypeEERKNSt13unordered_mapI14EventValueType14EventValueTypeEE"></span><span id="_CPPv2NK3khg8EventMap9MapValuesERKNSt13unordered_setI12EventKeyTypeEERKNSt13unordered_mapI14EventValueType14EventValueTypeEE"></span><span id="khg::EventMap::MapValues__std::unordered_set:EventKeyType:CR.std::unordered_map:EventValueType.EventValueType:CRC"></span><span class="target" id="classkhg_1_1EventMap_1a23acb867e1b5adadc2540560b2c63469"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg8EventMapE" title="khg::EventMap"><span class="n"><span class="pre">EventMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">MapValues</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">EventKeyType</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">keys_to_map</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">EventValueType</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">EventValueType</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value_map</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK3khg8EventMap9MapValuesERKNSt13unordered_setI12EventKeyTypeEERKNSt13unordered_mapI14EventValueType14EventValueTypeEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Maps the event values (not the answers) of selected keys. </p>
+<p>The function <a class="reference internal" href="#classkhg_1_1EventMap_1a23acb867e1b5adadc2540560b2c63469"><span class="std std-ref">MapValues()</span></a> is intended to be used to map phone-sets between different integer representations. For all the keys in the set &quot;keys_to_map&quot;, it will map the corresponding values using the map &quot;value_map&quot;. Note: these values are the values in the key-&gt;value pairs of the <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a>, which really correspond to phones in the usual case; they are not the &quot;answers&quot; of the <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> which correspond to clustered states. In case multiple values are mapped to the same value, it will try to deal with it gracefully where it can, but will crash if, for example, this would cause problems with the TableEventMap. It will also crash if any values used for keys in &quot;keys_to_map&quot; are not mapped by &quot;value_map&quot;. This function is not currently used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys_to_map</strong> -- The set of keys whose values should be remapped. </p></li>
+<li><p><strong>value_map</strong> -- The map from old values to new values. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A newly allocated remapped <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a>; the caller owns it. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg8EventMap5PruneEv">
+<span id="_CPPv3NK3khg8EventMap5PruneEv"></span><span id="_CPPv2NK3khg8EventMap5PruneEv"></span><span id="khg::EventMap::PruneC"></span><span class="target" id="classkhg_1_1EventMap_1a7bc638df31cdf001556d796999e62bcd"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg8EventMapE" title="khg::EventMap"><span class="n"><span class="pre">EventMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Prune</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK3khg8EventMap5PruneEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns a copy of this <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> with the parts answering only -1 removed. </p>
+<p>The function <a class="reference internal" href="#classkhg_1_1EventMap_1a7bc638df31cdf001556d796999e62bcd"><span class="std std-ref">Prune()</span></a> is like <a class="reference internal" href="#classkhg_1_1EventMap_1a37b94f029cb4435ae0c2cbab9885657a"><span class="std std-ref">Copy()</span></a>, except it removes parts of the tree that return only -1 (it will return NULL if this <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> returns only -1). This is a mechanism to remove parts of the tree– you would first use the <a class="reference internal" href="#classkhg_1_1EventMap_1a37b94f029cb4435ae0c2cbab9885657a"><span class="std std-ref">Copy()</span></a> function with a vector of EventMap*, and for the parts you don't want, you'd put a ConstantEventMap with -1; you'd then call <a class="reference internal" href="#classkhg_1_1EventMap_1a7bc638df31cdf001556d796999e62bcd"><span class="std std-ref">Prune()</span></a> on the result. This function is not currently used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A newly allocated pruned <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a>, or NULL if this <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> returns only -1; the caller owns it. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg8EventMap9MaxResultEv">
+<span id="_CPPv3NK3khg8EventMap9MaxResultEv"></span><span id="_CPPv2NK3khg8EventMap9MaxResultEv"></span><span id="khg::EventMap::MaxResultC"></span><span class="target" id="classkhg_1_1EventMap_1a0e06f6341733956d51180106d599834b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">EventAnswerType</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaxResult</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg8EventMap9MaxResultEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the largest answer value occurring in this <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a>. </p>
+<p>Child classes may override this for efficiency; here is the basic version.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The largest answer value, or a minimal (large-negative) value if nothing was found (std::numeric_limits::min()). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg8EventMap5WriteERNSt7ostreamEb">
+<span id="_CPPv3N3khg8EventMap5WriteERNSt7ostreamEb"></span><span id="_CPPv2N3khg8EventMap5WriteERNSt7ostreamEb"></span><span id="khg::EventMap::Write__osR.b"></span><span class="target" id="classkhg_1_1EventMap_1a2d6fc1e39e5b941ec96e4fd21a2069a0"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Write</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3khg8EventMap5WriteERNSt7ostreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Writes this <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> to a stream. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>os</strong> -- The stream to write to. </p></li>
+<li><p><strong>binary</strong> -- Whether to write in binary (<code class="docutils literal notranslate"><span class="pre">true</span></code>) or text (<code class="docutils literal notranslate"><span class="pre">false</span></code>) form. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg8EventMap5CheckERK9EventType">
+<span id="_CPPv3N3khg8EventMap5CheckERK9EventType"></span><span id="_CPPv2N3khg8EventMap5CheckERK9EventType"></span><span id="khg::EventMap::Check__EventTypeCR"></span><span class="target" id="classkhg_1_1EventMap_1a972e17a0807998a7a9495d465cfac9ce"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Check</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">EventType</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">event</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg8EventMap5CheckERK9EventType" title="Link to this definition"></a><br /></dt>
+<dd><p>Checks that an event is sorted and has unique keys. </p>
+<p>Will crash if not sorted and unique on key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> -- The event to check. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg8EventMap6LookupERK9EventType12EventKeyTypeP14EventValueType">
+<span id="_CPPv3N3khg8EventMap6LookupERK9EventType12EventKeyTypeP14EventValueType"></span><span id="_CPPv2N3khg8EventMap6LookupERK9EventType12EventKeyTypeP14EventValueType"></span><span id="khg::EventMap::Lookup__EventTypeCR.EventKeyType.EventValueTypeP"></span><span class="target" id="classkhg_1_1EventMap_1a11ae14be079e30264881fcbbf9d9d21d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Lookup</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">EventType</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">event</span></span>, <span class="n"><span class="pre">EventKeyType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span>, <span class="n"><span class="pre">EventValueType</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ans</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg8EventMap6LookupERK9EventType12EventKeyTypeP14EventValueType" title="Link to this definition"></a><br /></dt>
+<dd><p>Looks up the value of one key within an event. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> -- The event to look in; must be sorted and unique on key. </p></li>
+<li><p><strong>key</strong> -- The key to look up. </p></li>
+<li><p><strong>ans</strong> -- [out] The value corresponding to <code class="docutils literal notranslate"><span class="pre">key</span></code>, if present. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the key was found in the event. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg8EventMap5WriteERNSt7ostreamEbP8EventMap">
+<span id="_CPPv3N3khg8EventMap5WriteERNSt7ostreamEbP8EventMap"></span><span id="_CPPv2N3khg8EventMap5WriteERNSt7ostreamEbP8EventMap"></span><span id="khg::EventMap::Write__osR.b.EventMapP"></span><span class="target" id="classkhg_1_1EventMap_1a62dee035b37062345695692f09e245d2"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Write</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span>, <a class="reference internal" href="#_CPPv4N3khg8EventMapE" title="khg::EventMap"><span class="n"><span class="pre">EventMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">emap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg8EventMap5WriteERNSt7ostreamEbP8EventMap" title="Link to this definition"></a><br /></dt>
+<dd><p>Writes an <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> to a stream; also works for NULL pointers. </p>
+<p>A Write function that takes care of NULL pointers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>os</strong> -- The stream to write to. </p></li>
+<li><p><strong>binary</strong> -- Whether to write in binary (<code class="docutils literal notranslate"><span class="pre">true</span></code>) or text (<code class="docutils literal notranslate"><span class="pre">false</span></code>) form. </p></li>
+<li><p><strong>emap</strong> -- The <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> to write; may be NULL. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg8EventMap4ReadERNSt7istreamEb">
+<span id="_CPPv3N3khg8EventMap4ReadERNSt7istreamEb"></span><span id="_CPPv2N3khg8EventMap4ReadERNSt7istreamEb"></span><span id="khg::EventMap::Read__isR.b"></span><span class="target" id="classkhg_1_1EventMap_1a57f84f069aa420fc163339cbb3aa58f7"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg8EventMapE" title="khg::EventMap"><span class="n"><span class="pre">EventMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Read</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">is</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg8EventMap4ReadERNSt7istreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Reads an arbitrary <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> from a stream; also works for NULL pointers. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is</strong> -- The stream to read from. </p></li>
+<li><p><strong>binary</strong> -- Whether the stream is in binary (<code class="docutils literal notranslate"><span class="pre">true</span></code>) or text (<code class="docutils literal notranslate"><span class="pre">false</span></code>) form. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The <a class="reference internal" href="#classkhg_1_1EventMap"><span class="std std-ref">EventMap</span></a> that was read (may be NULL); the caller owns it. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gmm.html" class="btn btn-neutral float-left" title="GMMs and MLE/MAP estimation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="decodable.html" class="btn btn-neutral float-right" title="GMM decodables" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

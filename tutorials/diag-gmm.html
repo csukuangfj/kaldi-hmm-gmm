@@ -1,0 +1,193 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DiagGmm &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="HMM topology" href="hmm.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python-api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp-api/index.html">C++ API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Topic notes</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#model-structure">Model structure</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="hmm.html">HMM topology</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">DiagGmm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gconsts">gconsts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#split">split</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logdet">logdet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#merge">merge</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Topic notes</a></li>
+      <li class="breadcrumb-item active">DiagGmm</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/diag-gmm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="diaggmm">
+<h1>DiagGmm<a class="headerlink" href="#diaggmm" title="Link to this heading"></a></h1>
+<section id="gconsts">
+<h2>gconsts<a class="headerlink" href="#gconsts" title="Link to this heading"></a></h2>
+<p>The density of a diagonal-covariance Gaussian factorizes per dimension:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}f_x(x_1, \ldots, x_k) &amp;= \frac{\exp \Big(-\frac{1}{2} ( \frac{y_1^2}{\sigma_1^2} + \frac{y_2^2}{\sigma_2^2} + \ldots + \frac{y_k^2}{\sigma_k^2} ) \Big)}{\sqrt{(2\pi)^{k}\sigma_1^2 \cdot \sigma_2^2 \cdots \sigma_k^2}} \\
+&amp;= \frac{\exp \Big(-\frac{1}{2} ( \frac{y_1^2}{\sigma_1^2} + \frac{y_2^2}{\sigma_2^2} + \ldots + \frac{y_k^2}{\sigma_k^2} ) \Big)}{\sqrt{2\pi\sigma_1^2 \cdot 2\pi\sigma_2^2 \cdots 2\pi\sigma_k^2}} \\
+&amp;= \frac{\exp\Big(-\frac{y_1^2}{2\sigma_1^2} \Big)}{\sqrt{2\pi\sigma_1^2}}  \cdot \frac{\exp\Big(-\frac{y_2^2}{2\sigma_2^2} \Big)}{\sqrt{2\pi\sigma_2^2}}  \cdots \frac{\exp\Big(-\frac{y_k^2}{2\sigma_k^2} \Big)}{\sqrt{2\pi\sigma_k^2}} \\
+&amp;= \frac{\exp\Big(-\frac{(x_1-\mu_1)^2}{2\sigma_1^2} \Big)}{\sqrt{2\pi\sigma_1^2}}  \cdot \frac{\exp\Big(-\frac{(x_2-\mu_2)^2}{2\sigma_2^2} \Big)}{\sqrt{2\pi\sigma_2^2}}  \cdots \frac{\exp\Big(-\frac{(x_k-\mu_k)^2}{2\sigma_k^2} \Big)}{\sqrt{2\pi\sigma_k^2}} \\
+&amp;= f_1(x_1) \cdot f_2(x_2) \cdots f_k(x_k)\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\log f(x) = -0.5 \sum_{i=1}^{k}\left(\log 2\pi + \log \sigma_i^2 + \frac{(x_i-\mu_i)^2}{2\sigma_i^2}  \right)\]</div>
+<p>We define <code class="docutils literal notranslate"><span class="pre">gconst</span></code> as the x-independent part of the mixture component's
+log-likelihood (the log density at <code class="docutils literal notranslate"><span class="pre">x=0</span></code> plus the log weight):</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{gconst} = \log \lambda - 0.5 \left(k \log 2\pi + \sum_{i=1}^k \log \sigma_i^2 + \sum_{i=1}^k\frac{\mu_i^2}{\sigma_i^2}\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lambda\)</span> is the mixture weight, while <span class="math notranslate nohighlight">\(k\)</span> is the dimension.
+This is what <a class="reference internal" href="../python-api/gmm.html#kaldi_hmm_gmm.DiagGmm.compute_gconsts" title="kaldi_hmm_gmm.DiagGmm.compute_gconsts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">kaldi_hmm_gmm.DiagGmm.compute_gconsts()</span></code></a> precomputes.</p>
+</section>
+<section id="split">
+<h2>split<a class="headerlink" href="#split" title="Link to this heading"></a></h2>
+<p>How to increase the number of mixes?  This is kaldi's <code class="docutils literal notranslate"><span class="pre">DiagGmm::Split</span></code>.</p>
+<p>Find the component that has the largest weight.  Assume there is only one
+component and we want to split it into two components.  In this case,
+component 0 has the largest weight since there is only one component.</p>
+<p>For the weight, we split it into two uniformly:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}w_{0}^{new} = \frac{w_{0}}{2}\\
+w_{1}^{new} = \frac{w_{0}}{2}\end{split}\]</div>
+<p>For the standard deviation, we reuse it:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\sigma_{0}^{new} = \sigma_0\\
+\sigma_{1}^{new} = \sigma_0\end{split}\]</div>
+<p>For the mean, we use:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mu_0^{new} = \mu_0 + \mathrm{perturb\_factor} \cdot r \cdot \sigma_0\\
+\mu_1^{new} = \mu_0 - \mathrm{perturb\_factor} \cdot r \cdot \sigma_0\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(r\)</span> is a <strong>standard Gaussian</strong> random number (mean 0, variance 1;
+kaldi's <code class="docutils literal notranslate"><span class="pre">RandGauss()</span></code>) and <code class="docutils literal notranslate"><span class="pre">perturb_factor</span></code> is a user provided argument,
+e.g., <code class="docutils literal notranslate"><span class="pre">0.01</span></code>.</p>
+</section>
+<section id="logdet">
+<h2>logdet<a class="headerlink" href="#logdet" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">logdet</span></code> is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{logdet} = \log \left( \frac{1}{\sigma_1^2 \sigma_2^2 ... \sigma_n^2} \right)^{1/2}\]</div>
+<p>i.e. <span class="math notranslate nohighlight">\(-\frac{1}{2}\sum_i \log \sigma_i^2\)</span>.</p>
+</section>
+<section id="merge">
+<h2>merge<a class="headerlink" href="#merge" title="Link to this heading"></a></h2>
+<p>How to select two components to merge?  This is kaldi's <code class="docutils literal notranslate"><span class="pre">DiagGmm::Merge</span></code>.</p>
+<p>Suppose we have 3 components <code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code>, and <code class="docutils literal notranslate"><span class="pre">2</span></code>; we compute the
+objective improvement <code class="docutils literal notranslate"><span class="pre">delta</span></code> for every pair and merge the best one.  For
+a pair (0, 1), the merged statistics are moment-matched:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mu_{01} = \frac{w_0 \mu_0 + w_1 \mu_1}{w_0 + w_1}\\\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\mathrm{var}_{01} = \frac{w_0 (\mathrm{var}_0 + \mu_0^2) + w_1 (\mathrm{var}_1 + \mu_1^2)}{w_0 + w_1} - \mu_{01}^2\]</div>
+<p>The merged weight is <code class="docutils literal notranslate"><span class="pre">w_0</span> <span class="pre">+</span> <span class="pre">w_1</span></code>.</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{delta}\ \mathrm{loglike}_{01} = (w_0 + w_1) \cdot \mathrm{logdet}_{01} - w_0 \,\mathrm{logdet}_0 - w_1 \,\mathrm{logdet}_1\]</div>
+<p>We want to <strong>maximize this improvement</strong>, so we choose the pair with the
+largest <code class="docutils literal notranslate"><span class="pre">delta</span> <span class="pre">loglike</span></code> to merge.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="hmm.html" class="btn btn-neutral float-left" title="HMM topology" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

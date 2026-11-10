@@ -1,0 +1,1127 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HMM topology and transition model &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="GMMs and MLE/MAP estimation" href="gmm.html" />
+    <link rel="prev" title="C++ API" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python-api/index.html">Python API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">C++ API</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">HMM topology and transition model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-doxygen">API (doxygen)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg11HmmTopologyE"><code class="docutils literal notranslate"><span class="pre">khg::HmmTopology</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg15TransitionModelE"><code class="docutils literal notranslate"><span class="pre">khg::TransitionModel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg17HTransducerConfigE"><code class="docutils literal notranslate"><span class="pre">khg::HTransducerConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg14GetHTransducerERKNSt6vectorINSt6vectorI7int32_tEEEERK26ContextDependencyInterfaceRK15TransitionModelRK17HTransducerConfigPNSt6vectorI7int32_tEE"><code class="docutils literal notranslate"><span class="pre">GetHTransducer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg18AddTransitionProbsERK15TransitionModelRKNSt6vectorI7int32_tEEffPN3fst9VectorFstIN3fst6StdArcEEE"><code class="docutils literal notranslate"><span class="pre">AddTransitionProbs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg12AddSelfLoopsERK15TransitionModelRKNSt6vectorI7int32_tEEfbbPN3fst9VectorFstIN3fst6StdArcEEE"><code class="docutils literal notranslate"><span class="pre">AddSelfLoops()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N3khg13SplitToPhonesERK15TransitionModelRKNSt6vectorI7int32_tEEPNSt6vectorINSt6vectorI7int32_tEEEE"><code class="docutils literal notranslate"><span class="pre">SplitToPhones()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gmm.html">GMMs and MLE/MAP estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html">Trees and training graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="decodable.html">GMM decodables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">C++ API</a></li>
+      <li class="breadcrumb-item active">HMM topology and transition model</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cpp-api/hmm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hmm-topology-and-transition-model">
+<h1>HMM topology and transition model<a class="headerlink" href="#hmm-topology-and-transition-model" title="Link to this heading"></a></h1>
+<p>Headers: <a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/hmm-topology.h">kaldi-hmm-gmm/csrc/hmm-topology.h</a>,
+<a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/transition-model.h">kaldi-hmm-gmm/csrc/transition-model.h</a>,
+<a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/kaldi-hmm-gmm/csrc/hmm-utils.h">kaldi-hmm-gmm/csrc/hmm-utils.h</a> — kaldi's
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/hmm">src/hmm/</a> port.  <code class="docutils literal notranslate"><span class="pre">TransitionModel</span></code> implements
+<code class="docutils literal notranslate"><span class="pre">kaldi_decoder::TransitionInformation</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">khg</span><span class="o">::</span><span class="n">HmmTopology</span><span class="w"> </span><span class="n">topo</span><span class="p">;</span>
+<span class="n">topo</span><span class="p">.</span><span class="n">Read</span><span class="p">(</span><span class="n">is</span><span class="p">);</span><span class="w">                       </span><span class="c1">// kaldi topology text format</span>
+
+<span class="n">khg</span><span class="o">::</span><span class="n">ContextDependency</span><span class="w"> </span><span class="n">tree</span><span class="p">;</span>
+<span class="n">tree</span><span class="p">.</span><span class="n">Read</span><span class="p">(</span><span class="n">is</span><span class="p">,</span><span class="w"> </span><span class="n">binary</span><span class="p">);</span><span class="w">               </span><span class="c1">// kaldi tree format</span>
+
+<span class="n">khg</span><span class="o">::</span><span class="n">TransitionModel</span><span class="w"> </span><span class="nf">trans_model</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span><span class="w"> </span><span class="n">topo</span><span class="p">);</span>
+<span class="n">trans_model</span><span class="p">.</span><span class="n">TransitionIdToPhone</span><span class="p">(</span><span class="mi">17</span><span class="p">);</span>
+<span class="n">trans_model</span><span class="p">.</span><span class="n">IsSelfLoop</span><span class="p">(</span><span class="mi">17</span><span class="p">);</span>
+</pre></div>
+</div>
+<section id="api-doxygen">
+<h2>API (doxygen)<a class="headerlink" href="#api-doxygen" title="Link to this heading"></a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopologyE">
+<span id="_CPPv3N3khg11HmmTopologyE"></span><span id="_CPPv2N3khg11HmmTopologyE"></span><span id="khg::HmmTopology"></span><span class="target" id="classkhg_1_1HmmTopology"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HmmTopology</span></span></span><a class="headerlink" href="#_CPPv4N3khg11HmmTopologyE" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classkhg_1_1HmmTopology"><span class="std std-ref">HmmTopology</span></a> stores the HMM topology of the phones: one topology entry (a vector of <a class="reference internal" href="#structkhg_1_1HmmTopology_1_1HmmState"><span class="std std-ref">HmmState</span></a>) for each phone covered by the system. </p>
+<p>The following would be the text form for the &quot;normal&quot; HMM topology. Note that the first state is the start state, and the final state, which must have no output transitions and must be nonemitting, has an exit probability of one (no other state can have nonzero exit probability; you can treat the transition probability to the final state as an exit probability). Note also that it's valid to omit the &lt;PdfClass&gt; entry of the &lt;State&gt;, which will mean we won't have a pdf on that state [non-emitting state]. This is equivalent to setting the &lt;PdfClass&gt; to -1. We do this normally just for the final state. The Topology object can have multiple &lt;<a class="reference internal" href="#classkhg_1_1HmmTopology_1affeb389e29d6c74f75fcccde6e53c4df"><span class="std std-ref">TopologyEntry</span></a>&gt; blocks. This is useful if there are multiple types of topology in the system.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Topology</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">TopologyEntry</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">ForPhones</span><span class="o">&gt;</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="mi">7</span> <span class="mi">8</span> <span class="o">&lt;/</span><span class="n">ForPhones</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">State</span><span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&lt;</span><span class="n">PdfClass</span><span class="o">&gt;</span> <span class="mi">0</span>
+<span class="o">&lt;</span><span class="n">Transition</span><span class="o">&gt;</span> <span class="mi">0</span> <span class="mf">0.5</span>
+<span class="o">&lt;</span><span class="n">Transition</span><span class="o">&gt;</span> <span class="mi">1</span> <span class="mf">0.5</span>
+<span class="o">&lt;/</span><span class="n">State</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">State</span><span class="o">&gt;</span> <span class="mi">1</span> <span class="o">&lt;</span><span class="n">PdfClass</span><span class="o">&gt;</span> <span class="mi">1</span>
+<span class="o">&lt;</span><span class="n">Transition</span><span class="o">&gt;</span> <span class="mi">1</span> <span class="mf">0.5</span>
+<span class="o">&lt;</span><span class="n">Transition</span><span class="o">&gt;</span> <span class="mi">2</span> <span class="mf">0.5</span>
+<span class="o">&lt;/</span><span class="n">State</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">State</span><span class="o">&gt;</span> <span class="mi">2</span> <span class="o">&lt;</span><span class="n">PdfClass</span><span class="o">&gt;</span> <span class="mi">2</span>
+<span class="o">&lt;</span><span class="n">Transition</span><span class="o">&gt;</span> <span class="mi">2</span> <span class="mf">0.5</span>
+<span class="o">&lt;</span><span class="n">Transition</span><span class="o">&gt;</span> <span class="mi">3</span> <span class="mf">0.5</span>
+<span class="o">&lt;/</span><span class="n">State</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">State</span><span class="o">&gt;</span> <span class="mi">3</span>
+<span class="o">&lt;/</span><span class="n">State</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">TopologyEntry</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">Topology</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Note: the default assignment operator and copy constructor are allowed. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology13TopologyEntryE">
+<span id="_CPPv3N3khg11HmmTopology13TopologyEntryE"></span><span id="_CPPv2N3khg11HmmTopology13TopologyEntryE"></span><span class="target" id="classkhg_1_1HmmTopology_1affeb389e29d6c74f75fcccde6e53c4df"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TopologyEntry</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3khg11HmmTopology8HmmStateE" title="khg::HmmTopology::HmmState"><span class="n"><span class="pre">HmmState</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology13TopologyEntryE" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classkhg_1_1HmmTopology_1affeb389e29d6c74f75fcccde6e53c4df"><span class="std std-ref">TopologyEntry</span></a> is a typedef that represents the topology of a single (prototype) state. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology11HmmTopologyEv">
+<span id="_CPPv3N3khg11HmmTopology11HmmTopologyEv"></span><span id="_CPPv2N3khg11HmmTopology11HmmTopologyEv"></span><span id="khg::HmmTopology::HmmTopology"></span><span class="target" id="classkhg_1_1HmmTopology_1a443553f15e7deb4f9b1b28403bae4b1e"></span><span class="sig-name descname"><span class="n"><span class="pre">HmmTopology</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology11HmmTopologyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Default constructor: an empty topology; fill it via <a class="reference internal" href="#classkhg_1_1HmmTopology_1a22ea96e118f74ad73603b05456b78506"><span class="std std-ref">Read()</span></a> or the constructor below. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology11HmmTopologyERKNSt6vectorI7int32_tEERKNSt6vectorI7int32_tEERKNSt6vectorI13TopologyEntryEE">
+<span id="_CPPv3N3khg11HmmTopology11HmmTopologyERKNSt6vectorI7int32_tEERKNSt6vectorI7int32_tEERKNSt6vectorI13TopologyEntryEE"></span><span id="_CPPv2N3khg11HmmTopology11HmmTopologyERKNSt6vectorI7int32_tEERKNSt6vectorI7int32_tEERKNSt6vectorI13TopologyEntryEE"></span><span id="khg::HmmTopology::HmmTopology__std::vector:int32_t:CR.std::vector:int32_t:CR.std::vector:TopologyEntry:CR"></span><span class="target" id="classkhg_1_1HmmTopology_1afee68e2fb621941b8372b5465ee9fde9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HmmTopology</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">phones</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">phone2idx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3khg11HmmTopology13TopologyEntryE" title="khg::HmmTopology::TopologyEntry"><span class="n"><span class="pre">TopologyEntry</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">entries</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology11HmmTopologyERKNSt6vectorI7int32_tEERKNSt6vectorI7int32_tEERKNSt6vectorI13TopologyEntryEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor that fills in the members directly (the members are documented below). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phones</strong> -- Sorted, uniq list of phones covered by the topology. </p></li>
+<li><p><strong>phone2idx</strong> -- Map from phone to index into <code class="docutils literal notranslate"><span class="pre">entries</span></code> (or -1 if not present). </p></li>
+<li><p><strong>entries</strong> -- The topology entries, one per covered phone. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology4ReadERNSt7istreamEb">
+<span id="_CPPv3N3khg11HmmTopology4ReadERNSt7istreamEb"></span><span id="_CPPv2N3khg11HmmTopology4ReadERNSt7istreamEb"></span><span id="khg::HmmTopology::Read__isR.b"></span><span class="target" id="classkhg_1_1HmmTopology_1a22ea96e118f74ad73603b05456b78506"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Read</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">is</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology4ReadERNSt7istreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Read the topology from a stream, in the format shown in the class documentation (or its binary equivalent). </p>
+<p>Note: no symbol table is involved; phones are raw integer ids. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is</strong> -- Stream to read from. </p></li>
+<li><p><strong>binary</strong> -- If true, read in binary mode; otherwise in text mode. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg11HmmTopology5WriteERNSt7ostreamEb">
+<span id="_CPPv3NK3khg11HmmTopology5WriteERNSt7ostreamEb"></span><span id="_CPPv2NK3khg11HmmTopology5WriteERNSt7ostreamEb"></span><span id="khg::HmmTopology::Write__osR.bC"></span><span class="target" id="classkhg_1_1HmmTopology_1aa5faf258feb13f8eeac25523468f9ae2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Write</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg11HmmTopology5WriteERNSt7ostreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Write the topology to a stream, in the format shown in the class documentation (or its binary equivalent). </p>
+<p>Note: no symbol table is involved; phones are raw integer ids. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>os</strong> -- Stream to write to. </p></li>
+<li><p><strong>binary</strong> -- If true, write in binary mode; otherwise in text mode. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg11HmmTopology5IsHmmEv">
+<span id="_CPPv3NK3khg11HmmTopology5IsHmmEv"></span><span id="_CPPv2NK3khg11HmmTopology5IsHmmEv"></span><span id="khg::HmmTopology::IsHmmC"></span><span class="target" id="classkhg_1_1HmmTopology_1aa41b9947e65a764b2087010fcd07ebcf"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsHmm</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg11HmmTopology5IsHmmEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns true if this <a class="reference internal" href="#classkhg_1_1HmmTopology"><span class="std std-ref">HmmTopology</span></a> is really 'hmm-like', i.e. </p>
+<p>the pdf-class on the self-loops and forward transitions of all states are identical. [note: in HMMs, the densities are associated with the states.] We have extended this to support 'non-hmm-like' topologies (where those pdf-classes are different), in order to make for more compact decoding graphs in our so-called 'chain models' (AKA lattice-free MMI), where we use 1-state topologies that have different pdf-classes for the self-loop and the forward transition. Note that we always use the 'reorder=true' option so the 'forward transition' actually comes before the self-loop. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the topology is 'hmm-like'. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology5CheckEv">
+<span id="_CPPv3N3khg11HmmTopology5CheckEv"></span><span id="_CPPv2N3khg11HmmTopology5CheckEv"></span><span id="khg::HmmTopology::Check"></span><span class="target" id="classkhg_1_1HmmTopology_1a856ba751807cc626662bfd404157697c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Check</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology5CheckEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Checks that the object is valid, and throws an exception otherwise. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg11HmmTopology9GetPhonesEv">
+<span id="_CPPv3NK3khg11HmmTopology9GetPhonesEv"></span><span id="_CPPv2NK3khg11HmmTopology9GetPhonesEv"></span><span id="khg::HmmTopology::GetPhonesC"></span><span class="target" id="classkhg_1_1HmmTopology_1a2b94465c5d60fcd1aa8ac49562560290"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetPhones</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg11HmmTopology9GetPhonesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns a reference to a sorted, unique list of phones covered by the topology (these phones will be positive integers, and usually contiguous and starting from one but the toolkit doesn't assume they are contiguous). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The sorted, uniq list of phones. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg11HmmTopology12GetPhone2IdxEv">
+<span id="_CPPv3NK3khg11HmmTopology12GetPhone2IdxEv"></span><span id="_CPPv2NK3khg11HmmTopology12GetPhone2IdxEv"></span><span id="khg::HmmTopology::GetPhone2IdxC"></span><span class="target" id="classkhg_1_1HmmTopology_1ab3ea1ba0ee57c49937fc28ecb7b81c80"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetPhone2Idx</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg11HmmTopology12GetPhone2IdxEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns a map from phones to indexes into the entries vector (or -1 for phones not present). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The phone to entry-index map. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg11HmmTopology10GetEntriesEv">
+<span id="_CPPv3NK3khg11HmmTopology10GetEntriesEv"></span><span id="_CPPv2NK3khg11HmmTopology10GetEntriesEv"></span><span id="khg::HmmTopology::GetEntriesC"></span><span class="target" id="classkhg_1_1HmmTopology_1a7c7df956c728d00af9179447fb88a002"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3khg11HmmTopology13TopologyEntryE" title="khg::HmmTopology::TopologyEntry"><span class="n"><span class="pre">TopologyEntry</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetEntries</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg11HmmTopology10GetEntriesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the topology entries, indexed as indicated by <a class="reference internal" href="#classkhg_1_1HmmTopology_1ab3ea1ba0ee57c49937fc28ecb7b81c80"><span class="std std-ref">GetPhone2Idx()</span></a>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The topology entries. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg11HmmTopology16TopologyForPhoneE7int32_t">
+<span id="_CPPv3NK3khg11HmmTopology16TopologyForPhoneE7int32_t"></span><span id="_CPPv2NK3khg11HmmTopology16TopologyForPhoneE7int32_t"></span><span id="khg::HmmTopology::TopologyForPhone__int32_tC"></span><span class="target" id="classkhg_1_1HmmTopology_1ace9013e0ce321a409b80d2041cbf5b1d"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg11HmmTopology13TopologyEntryE" title="khg::HmmTopology::TopologyEntry"><span class="n"><span class="pre">TopologyEntry</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">TopologyForPhone</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">phone</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg11HmmTopology16TopologyForPhoneE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the topology entry (i.e. </p>
+<p>vector of <a class="reference internal" href="#structkhg_1_1HmmTopology_1_1HmmState"><span class="std std-ref">HmmState</span></a>) for this phone; will throw exception if phone not covered by the topology. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>phone</strong> -- Phone index (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The <a class="reference internal" href="#classkhg_1_1HmmTopology_1affeb389e29d6c74f75fcccde6e53c4df"><span class="std std-ref">TopologyEntry</span></a> of the phone. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg11HmmTopology13NumPdfClassesE7int32_t">
+<span id="_CPPv3NK3khg11HmmTopology13NumPdfClassesE7int32_t"></span><span id="_CPPv2NK3khg11HmmTopology13NumPdfClassesE7int32_t"></span><span id="khg::HmmTopology::NumPdfClasses__int32_tC"></span><span class="target" id="classkhg_1_1HmmTopology_1aaf9120a46012e7f07cada2934bb1fb54"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumPdfClasses</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">phone</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg11HmmTopology13NumPdfClassesE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the number of pdf-classes for this phone; throws exception if phone not covered by this topology. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>phone</strong> -- Phone index (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of distinct pdf-classes used by the phone's states. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg11HmmTopology23GetPhoneToNumPdfClassesEPNSt6vectorI7int32_tEE">
+<span id="_CPPv3NK3khg11HmmTopology23GetPhoneToNumPdfClassesEPNSt6vectorI7int32_tEE"></span><span id="_CPPv2NK3khg11HmmTopology23GetPhoneToNumPdfClassesEPNSt6vectorI7int32_tEE"></span><span id="khg::HmmTopology::GetPhoneToNumPdfClasses__std::vector:int32_t:PC"></span><span class="target" id="classkhg_1_1HmmTopology_1aabdfac318e4e56da67a0425edb2a3e5b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPhoneToNumPdfClasses</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">phone2num_pdf_classes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg11HmmTopology23GetPhoneToNumPdfClassesEPNSt6vectorI7int32_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Outputs a vector of int32, indexed by phone, that gives the number of pdf-classes for the phones; this is used by tree-building code such as BuildTree(). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>phone2num_pdf_classes</strong> -- [out] Resized to (highest phone + 1); element <code class="docutils literal notranslate"><span class="pre">p</span></code> holds the number of pdf-classes of phone <code class="docutils literal notranslate"><span class="pre">p</span></code> (0 for phones not covered). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg11HmmTopology9MinLengthE7int32_t">
+<span id="_CPPv3NK3khg11HmmTopology9MinLengthE7int32_t"></span><span id="_CPPv2NK3khg11HmmTopology9MinLengthE7int32_t"></span><span id="khg::HmmTopology::MinLength__int32_tC"></span><span class="target" id="classkhg_1_1HmmTopology_1a63378811c3af258fe22be322befe2011"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MinLength</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">phone</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg11HmmTopology9MinLengthE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the minimum number of frames it takes to traverse this model for this phone: e.g. </p>
+<p>3 for the normal HMM topology. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>phone</strong> -- Phone index (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The minimum model length in frames. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology8HmmStateE">
+<span id="_CPPv3N3khg11HmmTopology8HmmStateE"></span><span id="_CPPv2N3khg11HmmTopology8HmmStateE"></span><span id="khg::HmmTopology::HmmState"></span><span class="target" id="structkhg_1_1HmmTopology_1_1HmmState"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HmmState</span></span></span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology8HmmStateE" title="Link to this definition"></a><br /></dt>
+<dd><p>A structure defined inside <a class="reference internal" href="#classkhg_1_1HmmTopology"><span class="std std-ref">HmmTopology</span></a> to represent a HMM state. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology8HmmState8HmmStateE7int32_t">
+<span id="_CPPv3N3khg11HmmTopology8HmmState8HmmStateE7int32_t"></span><span id="_CPPv2N3khg11HmmTopology8HmmState8HmmStateE7int32_t"></span><span id="khg::HmmTopology::HmmState::HmmState__int32_t"></span><span class="target" id="structkhg_1_1HmmTopology_1_1HmmState_1a50ddda413dec04532747502405384684"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HmmState</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pdf_class</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology8HmmState8HmmStateE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor that sets both pdf-classes to <code class="docutils literal notranslate"><span class="pre">pdf_class</span></code>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology8HmmState8HmmStateE7int32_t7int32_tRKNSt6vectorINSt4pairI7int32_tfEEEE">
+<span id="_CPPv3N3khg11HmmTopology8HmmState8HmmStateE7int32_t7int32_tRKNSt6vectorINSt4pairI7int32_tfEEEE"></span><span id="_CPPv2N3khg11HmmTopology8HmmState8HmmStateE7int32_t7int32_tRKNSt6vectorINSt4pairI7int32_tfEEEE"></span><span id="khg::HmmTopology::HmmState::HmmState__int32_t.int32_t.std::vector:std::pair:int32_t.float::CR"></span><span class="target" id="structkhg_1_1HmmTopology_1_1HmmState_1a8fcb70380f4427ac097da2150544ca49"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HmmState</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">forward_pdf_class</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">self_loop_pdf_class</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">transitions</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology8HmmState8HmmStateE7int32_t7int32_tRKNSt6vectorINSt4pairI7int32_tfEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor that sets the two pdf-classes and the transition list. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology8HmmState8HmmStateE7int32_t7int32_t">
+<span id="_CPPv3N3khg11HmmTopology8HmmState8HmmStateE7int32_t7int32_t"></span><span id="_CPPv2N3khg11HmmTopology8HmmState8HmmStateE7int32_t7int32_t"></span><span id="khg::HmmTopology::HmmState::HmmState__int32_t.int32_t"></span><span class="target" id="structkhg_1_1HmmTopology_1_1HmmState_1affc010f888303def5241404de6677a79"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HmmState</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">forward_pdf_class</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">self_loop_pdf_class</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology8HmmState8HmmStateE7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor that sets the two pdf-classes; asserts that they are either both <code class="docutils literal notranslate"><span class="pre">kNoPdf</span></code> or both not <code class="docutils literal notranslate"><span class="pre">kNoPdf</span></code>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg11HmmTopology8HmmStateeqERK8HmmState">
+<span id="_CPPv3NK3khg11HmmTopology8HmmStateeqERK8HmmState"></span><span id="_CPPv2NK3khg11HmmTopology8HmmStateeqERK8HmmState"></span><span id="khg::HmmTopology::HmmState::eq-operator__HmmStateCRC"></span><span class="target" id="structkhg_1_1HmmTopology_1_1HmmState_1a62343e6ca9f6336d4e85279f38563ca3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg11HmmTopology8HmmStateE" title="khg::HmmTopology::HmmState"><span class="n"><span class="pre">HmmState</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg11HmmTopology8HmmStateeqERK8HmmState" title="Link to this definition"></a><br /></dt>
+<dd><p>Equality: both pdf-classes and the transition list are equal. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology8HmmState8HmmStateEv">
+<span id="_CPPv3N3khg11HmmTopology8HmmState8HmmStateEv"></span><span id="_CPPv2N3khg11HmmTopology8HmmState8HmmStateEv"></span><span id="khg::HmmTopology::HmmState::HmmState"></span><span class="target" id="structkhg_1_1HmmTopology_1_1HmmState_1aebe1731de44ed3a3e7a718e4b0a23239"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HmmState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology8HmmState8HmmStateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Default constructor: a nonemitting state (both pdf-classes are <code class="docutils literal notranslate"><span class="pre">kNoPdf</span></code>), with no transitions. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology8HmmState17forward_pdf_classE">
+<span id="_CPPv3N3khg11HmmTopology8HmmState17forward_pdf_classE"></span><span id="_CPPv2N3khg11HmmTopology8HmmState17forward_pdf_classE"></span><span id="khg::HmmTopology::HmmState::forward_pdf_class__int32_t"></span><span class="target" id="structkhg_1_1HmmTopology_1_1HmmState_1acc6e051a9695d115c10df465850d9349"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">forward_pdf_class</span></span></span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology8HmmState17forward_pdf_classE" title="Link to this definition"></a><br /></dt>
+<dd><p>The forward pdf-class, typically 0, 1 or 2 (the same as the HMM-state index), but may be different to enable us to hardwire sharing of state, and may be equal to <code class="docutils literal notranslate"><span class="pre">kNoPdf</span></code> == -1 in order to specify nonemitting states (unusual). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology8HmmState19self_loop_pdf_classE">
+<span id="_CPPv3N3khg11HmmTopology8HmmState19self_loop_pdf_classE"></span><span id="_CPPv2N3khg11HmmTopology8HmmState19self_loop_pdf_classE"></span><span id="khg::HmmTopology::HmmState::self_loop_pdf_class__int32_t"></span><span class="target" id="structkhg_1_1HmmTopology_1_1HmmState_1ac1951e1dfd3d66c75caec96fc99f923a"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">self_loop_pdf_class</span></span></span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology8HmmState19self_loop_pdf_classE" title="Link to this definition"></a><br /></dt>
+<dd><p>The self-loop pdf-class, similar to the forward pdf-class. </p>
+<p>They will either both be <code class="docutils literal notranslate"><span class="pre">kNoPdf</span></code>, or neither be <code class="docutils literal notranslate"><span class="pre">kNoPdf</span></code>. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg11HmmTopology8HmmState11transitionsE">
+<span id="_CPPv3N3khg11HmmTopology8HmmState11transitionsE"></span><span id="_CPPv2N3khg11HmmTopology8HmmState11transitionsE"></span><span id="khg::HmmTopology::HmmState::transitions__std::vector:std::pair:int32_t.float::"></span><span class="target" id="structkhg_1_1HmmTopology_1_1HmmState_1a47cb68375baafca7bbeaa27da9958d47"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">transitions</span></span></span><a class="headerlink" href="#_CPPv4N3khg11HmmTopology8HmmState11transitionsE" title="Link to this definition"></a><br /></dt>
+<dd><p>A list of transitions, indexed by what we call a 'transition-index'. </p>
+<p>The first member of each pair is the index of the next <a class="reference internal" href="#structkhg_1_1HmmTopology_1_1HmmState"><span class="std std-ref">HmmState</span></a>, and the second is the default transition probability (before training). </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModelE">
+<span id="_CPPv3N3khg15TransitionModelE"></span><span id="_CPPv2N3khg15TransitionModelE"></span><span id="khg::TransitionModel"></span><span class="target" id="classkhg_1_1TransitionModel"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionModel</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">kaldi_decoder</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">TransitionInformation</span></span><a class="headerlink" href="#_CPPv4N3khg15TransitionModelE" title="Link to this definition"></a><br /></dt>
+<dd><p>The class <a class="reference internal" href="#classkhg_1_1TransitionModel"><span class="std std-ref">TransitionModel</span></a> is a repository for the transition probabilities. </p>
+<p>It also handles certain integer mappings. It implements the <code class="docutils literal notranslate"><span class="pre">kaldi_decoder::TransitionInformation</span></code> interface (from the kaldi-decoder project), so decoders and lattice tools can use it through that interface.</p>
+<p>The basic model is as follows. Each phone has a HMM topology defined in hmm-topology.h. Each HMM-state of each of these phones has a number of transitions (and final-probs) out of it. Each HMM-state defined in the <a class="reference internal" href="#classkhg_1_1HmmTopology"><span class="std std-ref">HmmTopology</span></a> class has an associated &quot;pdf_class&quot;. This gets replaced with an actual pdf-id via the tree. The transition model associates the transition probs with the (phone, HMM-state, pdf-id). We associate with each such triple a transition-state. Each transition-state has a number of associated probabilities to estimate; this depends on the number of transitions/final-probs in the topology for that (phone, HMM-state). Each probability has an associated transition-index. We associate with each (transition-state, transition-index) a unique transition-id. Each individual probability estimated by the transition-model is associated with a transition-id.</p>
+<p>List of the various types of quantity referred to here and what they mean:<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">phone:</span></code> a phone index (1, 2, 3 ...)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HMM-state</span></code>: a number (0, 1, 2...) that indexes TopologyEntry (see hmm-topology.h)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pdf-id</span></code>: a number output by the Compute function of <a class="reference internal" href="graph.html#classkhg_1_1ContextDependency"><span class="std std-ref">ContextDependency</span></a> (it indexes pdf's, either forward or self-loop). Zero-based.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transition-state</span></code>: the states for which we estimate transition probabilities for transitions out of them. In some topologies, will map one-to-one with pdf-ids. One-based, since it appears on FSTs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transition-index</span></code>: identifier of a transition (or final-prob) in the HMM. Indexes the &quot;transitions&quot; vector in <a class="reference internal" href="#structkhg_1_1HmmTopology_1_1HmmState"><span class="std std-ref">HmmTopology::HmmState</span></a>. [if it is out of range, equal to transitions.size(), it refers to the final-prob.] Zero-based.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transition-id</span></code>: identifier of a unique parameter of the <a class="reference internal" href="#classkhg_1_1TransitionModel"><span class="std std-ref">TransitionModel</span></a>. Associated with a (transition-state, transition-index) pair. One-based, since it appears on FSTs.</p></li>
+</ul>
+</p>
+<p>List of the possible mappings <a class="reference internal" href="#classkhg_1_1TransitionModel"><span class="std std-ref">TransitionModel</span></a> can do:<ul class="simple">
+<li><p>(phone, HMM-state, forward-pdf-id, self-loop-pdf-id) -&gt; transition-state</p></li>
+<li><p>(transition-state, transition-index) -&gt; transition-id</p></li>
+</ul>
+</p>
+<p>Reverse mappings:<ul class="simple">
+<li><p>transition-id -&gt; transition-state</p></li>
+<li><p>transition-id -&gt; transition-index</p></li>
+<li><p>transition-state -&gt; phone</p></li>
+<li><p>transition-state -&gt; HMM-state</p></li>
+<li><p>transition-state -&gt; forward-pdf-id</p></li>
+<li><p>transition-state -&gt; self-loop-pdf-id</p></li>
+</ul>
+</p>
+<p>The main things the <a class="reference internal" href="#classkhg_1_1TransitionModel"><span class="std std-ref">TransitionModel</span></a> object can do are:<ul class="simple">
+<li><p>Get initialized (need <a class="reference internal" href="graph.html#classkhg_1_1ContextDependency"><span class="std std-ref">ContextDependency</span></a> and <a class="reference internal" href="#classkhg_1_1HmmTopology"><span class="std std-ref">HmmTopology</span></a> objects).</p></li>
+<li><p>Read/write.</p></li>
+<li><p>Update [given a vector of counts indexed by transition-id].</p></li>
+<li><p>Do the various integer mappings mentioned above.</p></li>
+<li><p>Get the probability (or log-probability) associated with a particular transition-id. </p></li>
+</ul>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel15TransitionModelERK26ContextDependencyInterfaceRK11HmmTopology">
+<span id="_CPPv3N3khg15TransitionModel15TransitionModelERK26ContextDependencyInterfaceRK11HmmTopology"></span><span id="_CPPv2N3khg15TransitionModel15TransitionModelERK26ContextDependencyInterfaceRK11HmmTopology"></span><span id="khg::TransitionModel::TransitionModel__ContextDependencyInterfaceCR.HmmTopologyCR"></span><span class="target" id="classkhg_1_1TransitionModel_1a3f71fc73baff365aa1a35e298b6aab49"></span><span class="sig-name descname"><span class="n"><span class="pre">TransitionModel</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">ContextDependencyInterface</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ctx_dep</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg11HmmTopologyE" title="khg::HmmTopology"><span class="n"><span class="pre">HmmTopology</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hmm_topo</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel15TransitionModelERK26ContextDependencyInterfaceRK11HmmTopology" title="Link to this definition"></a><br /></dt>
+<dd><p>Initialize the object [e.g. </p>
+<p>at the start of training]. The class keeps a copy of the <a class="reference internal" href="#classkhg_1_1HmmTopology"><span class="std std-ref">HmmTopology</span></a> object, but not the <a class="reference internal" href="graph.html#classkhg_1_1ContextDependency"><span class="std std-ref">ContextDependency</span></a> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ctx_dep</strong> -- The phonetic decision tree; used to map pdf-classes to pdf-ids. Not stored in this object. </p></li>
+<li><p><strong>hmm_topo</strong> -- The HMM topology; a copy is stored in this object. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel15TransitionModelEv">
+<span id="_CPPv3N3khg15TransitionModel15TransitionModelEv"></span><span id="_CPPv2N3khg15TransitionModel15TransitionModelEv"></span><span id="khg::TransitionModel::TransitionModel"></span><span class="target" id="classkhg_1_1TransitionModel_1a441d31b67e6dce6a713af7f80d8ba902"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionModel</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel15TransitionModelEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor that takes no arguments: typically used prior to calling Read. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel4ReadERNSt7istreamEb">
+<span id="_CPPv3N3khg15TransitionModel4ReadERNSt7istreamEb"></span><span id="_CPPv2N3khg15TransitionModel4ReadERNSt7istreamEb"></span><span id="khg::TransitionModel::Read__isR.b"></span><span class="target" id="classkhg_1_1TransitionModel_1a43ad803d8d21a3d2d29313d0e9aa7aec"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Read</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">is</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel4ReadERNSt7istreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Read the object from a stream. </p>
+<p>Note: no symbol table: topo object always read/written w/o symbols. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is</strong> -- Stream to read from. </p></li>
+<li><p><strong>binary</strong> -- If true, read in binary mode; otherwise in text mode. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel5WriteERNSt7ostreamEb">
+<span id="_CPPv3NK3khg15TransitionModel5WriteERNSt7ostreamEb"></span><span id="_CPPv2NK3khg15TransitionModel5WriteERNSt7ostreamEb"></span><span id="khg::TransitionModel::Write__osR.bC"></span><span class="target" id="classkhg_1_1TransitionModel_1a6105f5ae10970d588bee396bacd6d2b9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Write</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">binary</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel5WriteERNSt7ostreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Write the object to a stream. </p>
+<p>Note: no symbol table: topo object always read/written w/o symbols. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>os</strong> -- Stream to write to. </p></li>
+<li><p><strong>binary</strong> -- If true, write in binary mode; otherwise in text mode. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel7GetTopoEv">
+<span id="_CPPv3NK3khg15TransitionModel7GetTopoEv"></span><span id="_CPPv2NK3khg15TransitionModel7GetTopoEv"></span><span id="khg::TransitionModel::GetTopoC"></span><span class="target" id="classkhg_1_1TransitionModel_1ad65d4f737e5574422ddc066180057dfc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg11HmmTopologyE" title="khg::HmmTopology"><span class="n"><span class="pre">HmmTopology</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTopo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel7GetTopoEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return reference to the HMM-topology object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The <a class="reference internal" href="#classkhg_1_1HmmTopology"><span class="std std-ref">HmmTopology</span></a> object stored in this class. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel9GetPhonesEv">
+<span id="_CPPv3NK3khg15TransitionModel9GetPhonesEv"></span><span id="_CPPv2NK3khg15TransitionModel9GetPhonesEv"></span><span id="khg::TransitionModel::GetPhonesC"></span><span class="target" id="classkhg_1_1TransitionModel_1aa572c806f770d2dfa04eed6856cf9173"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetPhones</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel9GetPhonesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns a sorted, unique list of phones. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The sorted, uniq list of phones covered by the topology. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel17GetTransitionProbE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel17GetTransitionProbE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel17GetTransitionProbE7int32_t"></span><span id="khg::TransitionModel::GetTransitionProb__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1a9668fb06172f0a941c494655829f3a09"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTransitionProb</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel17GetTransitionProbE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the probability (not the log-probability) of the transition associated with <code class="docutils literal notranslate"><span class="pre">trans_id</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_id</strong> -- Transition-id (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transition probability <span class="math notranslate nohighlight">\(p\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel22TransitionIdToPdfArrayEv">
+<span id="_CPPv3NK3khg15TransitionModel22TransitionIdToPdfArrayEv"></span><span id="_CPPv2NK3khg15TransitionModel22TransitionIdToPdfArrayEv"></span><span id="khg::TransitionModel::TransitionIdToPdfArrayC"></span><span class="target" id="classkhg_1_1TransitionModel_1a4d921310b8ee7f3efb35fff2e327fc17"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">TransitionIdToPdfArray</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel22TransitionIdToPdfArrayEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the array that backs TransitionIdToPdf(): element <code class="docutils literal notranslate"><span class="pre">t</span></code> is the pdf-id of transition-id <code class="docutils literal notranslate"><span class="pre">t</span></code> (transition-ids are one-based, so element 0 is unused). </p>
+<p>Part of the <code class="docutils literal notranslate"><span class="pre">kaldi_decoder::TransitionInformation</span></code> interface. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The transition-id to pdf-id mapping array. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel10IsSelfLoopE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel10IsSelfLoopE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel10IsSelfLoopE7int32_t"></span><span id="khg::TransitionModel::IsSelfLoop__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1a9e2b3c4d8095a0bb8a426905fe0ddce1"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsSelfLoop</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel10IsSelfLoopE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return true if <code class="docutils literal notranslate"><span class="pre">trans_id</span></code> corresponds to a self-loop. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_id</strong> -- Transition-id (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the transition is a self-loop. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel23TransitionIdsEquivalentE7int32_t7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel23TransitionIdsEquivalentE7int32_t7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel23TransitionIdsEquivalentE7int32_t7int32_t"></span><span id="khg::TransitionModel::TransitionIdsEquivalent__int32_t.int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1ae725f2aab4ccabdb448cf4d9eec4826d"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionIdsEquivalent</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id1</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id2</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel23TransitionIdsEquivalentE7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return true if the two transition-ids belong to the same transition-state, i.e. </p>
+<p>they are transitions out of the same HMM state of the same phone (in this implementation they are equivalent iff <a class="reference internal" href="#classkhg_1_1TransitionModel_1ab1b139dab6550fb851f00b9f20cfbb38"><span class="std std-ref">TransitionIdToTransitionState()</span></a> gives the same value for both; in particular a transition-id is equivalent to itself). Part of the <code class="docutils literal notranslate"><span class="pre">kaldi_decoder::TransitionInformation</span></code> interface. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trans_id1</strong> -- First transition-id (one-based). </p></li>
+<li><p><strong>trans_id2</strong> -- Second transition-id (one-based). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the two transition-ids belong to the same transition-state. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel26TransitionIdIsStartOfPhoneE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel26TransitionIdIsStartOfPhoneE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel26TransitionIdIsStartOfPhoneE7int32_t"></span><span id="khg::TransitionModel::TransitionIdIsStartOfPhone__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1aefc5f9bfb287b30027ce50ddac6530dd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionIdIsStartOfPhone</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel26TransitionIdIsStartOfPhoneE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return true if the hmm state corresponding to the given transition ID is the 0th state of the topology (i.e. </p>
+<p>this transition-id starts a new phone in an alignment). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_id</strong> -- Transition-id (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the transition-id is in the 0th HMM state of its phone. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel19TransitionIdToPhoneE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel19TransitionIdToPhoneE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel19TransitionIdToPhoneE7int32_t"></span><span id="khg::TransitionModel::TransitionIdToPhone__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1a39074a425d66ca7c8048690261b9b26d"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionIdToPhone</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel19TransitionIdToPhoneE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the phone corresponding to the given transition id. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_id</strong> -- Transition-id (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The phone index (one-based). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel7IsFinalE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel7IsFinalE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel7IsFinalE7int32_t"></span><span id="khg::TransitionModel::IsFinal__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1a7cf2f3459120ef130a7e32183a6b2276"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsFinal</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel7IsFinalE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns true if <code class="docutils literal notranslate"><span class="pre">trans_id</span></code> goes to the final state (which is bound to be nonemitting). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_id</strong> -- Transition-id (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the transition goes to the final (nonemitting) state. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel7NumPdfsEv">
+<span id="_CPPv3NK3khg15TransitionModel7NumPdfsEv"></span><span id="_CPPv2NK3khg15TransitionModel7NumPdfsEv"></span><span id="khg::TransitionModel::NumPdfsC"></span><span class="target" id="classkhg_1_1TransitionModel_1aa4a7f67814f01845325f490ed33e0796"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumPdfs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel7NumPdfsEv" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classkhg_1_1TransitionModel_1aa4a7f67814f01845325f490ed33e0796"><span class="std std-ref">NumPdfs()</span></a> actually returns the highest-numbered pdf we ever saw, plus one. </p>
+<p>In normal cases this should equal the number of pdfs in the system, but if you initialized this object with fewer than all the phones, and it happens that an unseen phone has the highest-numbered pdf, this might be different. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>One plus the highest-numbered pdf seen from the tree. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel22TupleToTransitionStateE7int32_t7int32_t7int32_t7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel22TupleToTransitionStateE7int32_t7int32_t7int32_t7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel22TupleToTransitionStateE7int32_t7int32_t7int32_t7int32_t"></span><span id="khg::TransitionModel::TupleToTransitionState__int32_t.int32_t.int32_t.int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1a72f0abcf6dda1453579c8f5d6dfc4fb3"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TupleToTransitionState</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">phone</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">hmm_state</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pdf</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">self_loop_pdf</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel22TupleToTransitionStateE7int32_t7int32_t7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Maps a (phone, HMM-state, pdf, self-loop-pdf) tuple to its transition-state. </p>
+<p>Will crash if no transition state matches the given four tuple. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phone</strong> -- Phone index (one-based). </p></li>
+<li><p><strong>hmm_state</strong> -- HMM-state index within the phone's topology entry (zero-based). </p></li>
+<li><p><strong>pdf</strong> -- Forward pdf-id (zero-based; a pdf-id, not a pdf-class). </p></li>
+<li><p><strong>self_loop_pdf</strong> -- Self-loop pdf-id (zero-based; a pdf-id, not a pdf-class). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transition-state (one-based). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel18PairToTransitionIdE7int32_t7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel18PairToTransitionIdE7int32_t7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel18PairToTransitionIdE7int32_t7int32_t"></span><span id="khg::TransitionModel::PairToTransitionId__int32_t.int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1a70539fd745439f6e7946b4c943e17119"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PairToTransitionId</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_state</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_index</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel18PairToTransitionIdE7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the transition id given the transition state and the transition index. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trans_state</strong> -- Transition-state (one-based). </p></li>
+<li><p><strong>trans_index</strong> -- Transition-index (zero-based offset into the transitions out of the state; equal to the number of transitions refers to the final-prob). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transition-id (one-based). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel20GetTransitionLogProbE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel20GetTransitionLogProbE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel20GetTransitionLogProbE7int32_t"></span><span id="khg::TransitionModel::GetTransitionLogProb__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1a7c20b3baebc2cb00ae09f2791086595a"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTransitionLogProb</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel20GetTransitionLogProbE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the log-probability of the transition associated with <code class="docutils literal notranslate"><span class="pre">trans_id</span></code>, i.e. </p>
+<p><span class="math notranslate nohighlight">\(\log p\)</span>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_id</strong> -- Transition-id (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The log-probability of the transition. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel37GetTransitionLogProbIgnoringSelfLoopsE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel37GetTransitionLogProbIgnoringSelfLoopsE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel37GetTransitionLogProbIgnoringSelfLoopsE7int32_t"></span><span id="khg::TransitionModel::GetTransitionLogProbIgnoringSelfLoops__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1a415b5a5e32d83650e9b790563ca33d8f"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTransitionLogProbIgnoringSelfLoops</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel37GetTransitionLogProbIgnoringSelfLoopsE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>The following functions are more specialized functions for getting transition probabilities, that are provided for convenience. </p>
+<p>Returns the log-probability of a particular non-self-loop transition after subtracting the probability mass of the self-loop and renormalizing; will crash if called on a self-loop. Specifically: for non-self-loops it returns the log of (that prob divided by (1 minus self-loop-prob-for-that-state)), i.e. <span class="math notranslate nohighlight">\(\log\bigl(p / (1 - p_{\mathrm{sl}})\bigr)\)</span>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_id</strong> -- Transition-id (one-based) of a non-self-loop transition. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The renormalized log-probability. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel21GetNonSelfLoopLogProbE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel21GetNonSelfLoopLogProbE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel21GetNonSelfLoopLogProbE7int32_t"></span><span id="khg::TransitionModel::GetNonSelfLoopLogProb__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1a80be9fa56bb46e6cd078bf13d128de18"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNonSelfLoopLogProb</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel21GetNonSelfLoopLogProbE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the log-prob of the non-self-loop probability mass for this transition state, i.e. </p>
+<p><span class="math notranslate nohighlight">\(\log(1 - p_{\mathrm{sl}})\)</span> (you can get the self-loop prob, if a self-loop exists, by calling GetTransitionLogProb(SelfLoopOf(trans_state))). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_state</strong> -- Transition-state (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The log of the non-self-loop probability mass. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel10SelfLoopOfE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel10SelfLoopOfE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel10SelfLoopOfE7int32_t"></span><span id="khg::TransitionModel::SelfLoopOf__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1aaf48e445db8816575c2c1b8c519d58b7"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SelfLoopOf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel10SelfLoopOfE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the self-loop transition-id, or zero if this state doesn't have a self-loop. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_state</strong> -- Transition-state (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transition-id of the self-loop, or 0 if none exists. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel29TransitionIdToTransitionStateE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel29TransitionIdToTransitionStateE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel29TransitionIdToTransitionStateE7int32_t"></span><span id="khg::TransitionModel::TransitionIdToTransitionState__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1ab1b139dab6550fb851f00b9f20cfbb38"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionIdToTransitionState</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel29TransitionIdToTransitionStateE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the transition-state that the given transition-id belongs to. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_id</strong> -- Transition-id (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transition-state (one-based). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel9InitStatsEP12DoubleVector">
+<span id="_CPPv3NK3khg15TransitionModel9InitStatsEP12DoubleVector"></span><span id="_CPPv2NK3khg15TransitionModel9InitStatsEP12DoubleVector"></span><span id="khg::TransitionModel::InitStats__DoubleVectorPC"></span><span class="target" id="classkhg_1_1TransitionModel_1a1ac7c16f7427c9f120d7db03e8f07961"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InitStats</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">DoubleVector</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">stats</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel9InitStatsEP12DoubleVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Initializes the stats vector used by <a class="reference internal" href="#classkhg_1_1TransitionModel_1a1dd483c16fa4628e356820684e381e1f"><span class="std std-ref">Accumulate()</span></a>/MleUpdate(): sets it to zero with length NumTransitionIds() + 1. </p>
+<p>Transition-ids start from 1, so stats[0] is never used. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stats</strong> -- [out] 1-D double vector to initialize. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel10AccumulateEf7int32_tP12DoubleVector">
+<span id="_CPPv3NK3khg15TransitionModel10AccumulateEf7int32_tP12DoubleVector"></span><span id="_CPPv2NK3khg15TransitionModel10AccumulateEf7int32_tP12DoubleVector"></span><span id="khg::TransitionModel::Accumulate__float.int32_t.DoubleVectorPC"></span><span class="target" id="classkhg_1_1TransitionModel_1a1dd483c16fa4628e356820684e381e1f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Accumulate</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">prob</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_id</span></span>, <span class="n"><span class="pre">DoubleVector</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">stats</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel10AccumulateEf7int32_tP12DoubleVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Accumulates a count/weight for one transition-id into the stats vector (as initialized by <a class="reference internal" href="#classkhg_1_1TransitionModel_1a1ac7c16f7427c9f120d7db03e8f07961"><span class="std std-ref">InitStats()</span></a>). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prob</strong> -- Count or weight to add. </p></li>
+<li><p><strong>trans_id</strong> -- Transition-id (one-based). </p></li>
+<li><p><strong>stats</strong> -- [in,out] 1-D double vector of shape (num_transition_ids + 1,). </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel9MleUpdateERK12DoubleVectorRK25MleTransitionUpdateConfigPfPf">
+<span id="_CPPv3N3khg15TransitionModel9MleUpdateERK12DoubleVectorRK25MleTransitionUpdateConfigPfPf"></span><span id="_CPPv2N3khg15TransitionModel9MleUpdateERK12DoubleVectorRK25MleTransitionUpdateConfigPfPf"></span><span id="khg::TransitionModel::MleUpdate__DoubleVectorCR.MleTransitionUpdateConfigCR.floatP.floatP"></span><span class="target" id="classkhg_1_1TransitionModel_1ac34969b299094cb744e0a63e6796ead6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MleUpdate</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">DoubleVector</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stats</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">MleTransitionUpdateConfig</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cfg</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">objf_impr_out</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">count_out</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel9MleUpdateERK12DoubleVectorRK25MleTransitionUpdateConfigPfPf" title="Link to this definition"></a><br /></dt>
+<dd><p>Does Maximum Likelihood estimation. </p>
+<p>The stats are counts/weights, indexed by transition-id. This was previously called Update().</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stats</strong> -- 1-D double vector of shape (num_transition_ids + 1,), as filled in by <a class="reference internal" href="#classkhg_1_1TransitionModel_1a1ac7c16f7427c9f120d7db03e8f07961"><span class="std std-ref">InitStats()</span></a>/Accumulate(). </p></li>
+<li><p><strong>cfg</strong> -- Update configuration (probability floor, minimum count, optional sharing for equal pdfs). </p></li>
+<li><p><strong>objf_impr_out</strong> -- [out] If non-NULL, the total objective-function improvement of the update is written here. </p></li>
+<li><p><strong>count_out</strong> -- [out] If non-NULL, the total count (sum of the stats) is written here. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel19NumTransitionStatesEv">
+<span id="_CPPv3NK3khg15TransitionModel19NumTransitionStatesEv"></span><span id="_CPPv2NK3khg15TransitionModel19NumTransitionStatesEv"></span><span id="khg::TransitionModel::NumTransitionStatesC"></span><span class="target" id="classkhg_1_1TransitionModel_1a8157fbe81456051804aa21f816e08cdd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumTransitionStates</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel19NumTransitionStatesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the total number of transition-states (note, these are one-based). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of transition-states. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel22TransitionStateToPhoneE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel22TransitionStateToPhoneE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel22TransitionStateToPhoneE7int32_t"></span><span id="khg::TransitionModel::TransitionStateToPhone__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1ac1b68344f68a9ecc3f3731afc2a71ba9"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionStateToPhone</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel22TransitionStateToPhoneE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the phone corresponding to the given transition-state. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_state</strong> -- Transition-state (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The phone index (one-based). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel25TransitionStateToHmmStateE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel25TransitionStateToHmmStateE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel25TransitionStateToHmmStateE7int32_t"></span><span id="khg::TransitionModel::TransitionStateToHmmState__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1a26dc1cbf5986c6d575ec9d6d1c754b59"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionStateToHmmState</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel25TransitionStateToHmmStateE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the HMM-state index (within the phone's topology entry) corresponding to the given transition-state. </p>
+<p>Note: this is public in kaldi/src/hmm/transition-model.h (used by e.g. SplitToPhones); keep the same access level here. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_state</strong> -- Transition-state (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The HMM-state (zero-based) within the phone's TopologyEntry. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel28TransitionStateToSelfLoopPdfE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel28TransitionStateToSelfLoopPdfE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel28TransitionStateToSelfLoopPdfE7int32_t"></span><span id="khg::TransitionModel::TransitionStateToSelfLoopPdf__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1ab51d68495ff543474d082e2369ffb0e8"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionStateToSelfLoopPdf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel28TransitionStateToSelfLoopPdfE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the self-loop pdf-id corresponding to the given transition-state. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_state</strong> -- Transition-state (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The self-loop pdf-id (zero-based). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel27TransitionStateToForwardPdfE7int32_t">
+<span id="_CPPv3NK3khg15TransitionModel27TransitionStateToForwardPdfE7int32_t"></span><span id="_CPPv2NK3khg15TransitionModel27TransitionStateToForwardPdfE7int32_t"></span><span id="khg::TransitionModel::TransitionStateToForwardPdf__int32_tC"></span><span class="target" id="classkhg_1_1TransitionModel_1acae5f437fa0367e746b23d07c83d91aa"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionStateToForwardPdf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">trans_state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel27TransitionStateToForwardPdfE7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the forward pdf-id corresponding to the given transition-state. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trans_state</strong> -- Transition-state (one-based). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The forward pdf-id (zero-based). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel15TransitionModelERKNSt6vectorI5TupleEERK11HmmTopologyKNSt6vectorI7int32_tEEKNSt6vectorI7int32_tEEKNSt6vectorI7int32_tEE7int32_tKNSt6vectorIfEEKNSt6vectorIfEE">
+<span id="_CPPv3N3khg15TransitionModel15TransitionModelERKNSt6vectorI5TupleEERK11HmmTopologyKNSt6vectorI7int32_tEEKNSt6vectorI7int32_tEEKNSt6vectorI7int32_tEE7int32_tKNSt6vectorIfEEKNSt6vectorIfEE"></span><span id="_CPPv2N3khg15TransitionModel15TransitionModelERKNSt6vectorI5TupleEERK11HmmTopologyKNSt6vectorI7int32_tEEKNSt6vectorI7int32_tEEKNSt6vectorI7int32_tEE7int32_tKNSt6vectorIfEEKNSt6vectorIfEE"></span><span id="khg::TransitionModel::TransitionModel__std::vector:Tuple:CR.HmmTopologyCR.std::vector:int32_t:C.std::vector:int32_t:C.std::vector:int32_t:C.int32_t.std::vector:float:C.std::vector:float:C"></span><span class="target" id="classkhg_1_1TransitionModel_1a18064e8edaa6b7b0193c7d7ba1ef21e7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransitionModel</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3khg15TransitionModel5TupleE" title="khg::TransitionModel::Tuple"><span class="n"><span class="pre">Tuple</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tuples</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg11HmmTopologyE" title="khg::HmmTopology"><span class="n"><span class="pre">HmmTopology</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">topo</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">state2id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id2state</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id2pdf_id</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_pdfs</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_probs</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">non_self_loop_log_probs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel15TransitionModelERKNSt6vectorI5TupleEERK11HmmTopologyKNSt6vectorI7int32_tEEKNSt6vectorI7int32_tEEKNSt6vectorI7int32_tEE7int32_tKNSt6vectorIfEEKNSt6vectorIfEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Assembles a <a class="reference internal" href="#classkhg_1_1TransitionModel"><span class="std std-ref">TransitionModel</span></a> directly from its components, without consulting a tree or re-deriving the mappings. </p>
+<p>The vectors have the same meaning as the correspondingly named private members (see their docs): <code class="docutils literal notranslate"><span class="pre">state2id</span></code> is indexed by transition-state (1..num-states+1), <code class="docutils literal notranslate"><span class="pre">id2state</span></code> and <code class="docutils literal notranslate"><span class="pre">id2pdf_id</span></code> are indexed by transition-id (one-based), and the transition-id-indexed entries of the probability vectors are likewise one-based. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tuples</strong> -- The tuple list, indexed by transition-state minus one. </p></li>
+<li><p><strong>topo</strong> -- The HMM topology. </p></li>
+<li><p><strong>state2id</strong> -- First transition-id of each transition-state. </p></li>
+<li><p><strong>id2state</strong> -- Transition-id to transition-state mapping. </p></li>
+<li><p><strong>id2pdf_id</strong> -- Transition-id to pdf-id mapping. </p></li>
+<li><p><strong>num_pdfs</strong> -- One plus the highest-numbered pdf. </p></li>
+<li><p><strong>log_probs</strong> -- Log-probabilities indexed by transition-id. </p></li>
+<li><p><strong>non_self_loop_log_probs</strong> -- Log of (1 - self-loop-prob) per transition-state. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel9GetTuplesEv">
+<span id="_CPPv3NK3khg15TransitionModel9GetTuplesEv"></span><span id="_CPPv2NK3khg15TransitionModel9GetTuplesEv"></span><span id="khg::TransitionModel::GetTuplesC"></span><span class="target" id="classkhg_1_1TransitionModel_1aca2331e3ac74514f9236dc84ed84845f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3khg15TransitionModel5TupleE" title="khg::TransitionModel::Tuple"><span class="n"><span class="pre">Tuple</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTuples</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel9GetTuplesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the tuple list (indexed by transition-state minus one). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The tuples_ member. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel11GetState2IdEv">
+<span id="_CPPv3NK3khg15TransitionModel11GetState2IdEv"></span><span id="_CPPv2NK3khg15TransitionModel11GetState2IdEv"></span><span id="khg::TransitionModel::GetState2IdC"></span><span class="target" id="classkhg_1_1TransitionModel_1a34d574783f756850b38b91ad7cf39207"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetState2Id</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel11GetState2IdEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the state2id_ mapping (first transition-id per transition-state). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The state2id_ member. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel11GetId2StateEv">
+<span id="_CPPv3NK3khg15TransitionModel11GetId2StateEv"></span><span id="_CPPv2NK3khg15TransitionModel11GetId2StateEv"></span><span id="khg::TransitionModel::GetId2StateC"></span><span class="target" id="classkhg_1_1TransitionModel_1a0d29ebc09c77ebefde04e79069e1eb97"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetId2State</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel11GetId2StateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the id2state_ mapping (transition-id to transition-state). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The id2state_ member. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel11GetId2PdfIdEv">
+<span id="_CPPv3NK3khg15TransitionModel11GetId2PdfIdEv"></span><span id="_CPPv2NK3khg15TransitionModel11GetId2PdfIdEv"></span><span id="khg::TransitionModel::GetId2PdfIdC"></span><span class="target" id="classkhg_1_1TransitionModel_1a257e995978ec583c5866fa09eab2f842"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetId2PdfId</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel11GetId2PdfIdEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the id2pdf_id_ mapping (transition-id to pdf-id). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The id2pdf_id_ member. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel11GetLogProbsEv">
+<span id="_CPPv3NK3khg15TransitionModel11GetLogProbsEv"></span><span id="_CPPv2NK3khg15TransitionModel11GetLogProbsEv"></span><span id="khg::TransitionModel::GetLogProbsC"></span><span class="target" id="classkhg_1_1TransitionModel_1acc01aaeadcc6a5173ad6f9abf46679b4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">kaldiio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetLogProbs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel11GetLogProbsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the log-probabilities indexed by transition-id. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The log_probs_ member. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel22GetNonSelfLoopLogProbsEv">
+<span id="_CPPv3NK3khg15TransitionModel22GetNonSelfLoopLogProbsEv"></span><span id="_CPPv2NK3khg15TransitionModel22GetNonSelfLoopLogProbsEv"></span><span id="khg::TransitionModel::GetNonSelfLoopLogProbsC"></span><span class="target" id="classkhg_1_1TransitionModel_1a40a3643843b3c3fb5e318f71644580f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">kaldiio</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetNonSelfLoopLogProbs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel22GetNonSelfLoopLogProbsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns, for each transition-state, the log of (1 - self-loop-prob). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The non_self_loop_log_probs_ member. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel5TupleE">
+<span id="_CPPv3N3khg15TransitionModel5TupleE"></span><span id="_CPPv2N3khg15TransitionModel5TupleE"></span><span id="khg::TransitionModel::Tuple"></span><span class="target" id="structkhg_1_1TransitionModel_1_1Tuple"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Tuple</span></span></span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel5TupleE" title="Link to this definition"></a><br /></dt>
+<dd><p>Identifies a transition-state: the (phone, HMM-state, forward-pdf, self-loop-pdf) quadruple that the transition-state stands for. </p>
+<p>The tuples are kept sorted, which maps quadruples to transition-states. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel5Tuple5TupleE7int32_t7int32_t7int32_t7int32_t">
+<span id="_CPPv3N3khg15TransitionModel5Tuple5TupleE7int32_t7int32_t7int32_t7int32_t"></span><span id="_CPPv2N3khg15TransitionModel5Tuple5TupleE7int32_t7int32_t7int32_t7int32_t"></span><span id="khg::TransitionModel::Tuple::Tuple__int32_t.int32_t.int32_t.int32_t"></span><span class="target" id="structkhg_1_1TransitionModel_1_1Tuple_1a823773edeeaad2c94c471bbe440146df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Tuple</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">phone</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">hmm_state</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">forward_pdf</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">self_loop_pdf</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel5Tuple5TupleE7int32_t7int32_t7int32_t7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor filling in all four members. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel5TupleltERK5Tuple">
+<span id="_CPPv3NK3khg15TransitionModel5TupleltERK5Tuple"></span><span id="_CPPv2NK3khg15TransitionModel5TupleltERK5Tuple"></span><span id="khg::TransitionModel::Tuple::lt-operator__TupleCRC"></span><span class="target" id="structkhg_1_1TransitionModel_1_1Tuple_1a87adc66f20818328be3af901988bcb0f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg15TransitionModel5TupleE" title="khg::TransitionModel::Tuple"><span class="n"><span class="pre">Tuple</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel5TupleltERK5Tuple" title="Link to this definition"></a><br /></dt>
+<dd><p>Ordering on (phone, hmm_state, forward_pdf, self_loop_pdf), used to keep the tuple list sorted so that the reverse mapping tuple -&gt; transition-state is possible. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg15TransitionModel5TupleeqERK5Tuple">
+<span id="_CPPv3NK3khg15TransitionModel5TupleeqERK5Tuple"></span><span id="_CPPv2NK3khg15TransitionModel5TupleeqERK5Tuple"></span><span id="khg::TransitionModel::Tuple::eq-operator__TupleCRC"></span><span class="target" id="structkhg_1_1TransitionModel_1_1Tuple_1afd29b9a0c8fc9a0e73d9a6a0c8a4b146"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg15TransitionModel5TupleE" title="khg::TransitionModel::Tuple"><span class="n"><span class="pre">Tuple</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg15TransitionModel5TupleeqERK5Tuple" title="Link to this definition"></a><br /></dt>
+<dd><p>Equality: all four members are equal. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel5Tuple5phoneE">
+<span id="_CPPv3N3khg15TransitionModel5Tuple5phoneE"></span><span id="_CPPv2N3khg15TransitionModel5Tuple5phoneE"></span><span id="khg::TransitionModel::Tuple::phone__int32_t"></span><span class="target" id="structkhg_1_1TransitionModel_1_1Tuple_1a5f69b3b4df2adaff18423c0cdc4decac"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">phone</span></span></span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel5Tuple5phoneE" title="Link to this definition"></a><br /></dt>
+<dd><p>Phone index (one-based). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel5Tuple9hmm_stateE">
+<span id="_CPPv3N3khg15TransitionModel5Tuple9hmm_stateE"></span><span id="_CPPv2N3khg15TransitionModel5Tuple9hmm_stateE"></span><span id="khg::TransitionModel::Tuple::hmm_state__int32_t"></span><span class="target" id="structkhg_1_1TransitionModel_1_1Tuple_1ae829b6d54244eccf35ff22efc459554c"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hmm_state</span></span></span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel5Tuple9hmm_stateE" title="Link to this definition"></a><br /></dt>
+<dd><p>HMM-state index within the phone's topology entry (zero-based). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel5Tuple11forward_pdfE">
+<span id="_CPPv3N3khg15TransitionModel5Tuple11forward_pdfE"></span><span id="_CPPv2N3khg15TransitionModel5Tuple11forward_pdfE"></span><span id="khg::TransitionModel::Tuple::forward_pdf__int32_t"></span><span class="target" id="structkhg_1_1TransitionModel_1_1Tuple_1a762c93f6faadea4b59ee84f49206fb12"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">forward_pdf</span></span></span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel5Tuple11forward_pdfE" title="Link to this definition"></a><br /></dt>
+<dd><p>Forward pdf-id (it is pdf id, not pdf class). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg15TransitionModel5Tuple13self_loop_pdfE">
+<span id="_CPPv3N3khg15TransitionModel5Tuple13self_loop_pdfE"></span><span id="_CPPv2N3khg15TransitionModel5Tuple13self_loop_pdfE"></span><span id="khg::TransitionModel::Tuple::self_loop_pdf__int32_t"></span><span class="target" id="structkhg_1_1TransitionModel_1_1Tuple_1aebe9770f0ce4930441ae692a42dbb774"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">self_loop_pdf</span></span></span><a class="headerlink" href="#_CPPv4N3khg15TransitionModel5Tuple13self_loop_pdfE" title="Link to this definition"></a><br /></dt>
+<dd><p>Self-loop pdf-id (it is pdf id, not pdf class). </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17HTransducerConfigE">
+<span id="_CPPv3N3khg17HTransducerConfigE"></span><span id="_CPPv2N3khg17HTransducerConfigE"></span><span id="khg::HTransducerConfig"></span><span class="target" id="structkhg_1_1HTransducerConfig"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HTransducerConfig</span></span></span><a class="headerlink" href="#_CPPv4N3khg17HTransducerConfigE" title="Link to this definition"></a><br /></dt>
+<dd><p>Configuration class for the <a class="reference internal" href="#namespacekhg_1ab9471e1d51644bfacc9fd4755022a79e"><span class="std std-ref">GetHTransducer()</span></a> function. </p>
+<p>The scales follow the convention described in the file documentation: transition probabilities appear in the graph as costs <span class="math notranslate nohighlight">\(-s \log p\)</span>. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17HTransducerConfig17HTransducerConfigEf7int32_t">
+<span id="_CPPv3N3khg17HTransducerConfig17HTransducerConfigEf7int32_t"></span><span id="_CPPv2N3khg17HTransducerConfig17HTransducerConfigEf7int32_t"></span><span id="khg::HTransducerConfig::HTransducerConfig__float.int32_t"></span><span class="target" id="structkhg_1_1HTransducerConfig_1a070ce623e5ba9c36b8f635772155b2b3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HTransducerConfig</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">transition_scale</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.0</span></span>, <span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nonterm_phones_offset</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg17HTransducerConfig17HTransducerConfigEf7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor with the defaults shown on the members. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3khg17HTransducerConfig8ToStringEv">
+<span id="_CPPv3NK3khg17HTransducerConfig8ToStringEv"></span><span id="_CPPv2NK3khg17HTransducerConfig8ToStringEv"></span><span id="khg::HTransducerConfig::ToStringC"></span><span class="target" id="structkhg_1_1HTransducerConfig_1aad4750ae93433984a0e91114b42563d1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3khg17HTransducerConfig8ToStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns a human-readable string representation, for logging. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17HTransducerConfig16transition_scaleE">
+<span id="_CPPv3N3khg17HTransducerConfig16transition_scaleE"></span><span id="_CPPv2N3khg17HTransducerConfig16transition_scaleE"></span><span id="khg::HTransducerConfig::transition_scale__float"></span><span class="target" id="structkhg_1_1HTransducerConfig_1ae842729dbc39da18febaa3d7ba990766"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">transition_scale</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.0</span></span><a class="headerlink" href="#_CPPv4N3khg17HTransducerConfig16transition_scaleE" title="Link to this definition"></a><br /></dt>
+<dd><p>Transition log-prob scale (scale of transition probs, relative to LM). </p>
+<p>Note this doesn't apply to self-loops; <a class="reference internal" href="#namespacekhg_1ab9471e1d51644bfacc9fd4755022a79e"><span class="std std-ref">GetHTransducer()</span></a> does not include self-loops. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg17HTransducerConfig21nonterm_phones_offsetE">
+<span id="_CPPv3N3khg17HTransducerConfig21nonterm_phones_offsetE"></span><span id="_CPPv2N3khg17HTransducerConfig21nonterm_phones_offsetE"></span><span id="khg::HTransducerConfig::nonterm_phones_offset__int32_t"></span><span class="target" id="structkhg_1_1HTransducerConfig_1a0ea0445dac4488d3b35d3669ee12ada4"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nonterm_phones_offset</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N3khg17HTransducerConfig21nonterm_phones_offsetE" title="Link to this definition"></a><br /></dt>
+<dd><p>The integer id of <code class="docutils literal notranslate"><span class="pre">nonterm_bos</span></code> in phones.txt, if present. </p>
+<p>Only needs to be set if you are doing grammar decoding (see doc/grammar.dox in the kaldi source). </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg14GetHTransducerERKNSt6vectorINSt6vectorI7int32_tEEEERK26ContextDependencyInterfaceRK15TransitionModelRK17HTransducerConfigPNSt6vectorI7int32_tEE">
+<span id="_CPPv3N3khg14GetHTransducerERKNSt6vectorINSt6vectorI7int32_tEEEERK26ContextDependencyInterfaceRK15TransitionModelRK17HTransducerConfigPNSt6vectorI7int32_tEE"></span><span id="_CPPv2N3khg14GetHTransducerERKNSt6vectorINSt6vectorI7int32_tEEEERK26ContextDependencyInterfaceRK15TransitionModelRK17HTransducerConfigPNSt6vectorI7int32_tEE"></span><span id="khg::GetHTransducer__std::vector:std::vector:int32_t::CR.ContextDependencyInterfaceCR.TransitionModelCR.HTransducerConfigCR.std::vector:int32_t:P"></span><span class="target" id="namespacekhg_1ab9471e1d51644bfacc9fd4755022a79e"></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">fst</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">khg</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">GetHTransducer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ilabel_info</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">ContextDependencyInterface</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ctx_dep</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg15TransitionModelE" title="khg::TransitionModel"><span class="n"><span class="pre">TransitionModel</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">trans_model</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg17HTransducerConfigE" title="khg::HTransducerConfig"><span class="n"><span class="pre">HTransducerConfig</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">config</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">disambig_syms_left</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg14GetHTransducerERKNSt6vectorINSt6vectorI7int32_tEEEERK26ContextDependencyInterfaceRK15TransitionModelRK17HTransducerConfigPNSt6vectorI7int32_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the H transducer; result owned by caller. </p>
+<p>Caution: our version of the H transducer does not include self-loops; you have to add those later (see <a class="reference internal" href="#namespacekhg_1afbbac97d06a5e4cae21b34befa3cb050"><span class="std std-ref">AddSelfLoops()</span></a>). The H transducer has on the input transition-ids, and also possibly some disambiguation symbols, which will be put in disambig_syms. The output side contains the identifiers that are indexes into &quot;ilabel_info&quot; (these represent phones-in-context or disambiguation symbols). The ilabel_info vector allows GetHTransducer to map from symbols to phones-in-context (i.e. phonetic context windows). Any singleton symbols in the ilabel_info vector which are not phones, will be treated as disambiguation symbols. [Not all recipes use these]. The output &quot;disambig_syms_left&quot; will be set to a list of the disambiguation symbols on the input of the transducer (i.e. same symbol type as whatever is on the input of the transducer).</p>
+<p>The transition costs are baked ONLY on the HMM transition arcs: an arc labeled with a transition-id carries cost <span class="math notranslate nohighlight">\(-s_t \log \tilde{p}\)</span>, where <span class="math notranslate nohighlight">\(\tilde{p}\)</span> is the transition probability renormalized to exclude the self-loop probability mass of its state (see <a class="reference internal" href="#classkhg_1_1TransitionModel_1a415b5a5e32d83650e9b790563ca33d8f"><span class="std std-ref">TransitionModel::GetTransitionLogProbIgnoringSelfLoops</span></a>) and <span class="math notranslate nohighlight">\(s_t\)</span> is <code class="docutils literal notranslate"><span class="pre">config's</span></code> transition_scale. The context-expansion arcs (labeled on the output side with indexes into <code class="docutils literal notranslate"><span class="pre">ilabel_info</span></code>) have weight zero. This matches kaldi; the cost placement is intentional.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ilabel_info</strong> -- [in] The ilabel info: element <code class="docutils literal notranslate"><span class="pre">i</span></code> is the phone-in-context (or singleton disambiguation symbol) that output symbol <code class="docutils literal notranslate"><span class="pre">i</span></code> stands for. </p></li>
+<li><p><strong>ctx_dep</strong> -- [in] The phonetic decision tree; maps pdf-classes to pdf-ids. </p></li>
+<li><p><strong>trans_model</strong> -- [in] The transition model; provides the transition-ids and the transition probabilities. </p></li>
+<li><p><strong>config</strong> -- [in] Configuration object; see <a class="reference internal" href="#structkhg_1_1HTransducerConfig"><span class="std std-ref">HTransducerConfig</span></a>. </p></li>
+<li><p><strong>disambig_syms_left</strong> -- [out] Set to the list of disambiguation symbols appearing on the input side of the transducer. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The H transducer (ownership passed to the caller). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg18AddTransitionProbsERK15TransitionModelRKNSt6vectorI7int32_tEEffPN3fst9VectorFstIN3fst6StdArcEEE">
+<span id="_CPPv3N3khg18AddTransitionProbsERK15TransitionModelRKNSt6vectorI7int32_tEEffPN3fst9VectorFstIN3fst6StdArcEEE"></span><span id="_CPPv2N3khg18AddTransitionProbsERK15TransitionModelRKNSt6vectorI7int32_tEEffPN3fst9VectorFstIN3fst6StdArcEEE"></span><span id="khg::AddTransitionProbs__TransitionModelCR.std::vector:int32_t:CR.float.float.fst::VectorFst:fst::StdArc:P"></span><span class="target" id="namespacekhg_1a80c65c596d36f0b76c4f57bf658b2be3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">khg</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">AddTransitionProbs</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg15TransitionModelE" title="khg::TransitionModel"><span class="n"><span class="pre">TransitionModel</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">trans_model</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">disambig_syms</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">transition_scale</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">self_loop_scale</span></span>, <a class="reference internal" href="#_CPPv4N3khg18AddTransitionProbsERK15TransitionModelRKNSt6vectorI7int32_tEEffPN3fst9VectorFstIN3fst6StdArcEEE" title="khg::AddTransitionProbs::fst"><span class="n"><span class="pre">fst</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3khg18AddTransitionProbsERK15TransitionModelRKNSt6vectorI7int32_tEEffPN3fst9VectorFstIN3fst6StdArcEEE" title="khg::AddTransitionProbs::fst"><span class="n"><span class="pre">fst</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg18AddTransitionProbsERK15TransitionModelRKNSt6vectorI7int32_tEEffPN3fst9VectorFstIN3fst6StdArcEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Adds transition-probs to the graph. </p>
+<p>Adds transition-probs, with the supplied scales (see the scale conventions in the file documentation), to the graph. Every arc labeled with a transition-id gets its weight multiplied by the corresponding transition probability: if <code class="docutils literal notranslate"><span class="pre">transition_scale</span></code> and <code class="docutils literal notranslate"><span class="pre">self_loop_scale</span></code> are equal this is just <span class="math notranslate nohighlight">\(s \log p\)</span>; otherwise self-loops get <span class="math notranslate nohighlight">\(s_{\mathrm{sl}} \log p\)</span> and non-self-loop transitions get <span class="math notranslate nohighlight">\(s_{\mathrm{sl}} \log(1 - p_{\mathrm{sl}}) + s_t \log \tilde{p}\)</span> (the renormalized scheme of <a class="reference internal" href="#namespacekhg_1ab9471e1d51644bfacc9fd4755022a79e"><span class="std std-ref">GetHTransducer()</span></a>/AddSelfLoops()). In all cases the log-probs are simply added to what the arcs already carry.</p>
+<p>Useful if you want to create a graph without transition probs, then possibly train the model (including the transition probs) but keep the graph fixed, and add back in the transition probs. It assumes the fst has transition-ids on it. It is not an error if the FST has no states (nothing will be done). Note that in the standard training pipeline this is called at alignment time (the training graphs are compiled with both scales set to 0, because the transition probs change at every iteration while the graphs stay fixed); applying it to a graph that already has transition probs applies them a second time, which matches kaldi and is intentional - do not &quot;fix&quot; it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trans_model</strong> -- [in] The transition model </p></li>
+<li><p><strong>disambig_syms</strong> -- [in] A list of disambiguation symbols, required if the graph has disambiguation symbols on its input but only used for checks. </p></li>
+<li><p><strong>transition_scale</strong> -- [in] A scale on transition-probabilities apart from those involving self-loops. </p></li>
+<li><p><strong>self_loop_scale</strong> -- [in] A scale on self-loop transition probabilities. </p></li>
+<li><p><strong>fst</strong> -- [in, out] The FST to be modified. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg12AddSelfLoopsERK15TransitionModelRKNSt6vectorI7int32_tEEfbbPN3fst9VectorFstIN3fst6StdArcEEE">
+<span id="_CPPv3N3khg12AddSelfLoopsERK15TransitionModelRKNSt6vectorI7int32_tEEfbbPN3fst9VectorFstIN3fst6StdArcEEE"></span><span id="_CPPv2N3khg12AddSelfLoopsERK15TransitionModelRKNSt6vectorI7int32_tEEfbbPN3fst9VectorFstIN3fst6StdArcEEE"></span><span id="khg::AddSelfLoops__TransitionModelCR.std::vector:int32_t:CR.float.b.b.fst::VectorFst:fst::StdArc:P"></span><span class="target" id="namespacekhg_1afbbac97d06a5e4cae21b34befa3cb050"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">khg</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">AddSelfLoops</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg15TransitionModelE" title="khg::TransitionModel"><span class="n"><span class="pre">TransitionModel</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">trans_model</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">disambig_syms</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">self_loop_scale</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reorder</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">check_no_self_loops</span></span>, <a class="reference internal" href="#_CPPv4N3khg12AddSelfLoopsERK15TransitionModelRKNSt6vectorI7int32_tEEfbbPN3fst9VectorFstIN3fst6StdArcEEE" title="khg::AddSelfLoops::fst"><span class="n"><span class="pre">fst</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorFst</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3khg12AddSelfLoopsERK15TransitionModelRKNSt6vectorI7int32_tEEfbbPN3fst9VectorFstIN3fst6StdArcEEE" title="khg::AddSelfLoops::fst"><span class="n"><span class="pre">fst</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">StdArc</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg12AddSelfLoopsERK15TransitionModelRKNSt6vectorI7int32_tEEfbbPN3fst9VectorFstIN3fst6StdArcEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Adds self-loops to an FST that was built without them. </p>
+<p>For context, this is the last step of building HCLG-style graphs from the H transducer of <a class="reference internal" href="#namespacekhg_1ab9471e1d51644bfacc9fd4755022a79e"><span class="std std-ref">GetHTransducer()</span></a>. Expands an FST that has been built without self-loops, and adds the self-loops (it also needs to modify the probability of the non-self-loop ones, as the graph without self-loops was created in such a way that it was stochastic). Concretely, for every state with a transition-state, a self-loop is added with cost <span class="math notranslate nohighlight">\(-s_{\mathrm{sl}} \log p_{\mathrm{sl}}\)</span> and the other out-arcs (and the final weight) of the state are multiplied by the forward probability mass, i.e. their cost is increased by <span class="math notranslate nohighlight">\(-s_{\mathrm{sl}} \log (1 - p_{\mathrm{sl}})\)</span>, where <span class="math notranslate nohighlight">\(p_{\mathrm{sl}}\)</span> is the self-loop probability and <span class="math notranslate nohighlight">\(s_{\mathrm{sl}}\)</span> is <code class="docutils literal notranslate"><span class="pre">self_loop_scale</span></code>. Note that the disambig_syms will be empty in some recipes (e.g. if you already removed the disambiguation symbols). This function will treat numbers over 10000000 (kNontermBigNumber) the same as disambiguation symbols, assuming they are special symbols for grammar decoding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trans_model</strong> -- [in] Transition model </p></li>
+<li><p><strong>disambig_syms</strong> -- [in] Sorted, uniq list of disambiguation symbols, required if the graph contains disambiguation symbols but only needed for sanity checks. </p></li>
+<li><p><strong>self_loop_scale</strong> -- [in] Transition-probability scale for self-loops; see the scale conventions in the file documentation. </p></li>
+<li><p><strong>reorder</strong> -- [in] If true, reorders the transitions (the transition-id of a forward transition is placed on the arc entering its destination state, before the self-loop; Dan-style graphs). You'll normally want this to be true. </p></li>
+<li><p><strong>check_no_self_loops</strong> -- [in] If true, it will check that there are no self-loops in the original graph; you'll normally want this to be true. If false, it will allow them, and will add self-loops after the original self-loop transitions, assuming reorder==true... this happens to be what we want when converting normal to unconstrained chain examples. WARNING: this was added in 2018; if you get a compilation error, add this as 'true', which emulates the behavior of older code. </p></li>
+<li><p><strong>fst</strong> -- [in, out] The FST to be modified. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3khg13SplitToPhonesERK15TransitionModelRKNSt6vectorI7int32_tEEPNSt6vectorINSt6vectorI7int32_tEEEE">
+<span id="_CPPv3N3khg13SplitToPhonesERK15TransitionModelRKNSt6vectorI7int32_tEEPNSt6vectorINSt6vectorI7int32_tEEEE"></span><span id="_CPPv2N3khg13SplitToPhonesERK15TransitionModelRKNSt6vectorI7int32_tEEPNSt6vectorINSt6vectorI7int32_tEEEE"></span><span id="khg::SplitToPhones__TransitionModelCR.std::vector:int32_t:CR.std::vector:std::vector:int32_t::P"></span><span class="target" id="namespacekhg_1a259ab773a9aca6f02ef37d66221ad9a2"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">khg</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">SplitToPhones</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3khg15TransitionModelE" title="khg::TransitionModel"><span class="n"><span class="pre">TransitionModel</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">trans_model</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">alignment</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">split_alignment</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3khg13SplitToPhonesERK15TransitionModelRKNSt6vectorI7int32_tEEPNSt6vectorINSt6vectorI7int32_tEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>SplitToPhones splits up the TransitionIds in &quot;alignment&quot; into their individual phones (one vector per instance of a phone). </p>
+<p>At output, the sum of the sizes of the vectors in split_alignment will be the same as the corresponding sum for &quot;alignment&quot;. The function returns true on success. If the alignment appears to be incomplete, e.g. not ending at the end-state of a phone, it will still break it up into phones but it will return false. For more serious errors it will die or throw an exception. This function works out by itself whether the graph was created with &quot;reordering&quot;, and just does the right thing.</p>
+<p>This is ported from ../kaldi/src/hmm/hmm-utils.cc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trans_model</strong> -- [in] The transition model. </p></li>
+<li><p><strong>alignment</strong> -- [in] The alignment: a sequence of transition-ids. </p></li>
+<li><p><strong>split_alignment</strong> -- [out] The alignment split into per-phone segments, in order; one vector of transition-ids per instance of a phone. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True on success; false if the alignment was incomplete (e.g. not ending at the end-state of a phone), in which case the split is still produced. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="C++ API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gmm.html" class="btn btn-neutral float-right" title="GMMs and MLE/MAP estimation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

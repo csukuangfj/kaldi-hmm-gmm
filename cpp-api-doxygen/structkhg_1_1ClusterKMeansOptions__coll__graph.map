@@ -1,0 +1,5 @@
+<map id="khg::ClusterKMeansOptions" name="khg::ClusterKMeansOptions">
+<area shape="rect" id="Node000001" title="Options for ClusterKMeans." alt="" coords="5,106,207,134"/>
+<area shape="rect" id="Node000002" href="$structkhg_1_1RefineClustersOptions.html" title="Options for the internal RefineClusters step of the clustering algorithms." alt="" coords="7,5,205,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,47,109,106,103,105,104,50"/>
+</map>

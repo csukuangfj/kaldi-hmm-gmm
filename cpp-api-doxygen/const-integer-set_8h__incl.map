@@ -1,0 +1,35 @@
+<map id="const&#45;integer&#45;set.h" name="const&#45;integer&#45;set.h">
+<area shape="rect" id="Node000001" title="Immutable integer set with fast membership tests." alt="" coords="313,5,457,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,182,90,210"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="310,26,270,34,223,45,177,61,134,83,111,102,91,125,63,170,58,167,87,121,108,98,131,79,175,56,222,39,269,29,315,24"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="351,90,419,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="386,31,387,75,382,73,383,36"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="444,90,502,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="400,31,451,79,445,79,398,36"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="526,90,567,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="416,31,517,81,511,82,416,36"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="114,182,176,210"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="310,32,219,53,180,67,156,83,145,102,140,123,141,167,136,166,135,123,140,100,152,79,178,62,218,48,314,29"/>
+<area shape="rect" id="Node000007" href="$stl-utils_8h.html" title="Small generic STL container utilities ported from kaldi/src/util/stl&#45;utils.h." alt="" coords="166,81,326,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="360,35,297,75,295,70,365,32"/>
+<area shape="rect" id="Node000016" href="$const-integer-set-inl_8h.html" title="Inline/templated implementations of ConstIntegerSet." alt="" coords="591,81,760,126"/>
+<area shape="poly" id="edge17_Node000001_Node000016" title=" " alt="" coords="432,31,586,76,581,77,431,36"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="198,129,91,178,89,173,200,124"/>
+<area shape="poly" id="edge11_Node000007_Node000006" title=" " alt="" coords="224,124,172,174,169,170,220,128"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="468,182,539,210"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="317,124,456,171,464,176,458,176,455,176,317,129"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="563,182,654,210"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="327,120,339,123,446,145,552,171,564,177,559,177,551,176,445,150,338,128,327,126"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="200,182,260,210"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="244,124,237,168,233,165,241,128"/>
+<area shape="rect" id="Node000011" href="$log_8h.html" title="Logging and assertion macros used throughout the library." alt="" coords="283,174,444,218"/>
+<area shape="poly" id="edge12_Node000007_Node000011" title=" " alt="" coords="275,123,326,164,321,164,273,129"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="184,266,250,294"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="327,218,255,261,253,256,322,220"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="273,266,352,294"/>
+<area shape="poly" id="edge14_Node000011_Node000013" title=" " alt="" coords="353,217,331,255,327,251,348,220"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="377,266,451,294"/>
+<area shape="poly" id="edge15_Node000011_Node000014" title=" " alt="" coords="378,216,401,254,396,252,376,221"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="476,266,561,294"/>
+<area shape="poly" id="edge16_Node000011_Node000015" title=" " alt="" coords="405,216,483,259,477,259,404,222"/>
+</map>

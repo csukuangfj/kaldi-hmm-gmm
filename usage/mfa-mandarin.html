@@ -1,0 +1,233 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MFA alignment — Mandarin &mdash; kaldi-hmm-gmm 1.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=00f267c6"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Python API" href="../python-api/index.html" />
+    <link rel="prev" title="MFA alignment — English" href="mfa-english.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="setup.html">Environment setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yesno.html">The yesno recipe — train a monophone GMM</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="mfa.html">MFA-style forced alignment</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="mfa-english.html">MFA alignment — English</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">MFA alignment — Mandarin</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#test-audio">Test audio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aishell-3-pinyin-model">AISHELL-3 pinyin model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#large-pinyin-model">Large pinyin model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#inspect-the-results">Inspect the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-official-mfa-mandarin-model">The official MFA Mandarin model</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mfa.html#what-a-model-directory-contains">What a model directory contains</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mfa.html#command-line-options">Command-line options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mfa.html#the-textgrid-output">The TextGrid output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mfa.html#how-it-works">How it works</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../python-api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp-api/index.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Usage</a></li>
+          <li class="breadcrumb-item"><a href="mfa.html">MFA-style forced alignment</a></li>
+      <li class="breadcrumb-item active">MFA alignment — Mandarin</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/mfa-mandarin.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mfa-alignment-mandarin">
+<h1>MFA alignment — Mandarin<a class="headerlink" href="#mfa-alignment-mandarin" title="Link to this heading"></a></h1>
+<p>Complete, copy-paste runnable Mandarin examples (two pinyin models).
+See <a class="reference internal" href="mfa.html"><span class="doc">MFA-style forced alignment</span></a> for how the pipeline works and <a class="reference internal" href="setup.html"><span class="doc">Environment setup</span></a> for installing
+the dependencies (<code class="docutils literal notranslate"><span class="pre">pypinyin</span></code> is required for <code class="docutils literal notranslate"><span class="pre">--tokenize</span> <span class="pre">pinyin</span></code>).</p>
+<section id="test-audio">
+<h2>Test audio<a class="headerlink" href="#test-audio" title="Link to this heading"></a></h2>
+<audio controls src="https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/zh.wav">
+  Your browser does not support the audio element.
+</audio><p>Download it with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>mandarin
+wget<span class="w"> </span>-O<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/zh.wav
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>file: <code class="docutils literal notranslate"><span class="pre">zh.wav</span></code> (mono, 16-bit PCM, <strong>24 kHz</strong>, 4.76 s)</p></li>
+<li><p>transcript: 不要问你的国家能为你做什么，而要问你能为你的国家做什么。</p></li>
+</ul>
+<p>The transcript is Chinese characters; <code class="docutils literal notranslate"><span class="pre">--tokenize</span> <span class="pre">pinyin</span></code> converts each
+character to pinyin for dictionary lookup and keeps the characters for the
+TextGrid word tier.</p>
+</section>
+<section id="aishell-3-pinyin-model">
+<h2>AISHELL-3 pinyin model<a class="headerlink" href="#aishell-3-pinyin-model" title="Link to this heading"></a></h2>
+<p>Step 1 — download the model (from
+<a class="reference external" href="https://github.com/lars76/forced-alignment-chinese">lars76/forced-alignment-chinese</a>).
+The outer zip contains the <strong>pronunciation dictionary</strong>
+(<code class="docutils literal notranslate"><span class="pre">*_dictionary.dict</span></code> — no extra download needed) and a <strong>nested</strong>
+acoustic-model zip; unzip both inside the model directory so the
+<code class="docutils literal notranslate"><span class="pre">--dict</span></code>/<code class="docutils literal notranslate"><span class="pre">--model-dir</span></code> paths below resolve:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>aishell3_pinyin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>aishell3_pinyin
+wget<span class="w"> </span>https://github.com/lars76/forced-alignment-chinese/releases/download/model_files/aishell3_pinyin.zip
+unzip<span class="w"> </span>aishell3_pinyin.zip<span class="w">          </span><span class="c1"># -&gt; aishell3_pinyin_acoustic.zip + dictionaries</span>
+unzip<span class="w"> </span>aishell3_pinyin_acoustic.zip<span class="w"> </span><span class="c1"># -&gt; aishell3_pinyin_acoustic/</span>
+<span class="nb">cd</span><span class="w"> </span>..
+</pre></div>
+</div>
+<p>Step 2 — run the alignment from the repository root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tools/align_mfa.py<span class="w"> </span>--wav<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--text<span class="w"> </span><span class="s2">"不要问你的国家能为你做什么，而要问你能为你的国家做什么。"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model-dir<span class="w"> </span>aishell3_pinyin/aishell3_pinyin_acoustic<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dict<span class="w"> </span>aishell3_pinyin/aishell3_pinyin_dictionary.dict<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--phones-txt<span class="w"> </span>aishell3_pinyin/aishell3_pinyin_acoustic/phones.txt<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tokenize<span class="w"> </span>pinyin<span class="w"> </span>--out<span class="w"> </span>mandarin/zh-aishell3.TextGrid
+</pre></div>
+</div>
+<p>Expected output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>OK: mandarin/zh-aishell3.TextGrid  frames=476 dur=4.76s phones=71 words=26
+timing: audio duration 4.76s, elapsed 0.67s, RTF 0.140
+</pre></div>
+</div>
+</section>
+<section id="large-pinyin-model">
+<h2>Large pinyin model<a class="headerlink" href="#large-pinyin-model" title="Link to this heading"></a></h2>
+<p>Step 1 — same pattern (note: the nested zip unpacks into the directory
+<code class="docutils literal notranslate"><span class="pre">d_pinyin_acoustic/</span></code>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>large_pinyin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>large_pinyin
+wget<span class="w"> </span>https://github.com/lars76/forced-alignment-chinese/releases/download/model_files/large_pinyin.zip
+unzip<span class="w"> </span>large_pinyin.zip<span class="w">             </span><span class="c1"># -&gt; large_pinyin_acoustic.zip + dictionaries</span>
+unzip<span class="w"> </span>large_pinyin_acoustic.zip<span class="w">    </span><span class="c1"># -&gt; d_pinyin_acoustic/</span>
+<span class="nb">cd</span><span class="w"> </span>..
+</pre></div>
+</div>
+<p>Step 2 — run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tools/align_mfa.py<span class="w"> </span>--wav<span class="w"> </span>mandarin/zh.wav<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--text<span class="w"> </span><span class="s2">"不要问你的国家能为你做什么，而要问你能为你的国家做什么。"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model-dir<span class="w"> </span>large_pinyin/d_pinyin_acoustic<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dict<span class="w"> </span>large_pinyin/large_pinyin_dictionary.dict<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--phones-txt<span class="w"> </span>large_pinyin/d_pinyin_acoustic/phones.txt<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tokenize<span class="w"> </span>pinyin<span class="w"> </span>--out<span class="w"> </span>mandarin/zh-large.TextGrid
+</pre></div>
+</div>
+<p>Expected output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>OK: mandarin/zh-large.TextGrid  frames=476 dur=4.76s phones=66 words=26
+timing: audio duration 4.76s, elapsed 0.67s, RTF 0.141
+</pre></div>
+</div>
+</section>
+<section id="inspect-the-results">
+<h2>Inspect the results<a class="headerlink" href="#inspect-the-results" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">mandarin/zh-aishell3.TextGrid</span></code> and <code class="docutils literal notranslate"><span class="pre">mandarin/zh-large.TextGrid</span></code> each
+have phones and words tiers; the word tier contains the 26 characters of
+the transcript.  Open them in <a class="reference external" href="https://praat.org/">Praat</a> next to
+<code class="docutils literal notranslate"><span class="pre">mandarin/zh.wav</span></code>.  The two models produce slightly different phone
+inventories (71 vs 66 phone intervals) — both alignments are valid; choose
+the model that fits your data.</p>
+</section>
+<section id="the-official-mfa-mandarin-model">
+<h2>The official MFA Mandarin model<a class="headerlink" href="#the-official-mfa-mandarin-model" title="Link to this heading"></a></h2>
+<p>The official
+<a class="reference external" href="https://github.com/MontrealCorpusTools/mfa-models/releases/tag/acoustic-mandarin_mfa-v2.0.0">acoustic-mandarin_mfa</a>
+model is also supported (its <code class="docutils literal notranslate"><span class="pre">meta.json</span></code> turns pitch features on, so add
+<code class="docutils literal notranslate"><span class="pre">--pitch</span></code>).  It needs a matching MFA pinyin dictionary — pass it with
+<code class="docutils literal notranslate"><span class="pre">--dict</span></code> just like the examples above.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mfa-english.html" class="btn btn-neutral float-left" title="MFA alignment — English" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../python-api/index.html" class="btn btn-neutral float-right" title="Python API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

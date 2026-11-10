@@ -1,0 +1,22 @@
+<map id="clusterable&#45;classes.h" name="clusterable&#45;classes.h">
+<area shape="rect" id="Node000001" title="Concrete Clusterable classes holding scalar and Gaussian statistics." alt="" coords="90,5,248,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="22,182,80,210"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,36,107,55,79,83,68,103,61,125,54,167,49,166,56,123,63,101,75,79,103,51,139,31"/>
+<area shape="rect" id="Node000003" href="$clusterable-itf_8h.html" title="Abstract interface for statistics that can be clustered." alt="" coords="88,81,249,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="170,31,171,66,166,64,168,36"/>
+<area shape="rect" id="Node000009" href="$eigen_8h.html" title="Eigen typedefs matching kaldi&#39;s Matrix layout, plus small vector math and random helpers." alt="" coords="272,81,433,126"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="198,31,292,73,288,75,198,36"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="139,128,82,174,78,171,142,124"/>
+<area shape="rect" id="Node000004" href="$log_8h.html" title="Logging and assertion macros used throughout the library." alt="" coords="104,174,265,218"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="174,124,181,159,176,158,171,128"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,266,71,294"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="148,221,76,261,73,256,144,217"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="94,266,174,294"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="174,217,152,255,148,251,169,220"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="198,266,272,294"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="199,216,222,254,217,252,197,221"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="297,266,382,294"/>
+<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="226,216,304,258,299,259,225,222"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="302,182,404,210"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="354,124,355,168,350,165,351,128"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="am&#45;diag&#45;gmm.h" name="am&#45;diag&#45;gmm.h">
+<area shape="rect" id="Node000001" title="Acoustic model of diagonal&#45;covariance GMMs (AmDiagGmm)." alt="" coords="141,5,268,33"/>
+<area shape="rect" id="Node000002" href="$decodable-am-diag-gmm_8h.html" title="Decodable objects for AmDiagGmm acoustic models." alt="" coords="5,81,204,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,42,124,83,121,78,172,43"/>
+<area shape="rect" id="Node000003" href="$mle-am-diag-gmm_8h.html" title="ML/MAP estimation for whole acoustic models of diagonal GMMs." alt="" coords="228,81,384,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="236,40,291,81,285,80,234,45"/>
+</map>

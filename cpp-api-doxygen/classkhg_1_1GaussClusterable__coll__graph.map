@@ -1,0 +1,5 @@
+<map id="khg::GaussClusterable" name="khg::GaussClusterable">
+<area shape="rect" id="Node000001" title="GaussClusterable wraps Gaussian statistics in a form accessible to generic clustering algorithms." alt="" coords="5,81,173,109"/>
+<area shape="rect" id="Node000002" href="$classkhg_1_1Clusterable.html" title="A virtual class for clusterable objects." alt="" coords="25,5,153,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,47,91,82,87,80,87,51"/>
+</map>

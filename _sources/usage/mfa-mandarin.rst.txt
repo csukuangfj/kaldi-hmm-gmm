@@ -1,0 +1,117 @@
+MFA alignment — Mandarin
+========================
+
+Complete, copy-paste runnable Mandarin examples (two pinyin models).
+See :doc:`mfa` for how the pipeline works and :doc:`setup` for installing
+the dependencies (``pypinyin`` is required for ``--tokenize pinyin``).
+
+Test audio
+----------
+
+.. raw:: html
+
+   <audio controls src="https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/zh.wav">
+     Your browser does not support the audio element.
+   </audio>
+
+Download it with:
+
+.. code-block:: bash
+
+   mkdir -p mandarin
+   wget -O mandarin/zh.wav \
+     https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/zh.wav
+
+- file: ``zh.wav`` (mono, 16-bit PCM, **24 kHz**, 4.76 s)
+- transcript: 不要问你的国家能为你做什么，而要问你能为你的国家做什么。
+
+The transcript is Chinese characters; ``--tokenize pinyin`` converts each
+character to pinyin for dictionary lookup and keeps the characters for the
+TextGrid word tier.
+
+AISHELL-3 pinyin model
+----------------------
+
+Step 1 — download the model (from
+`lars76/forced-alignment-chinese <https://github.com/lars76/forced-alignment-chinese>`_).
+The outer zip contains the **pronunciation dictionary**
+(``*_dictionary.dict`` — no extra download needed) and a **nested**
+acoustic-model zip; unzip both inside the model directory so the
+``--dict``/``--model-dir`` paths below resolve:
+
+.. code-block:: bash
+
+   mkdir -p aishell3_pinyin && cd aishell3_pinyin
+   wget https://github.com/lars76/forced-alignment-chinese/releases/download/model_files/aishell3_pinyin.zip
+   unzip aishell3_pinyin.zip          # -> aishell3_pinyin_acoustic.zip + dictionaries
+   unzip aishell3_pinyin_acoustic.zip # -> aishell3_pinyin_acoustic/
+   cd ..
+
+Step 2 — run the alignment from the repository root:
+
+.. code-block:: bash
+
+   python3 tools/align_mfa.py --wav mandarin/zh.wav \
+     --text "不要问你的国家能为你做什么，而要问你能为你的国家做什么。" \
+     --model-dir aishell3_pinyin/aishell3_pinyin_acoustic \
+     --dict aishell3_pinyin/aishell3_pinyin_dictionary.dict \
+     --phones-txt aishell3_pinyin/aishell3_pinyin_acoustic/phones.txt \
+     --tokenize pinyin --out mandarin/zh-aishell3.TextGrid
+
+Expected output:
+
+.. code-block:: text
+
+   OK: mandarin/zh-aishell3.TextGrid  frames=476 dur=4.76s phones=71 words=26
+   timing: audio duration 4.76s, elapsed 0.67s, RTF 0.140
+
+Large pinyin model
+------------------
+
+Step 1 — same pattern (note: the nested zip unpacks into the directory
+``d_pinyin_acoustic/``):
+
+.. code-block:: bash
+
+   mkdir -p large_pinyin && cd large_pinyin
+   wget https://github.com/lars76/forced-alignment-chinese/releases/download/model_files/large_pinyin.zip
+   unzip large_pinyin.zip             # -> large_pinyin_acoustic.zip + dictionaries
+   unzip large_pinyin_acoustic.zip    # -> d_pinyin_acoustic/
+   cd ..
+
+Step 2 — run:
+
+.. code-block:: bash
+
+   python3 tools/align_mfa.py --wav mandarin/zh.wav \
+     --text "不要问你的国家能为你做什么，而要问你能为你的国家做什么。" \
+     --model-dir large_pinyin/d_pinyin_acoustic \
+     --dict large_pinyin/large_pinyin_dictionary.dict \
+     --phones-txt large_pinyin/d_pinyin_acoustic/phones.txt \
+     --tokenize pinyin --out mandarin/zh-large.TextGrid
+
+Expected output:
+
+.. code-block:: text
+
+   OK: mandarin/zh-large.TextGrid  frames=476 dur=4.76s phones=66 words=26
+   timing: audio duration 4.76s, elapsed 0.67s, RTF 0.141
+
+Inspect the results
+-------------------
+
+``mandarin/zh-aishell3.TextGrid`` and ``mandarin/zh-large.TextGrid`` each
+have phones and words tiers; the word tier contains the 26 characters of
+the transcript.  Open them in `Praat <https://praat.org/>`_ next to
+``mandarin/zh.wav``.  The two models produce slightly different phone
+inventories (71 vs 66 phone intervals) — both alignments are valid; choose
+the model that fits your data.
+
+The official MFA Mandarin model
+-------------------------------
+
+The official
+`acoustic-mandarin_mfa <https://github.com/MontrealCorpusTools/mfa-models/releases/tag/acoustic-mandarin_mfa-v2.0.0>`_
+model is also supported (its ``meta.json`` turns pitch features on, so add
+``--pitch``).  It needs a matching MFA pinyin dictionary — pass it with
+``--dict`` just like the examples above.

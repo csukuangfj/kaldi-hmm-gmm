@@ -1,0 +1,7 @@
+<map id="khg::Clusterable" name="khg::Clusterable">
+<area shape="rect" id="Node000001" title="A virtual class for clusterable objects." alt="" coords="121,5,249,33"/>
+<area shape="rect" id="Node000002" href="$classkhg_1_1GaussClusterable.html" title="GaussClusterable wraps Gaussian statistics in a form accessible to generic clustering algorithms." alt="" coords="5,81,173,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,42,107,83,105,78,153,43"/>
+<area shape="rect" id="Node000003" href="$classkhg_1_1ScalarClusterable.html" title="ScalarClusterable clusters scalars with x^2 loss." alt="" coords="197,81,365,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="215,40,267,81,261,80,213,45"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="context&#45;dep&#45;itf.h" name="context&#45;dep&#45;itf.h">
+<area shape="rect" id="Node000001" title="Abstract interface mapping a phone&#45;in&#45;context to acoustic pdf&#45;ids." alt="" coords="60,5,189,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,71,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,33,66,73,63,69,107,34"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="95,81,154,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="126,32,127,66,122,64,123,36"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="179,81,241,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="141,31,186,70,181,71,139,36"/>
+</map>
