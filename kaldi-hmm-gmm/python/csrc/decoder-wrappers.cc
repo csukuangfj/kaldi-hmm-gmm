@@ -164,7 +164,28 @@ costs already divided by the decode acoustic scale), use
    lattice has no complete path (outputs empty).)doc");
 }
 
+static void PybindLatticeType(py::module *m) {
+  // Register the lattice type returned by decode_utterance_* (kaldi's
+  // fst::VectorFst<fst::LatticeArc>).  The kaldifst package registers the
+  // same C++ type in its own module, but that registration is not visible
+  // to this module's type lookup on every interpreter/wheel combination
+  // (Python 3.8 with the kaldifst 1.9.0 wheels fails with "Unregistered
+  // type").  A module_local registration makes the conversion deterministic
+  // everywhere; lattice_best_path() still accepts kaldifst Lattice objects
+  // as inputs (local lookup misses, global lookup hits).
+  using PyClass = fst::VectorFst<fst::LatticeArc>;
+  py::class_<PyClass>(*m, "Lattice", py::module_local(),
+                      R"doc(A lattice (kaldi's ``fst::VectorFst<fst::LatticeArc>``).
+
+Returned by :func:`decode_utterance_lattice_faster` /
+:func:`decode_utterance_lattice_simple`; accepted by
+:func:`lattice_best_path`.  ``kaldifst.Lattice`` objects are accepted
+wherever a Lattice is expected.)doc")
+      .def(py::init<>());
+}
+
 void PybindDecoderWrappers(py::module *m) {
+  PybindLatticeType(m);
   PybindAlignConfig(m);
   PybindLatticeFasterDecoderConfig(m);
   PybindLatticeSimpleDecoderConfig(m);
