@@ -4,6 +4,11 @@ MFA alignment — English
 A complete, copy-paste runnable English example.  See :doc:`mfa` for how
 the pipeline works and :doc:`setup` for installing the dependencies.
 
+Try it in Colab: |mfa english colab|
+
+.. |mfa english colab| image:: https://colab.research.google.com/assets/colab-badge.svg
+   :target: https://colab.research.google.com/github/csukuangfj/kaldi-hmm-gmm/blob/master/mfa_english.ipynb
+
 Test audio
 ----------
 
