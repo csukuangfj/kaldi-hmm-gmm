@@ -66,7 +66,7 @@ See the documentation for the full API and two complete tutorials.
   to reduce CI download time.
 - **MFA forced alignment** ([`tools/align_mfa.py`](tools/align_mfa.py)) —
   align a single utterance to its transcript with pretrained MFA acoustic
-  models (English `english_mfa`, Mandarin `aishell3_pinyin` /
+  models (English `english_mfa`, Chinese `aishell3_pinyin` /
   `large_pinyin`) and produce Praat TextGrids.  Test audio: [en.wav](https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/en.wav) /
   [zh.wav](https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/zh.wav).
   Every run reports the audio duration, elapsed seconds and the real-time
@@ -76,6 +76,13 @@ See the documentation for the full API and two complete tutorials.
 Both are documented in detail in the documentation (`docs/source/usage/`),
 including environment setup (no C++ build needed — `pip install
 kaldi-hmm-gmm`) and copy-paste runnable commands.
+
+# Colab notebooks
+
+Run the MFA examples in your browser:
+
+- MFA forced alignment — English [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/csukuangfj/kaldi-hmm-gmm/blob/master/mfa_english.ipynb)
+- MFA forced alignment — Chinese [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/csukuangfj/kaldi-hmm-gmm/blob/master/mfa_chinese.ipynb)
 
 # Documentation
 

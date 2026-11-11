@@ -1,9 +1,14 @@
-MFA alignment — Mandarin
+MFA alignment — Chinese
 ========================
 
-Complete, copy-paste runnable Mandarin examples (two pinyin models).
+Complete, copy-paste runnable Chinese examples (two pinyin models).
 See :doc:`mfa` for how the pipeline works and :doc:`setup` for installing
 the dependencies (``pypinyin`` is required for ``--tokenize pinyin``).
+
+Try it in Colab: |mfa chinese colab|
+
+.. |mfa chinese colab| image:: https://colab.research.google.com/assets/colab-badge.svg
+   :target: https://colab.research.google.com/github/csukuangfj/kaldi-hmm-gmm/blob/master/mfa_chinese.ipynb
 
 Test audio
 ----------
