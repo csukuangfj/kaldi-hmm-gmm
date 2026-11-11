@@ -38,7 +38,9 @@ Decoding (kaldi ``gmm-latgen-*``)
 ``decode_utterance_*`` returns ``(ok, alignment, words, like, lat)`` where
 ``lat`` is the lattice exactly as kaldi writes it (acoustic costs divided by
 the acoustic scale); feed it to ``lattice_best_path`` for 1-best under
-lm/acoustic scaling (kaldi's ``lattice-best-path``).
+lm/acoustic scaling (kaldi's ``lattice-best-path``).  ``lat`` is a
+:class:`Lattice` (the ``fst::VectorFst<fst::LatticeArc>`` returned by the
+decoder); ``lattice_best_path`` also accepts ``kaldifst.Lattice`` objects.
 
 Decodables
 ----------
