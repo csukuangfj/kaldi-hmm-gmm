@@ -83,7 +83,7 @@ jobs:
             echo "################ INSTALL ################"
             export DEBIAN_FRONTEND=noninteractive
             apt-get update
-            apt-get install -y --no-install-recommends python3-pip python3-venv cmake g++ ninja-build git
+            apt-get install -y --no-install-recommends python3-pip python3-venv python3-dev cmake g++ ninja-build git
 
             python3 -m venv /opt/venv
             . /opt/venv/bin/activate
