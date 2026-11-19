@@ -254,13 +254,14 @@ is transition-ids.
   m->def(
       "decode_utterance_lattice_simple",
       [](const kaldi_decoder::LatticeSimpleDecoderConfig &config,
-         fst::VectorFst<fst::StdArc> *fst,
+         fst::Fst<fst::StdArc> *graph,
          kaldi_decoder::DecodableInterface &decodable,
          const kaldi_decoder::TransitionInformation &trans_model,
          const std::string &utt, bool allow_partial, float acoustic_scale)
           -> std::tuple<bool, std::vector<int32_t>, std::vector<int32_t>,
                         double, fst::VectorFst<fst::LatticeArc>> {
-        kaldi_decoder::LatticeSimpleDecoder decoder(*fst, config);
+        // LatticeSimpleDecoder takes any Fst (lazy graphs included)
+        kaldi_decoder::LatticeSimpleDecoder decoder(*graph, config);
         std::vector<int32_t> alignment;
         std::vector<int32_t> words;
         double log_like = 0;
@@ -283,7 +284,8 @@ as kaldi writes it (acoustic costs divided by ``acoustic_scale``) -- feed it
 to :func:`lattice_best_path` for lmwt/wip scoring.
 
 :param config: Decoder options (:class:`LatticeSimpleDecoderConfig`).
-:param fst: Decoding graph (e.g. HCLG); borrowed, not mutated.
+:param fst: Decoding graph (e.g. HCLG, or a lazily composed graph from
+   ``kaldifst.lookahead_compose_fst``); borrowed, not mutated.
 :param decodable: Scores (:class:`DecodableInterface`).
 :param trans_model: Transition information (any
    :class:`TransitionInformation`, e.g. :class:`TransitionModel`).
@@ -294,13 +296,17 @@ to :func:`lattice_best_path` for lmwt/wip scoring.
   m->def(
       "decode_utterance_lattice_faster",
       [](const kaldi_decoder::LatticeFasterDecoderConfig &config,
-         fst::VectorFst<fst::StdArc> *fst,
+         fst::Fst<fst::StdArc> *graph,
          kaldi_decoder::DecodableInterface &decodable,
          const kaldi_decoder::TransitionInformation &trans_model,
          const std::string &utt, bool allow_partial, float acoustic_scale)
           -> std::tuple<bool, std::vector<int32_t>, std::vector<int32_t>,
                         double, fst::VectorFst<fst::LatticeArc>> {
-        kaldi_decoder::LatticeFasterDecoder decoder(*fst, config);
+        // templated decoder: works with materialized graphs (HCLG
+        // VectorFst) AND lazily composed ones (kaldifst.lookahead_compose_fst),
+        // like kaldi's own fst::Fst<StdArc> instantiations.
+        kaldi_decoder::LatticeFasterDecoderTpl<fst::Fst<fst::StdArc>> decoder(
+            *graph, config);
         std::vector<int32_t> alignment;
         std::vector<int32_t> words;
         double log_like = 0;
@@ -323,7 +329,8 @@ as kaldi writes it (acoustic costs divided by ``acoustic_scale``) -- feed it
 to :func:`lattice_best_path` for lmwt/wip scoring.
 
 :param config: Decoder options (:class:`LatticeFasterDecoderConfig`).
-:param fst: Decoding graph (e.g. HCLG); borrowed, not mutated.
+:param fst: Decoding graph (e.g. HCLG, or a lazily composed graph from
+   ``kaldifst.lookahead_compose_fst``); borrowed, not mutated.
 :param decodable: Scores (:class:`DecodableInterface`).
 :param trans_model: Transition information (any
    :class:`TransitionInformation`, e.g. :class:`TransitionModel`).

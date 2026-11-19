@@ -22,22 +22,32 @@ class PyDecodableInterface : public kaldi_decoder::DecodableInterface {
  public:
   using kaldi_decoder::DecodableInterface::DecodableInterface;
 
+  // NOTE: the decode/align bindings run under
+  // py::call_guard<py::gil_scoped_release>, so these callbacks arrive with
+  // the GIL RELEASED.  Re-acquire it before touching python (acquire is
+  // safe when already held).  Without this, calling a python-implemented
+  // decodable from the decoder is undefined behavior -- observed as
+  // intermittent segfaults during decoding.
   float LogLikelihood(int32_t frame, int32_t index) override {
+    pybind11::gil_scoped_acquire gil;
     PYBIND11_OVERRIDE_PURE_NAME(float, kaldi_decoder::DecodableInterface,
                                 "log_likelihood", LogLikelihood, frame, index);
   }
 
   bool IsLastFrame(int32_t frame) const override {
+    pybind11::gil_scoped_acquire gil;
     PYBIND11_OVERRIDE_PURE_NAME(bool, kaldi_decoder::DecodableInterface,
                                 "is_last_frame", IsLastFrame, frame);
   }
 
   int32_t NumFramesReady() const override {
+    pybind11::gil_scoped_acquire gil;
     PYBIND11_OVERRIDE_NAME(int32_t, kaldi_decoder::DecodableInterface,
                            "num_frames_ready", NumFramesReady);
   }
 
   int32_t NumIndices() const override {
+    pybind11::gil_scoped_acquire gil;
     PYBIND11_OVERRIDE_PURE_NAME(int32_t, kaldi_decoder::DecodableInterface,
                                 "num_indices", NumIndices);
   }

@@ -114,9 +114,12 @@ struct type_caster<fst::Fst<fst::StdArc>> {
     if (src.is_none()) return false;
     try {
       pybind11::gil_scoped_acquire gil;  // safe if already held
+      // generic bridge: works for ANY FST type, including lazy fsts
+      // (kaldifst.lookahead_compose_fst results) and the native extension
+      // types (olabel_lookahead, ngram) read via StdFst.read
       uint64_t addr =
-          khg_kaldifst_module().attr("_vector_fst_addr")(src).cast<uint64_t>();
-      held_ = reinterpret_cast<fst::VectorFst<fst::StdArc> *>(addr);
+          khg_kaldifst_module().attr("_fst_addr")(src).cast<uint64_t>();
+      held_ = reinterpret_cast<fst::Fst<fst::StdArc> *>(addr);
       return held_ != nullptr;
     } catch (const std::exception &) {
       return false;
@@ -125,7 +128,9 @@ struct type_caster<fst::Fst<fst::StdArc>> {
 
   static handle cast(const fst::Fst<fst::StdArc> &src, return_value_policy,
                      handle) {
-    // Best effort: copy the FST into a VectorFst and hand it over.
+    // Best effort: materialize into a VectorFst and hand it over.  (khg
+    // does not return FSTs to python today; Lattice comes back via the
+    // VectorFst caster.)
     auto *heap = new fst::VectorFst<fst::StdArc>(src);
     return khg_kaldifst_module()
         .attr("_vector_fst_take")(reinterpret_cast<uint64_t>(heap))
@@ -149,7 +154,7 @@ struct type_caster<fst::Fst<fst::StdArc>> {
   using cast_op_type = movable_cast_op_type<T_>;
 
  private:
-  fst::VectorFst<fst::StdArc> *held_ = nullptr;
+  fst::Fst<fst::StdArc> *held_ = nullptr;
 };
 
 }  // namespace detail
