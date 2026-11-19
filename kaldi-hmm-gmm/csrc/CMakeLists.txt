@@ -16,10 +16,12 @@ set(srcs
   event-map.cc
   hmm-topology.cc
   hmm-utils.cc
+  ivector-extractor.cc
   kaldi-math.cc
   mle-am-diag-gmm.cc
   mle-diag-gmm.cc
   model-common.cc
+  online-ivector-extractor.cc
   training-graph-compiler.cc
   transition-model.cc
   tree-renderer.cc
@@ -35,6 +37,7 @@ target_link_libraries(kaldi-hmm-gmm-core PUBLIC fst)
 target_include_directories(kaldi-hmm-gmm-core PUBLIC ${PROJECT_SOURCE_DIR})
 
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldi-decoder-core)
+target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldi-native-fbank-core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC kaldifst_core)
 target_link_libraries(kaldi-hmm-gmm-core PUBLIC Eigen3::Eigen)
 
@@ -50,6 +53,7 @@ if(KHG_ENABLE_TESTS)
     event-map-test.cc
     hmm-topology-test.cc
     hmm-utils-test.cc
+    ivector-extractor-test.cc
     kaldi-math-test.cc
     mle-am-diag-gmm-test.cc
     mle-diag-gmm-test.cc
