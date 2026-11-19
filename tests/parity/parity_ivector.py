@@ -17,6 +17,7 @@ Usage (from tests/parity):
 """
 
 import argparse
+import os
 import subprocess
 import sys
 import tempfile
@@ -32,7 +33,8 @@ import kaldi_native_io  # noqa: E402
 
 def get_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--kaldi-dir", default="/Users/fangjun/open-source/kaldi/src")
+    p.add_argument("--kaldi-dir", default=None,
+                   help="kaldi src dir (default: $KALDI_ROOT/src or /opt/kaldi/src)")
     p.add_argument("--model-dir", required=True,
                    help="a model's ivector/ dir (final.ie, final.dubm, ...)")
     p.add_argument("--wav", action="append", required=True,
@@ -117,8 +119,19 @@ def our_ivectors(args, raw_by_utt):
     return out
 
 
+def default_kaldi_src():
+    for cand in (os.environ.get("KALDI_ROOT"), "/opt/kaldi",
+                 "/Users/fangjun/open-source/kaldi"):
+        if cand and os.path.isdir(os.path.join(cand, "src")):
+            return os.path.join(cand, "src")
+    return None
+
+
 def main():
     args = get_args()
+    if args.kaldi_dir is None:
+        args.kaldi_dir = default_kaldi_src()
+        assert args.kaldi_dir, "no kaldi found; pass --kaldi-dir or set KALDI_ROOT"
     wav_paths = [Path(w) for w in args.wav]
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp = Path(tmpdir)
