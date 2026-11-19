@@ -14,6 +14,7 @@ not shell out to kaldi binaries.
 
    intro
    install
+   ivector
    usage/index
    python-api/index
    cpp-api/index

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['vectorhasher_0',['VectorHasher',['../structkhg_1_1VectorHasher.html',1,'khg']]],
-  ['voidifier_1',['Voidifier',['../classkhg_1_1Voidifier.html',1,'khg']]]
+  ['scalarclusterable_0',['ScalarClusterable',['../classkhg_1_1ScalarClusterable.html',1,'khg']]],
+  ['spliteventmap_1',['SplitEventMap',['../classkhg_1_1SplitEventMap.html',1,'khg']]]
 ];

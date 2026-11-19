@@ -248,6 +248,6 @@ var NAVTREEINDEX1 =
 "classkhg_1_1HmmTopology.html#afee68e2fb621941b8372b5465ee9fde9":[2,0,0,19,3],
 "classkhg_1_1HmmTopology.html#affeb389e29d6c74f75fcccde6e53c4df":[1,0,0,19,1],
 "classkhg_1_1HmmTopology.html#affeb389e29d6c74f75fcccde6e53c4df":[2,0,0,19,1],
-"classkhg_1_1Logger.html":[1,0,0,23],
-"classkhg_1_1Logger.html":[2,0,0,23]
+"classkhg_1_1IvectorExtractor.html":[1,0,0,23],
+"classkhg_1_1IvectorExtractor.html":[2,0,0,23]
 };

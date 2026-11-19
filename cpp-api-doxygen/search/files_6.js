@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kaldi_2dmath_2eh_0',['kaldi-math.h',['../kaldi-math_8h.html',1,'']]]
+  ['ivector_2dextractor_2eh_0',['ivector-extractor.h',['../ivector-extractor_8h.html',1,'']]]
 ];

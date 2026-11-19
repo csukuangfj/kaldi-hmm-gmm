@@ -1,0 +1,25 @@
+var classkhg_1_1IvectorExtractor =
+[
+    [ "IvectorExtractor", "classkhg_1_1IvectorExtractor.html#a4b70abfe580e49d3a7e18b5af1bb2aab", null ],
+    [ "ComputeDerivedVars", "classkhg_1_1IvectorExtractor.html#a8e663cfd3808e536f7bb16084f5bc15d", null ],
+    [ "ComputeDerivedVars", "classkhg_1_1IvectorExtractor.html#a23a024137d8fdc2b60e78209d66d45c0", null ],
+    [ "FeatDim", "classkhg_1_1IvectorExtractor.html#a7683ee42880f83bd5362ca500fc686c1", null ],
+    [ "GetIvectorDistMean", "classkhg_1_1IvectorExtractor.html#a6a51ad8b54061aef7ac85fc85300a6af", null ],
+    [ "GetIvectorDistPrior", "classkhg_1_1IvectorExtractor.html#a5740f1d83d3f2a3fa04e56e1cd6a55fb", null ],
+    [ "GetIvectorDistribution", "classkhg_1_1IvectorExtractor.html#a111e6bb0dc45286ec00f7cb00a7a2f0c", null ],
+    [ "GetIvectorDistWeight", "classkhg_1_1IvectorExtractor.html#a0b233ee89e57ba6b97ed2a680cda54bd", null ],
+    [ "IvectorDependentWeights", "classkhg_1_1IvectorExtractor.html#abaf6967615e0b4bc82041c56e2d5f57e", null ],
+    [ "IvectorDim", "classkhg_1_1IvectorExtractor.html#aaed663770287d0a6aae982287f3d92c9", null ],
+    [ "NumGauss", "classkhg_1_1IvectorExtractor.html#aa99bdf9eb1c936260361192e70a73f8b", null ],
+    [ "PriorOffset", "classkhg_1_1IvectorExtractor.html#ad2c522f2ffd0c40918a52f766d68a2ac", null ],
+    [ "Read", "classkhg_1_1IvectorExtractor.html#a220868c69255e9c2849ff9dd56a24ada", null ],
+    [ "SigmaInvM", "classkhg_1_1IvectorExtractor.html#a5e37a44886d3a114e79cac70d40a05a0", null ],
+    [ "U", "classkhg_1_1IvectorExtractor.html#a7d08caa79e1fdb1f4996fd45c93f46cc", null ],
+    [ "M_", "classkhg_1_1IvectorExtractor.html#a06cb7dbf70c1b7a62908ef57733f7202", null ],
+    [ "prior_offset_", "classkhg_1_1IvectorExtractor.html#a8aef8e74a296e86abba7819eb2672756", null ],
+    [ "Sigma_inv_", "classkhg_1_1IvectorExtractor.html#aa144b6f81537cab9c1dfeaa94f2769c2", null ],
+    [ "Sigma_inv_M_", "classkhg_1_1IvectorExtractor.html#aa770d8ad63e3460a9012e7772f5b907b", null ],
+    [ "U_", "classkhg_1_1IvectorExtractor.html#a02643e13f0f982d2b9279ab57fa355fb", null ],
+    [ "w_", "classkhg_1_1IvectorExtractor.html#adeb53c2f4e29e70c521bb27211a563ec", null ],
+    [ "w_vec_", "classkhg_1_1IvectorExtractor.html#af10d3a2668b295a4da3af7d336bd44dd", null ]
+];

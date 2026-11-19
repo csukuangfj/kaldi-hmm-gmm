@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['weight_5ftau_0',['weight_tau',['../structkhg_1_1MapDiagGmmOptions.html#a0a0afad3f1a4f0a3d96e0e3555eb4401',1,'khg::MapDiagGmmOptions']]],
-  ['weights_5f_1',['weights_',['../classkhg_1_1DiagGmmNormal.html#ad24102555cabf763a217f499e04aee8e',1,'khg::DiagGmmNormal']]]
+  ['quadratic_5fterm_5f_0',['quadratic_term_',['../classkhg_1_1OnlineIvectorEstimationStats.html#a0bc6c3368ef6204d3253f6e4eb79b938',1,'khg::OnlineIvectorEstimationStats']]]
 ];

@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['variance_5ffloor_5fvector_0',['variance_floor_vector',['../structkhg_1_1MleDiagGmmOptions.html#a133ee0bc0bea78f4aa5c3b9ecfeb5316',1,'khg::MleDiagGmmOptions']]],
-  ['variance_5ftau_1',['variance_tau',['../structkhg_1_1MapDiagGmmOptions.html#afac85190ecbe5391b5362f3b06caf9bf',1,'khg::MapDiagGmmOptions']]],
-  ['vars_5f_2',['vars_',['../classkhg_1_1DiagGmmNormal.html#a7c87e09bb4375af95ef8ea56f92f6b97',1,'khg::DiagGmmNormal']]],
-  ['verbose_3',['verbose',['../structkhg_1_1ClusterKMeansOptions.html#a9545698897a9c556dc22aae8df56c86f',1,'khg::ClusterKMeansOptions']]]
+  ['phone_0',['phone',['../structkhg_1_1TransitionModel_1_1Tuple.html#a5f69b3b4df2adaff18423c0cdc4decac',1,'khg::TransitionModel::Tuple']]],
+  ['posterior_5fscale_1',['posterior_scale',['../structkhg_1_1OnlineIvectorExtractorConfig.html#a38a0b4e595ea2b20121c5601cc447b26',1,'khg::OnlineIvectorExtractorConfig']]],
+  ['prior_5foffset_5f_2',['prior_offset_',['../classkhg_1_1IvectorExtractor.html#a8aef8e74a296e86abba7819eb2672756',1,'khg::IvectorExtractor::prior_offset_'],['../classkhg_1_1OnlineIvectorEstimationStats.html#a8356bfc515b0cc29d8b238a4b4d83329',1,'khg::OnlineIvectorEstimationStats::prior_offset_']]]
 ];

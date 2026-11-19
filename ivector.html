@@ -1,0 +1,342 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>i-Vectors &mdash; kaldi-hmm-gmm 1.2.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=fd7cadf9"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Usage" href="usage/index.html" />
+    <link rel="prev" title="Installation" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            kaldi-hmm-gmm
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">i-Vectors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-problem-i-vectors-solve">What problem i-Vectors solve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-generative-model">The generative model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-it-is-computed">How it is computed</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-gaussian-posteriors">Step 1: Gaussian posteriors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-sufficient-statistics">Step 2: sufficient statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-the-posterior-over-mathbf-y">Step 3: the posterior over <span class="math notranslate nohighlight">\(\mathbf{y}\)</span></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-4-solving-for-hat-mathbf-y">Step 4: solving for <span class="math notranslate nohighlight">\(\hat{\mathbf{y}}\)</span></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#streaming-estimation">Streaming estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-full-pipeline-of-a-vosk-model">The full pipeline of a vosk model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-files">Model files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-example">Python example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage/index.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python-api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp-api/index.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Topic notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">kaldi-hmm-gmm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">i-Vectors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ivector.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="i-vectors">
+<h1>i-Vectors<a class="headerlink" href="#i-vectors" title="Link to this heading"></a></h1>
+<p>This page explains what an i-vector is, how it is computed, and how the
+classes in this package (<code class="xref py py-class docutils literal notranslate"><span class="pre">IvectorExtractor</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OnlineIvectorEstimationStats</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">OnlineIvectorExtractor</span></code>)
+implement the computation.  The math follows kaldi's
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/ivector/ivector-extractor.h">ivector/ivector-extractor.h</a>,
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/ivector/ivector-extractor.cc">ivector/ivector-extractor.cc</a> and
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/online2/online-ivector-feature.cc">online2/online-ivector-feature.cc</a> exactly; the port is validated
+frame-by-frame against kaldi (see <a class="extlink-khg reference external" href="https://github.com/csukuangfj/kaldi-hmm-gmm/blob/master/tests/parity/parity_ivector.py">tests/parity/parity_ivector.py</a>).</p>
+<section id="what-problem-i-vectors-solve">
+<h2>What problem i-Vectors solve<a class="headerlink" href="#what-problem-i-vectors-solve" title="Link to this heading"></a></h2>
+<p>The acoustic features of the same word depend strongly on <em>who</em> is speaking
+and <em>how</em> it was recorded (microphone, room, channel).  A speech recognizer
+trained on many speakers therefore sees each phone smeared across many
+slightly-different feature distributions.</p>
+<p>An <strong>i-vector</strong> is a single, low-dimensional vector (typically 40–400
+dimensions) that summarizes the speaker and channel of one utterance.  The
+recognizer's acoustic model takes it as an extra input and can compensate for
+the mismatch.  It is called <em>total variability</em> modeling: one latent space
+carries both speaker and channel variability (Dehak et al., 2011).</p>
+</section>
+<section id="the-generative-model">
+<h2>The generative model<a class="headerlink" href="#the-generative-model" title="Link to this heading"></a></h2>
+<p>Notation (kaldi uses SGMM-style letters throughout its code):</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(D\)</span> — feature dimension (e.g. 40 MFCCs after transform)</p></li>
+<li><p><span class="math notranslate nohighlight">\(I\)</span> — number of Gaussians in the universal background model (UBM)</p></li>
+<li><p><span class="math notranslate nohighlight">\(S\)</span> — i-vector dimension</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mathbf{x}\)</span> — one feature frame</p></li>
+</ul>
+<p>Each UBM Gaussian <span class="math notranslate nohighlight">\(g\)</span> has a mean <span class="math notranslate nohighlight">\(\mathbf{m}_g\)</span> and
+(diagonal) covariance <span class="math notranslate nohighlight">\(\Sigma_g\)</span>.  When speaker <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> is
+present, the mean of Gaussian <span class="math notranslate nohighlight">\(g\)</span> is shifted linearly:</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{\mu}_g(\mathbf{y}) = \mathbf{m}_g + M_g \mathbf{y},\]</div>
+<p>where <span class="math notranslate nohighlight">\(M_g\)</span> is a <span class="math notranslate nohighlight">\(D \times S\)</span> matrix (&quot;mean subspace&quot;, <code class="docutils literal notranslate"><span class="pre">M_</span></code> in
+the code) and <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> is the <strong>i-vector</strong>.  The prior over
+i-vectors is standard normal except for the first dimension, which has offset
+<span class="math notranslate nohighlight">\(o\)</span> (<code class="docutils literal notranslate"><span class="pre">prior_offset_</span></code>, e.g. 33.1 — this encodes the global offset of
+the adapted means so the subspace can stay zero-mean):</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}p(\mathbf{y}) = \mathcal{N}\!\left(\begin{bmatrix}o\\ \mathbf{0}\end{bmatrix},
+I\right).\end{split}\]</div>
+<p>At test time we never know <span class="math notranslate nohighlight">\(\mathbf{y}\)</span>; we compute its <strong>posterior
+mean</strong> from the features of an utterance — that estimate is the i-vector.</p>
+</section>
+<section id="how-it-is-computed">
+<h2>How it is computed<a class="headerlink" href="#how-it-is-computed" title="Link to this heading"></a></h2>
+<section id="step-1-gaussian-posteriors">
+<h3>Step 1: Gaussian posteriors<a class="headerlink" href="#step-1-gaussian-posteriors" title="Link to this heading"></a></h3>
+<p>Every frame is assigned soft posteriors over the <span class="math notranslate nohighlight">\(I\)</span> Gaussians using the
+UBM (a diagonal-covariance GMM, e.g. <code class="docutils literal notranslate"><span class="pre">final.dubm</span></code>):</p>
+<div class="math notranslate nohighlight">
+\[\gamma_{tg} = \frac{p_g\,\mathcal{N}(\mathbf{x}_t; \mathbf{m}_g, \Sigma_g)}
+                   {\sum_{g'} p_{g'}\,\mathcal{N}(\mathbf{x}_t; \mathbf{m}_{g'}, \Sigma_{g'})}.\]</div>
+<p>In practice the posterior is pruned: keep the top-<code class="docutils literal notranslate"><span class="pre">num_gselect</span></code> Gaussians
+and/or drop entries below <code class="docutils literal notranslate"><span class="pre">min_post</span></code> of the total
+(<code class="xref py py-func docutils literal notranslate"><span class="pre">vector_to_posterior_entry()</span></code>).</p>
+</section>
+<section id="step-2-sufficient-statistics">
+<h3>Step 2: sufficient statistics<a class="headerlink" href="#step-2-sufficient-statistics" title="Link to this heading"></a></h3>
+<p>Accumulate per-Gaussian zeroth- and first-order statistics over the utterance
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">IvectorExtractorUtteranceStats</span></code>):</p>
+<div class="math notranslate nohighlight">
+\[\gamma_g = \sum_t \gamma_{tg}, \qquad
+\mathbf{X}_g = \sum_t \gamma_{tg}\, \mathbf{x}_t.\]</div>
+</section>
+<section id="step-3-the-posterior-over-mathbf-y">
+<h3>Step 3: the posterior over <span class="math notranslate nohighlight">\(\mathbf{y}\)</span><a class="headerlink" href="#step-3-the-posterior-over-mathbf-y" title="Link to this heading"></a></h3>
+<p>Marginalizing the Gaussians, the posterior <span class="math notranslate nohighlight">\(p(\mathbf{y}\,|\,\text{utt})\)</span>
+is Gaussian with precision and linear term</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\Lambda = I + \sum_g \gamma_g\, M_g^\top \Sigma_g^{-1} M_g, \qquad
+\boldsymbol{\ell} = \sum_g M_g^\top \Sigma_g^{-1} \mathbf{X}_g
+                    + \begin{bmatrix}o\\ \mathbf{0}\end{bmatrix},\end{split}\]</div>
+<p>and therefore</p>
+<div class="math notranslate nohighlight">
+\[\hat{\mathbf{y}} = \Lambda^{-1} \boldsymbol{\ell}.\]</div>
+<p>The code precomputes <span class="math notranslate nohighlight">\(U_g = M_g^\top \Sigma_g^{-1} M_g\)</span> and
+<span class="math notranslate nohighlight">\(\Sigma_g^{-1} M_g\)</span> once (<code class="docutils literal notranslate"><span class="pre">ComputeDerivedVars</span></code>) so that estimating an
+i-vector is only a few matrix-vector products plus one linear solve.</p>
+</section>
+<section id="step-4-solving-for-hat-mathbf-y">
+<h3>Step 4: solving for <span class="math notranslate nohighlight">\(\hat{\mathbf{y}}\)</span><a class="headerlink" href="#step-4-solving-for-hat-mathbf-y" title="Link to this heading"></a></h3>
+<p>Two options:</p>
+<ul class="simple">
+<li><p><strong>Exact</strong>: invert <span class="math notranslate nohighlight">\(\Lambda\)</span> (or solve the linear system).  Used by
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">IvectorExtractor.compute_ivector()</span></code>.</p></li>
+<li><p><strong>Conjugate gradient</strong>, warm-started from the previous estimate — the
+streaming choice.  <code class="xref py py-meth docutils literal notranslate"><span class="pre">OnlineIvectorEstimationStats.get_ivector()</span></code> runs
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/matrix/optimization.cc">LinearCgd</a> for <code class="docutils literal notranslate"><span class="pre">num_cg_iters</span></code>
+iterations (kaldi suggests 15;
+pass a negative value to solve exactly).  Warm starts matter: every
+re-estimate begins near the solution, so a handful of iterations suffices.</p></li>
+</ul>
+</section>
+</section>
+<section id="streaming-estimation">
+<h2>Streaming estimation<a class="headerlink" href="#streaming-estimation" title="Link to this heading"></a></h2>
+<p>In online decoding the i-vector is re-estimated every
+<code class="docutils literal notranslate"><span class="pre">ivector_period</span></code> frames (e.g. 10) using <strong>all frames seen so far</strong>.  Rather
+than re-accumulating statistics from scratch, <code class="xref py py-class docutils literal notranslate"><span class="pre">OnlineIvectorEstimationStats</span></code>
+maintains <span class="math notranslate nohighlight">\(\Lambda\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{\ell}\)</span> incrementally: each
+frame adds <span class="math notranslate nohighlight">\(\gamma_{tg} U_g\)</span> and <span class="math notranslate nohighlight">\(M_g^\top \Sigma_g^{-1}
+(\gamma_{tg}\mathbf{x}_t)\)</span>.</p>
+<p><strong>Prior scaling (``max_count``).</strong>  As the utterance grows, the data term
+overwhelms the unit prior and long utterances produce atypical
+(&quot;too confident&quot;) i-vectors.  With <code class="docutils literal notranslate"><span class="pre">max_count</span></code> (vosk uses 100) the prior
+term is weighted by <span class="math notranslate nohighlight">\(\max(n, c)/c\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is the frame count
+and <span class="math notranslate nohighlight">\(c\)</span> is <code class="docutils literal notranslate"><span class="pre">max_count</span></code>: up to <span class="math notranslate nohighlight">\(c\)</span> frames nothing changes, beyond
+it the prior pulls the estimate back toward typical.</p>
+<p><strong>Output convention.</strong>  Both kaldi's
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/ivectorbin/ivector-extract-online.cc">ivector-extract-online</a> and
+its runtime class
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/online2/online-ivector-feature.cc">OnlineIvectorFeature</a> remove
+the prior offset from the first
+dimension of the output (<code class="docutils literal notranslate"><span class="pre">y[0]</span> <span class="pre">-=</span> <span class="pre">prior_offset</span></code>) so the vector is
+approximately zero-mean — this is the vector the acoustic model expects.
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OnlineIvectorExtractor</span></code> follows the same convention (the raw
+estimate keeps the offset internally as the CG starting point).</p>
+</section>
+<section id="the-full-pipeline-of-a-vosk-model">
+<h2>The full pipeline of a vosk model<a class="headerlink" href="#the-full-pipeline-of-a-vosk-model" title="Link to this heading"></a></h2>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">OnlineIvectorExtractor</span></code> reproduces kaldi's
+<code class="docutils literal notranslate"><span class="pre">OnlineIvectorFeature</span></code> dataflow:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>raw MFCC ──┬── running CMVN → splice(±3) → lda (final.mat) → UBM posteriors
+           │                                              │
+           └── splice(±3) → lda ──────────────────────────┴─→ stats → y-hat
+</pre></div>
+</div>
+<p>Note the asymmetry (it is kaldi's, deliberately): the UBM <strong>posteriors</strong> are
+computed on the CMVN-normalized chain, while the <strong>first-order statistics</strong>
+accumulate the un-normalized transformed features (unless the
+<code class="docutils literal notranslate"><span class="pre">online_cmvn_iextractor</span></code> option is set; vosk's models leave it off).</p>
+</section>
+<section id="model-files">
+<h2>Model files<a class="headerlink" href="#model-files" title="Link to this heading"></a></h2>
+<p>A trained i-vector model directory (e.g. a vosk model's <code class="docutils literal notranslate"><span class="pre">ivector/</span></code>):</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Role</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">final.ie</span></code></p></td>
+<td><p>The extractor: <span class="math notranslate nohighlight">\(M_g\)</span>, <span class="math notranslate nohighlight">\(\Sigma_g^{-1}\)</span>,
+<code class="docutils literal notranslate"><span class="pre">prior_offset</span></code> (and optionally weight
+projections <span class="math notranslate nohighlight">\(\mathbf{w}_g\)</span>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">final.dubm</span></code></p></td>
+<td><p>The UBM (diagonal GMM) used for posteriors</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">final.mat</span></code></p></td>
+<td><p>LDA-like linear transform of spliced features</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">global_cmvn.stats</span></code></p></td>
+<td><p>Global CMVN stats <code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">D+1]</span></code>, seeds running CMVN</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">splice.conf</span></code></p></td>
+<td><p>Splice context (usually <code class="docutils literal notranslate"><span class="pre">--left-context=3</span>
+<span class="pre">--right-context=3</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">online_cmvn.conf</span></code></p></td>
+<td><p>Running-CMVN options (may be empty ⇒ defaults)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="python-example">
+<h2>Python example<a class="headerlink" href="#python-example" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">kaldi_hmm_gmm</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">khg</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">kaldi_native_io</span>
+
+<span class="n">extractor</span> <span class="o">=</span> <span class="n">khg</span><span class="o">.</span><span class="n">IvectorExtractor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">"ivector/final.ie"</span><span class="p">)</span>
+<span class="n">ubm</span> <span class="o">=</span> <span class="n">khg</span><span class="o">.</span><span class="n">read_diag_gmm</span><span class="p">(</span><span class="s2">"ivector/final.dubm"</span><span class="p">)</span>
+<span class="n">lda</span> <span class="o">=</span> <span class="n">kaldi_native_io</span><span class="o">.</span><span class="n">FloatMatrix</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">"ivector/final.mat"</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">gs</span> <span class="o">=</span> <span class="n">kaldi_native_io</span><span class="o">.</span><span class="n">DoubleMatrix</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">"ivector/global_cmvn.stats"</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">khg</span><span class="o">.</span><span class="n">OnlineIvectorExtractorConfig</span><span class="p">(</span>
+    <span class="n">left_context</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">right_context</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">lda_mat</span><span class="o">=</span><span class="n">lda</span><span class="p">,</span> <span class="n">global_cmvn_stats</span><span class="o">=</span><span class="n">gs</span><span class="p">,</span>
+    <span class="n">max_count</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">num_cg_iters</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">ivector_period</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">eng</span> <span class="o">=</span> <span class="n">khg</span><span class="o">.</span><span class="n">OnlineIvectorExtractor</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">extractor</span><span class="p">,</span> <span class="n">ubm</span><span class="p">)</span>
+<span class="n">eng</span><span class="o">.</span><span class="n">accept_features</span><span class="p">(</span><span class="n">mfcc</span><span class="p">)</span>          <span class="c1"># [T, 40] float32, from int16-scale audio</span>
+<span class="n">eng</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>                        <span class="c1"># end of utterance</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">eng</span><span class="o">.</span><span class="n">get_ivectors</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>    <span class="c1"># [ceil(T/10), ivector_dim]</span>
+</pre></div>
+</div>
+<p>For a batch/offline computation with explicit posteriors, see
+<code class="xref py py-class docutils literal notranslate"><span class="pre">IvectorExtractorUtteranceStats</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">IvectorExtractor.compute_ivector()</span></code>.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>N. Dehak, P. Kenny, R. Dehak, P. Dumouchel, P. Ouellet,
+<em>&quot;Front-end factor analysis for speaker verification&quot;</em>, IEEE TASLP, 2011.</p></li>
+<li><ol class="upperalpha simple" start="16">
+<li><p>Kenny, <em>&quot;A small-footprint i-vector extractor&quot;</em>, Odyssey 2012.</p></li>
+</ol>
+</li>
+<li><p>D. Povey et al., <em>&quot;The subspace Gaussian mixture model — a structured model
+for speech recognition&quot;</em>, Computer Speech &amp; Language, 2011 (the SGMM
+notation used throughout kaldi's i-vector code).</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usage/index.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Next-gen Kaldi team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

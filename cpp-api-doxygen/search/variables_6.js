@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['nonterm_5fphones_5foffset_0',['nonterm_phones_offset',['../structkhg_1_1HTransducerConfig.html#a0ea0445dac4488d3b35d3669ee12ada4',1,'khg::HTransducerConfig']]],
-  ['num_5fiters_1',['num_iters',['../structkhg_1_1RefineClustersOptions.html#af563f31acf065c8154ea5a39c1ab810c',1,'khg::RefineClustersOptions::num_iters'],['../structkhg_1_1ClusterKMeansOptions.html#a5b4970dcd69b7e24dd05d011b73d0729',1,'khg::ClusterKMeansOptions::num_iters']]],
-  ['num_5ftries_2',['num_tries',['../structkhg_1_1ClusterKMeansOptions.html#a93e335332e6359a934adf167e0855ceb',1,'khg::ClusterKMeansOptions']]]
+  ['kedgecolor_0',['kEdgeColor',['../classkhg_1_1TreeRenderer.html#a193d5ee93d1031dcf358b854fe67ffd8',1,'khg::TreeRenderer']]],
+  ['kedgecolorquery_1',['kEdgeColorQuery',['../classkhg_1_1TreeRenderer.html#ab27c8dcb4ab4949cc6ef1e985a6622a6',1,'khg::TreeRenderer']]],
+  ['kedgewidth_2',['kEdgeWidth',['../classkhg_1_1TreeRenderer.html#a19812428016fd97ba7311ce4c565b075',1,'khg::TreeRenderer']]],
+  ['kedgewidthquery_3',['kEdgeWidthQuery',['../classkhg_1_1TreeRenderer.html#ad2a31b9cc9619865485bd1a5d8af822f',1,'khg::TreeRenderer']]],
+  ['kpi_4',['kPi',['../namespacekhg.html#aa674a5ee5c3992e30c27320556a28786',1,'khg']]]
 ];

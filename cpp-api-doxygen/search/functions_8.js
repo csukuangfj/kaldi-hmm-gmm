@@ -5,10 +5,15 @@ var searchData=
   ['initstats_2',['InitStats',['../classkhg_1_1TransitionModel.html#a1ac7c16f7427c9f120d7db03e8f07961',1,'khg::TransitionModel']]],
   ['interpolate_3',['Interpolate',['../classkhg_1_1DiagGmm.html#ae356f62dd71819356157acc00b2db577',1,'khg::DiagGmm']]],
   ['inv_5fvars_4',['inv_vars',['../classkhg_1_1DiagGmm.html#a652c69dad6724699a746ef969695a772',1,'khg::DiagGmm']]],
-  ['isfinal_5',['IsFinal',['../classkhg_1_1TransitionModel.html#a7cf2f3459120ef130a7e32183a6b2276',1,'khg::TransitionModel']]],
-  ['ishmm_6',['IsHmm',['../classkhg_1_1HmmTopology.html#aa41b9947e65a764b2087010fcd07ebcf',1,'khg::HmmTopology']]],
-  ['islastframe_7',['IsLastFrame',['../classkhg_1_1DecodableAmDiagGmmUnmapped.html#a032c6a8e6fc424209395c9f0d8664230',1,'khg::DecodableAmDiagGmmUnmapped']]],
-  ['isselfloop_8',['IsSelfLoop',['../classkhg_1_1TransitionModel.html#a9e2b3c4d8095a0bb8a426905fe0ddce1',1,'khg::TransitionModel']]],
-  ['issorted_9',['IsSorted',['../namespacekhg.html#a8da7d8eef6629771251d56982a6d0bc5',1,'khg']]],
-  ['issortedanduniq_10',['IsSortedAndUniq',['../namespacekhg.html#a1293075c6918e0cd4dd848e747c436ba',1,'khg']]]
+  ['invertwithflooring_5',['InvertWithFlooring',['../classkhg_1_1IvectorExtractor.html#a999f7f62aaf4a0f38af1bd9824a922af',1,'khg::IvectorExtractor']]],
+  ['isfinal_6',['IsFinal',['../classkhg_1_1TransitionModel.html#a7cf2f3459120ef130a7e32183a6b2276',1,'khg::TransitionModel']]],
+  ['ishmm_7',['IsHmm',['../classkhg_1_1HmmTopology.html#aa41b9947e65a764b2087010fcd07ebcf',1,'khg::HmmTopology']]],
+  ['islastframe_8',['IsLastFrame',['../classkhg_1_1DecodableAmDiagGmmUnmapped.html#a032c6a8e6fc424209395c9f0d8664230',1,'khg::DecodableAmDiagGmmUnmapped']]],
+  ['isselfloop_9',['IsSelfLoop',['../classkhg_1_1TransitionModel.html#a9e2b3c4d8095a0bb8a426905fe0ddce1',1,'khg::TransitionModel']]],
+  ['issorted_10',['IsSorted',['../namespacekhg.html#a8da7d8eef6629771251d56982a6d0bc5',1,'khg']]],
+  ['issortedanduniq_11',['IsSortedAndUniq',['../namespacekhg.html#a1293075c6918e0cd4dd848e747c436ba',1,'khg']]],
+  ['ivectordependentweights_12',['IvectorDependentWeights',['../classkhg_1_1IvectorExtractor.html#abaf6967615e0b4bc82041c56e2d5f57e',1,'khg::IvectorExtractor']]],
+  ['ivectordim_13',['IvectorDim',['../classkhg_1_1IvectorExtractor.html#aaed663770287d0a6aae982287f3d92c9',1,'khg::IvectorExtractor::IvectorDim()'],['../classkhg_1_1OnlineIvectorEstimationStats.html#ac0e4da6ba7b7adff506289e1af0b55ca',1,'khg::OnlineIvectorEstimationStats::IvectorDim()']]],
+  ['ivectorextractor_14',['IvectorExtractor',['../classkhg_1_1IvectorExtractor.html#a4b70abfe580e49d3a7e18b5af1bb2aab',1,'khg::IvectorExtractor']]],
+  ['ivectorextractorutterancestats_15',['IvectorExtractorUtteranceStats',['../classkhg_1_1IvectorExtractorUtteranceStats.html#a201b3720842ea129d300504bf2e1f91b',1,'khg::IvectorExtractorUtteranceStats']]]
 ];

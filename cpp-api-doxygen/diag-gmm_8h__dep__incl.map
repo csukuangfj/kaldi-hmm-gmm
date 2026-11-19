@@ -1,9 +1,11 @@
 <map id="diag&#45;gmm.h" name="diag&#45;gmm.h">
-<area shape="rect" id="Node000001" title="Diagonal&#45;covariance Gaussian mixture models (DiagGmm) stored in exponential form." alt="" coords="180,5,280,33"/>
+<area shape="rect" id="Node000001" title="Diagonal&#45;covariance Gaussian mixture models (DiagGmm) stored in exponential form." alt="" coords="256,5,356,33"/>
 <area shape="rect" id="Node000002" href="$am-diag-gmm_8h.html" title="Acoustic model of diagonal&#45;covariance GMMs (AmDiagGmm)." alt="" coords="91,81,217,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,42,169,83,166,79,203,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="263,41,182,83,180,78,267,39"/>
 <area shape="rect" id="Node000005" href="$mle-diag-gmm_8h.html" title="Maximum&#45;likelihood and MAP estimation for diagonal&#45;covariance GMMs." alt="" coords="241,81,371,109"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="255,41,295,81,290,80,253,46"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="307,47,308,82,304,79,304,51"/>
+<area shape="rect" id="Node000006" href="$online-ivector-extractor_8h.html" title=" " alt="" coords="395,81,582,109"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="353,37,459,80,453,81,352,42"/>
 <area shape="rect" id="Node000003" href="$decodable-am-diag-gmm_8h.html" title="Decodable objects for AmDiagGmm acoustic models." alt="" coords="5,157,204,184"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="139,121,115,158,111,154,134,123"/>
 <area shape="rect" id="Node000004" href="$mle-am-diag-gmm_8h.html" title="ML/MAP estimation for whole acoustic models of diagonal GMMs." alt="" coords="228,157,384,184"/>
