@@ -13,10 +13,12 @@ set(srcs
   event-map.cc
   hmm-topology.cc
   hmm-utils.cc
+  ivector-extractor.cc
   kaldi-hmm-gmm.cc
   mle-am-diag-gmm.cc
   mle-diag-gmm.cc
   model-common.cc
+  online-ivector-extractor.cc
   training-graph-compiler.cc
   transition-information.cc
   transition-model.cc

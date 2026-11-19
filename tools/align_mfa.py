@@ -232,7 +232,8 @@ def load_dictionary(path):
                 p = line.split()
                 if len(p) >= 2 and p[0].lower() not in d:
                     # skip numeric weight columns (some dicts: word w1 w2 w3 w4 phones)
-                    phones = [t for t in p[1:] if not _is_float(t)]
+                    # and " || " per-character phone-group separators
+                    phones = [t for t in p[1:] if not _is_float(t) and t != "||"]
                     if phones:
                         d[p[0].lower()] = [phones]
     return d
