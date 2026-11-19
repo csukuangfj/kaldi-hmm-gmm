@@ -99,15 +99,11 @@ jobs:
 
             echo
             echo "################ TEST DATA ################"
-            # 1 s 16 kHz mono sine wav; parity only needs valid audio
-            python3 - <<'WAV'
-            import math, struct, wave
-            with wave.open("/tmp/test.wav", "wb") as w:
-                w.setnchannels(1); w.setsampwidth(2); w.setframerate(16000)
-                w.writeframes(b"".join(
-                    struct.pack("<h", int(8000 * math.sin(2 * math.pi * 440 * t / 16000)))
-                    for t in range(16000)))
-            WAV
+            # 1 s 16 kHz mono sine wav; parity only needs valid audio.
+            # (a quoted one-liner, NOT a nested heredoc: inside the outer
+            # <<'KALDI_PARITY' heredoc an inner heredoc terminator would keep
+            # its YAML indentation and never close)
+            python3 -c 'import math,struct,wave; w=wave.open("/tmp/test.wav","wb"); w.setnchannels(1); w.setsampwidth(2); w.setframerate(16000); w.writeframes(b"".join(struct.pack("<h",int(8000*math.sin(2*math.pi*440*t/16000))) for t in range(16000))); w.close()' 
             ls -l /tmp/test.wav tests/data/ivector/
 
             echo
