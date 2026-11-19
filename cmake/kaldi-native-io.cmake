@@ -58,6 +58,16 @@ function(download_kaldi_native_io)
       ${kaldi_native_io_SOURCE_DIR}/
   )
 
+  # v1.22.1's csrc/CMakeLists.txt uses include_directories(${CMAKE_SOURCE_DIR}),
+  # which resolves to THIS project's root when built as a subproject, so the
+  # *_static* target (built alongside core) cannot find its own headers.
+  if(TARGET kaldi_native_io_core_static)
+    target_include_directories(kaldi_native_io_core_static
+      PRIVATE
+        ${kaldi_native_io_SOURCE_DIR}/
+    )
+  endif()
+
   set_target_properties(kaldi_native_io_core PROPERTIES OUTPUT_NAME "kaldi-hgmm-gmm-kaldi-native-io-core")
 
   if(KHG_INSTALL_CORE_LIB)
