@@ -111,9 +111,11 @@ class OnlineIvectorExtractor {
   const IvectorExtractor &extractor_;
   const DiagGmm &ubm_;
 
-  int32_t feat_dim_ = 0;
-  int32_t spliced_dim_ = 0;
+  int32_t raw_feat_dim_ = 0;  // input feature dim (e.g. 30 for German vosk)
+  int32_t feat_dim_ = 0;      // extractor (post-lda) dim
+  int32_t spliced_dim_ = 0;   // raw_feat_dim_ * (1 + L + R)
   int32_t lda_dim_ = 0;
+  bool lda_affine_ = false;   // lda_mat has an extra offset column
 
   std::unique_ptr<knf::OnlineCmvn> posterior_cmvn_;
   std::unique_ptr<knf::OnlineCmvn> stats_cmvn_;  // only if configured
