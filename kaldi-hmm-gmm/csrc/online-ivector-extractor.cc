@@ -32,14 +32,22 @@ OnlineIvectorExtractor::OnlineIvectorExtractor(
     : config_(config), extractor_(extractor), ubm_(ubm),
       stats_(extractor.IvectorDim(), extractor.PriorOffset(),
              config.max_count) {
-  feat_dim_ = extractor_.FeatDim();
-  spliced_dim_ = feat_dim_ * (1 + config_.left_context + config_.right_context);
+  // Follow kaldi's online-ivector-feature.cc checks exactly: the raw
+  // feature dim comes from the global CMVN stats, and lda_mat's columns are
+  // raw_dim * num_splice (optionally +1 for an affine offset).  The raw dim
+  // is NOT assumed equal to the extractor's dim (e.g. the German vosk
+  // model is 30 -> 40).
   KHG_ASSERT(config_.left_context >= 0 && config_.right_context >= 0);
-  KHG_ASSERT(config_.lda_mat.rows() > 0);
-  KHG_ASSERT(config_.lda_mat.cols() == spliced_dim_ ||
-             config_.lda_mat.cols() == spliced_dim_ + 1);
-  KHG_ASSERT(config_.global_cmvn_stats.rows() == 2 &&
-             config_.global_cmvn_stats.cols() == feat_dim_ + 1);
+  KHG_ASSERT(config_.global_cmvn_stats.rows() == 2);
+  raw_feat_dim_ = config_.global_cmvn_stats.cols() - 1;
+  int32_t num_splice = 1 + config_.left_context + config_.right_context;
+  int32_t spliced_input_dim = raw_feat_dim_ * num_splice;
+  KHG_ASSERT(config_.lda_mat.cols() == spliced_input_dim ||
+             config_.lda_mat.cols() == spliced_input_dim + 1);
+  lda_affine_ = (config_.lda_mat.cols() == spliced_input_dim + 1);
+  spliced_dim_ = spliced_input_dim;
+  feat_dim_ = extractor_.FeatDim();   // post-lda dim
+  KHG_ASSERT(config_.lda_mat.rows() == feat_dim_);
   KHG_ASSERT(config_.posterior_scale > 0.0 && config_.posterior_scale <= 1.0);
   KHG_ASSERT(config_.ivector_period > 0);
   lda_dim_ = config_.lda_mat.rows();
@@ -66,7 +74,7 @@ void OnlineIvectorExtractor::Reset() {
 }
 
 void OnlineIvectorExtractor::AcceptFeatures(const FloatMatrix &raw_feats) {
-  KHG_ASSERT(raw_feats.cols() == feat_dim_);
+  KHG_ASSERT(raw_feats.cols() == raw_feat_dim_);
   for (int32_t t = 0; t < raw_feats.rows(); t++) {
     FloatVector frame = raw_feats.row(t).transpose();
     raw_frames_.push_back(frame);
@@ -95,7 +103,7 @@ FloatMatrix OnlineIvectorExtractor::SpliceChain(
     int32_t t2 = t - config_.left_context + n;
     if (t2 < 0) t2 = 0;
     if (t2 >= T) t2 = T - 1;  // kaldi clamps at the utterance level
-    out.block(0, n * feat_dim_, 1, feat_dim_) = frames[t2].transpose();
+    out.block(0, n * raw_feat_dim_, 1, raw_feat_dim_) = frames[t2].transpose();
   }
   return out;
 }
@@ -109,7 +117,7 @@ void OnlineIvectorExtractor::ProcessFrame(int32_t t, bool last_chunk) {
       last_chunk);
 
   auto apply_lda = [&](const FloatMatrix &spliced) -> FloatVector {
-    if (config_.lda_mat.cols() == spliced_dim_ + 1) {
+    if (lda_affine_) {
       FloatMatrix x(1, spliced_dim_ + 1);
       x.block(0, 0, 1, spliced_dim_) = spliced;
       x(0, spliced_dim_) = 1.0f;
