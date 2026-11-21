@@ -3,17 +3,17 @@ include_guard(GLOBAL)
 function(download_kaldifst)
   include(FetchContent)
 
-  set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.9.1.tar.gz")
-  set(kaldifst_HASH "SHA256=b6811197ecd4a3d83fabb154e397584783078ccb9016bfc1f8959865562b5cf3")
+  set(kaldifst_URL  "https://github.com/k2-fsa/kaldifst/archive/refs/tags/v1.9.2.tar.gz")
+  set(kaldifst_HASH "SHA256=8007cfde794f6c5e287d0e5e22753c1cf3503c9b02512fbcd6dc5d75e5b41fa2")
 
   # If you don't have access to the Internet,
   # please pre-download kaldifst
   set(possible_file_locations
-    $ENV{HOME}/Downloads/kaldifst-1.9.1.tar.gz
-    ${CMAKE_SOURCE_DIR}/kaldifst-1.9.1.tar.gz
-    ${CMAKE_BINARY_DIR}/kaldifst-1.9.1.tar.gz
-    /tmp/kaldifst-1.9.1.tar.gz
-    /star-fj/fangjun/download/github/kaldifst-1.9.1.tar.gz
+    $ENV{HOME}/Downloads/kaldifst-1.9.2.tar.gz
+    ${CMAKE_SOURCE_DIR}/kaldifst-1.9.2.tar.gz
+    ${CMAKE_BINARY_DIR}/kaldifst-1.9.2.tar.gz
+    /tmp/kaldifst-1.9.2.tar.gz
+    /star-fj/fangjun/download/github/kaldifst-1.9.2.tar.gz
   )
 
   foreach(f IN LISTS possible_file_locations)
@@ -43,6 +43,27 @@ function(download_kaldifst)
   list(APPEND CMAKE_MODULE_PATH ${kaldifst_SOURCE_DIR}/cmake)
   add_subdirectory(${kaldifst_SOURCE_DIR} ${kaldifst_BINARY_DIR})
 
+  # openfst's fst/extensions/ngram/nthbit.h calls __builtin_ctzll() and
+  # __builtin_popcountll() but never includes <fst/compat.h>, where openfst
+  # keeps its MSVC fallbacks for these GCC builtins.  MSVC therefore fails
+  # to compile fstngram (C3861: '__builtin_ctzll': identifier not found);
+  # other ngram sources get it only because their own headers happen to
+  # include fst/compat.h first.  Patch the missing include into the
+  # downloaded source; no-op wherever it is already present.
+  FetchContent_GetProperties(openfst)
+  if(openfst_POPULATED)
+    set(nthbit_h ${openfst_SOURCE_DIR}/src/include/fst/extensions/ngram/nthbit.h)
+    file(READ ${nthbit_h} nthbit_src)
+    string(FIND "${nthbit_src}" "#include <fst/compat.h>" nthbit_compat_pos)
+    if(nthbit_compat_pos EQUAL -1)
+      string(REPLACE
+        "#include <fst/log.h>"
+        "#include <fst/compat.h>\n#include <fst/log.h>"
+        nthbit_src "${nthbit_src}")
+      file(WRITE ${nthbit_h} "${nthbit_src}")
+      message(STATUS "Patched ${nthbit_h} to include fst/compat.h")
+    endif()
+  endif()
 
   target_include_directories(kaldifst_core
     PUBLIC
