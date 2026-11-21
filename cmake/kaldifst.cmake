@@ -43,28 +43,6 @@ function(download_kaldifst)
   list(APPEND CMAKE_MODULE_PATH ${kaldifst_SOURCE_DIR}/cmake)
   add_subdirectory(${kaldifst_SOURCE_DIR} ${kaldifst_BINARY_DIR})
 
-  # openfst's fst/extensions/ngram/nthbit.h calls __builtin_ctzll() and
-  # __builtin_popcountll() but never includes <fst/compat.h>, where openfst
-  # keeps its MSVC fallbacks for these GCC builtins.  MSVC therefore fails
-  # to compile fstngram (C3861: '__builtin_ctzll': identifier not found);
-  # other ngram sources get it only because their own headers happen to
-  # include fst/compat.h first.  Patch the missing include into the
-  # downloaded source; no-op wherever it is already present.
-  FetchContent_GetProperties(openfst)
-  if(openfst_POPULATED)
-    set(nthbit_h ${openfst_SOURCE_DIR}/src/include/fst/extensions/ngram/nthbit.h)
-    file(READ ${nthbit_h} nthbit_src)
-    string(FIND "${nthbit_src}" "#include <fst/compat.h>" nthbit_compat_pos)
-    if(nthbit_compat_pos EQUAL -1)
-      string(REPLACE
-        "#include <fst/log.h>"
-        "#include <fst/compat.h>\n#include <fst/log.h>"
-        nthbit_src "${nthbit_src}")
-      file(WRITE ${nthbit_h} "${nthbit_src}")
-      message(STATUS "Patched ${nthbit_h} to include fst/compat.h")
-    endif()
-  endif()
-
   target_include_directories(kaldifst_core
     PUBLIC
       ${kaldifst_SOURCE_DIR}/
