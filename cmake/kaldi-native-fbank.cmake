@@ -5,7 +5,7 @@ include_guard(GLOBAL)
 #
 # Resolution order:
 #   1. KALDI_NATIVE_FBANK_SOURCE_DIR (explicit local checkout, for development),
-#   2. the v1.23.2 release tarball (URL + SHA256; a pre-downloaded local copy
+#   2. the v1.23.3 release tarball (URL + SHA256; a pre-downloaded local copy
 #      in possible_file_locations is preferred when present).
 #
 # kaldi-native-fbank provides the feature pipeline for the i-vector extractor
@@ -15,21 +15,21 @@ function(download_kaldi_native_fbank)
     return()
   endif()
 
-  set(kaldi_native_fbank_URL  "https://github.com/csukuangfj/kaldi-native-fbank/archive/refs/tags/v1.23.2.tar.gz")
-  set(kaldi_native_fbank_HASH "SHA256=d37aa34a523e7e16d0ab729976c065fcadb2026c164c0adfd77616186280407c")
+  set(kaldi_native_fbank_URL  "https://github.com/csukuangfj/kaldi-native-fbank/archive/refs/tags/v1.23.3.tar.gz")
+  set(kaldi_native_fbank_HASH "SHA256=1f14b426da8701b6e14acf6c72e7517f42710d7239dc2868e6610b8fc46ae4b0")
 
   set(KALDI_NATIVE_FBANK_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   set(KALDI_NATIVE_FBANK_BUILD_PYTHON OFF CACHE BOOL "" FORCE)
   set(KALDI_NATIVE_FBANK_ENABLE_CHECK OFF CACHE BOOL "" FORCE)
 
   # If you don't have access to the Internet,
-  # please pre-download kaldi-native-fbank-1.23.2.tar.gz
+  # please pre-download kaldi-native-fbank-1.23.3.tar.gz
   set(possible_file_locations
-    $ENV{HOME}/Downloads/kaldi-native-fbank-1.23.2.tar.gz
-    ${CMAKE_SOURCE_DIR}/kaldi-native-fbank-1.23.2.tar.gz
-    ${CMAKE_BINARY_DIR}/kaldi-native-fbank-1.23.2.tar.gz
-    /tmp/kaldi-native-fbank-1.23.2.tar.gz
-    /star-fj/fangjun/download/github/kaldi-native-fbank-1.23.2.tar.gz
+    $ENV{HOME}/Downloads/kaldi-native-fbank-1.23.3.tar.gz
+    ${CMAKE_SOURCE_DIR}/kaldi-native-fbank-1.23.3.tar.gz
+    ${CMAKE_BINARY_DIR}/kaldi-native-fbank-1.23.3.tar.gz
+    /tmp/kaldi-native-fbank-1.23.3.tar.gz
+    /star-fj/fangjun/download/github/kaldi-native-fbank-1.23.3.tar.gz
   )
   foreach(f IN LISTS possible_file_locations)
     if(EXISTS ${f})
