@@ -32,7 +32,7 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
   cmake_policy(SET CMP0135 NEW)
 endif()
 
-set(KHG_VERSION "1.3.1")
+set(KHG_VERSION "1.3.2")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
@@ -80,18 +80,6 @@ if(MSVC)
   # windows.h defines min/max macros that break std::min/std::max in the
   # vendored headers (e.g. openfst's randgen.h).
   add_compile_definitions(NOMINMAX)
-endif()
-
-if(NOT BUILD_SHARED_LIBS AND MSVC)
-  # see https://cmake.org/cmake/help/latest/prop_tgt/MSVC_RUNTIME_LIBRARY.html
-  # https://stackoverflow.com/questions/14172856/compile-with-mt-instead-of-md-using-cmake
-  if(MSVC)
-      add_compile_options(
-          $<$<CONFIG:>:/MT> #---------|
-          $<$<CONFIG:Debug>:/MTd> #---|-- Statically link the runtime libraries
-          $<$<CONFIG:Release>:/MT> #--|
-      )
-  endif()
 endif()
 
 if(KHG_BUILD_PYTHON)
