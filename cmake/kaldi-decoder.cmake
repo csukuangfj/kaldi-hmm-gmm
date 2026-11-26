@@ -4,7 +4,7 @@ include_guard(GLOBAL)
 #
 # Resolution order:
 #   1. KALDI_DECODER_SOURCE_DIR (explicit local checkout, for development),
-#   2. the v0.5.0 release tarball (URL + SHA256; a pre-downloaded local copy
+#   2. the v0.6.0 release tarball (URL + SHA256; a pre-downloaded local copy
 #      in possible_file_locations is preferred when present).
 #
 # NOTE: the statically linked kaldi-decoder-core is the ONLY copy of the
@@ -19,17 +19,17 @@ function(download_kaldi_decoder)
     return()
   endif()
 
-  set(kaldi_decoder_URL "https://github.com/k2-fsa/kaldi-decoder/archive/refs/tags/v0.5.0.tar.gz")
-  set(kaldi_decoder_HASH "SHA256=0c5a4f61971cd00a6030edb63eafb8834f9d83cdead0cfa58b6b5152a53b5049")
+  set(kaldi_decoder_URL "https://github.com/k2-fsa/kaldi-decoder/archive/refs/tags/v0.6.0.tar.gz")
+  set(kaldi_decoder_HASH "SHA256=0afe271443fb365efa25b25244143e56c66b977af1b4fcf0c1e37698e666bea0")
 
   # If you don't have access to the Internet,
-  # please pre-download kaldi-decoder-0.5.0.tar.gz
+  # please pre-download kaldi-decoder-0.6.0.tar.gz
   set(possible_file_locations
-    $ENV{HOME}/Downloads/kaldi-decoder-0.5.0.tar.gz
-    ${CMAKE_SOURCE_DIR}/kaldi-decoder-0.5.0.tar.gz
-    ${CMAKE_BINARY_DIR}/kaldi-decoder-0.5.0.tar.gz
-    /tmp/kaldi-decoder-0.5.0.tar.gz
-    /star-fj/fangjun/download/github/kaldi-decoder-0.5.0.tar.gz
+    $ENV{HOME}/Downloads/kaldi-decoder-0.6.0.tar.gz
+    ${CMAKE_SOURCE_DIR}/kaldi-decoder-0.6.0.tar.gz
+    ${CMAKE_BINARY_DIR}/kaldi-decoder-0.6.0.tar.gz
+    /tmp/kaldi-decoder-0.6.0.tar.gz
+    /star-fj/fangjun/download/github/kaldi-decoder-0.6.0.tar.gz
   )
   foreach(f IN LISTS possible_file_locations)
     if(EXISTS ${f})

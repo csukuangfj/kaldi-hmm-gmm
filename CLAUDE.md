@@ -28,7 +28,7 @@ ctest --output-on-failure     # runs both gtest and python tests (python tests a
 
 - **Decoding lives in the sibling repo `../kaldi-decoder`**: decoders,
   decoder-wrappers, lattice best path, decodable-itf / transition-information
-  interfaces. This repo links `kaldi-decoder-core` built from the **v0.5.0
+  interfaces. This repo links `kaldi-decoder-core` built from the **v0.6.0
   release tarball** (see `cmake/kaldi-decoder.cmake`;
   `KALDI_DECODER_SOURCE_DIR` overrides for development) and keeps only the
   GMM/HMM/tree/training side. The python package `kaldi_hmm_gmm` is
