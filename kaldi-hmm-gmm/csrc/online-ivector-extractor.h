@@ -59,12 +59,22 @@ struct OnlineIvectorExtractorConfig {
   int32_t num_cg_iters = 15;
   /// Re-estimate the iVector every N frames (kaldi/vosk: 10).
   int32_t ivector_period = 10;
-  /// UBM pruning: keep top-N Gaussians (0 = all).
-  int32_t num_gselect = 0;
-  /// UBM pruning: drop posteriors below min_post * total (0 = keep all kept).
-  double min_post = 0.0;
-  /// Scale applied to UBM posteriors before accumulating stats (0 < s <= 1).
-  double posterior_scale = 1.0;
+  /// UBM pruning: keep top-N Gaussians (0 = all; kaldi default 5).
+  int32_t num_gselect = 5;
+  /// UBM pruning: drop posteriors below min_post * total (0 = keep all
+  /// kept; kaldi default 0.025).
+  double min_post = 0.025;
+  /// Scale applied to UBM posteriors before accumulating stats
+  /// (0 < s <= 1; kaldi default 0.1).
+  double posterior_scale = 0.1;
+  /// [OnlineIvectorFeature only] If true, GetFrame() returns the most recent
+  /// iVector, estimated at the requested frame; else the one estimated at
+  /// the last multiple of ivector_period (kaldi default true).
+  bool use_most_recent_ivector = true;
+  /// [OnlineIvectorFeature only] If true, GetFrame() uses all frames ready
+  /// so far, not only those up to the requested frame (kaldi default
+  /// false).
+  bool greedy_ivector_extractor = false;
 };
 
 class OnlineIvectorExtractor {

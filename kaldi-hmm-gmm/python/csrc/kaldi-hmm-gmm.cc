@@ -19,6 +19,7 @@
 #include "kaldi-hmm-gmm/python/csrc/ivector-extractor.h"
 #include "kaldi-hmm-gmm/python/csrc/mle-am-diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/online-ivector-extractor.h"
+#include "kaldi-hmm-gmm/python/csrc/online-ivector-feature.h"
 #include "kaldi-hmm-gmm/python/csrc/mle-diag-gmm.h"
 #include "kaldi-hmm-gmm/python/csrc/model-common.h"
 #include "kaldi-hmm-gmm/python/csrc/training-graph-compiler.h"
@@ -61,6 +62,7 @@ PYBIND11_MODULE(_kaldi_hmm_gmm, m) {
 
   PybindIvectorExtractor(&m);
   PybindOnlineIvectorExtractor(&m);
+  PybindOnlineIvectorFeature(&m);
 
 
   PybindDecoderWrappers(&m);

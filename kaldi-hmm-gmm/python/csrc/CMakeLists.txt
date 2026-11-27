@@ -19,6 +19,7 @@ set(srcs
   mle-diag-gmm.cc
   model-common.cc
   online-ivector-extractor.cc
+  online-ivector-feature.cc
   training-graph-compiler.cc
   transition-information.cc
   transition-model.cc
