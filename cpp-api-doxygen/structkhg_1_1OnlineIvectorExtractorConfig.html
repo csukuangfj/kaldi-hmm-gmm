@@ -121,12 +121,16 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:a35465107becfc941ac66ca8e251412e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Warm-started conjugate-gradient iterations per estimate (kaldi: 15).  <br /></td></tr>
 <tr class="memitem:ac515065c59a4de72c6ae643cf32b6bd3" id="r_ac515065c59a4de72c6ae643cf32b6bd3"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac515065c59a4de72c6ae643cf32b6bd3">ivector_period</a> = 10</td></tr>
 <tr class="memdesc:ac515065c59a4de72c6ae643cf32b6bd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Re-estimate the iVector every N frames (kaldi/vosk: 10).  <br /></td></tr>
-<tr class="memitem:ad5262c4406977e08cd33779c44c8404d" id="r_ad5262c4406977e08cd33779c44c8404d"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5262c4406977e08cd33779c44c8404d">num_gselect</a> = 0</td></tr>
-<tr class="memdesc:ad5262c4406977e08cd33779c44c8404d"><td class="mdescLeft">&#160;</td><td class="mdescRight">UBM pruning: keep top-N Gaussians (0 = all).  <br /></td></tr>
-<tr class="memitem:adfde0e1f591249f12c5894029438596d" id="r_adfde0e1f591249f12c5894029438596d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adfde0e1f591249f12c5894029438596d">min_post</a> = 0.0</td></tr>
-<tr class="memdesc:adfde0e1f591249f12c5894029438596d"><td class="mdescLeft">&#160;</td><td class="mdescRight">UBM pruning: drop posteriors below min_post * total (0 = keep all kept).  <br /></td></tr>
-<tr class="memitem:a38a0b4e595ea2b20121c5601cc447b26" id="r_a38a0b4e595ea2b20121c5601cc447b26"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a38a0b4e595ea2b20121c5601cc447b26">posterior_scale</a> = 1.0</td></tr>
-<tr class="memdesc:a38a0b4e595ea2b20121c5601cc447b26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scale applied to UBM posteriors before accumulating stats (0 &lt; s &lt;= 1).  <br /></td></tr>
+<tr class="memitem:ad5262c4406977e08cd33779c44c8404d" id="r_ad5262c4406977e08cd33779c44c8404d"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5262c4406977e08cd33779c44c8404d">num_gselect</a> = 5</td></tr>
+<tr class="memdesc:ad5262c4406977e08cd33779c44c8404d"><td class="mdescLeft">&#160;</td><td class="mdescRight">UBM pruning: keep top-N Gaussians (0 = all; kaldi default 5).  <br /></td></tr>
+<tr class="memitem:adfde0e1f591249f12c5894029438596d" id="r_adfde0e1f591249f12c5894029438596d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adfde0e1f591249f12c5894029438596d">min_post</a> = 0.025</td></tr>
+<tr class="memdesc:adfde0e1f591249f12c5894029438596d"><td class="mdescLeft">&#160;</td><td class="mdescRight">UBM pruning: drop posteriors below min_post * total (0 = keep all kept; kaldi default 0.025).  <br /></td></tr>
+<tr class="memitem:a38a0b4e595ea2b20121c5601cc447b26" id="r_a38a0b4e595ea2b20121c5601cc447b26"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a38a0b4e595ea2b20121c5601cc447b26">posterior_scale</a> = 0.1</td></tr>
+<tr class="memdesc:a38a0b4e595ea2b20121c5601cc447b26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scale applied to UBM posteriors before accumulating stats (0 &lt; s &lt;= 1; kaldi default 0.1).  <br /></td></tr>
+<tr class="memitem:aa8875425d85c2bc9d5c3a4b8fedb4acd" id="r_aa8875425d85c2bc9d5c3a4b8fedb4acd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa8875425d85c2bc9d5c3a4b8fedb4acd">use_most_recent_ivector</a> = true</td></tr>
+<tr class="memdesc:aa8875425d85c2bc9d5c3a4b8fedb4acd"><td class="mdescLeft">&#160;</td><td class="mdescRight">[<a class="el" href="classkhg_1_1OnlineIvectorFeature.html" title="kaldi&#39;s OnlineIvectorFeature (online2/online-ivector-feature.h).">OnlineIvectorFeature</a> only] If true, GetFrame() returns the most recent iVector, estimated at the requested frame; else the one estimated at the last multiple of ivector_period (kaldi default true).  <br /></td></tr>
+<tr class="memitem:a6a76ca44e6fed9cbf60db7291aa88a36" id="r_a6a76ca44e6fed9cbf60db7291aa88a36"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6a76ca44e6fed9cbf60db7291aa88a36">greedy_ivector_extractor</a> = false</td></tr>
+<tr class="memdesc:a6a76ca44e6fed9cbf60db7291aa88a36"><td class="mdescLeft">&#160;</td><td class="mdescRight">[<a class="el" href="classkhg_1_1OnlineIvectorFeature.html" title="kaldi&#39;s OnlineIvectorFeature (online2/online-ivector-feature.h).">OnlineIvectorFeature</a> only] If true, GetFrame() uses all frames ready so far, not only those up to the requested frame (kaldi default false).  <br /></td></tr>
 </table>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="a7c9bbcf1eb5069500dfd7ed2e5e667fe" name="a7c9bbcf1eb5069500dfd7ed2e5e667fe"></a>
@@ -158,6 +162,22 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Global CMVN stats [2][feat_dim + 1] (ivector/global_cmvn_stats). </p>
+
+</div>
+</div>
+<a id="a6a76ca44e6fed9cbf60db7291aa88a36" name="a6a76ca44e6fed9cbf60db7291aa88a36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a76ca44e6fed9cbf60db7291aa88a36">&#9670;&#160;</a></span>greedy_ivector_extractor</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool khg::OnlineIvectorExtractorConfig::greedy_ivector_extractor = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>[<a class="el" href="classkhg_1_1OnlineIvectorFeature.html" title="kaldi&#39;s OnlineIvectorFeature (online2/online-ivector-feature.h).">OnlineIvectorFeature</a> only] If true, GetFrame() uses all frames ready so far, not only those up to the requested frame (kaldi default false). </p>
 
 </div>
 </div>
@@ -233,12 +253,12 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double khg::OnlineIvectorExtractorConfig::min_post = 0.0</td>
+          <td class="memname">double khg::OnlineIvectorExtractorConfig::min_post = 0.025</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>UBM pruning: drop posteriors below min_post * total (0 = keep all kept). </p>
+<p>UBM pruning: drop posteriors below min_post * total (0 = keep all kept; kaldi default 0.025). </p>
 
 </div>
 </div>
@@ -265,12 +285,12 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int32_t khg::OnlineIvectorExtractorConfig::num_gselect = 0</td>
+          <td class="memname">int32_t khg::OnlineIvectorExtractorConfig::num_gselect = 5</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>UBM pruning: keep top-N Gaussians (0 = all). </p>
+<p>UBM pruning: keep top-N Gaussians (0 = all; kaldi default 5). </p>
 
 </div>
 </div>
@@ -297,12 +317,12 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double khg::OnlineIvectorExtractorConfig::posterior_scale = 1.0</td>
+          <td class="memname">double khg::OnlineIvectorExtractorConfig::posterior_scale = 0.1</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Scale applied to UBM posteriors before accumulating stats (0 &lt; s &lt;= 1). </p>
+<p>Scale applied to UBM posteriors before accumulating stats (0 &lt; s &lt;= 1; kaldi default 0.1). </p>
 
 </div>
 </div>
@@ -317,6 +337,22 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa8875425d85c2bc9d5c3a4b8fedb4acd" name="aa8875425d85c2bc9d5c3a4b8fedb4acd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8875425d85c2bc9d5c3a4b8fedb4acd">&#9670;&#160;</a></span>use_most_recent_ivector</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool khg::OnlineIvectorExtractorConfig::use_most_recent_ivector = true</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>[<a class="el" href="classkhg_1_1OnlineIvectorFeature.html" title="kaldi&#39;s OnlineIvectorFeature (online2/online-ivector-feature.h).">OnlineIvectorFeature</a> only] If true, GetFrame() returns the most recent iVector, estimated at the requested frame; else the one estimated at the last multiple of ivector_period (kaldi default true). </p>
 
 </div>
 </div>

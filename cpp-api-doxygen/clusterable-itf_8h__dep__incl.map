@@ -1,20 +1,23 @@
 <map id="clusterable&#45;itf.h" name="clusterable&#45;itf.h">
-<area shape="rect" id="Node000001" title="Abstract interface for statistics that can be clustered." alt="" coords="244,5,368,33"/>
-<area shape="rect" id="Node000002" href="$clusterable-classes_8h.html" title="Concrete Clusterable classes holding scalar and Gaussian statistics." alt="" coords="227,81,385,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="307,46,308,81,303,80,305,51"/>
-<area shape="rect" id="Node000003" href="$cluster-utils_8h.html" title="K&#45;means&#45;like clustering of Clusterable statistics." alt="" coords="251,157,361,184"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="307,122,308,157,303,155,305,127"/>
-<area shape="rect" id="Node000004" href="$diag-gmm_8h.html" title="Diagonal&#45;covariance Gaussian mixture models (DiagGmm) stored in exponential form." alt="" coords="256,232,356,260"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="307,198,308,233,303,231,304,202"/>
+<area shape="rect" id="Node000001" title="Abstract interface for statistics that can be clustered." alt="" coords="335,5,458,33"/>
+<area shape="rect" id="Node000002" href="$clusterable-classes_8h.html" title="Concrete Clusterable classes holding scalar and Gaussian statistics." alt="" coords="317,81,476,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="398,46,399,82,394,80,395,51"/>
+<area shape="rect" id="Node000003" href="$cluster-utils_8h.html" title="K&#45;means&#45;like clustering of Clusterable statistics." alt="" coords="341,157,452,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="398,122,399,157,394,155,395,127"/>
+<area shape="rect" id="Node000004" href="$diag-gmm_8h.html" title="Diagonal&#45;covariance Gaussian mixture models (DiagGmm) stored in exponential form." alt="" coords="346,232,447,260"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="398,198,399,233,394,231,395,202"/>
 <area shape="rect" id="Node000005" href="$am-diag-gmm_8h.html" title="Acoustic model of diagonal&#45;covariance GMMs (AmDiagGmm)." alt="" coords="91,308,217,336"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="263,268,182,310,180,305,267,266"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="336,266,198,310,196,305,341,263"/>
 <area shape="rect" id="Node000008" href="$mle-diag-gmm_8h.html" title="Maximum&#45;likelihood and MAP estimation for diagonal&#45;covariance GMMs." alt="" coords="241,308,371,336"/>
-<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="307,274,308,309,304,306,304,278"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="371,269,323,310,321,305,366,271"/>
 <area shape="rect" id="Node000009" href="$online-ivector-extractor_8h.html" title=" " alt="" coords="395,308,582,336"/>
-<area shape="poly" id="edge9_Node000004_Node000009" title=" " alt="" coords="353,264,459,307,453,308,352,269"/>
+<area shape="poly" id="edge9_Node000004_Node000009" title=" " alt="" coords="425,267,475,308,470,307,424,272"/>
+<area shape="rect" id="Node000010" href="$online-ivector-feature_8h.html" title="kaldi&#39;s online2 i&#45;vector feature: the i&#45;vector the nnet3 online decoders (and vosk) feed to the acous..." alt="" coords="469,384,644,411"/>
+<area shape="poly" id="edge11_Node000004_Node000010" title=" " alt="" coords="462,246,498,251,534,262,568,280,596,307,603,327,597,349,585,369,571,386,568,381,581,366,592,347,597,327,592,309,565,284,532,267,497,257,462,251"/>
 <area shape="rect" id="Node000006" href="$decodable-am-diag-gmm_8h.html" title="Decodable objects for AmDiagGmm acoustic models." alt="" coords="5,384,204,411"/>
 <area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="139,348,115,385,111,381,134,350"/>
 <area shape="rect" id="Node000007" href="$mle-am-diag-gmm_8h.html" title="ML/MAP estimation for whole acoustic models of diagonal GMMs." alt="" coords="228,384,384,411"/>
 <area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="195,340,282,383,276,384,194,345"/>
 <area shape="poly" id="edge8_Node000008_Node000007" title=" " alt="" coords="308,350,308,385,304,382,304,353"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="512,345,547,384,542,382,510,350"/>
 </map>

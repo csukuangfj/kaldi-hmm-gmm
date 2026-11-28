@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>i-Vectors &mdash; kaldi-hmm-gmm 1.3.1 documentation</title>
+  <title>i-Vectors &mdash; kaldi-hmm-gmm 1.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=bb516dca"></script>
+      <script src="_static/documentation_options.js?v=9172181d"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -64,6 +64,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#the-full-pipeline-of-a-vosk-model">The full pipeline of a vosk model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#model-files">Model files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#python-example">Python example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#streaming-as-kaldi-s-online2-decoders-and-vosk-do-it">Streaming, as kaldi's online2 decoders and vosk do it</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
@@ -288,6 +289,42 @@ projections <span class="math notranslate nohighlight">\(\mathbf{w}_g\)</span>)<
 <span class="nb">print</span><span class="p">(</span><span class="n">eng</span><span class="o">.</span><span class="n">get_ivectors</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>    <span class="c1"># [ceil(T/10), ivector_dim]</span>
 </pre></div>
 </div>
+</section>
+<section id="streaming-as-kaldi-s-online2-decoders-and-vosk-do-it">
+<h2>Streaming, as kaldi's online2 decoders and vosk do it<a class="headerlink" href="#streaming-as-kaldi-s-online2-decoders-and-vosk-do-it" title="Link to this heading"></a></h2>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">OnlineIvectorFeature</span></code> is a port of kaldi's
+<a class="extlink-kaldi reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/online2/online-ivector-feature.h">OnlineIvectorFeature</a> itself:
+stats are accumulated lazily up to the frame asked for, and with
+<code class="docutils literal notranslate"><span class="pre">use_most_recent_ivector</span></code> (default) <code class="xref py py-meth docutils literal notranslate"><span class="pre">OnlineIvectorFeature.get_frame()</span></code>
+returns the estimate at that frame.  Optional frame weights implement
+kaldi's silence weighting: <code class="xref py py-class docutils literal notranslate"><span class="pre">OnlineSilenceWeighting</span></code> turns the
+decoder's current best path (one transition-id per decoder frame, e.g. from
+kaldi-decoder's <code class="docutils literal notranslate"><span class="pre">LatticeFasterOnlineDecoder.get_best_path_transition_ids</span></code>)
+into delta-weights.  <code class="docutils literal notranslate"><span class="pre">OnlineIvectorExtractorConfig</span></code> defaults are kaldi's
+(<code class="docutils literal notranslate"><span class="pre">num_gselect=5</span></code>, <code class="docutils literal notranslate"><span class="pre">min_post=0.025</span></code>, <code class="docutils literal notranslate"><span class="pre">posterior_scale=0.1</span></code>); vosk adds
+<code class="docutils literal notranslate"><span class="pre">max_count=100</span></code> and silence weight <code class="docutils literal notranslate"><span class="pre">0.001</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span> <span class="o">=</span> <span class="n">khg</span><span class="o">.</span><span class="n">OnlineIvectorExtractorConfig</span><span class="p">(</span>
+    <span class="n">left_context</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">right_context</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">lda_mat</span><span class="o">=</span><span class="n">lda</span><span class="p">,</span> <span class="n">global_cmvn_stats</span><span class="o">=</span><span class="n">gs</span><span class="p">,</span>
+    <span class="n">max_count</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">ivector</span> <span class="o">=</span> <span class="n">khg</span><span class="o">.</span><span class="n">OnlineIvectorFeature</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">extractor</span><span class="p">,</span> <span class="n">ubm</span><span class="p">)</span>
+<span class="n">silence</span> <span class="o">=</span> <span class="n">khg</span><span class="o">.</span><span class="n">OnlineSilenceWeighting</span><span class="p">(</span>
+    <span class="n">trans_model</span><span class="p">,</span>
+    <span class="n">khg</span><span class="o">.</span><span class="n">OnlineSilenceWeightingConfig</span><span class="p">(</span><span class="s2">"1:2:3:4:5:6:7:8:9:10"</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">),</span>
+    <span class="n">frame_subsampling_factor</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">mfcc_chunk</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>                       <span class="c1"># every 0.2 s of audio</span>
+    <span class="n">ivector</span><span class="o">.</span><span class="n">accept_features</span><span class="p">(</span><span class="n">mfcc_chunk</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ivector</span><span class="o">.</span><span class="n">num_frames_ready</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">silence</span><span class="o">.</span><span class="n">compute_current_traceback</span><span class="p">(</span>
+            <span class="n">decoder</span><span class="o">.</span><span class="n">get_best_path_transition_ids</span><span class="p">(</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">ivector</span><span class="o">.</span><span class="n">update_frame_weights</span><span class="p">(</span>
+            <span class="n">silence</span><span class="o">.</span><span class="n">get_delta_weights</span><span class="p">(</span><span class="n">ivector</span><span class="o">.</span><span class="n">num_frames_ready</span><span class="p">))</span>
+    <span class="c1"># for each nnet chunk: the latest i-vector</span>
+    <span class="n">iv</span> <span class="o">=</span> <span class="n">ivector</span><span class="o">.</span><span class="n">get_frame</span><span class="p">(</span><span class="n">ivector</span><span class="o">.</span><span class="n">num_frames_ready</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Parity: <code class="docutils literal notranslate"><span class="pre">tests/parity/parity_online_ivector_feature.py</span></code> compares against
+kaldi's <code class="docutils literal notranslate"><span class="pre">ivector-extract-online2</span></code> with and without frame weights.</p>
 <p>For a batch/offline computation with explicit posteriors, see
 <code class="xref py py-class docutils literal notranslate"><span class="pre">IvectorExtractorUtteranceStats</span></code> and
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">IvectorExtractor.compute_ivector()</span></code>.</p>

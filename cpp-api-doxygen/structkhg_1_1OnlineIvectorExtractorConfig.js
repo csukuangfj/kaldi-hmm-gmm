@@ -2,6 +2,7 @@ var structkhg_1_1OnlineIvectorExtractorConfig =
 [
     [ "cmvn_opts", "structkhg_1_1OnlineIvectorExtractorConfig.html#a7c9bbcf1eb5069500dfd7ed2e5e667fe", null ],
     [ "global_cmvn_stats", "structkhg_1_1OnlineIvectorExtractorConfig.html#a0653b7c7d6f27614b826993837b10e71", null ],
+    [ "greedy_ivector_extractor", "structkhg_1_1OnlineIvectorExtractorConfig.html#a6a76ca44e6fed9cbf60db7291aa88a36", null ],
     [ "ivector_period", "structkhg_1_1OnlineIvectorExtractorConfig.html#ac515065c59a4de72c6ae643cf32b6bd3", null ],
     [ "lda_mat", "structkhg_1_1OnlineIvectorExtractorConfig.html#a6fdf93d445207e7a0b8a9f5d9592c788", null ],
     [ "left_context", "structkhg_1_1OnlineIvectorExtractorConfig.html#a6990b01affd5dbf0b7e46cd34d662b7d", null ],
@@ -11,5 +12,6 @@ var structkhg_1_1OnlineIvectorExtractorConfig =
     [ "num_gselect", "structkhg_1_1OnlineIvectorExtractorConfig.html#ad5262c4406977e08cd33779c44c8404d", null ],
     [ "online_cmvn_iextractor", "structkhg_1_1OnlineIvectorExtractorConfig.html#a9d734e9937d624964350740302df5c8d", null ],
     [ "posterior_scale", "structkhg_1_1OnlineIvectorExtractorConfig.html#a38a0b4e595ea2b20121c5601cc447b26", null ],
-    [ "right_context", "structkhg_1_1OnlineIvectorExtractorConfig.html#a5846fca436191e40ec0bdf58fb1f5d60", null ]
+    [ "right_context", "structkhg_1_1OnlineIvectorExtractorConfig.html#a5846fca436191e40ec0bdf58fb1f5d60", null ],
+    [ "use_most_recent_ivector", "structkhg_1_1OnlineIvectorExtractorConfig.html#aa8875425d85c2bc9d5c3a4b8fedb4acd", null ]
 ];

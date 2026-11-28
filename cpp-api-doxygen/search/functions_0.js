@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['acceptfeatures_0',['AcceptFeatures',['../classkhg_1_1OnlineIvectorExtractor.html#afe08d5d63dbefcd5d996d6261be87dd0',1,'khg::OnlineIvectorExtractor']]],
+  ['acceptfeatures_0',['AcceptFeatures',['../classkhg_1_1OnlineIvectorExtractor.html#afe08d5d63dbefcd5d996d6261be87dd0',1,'khg::OnlineIvectorExtractor::AcceptFeatures()'],['../classkhg_1_1OnlineIvectorFeature.html#a59f2b30931164372126adb2ca87d58a3',1,'khg::OnlineIvectorFeature::AcceptFeatures()']]],
   ['accstats_1',['AccStats',['../classkhg_1_1IvectorExtractorUtteranceStats.html#a4d5742cd33047b7c3cef5442bc42990e',1,'khg::IvectorExtractorUtteranceStats::AccStats()'],['../classkhg_1_1OnlineIvectorEstimationStats.html#a49432540cb8b062ac685d1503283283a',1,'khg::OnlineIvectorEstimationStats::AccStats(const IvectorExtractor &amp;extractor, const FloatVector &amp;feature, const GaussPost &amp;gauss_post)'],['../classkhg_1_1OnlineIvectorEstimationStats.html#a08f1b23255573070f471fab752e7a5b6',1,'khg::OnlineIvectorEstimationStats::AccStats(const IvectorExtractor &amp;extractor, const FloatMatrix &amp;features, const std::vector&lt; GaussPost &gt; &amp;gauss_post)']]],
   ['accumamdiaggmm_2',['AccumAmDiagGmm',['../classkhg_1_1AccumAmDiagGmm.html#a92b0199168d2767cc350db3e9f79ce72',1,'khg::AccumAmDiagGmm::AccumAmDiagGmm()'],['../classkhg_1_1AccumAmDiagGmm.html#a65872bb9ebff10551c2b99d87f912171',1,'khg::AccumAmDiagGmm::AccumAmDiagGmm(const AccumAmDiagGmm &amp;)=delete']]],
   ['accumdiaggmm_3',['AccumDiagGmm',['../classkhg_1_1AccumDiagGmm.html#ae09ed38bf6ad1ad42babd227b27b59ef',1,'khg::AccumDiagGmm::AccumDiagGmm()'],['../classkhg_1_1AccumDiagGmm.html#a8b3a31c3c7f4e25003137abf4177896c',1,'khg::AccumDiagGmm::AccumDiagGmm(const DiagGmm &amp;gmm, GmmFlagsType flags)']]],
@@ -11,12 +11,13 @@ var searchData=
   ['accumulateforgmmtwofeats_8',['AccumulateForGmmTwofeats',['../classkhg_1_1AccumAmDiagGmm.html#af39dc72f192180d84b1aef4ea211e122',1,'khg::AccumAmDiagGmm']]],
   ['accumulatefromdiag_9',['AccumulateFromDiag',['../classkhg_1_1AccumDiagGmm.html#ac9d9229a17cf1a703399ff722b5f7254',1,'khg::AccumDiagGmm']]],
   ['accumulatefromposteriors_10',['AccumulateFromPosteriors',['../classkhg_1_1AccumAmDiagGmm.html#aec8d01e6fe46e1caa8432e60a72da455',1,'khg::AccumAmDiagGmm::AccumulateFromPosteriors()'],['../classkhg_1_1AccumDiagGmm.html#ad44e4930863b4e730de5e0399f9666c5',1,'khg::AccumDiagGmm::AccumulateFromPosteriors()']]],
-  ['add_11',['Add',['../classkhg_1_1ScalarClusterable.html#a9790db195ed8094ded671ca37333d5f8',1,'khg::ScalarClusterable::Add()'],['../classkhg_1_1GaussClusterable.html#a59c33f32e9ac2ccd75f7f4a8cd6a07f0',1,'khg::GaussClusterable::Add()'],['../classkhg_1_1Clusterable.html#aeec61fa92fd5787db3b3b2d7288bb61a',1,'khg::Clusterable::Add()'],['../classkhg_1_1AccumAmDiagGmm.html#a50f97ea9e66f89ef830f7a94ba29ecab',1,'khg::AccumAmDiagGmm::Add()'],['../classkhg_1_1AccumDiagGmm.html#a3efc29b7434d40f759c70c675afadc1e',1,'khg::AccumDiagGmm::Add()']]],
-  ['addpdf_12',['AddPdf',['../classkhg_1_1AmDiagGmm.html#afdc6b097e75bf34ba74bf57c70a5757c',1,'khg::AmDiagGmm']]],
-  ['addselfloops_13',['AddSelfLoops',['../namespacekhg.html#afbbac97d06a5e4cae21b34befa3cb050',1,'khg']]],
-  ['addstats_14',['AddStats',['../classkhg_1_1GaussClusterable.html#a04405c5271dacc164adee83f32a4cbb8',1,'khg::GaussClusterable']]],
-  ['addstatsforcomponent_15',['AddStatsForComponent',['../classkhg_1_1AccumDiagGmm.html#aba8453828581cd508995a910d443115b',1,'khg::AccumDiagGmm']]],
-  ['addtransitionprobs_16',['AddTransitionProbs',['../namespacekhg.html#a80c65c596d36f0b76c4f57bf658b2be3',1,'khg']]],
-  ['amdiaggmm_17',['AmDiagGmm',['../classkhg_1_1AmDiagGmm.html#a3dbe015d26fcd9128f794b4eb9fde92a',1,'khg::AmDiagGmm::AmDiagGmm()=default'],['../classkhg_1_1AmDiagGmm.html#a51a4b93bfbc0857cc6d2d994410a69d6',1,'khg::AmDiagGmm::AmDiagGmm(const AmDiagGmm &amp;)=delete']]],
-  ['augmentgmmflags_18',['AugmentGmmFlags',['../namespacekhg.html#a5103f34956cb05b12a35158a4e2258b3',1,'khg']]]
+  ['active_11',['Active',['../structkhg_1_1OnlineSilenceWeightingConfig.html#a6e76e7c97d134a56427a1ac00d0b630a',1,'khg::OnlineSilenceWeightingConfig::Active()'],['../classkhg_1_1OnlineSilenceWeighting.html#abd4b8d963f566031fa871d5f62db8fae',1,'khg::OnlineSilenceWeighting::Active()']]],
+  ['add_12',['Add',['../classkhg_1_1ScalarClusterable.html#a9790db195ed8094ded671ca37333d5f8',1,'khg::ScalarClusterable::Add()'],['../classkhg_1_1GaussClusterable.html#a59c33f32e9ac2ccd75f7f4a8cd6a07f0',1,'khg::GaussClusterable::Add()'],['../classkhg_1_1Clusterable.html#aeec61fa92fd5787db3b3b2d7288bb61a',1,'khg::Clusterable::Add()'],['../classkhg_1_1AccumAmDiagGmm.html#a50f97ea9e66f89ef830f7a94ba29ecab',1,'khg::AccumAmDiagGmm::Add()'],['../classkhg_1_1AccumDiagGmm.html#a3efc29b7434d40f759c70c675afadc1e',1,'khg::AccumDiagGmm::Add()']]],
+  ['addpdf_13',['AddPdf',['../classkhg_1_1AmDiagGmm.html#afdc6b097e75bf34ba74bf57c70a5757c',1,'khg::AmDiagGmm']]],
+  ['addselfloops_14',['AddSelfLoops',['../namespacekhg.html#afbbac97d06a5e4cae21b34befa3cb050',1,'khg']]],
+  ['addstats_15',['AddStats',['../classkhg_1_1GaussClusterable.html#a04405c5271dacc164adee83f32a4cbb8',1,'khg::GaussClusterable']]],
+  ['addstatsforcomponent_16',['AddStatsForComponent',['../classkhg_1_1AccumDiagGmm.html#aba8453828581cd508995a910d443115b',1,'khg::AccumDiagGmm']]],
+  ['addtransitionprobs_17',['AddTransitionProbs',['../namespacekhg.html#a80c65c596d36f0b76c4f57bf658b2be3',1,'khg']]],
+  ['amdiaggmm_18',['AmDiagGmm',['../classkhg_1_1AmDiagGmm.html#a3dbe015d26fcd9128f794b4eb9fde92a',1,'khg::AmDiagGmm::AmDiagGmm()=default'],['../classkhg_1_1AmDiagGmm.html#a51a4b93bfbc0857cc6d2d994410a69d6',1,'khg::AmDiagGmm::AmDiagGmm(const AmDiagGmm &amp;)=delete']]],
+  ['augmentgmmflags_19',['AugmentGmmFlags',['../namespacekhg.html#a5103f34956cb05b12a35158a4e2258b3',1,'khg']]]
 ];

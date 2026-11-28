@@ -1,5 +1,8 @@
 <map id="ivector&#45;extractor.h" name="ivector&#45;extractor.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="28,5,169,33"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="93,5,234,33"/>
 <area shape="rect" id="Node000002" href="$online-ivector-extractor_8h.html" title=" " alt="" coords="5,81,192,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,47,101,82,96,80,97,51"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,43,112,82,108,79,140,47"/>
+<area shape="rect" id="Node000003" href="$online-ivector-feature_8h.html" title="kaldi&#39;s online2 i&#45;vector feature: the i&#45;vector the nnet3 online decoders (and vosk) feed to the acous..." alt="" coords="76,157,252,184"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="186,43,206,80,209,95,206,109,194,136,177,159,174,154,189,134,201,108,204,95,201,82,184,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="121,118,155,156,150,156,119,123"/>
 </map>

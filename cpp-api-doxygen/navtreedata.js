@@ -65,8 +65,8 @@ var NAVTREEINDEX =
 "am-diag-gmm_8h.html",
 "classkhg_1_1ContextDependencyInterface.html#a5acdc5540d5c445eef0f0b458b97d399",
 "classkhg_1_1IvectorExtractor.html#a02643e13f0f982d2b9279ab57fa355fb",
-"classkhg_1_1TransitionModel.html#a80be9fa56bb46e6cd078bf13d128de18",
-"structkhg_1_1ClusterKMeansOptions.html#a5b4970dcd69b7e24dd05d011b73d0729"
+"classkhg_1_1TransitionModel.html#a1ac7c16f7427c9f120d7db03e8f07961",
+"namespacekhg.html#ada05d3bccc66e6b4b9634f23be07e1ec"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

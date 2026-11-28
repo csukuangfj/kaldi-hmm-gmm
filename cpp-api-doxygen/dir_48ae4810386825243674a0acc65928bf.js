@@ -23,6 +23,7 @@ var dir_48ae4810386825243674a0acc65928bf =
     [ "mle-diag-gmm.h", "mle-diag-gmm_8h.html", "mle-diag-gmm_8h" ],
     [ "model-common.h", "model-common_8h.html", "model-common_8h" ],
     [ "online-ivector-extractor.h", "online-ivector-extractor_8h.html", "online-ivector-extractor_8h" ],
+    [ "online-ivector-feature.h", "online-ivector-feature_8h.html", "online-ivector-feature_8h" ],
     [ "stl-utils.h", "stl-utils_8h.html", "stl-utils_8h" ],
     [ "training-graph-compiler.h", "training-graph-compiler_8h.html", "training-graph-compiler_8h" ],
     [ "transition-model.h", "transition-model_8h.html", "transition-model_8h" ],

@@ -6,5 +6,7 @@ var searchData=
   ['self_5floop_5fscale_3',['self_loop_scale',['../structkhg_1_1TrainingGraphCompilerOptions.html#ac9e93658252cbf7c5746000a6dbaf3eb',1,'khg::TrainingGraphCompilerOptions']]],
   ['share_5ffor_5fpdfs_4',['share_for_pdfs',['../structkhg_1_1MleTransitionUpdateConfig.html#ad857acbeabd0279a3fd8207a17638c6f',1,'khg::MleTransitionUpdateConfig']]],
   ['sigma_5finv_5f_5',['Sigma_inv_',['../classkhg_1_1IvectorExtractor.html#aa144b6f81537cab9c1dfeaa94f2769c2',1,'khg::IvectorExtractor']]],
-  ['sigma_5finv_5fm_5f_6',['Sigma_inv_M_',['../classkhg_1_1IvectorExtractor.html#aa770d8ad63e3460a9012e7772f5b907b',1,'khg::IvectorExtractor']]]
+  ['sigma_5finv_5fm_5f_6',['Sigma_inv_M_',['../classkhg_1_1IvectorExtractor.html#aa770d8ad63e3460a9012e7772f5b907b',1,'khg::IvectorExtractor']]],
+  ['silence_5fphones_5fstr_7',['silence_phones_str',['../structkhg_1_1OnlineSilenceWeightingConfig.html#a9602a5513c452ddbe0bdb9776755742b',1,'khg::OnlineSilenceWeightingConfig']]],
+  ['silence_5fweight_8',['silence_weight',['../structkhg_1_1OnlineSilenceWeightingConfig.html#a98137ca8ab8f2c5f13a01fdf75407fdd',1,'khg::OnlineSilenceWeightingConfig']]]
 ];
