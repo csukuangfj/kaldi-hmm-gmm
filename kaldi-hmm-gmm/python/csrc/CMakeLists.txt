@@ -45,6 +45,18 @@ endforeach()
 target_link_libraries(_kaldi_hmm_gmm PRIVATE kaldi-hmm-gmm-core)
 
 if(APPLE)
+  # Fall back to the interpreter found by FindPython (pulled in by pybind11)
+  # when the legacy PYTHON_EXECUTABLE variable is not set; otherwise the
+  # command below runs an empty executable, purelib comes back empty and we
+  # would spuriously warn. Mirrors python/tests/CMakeLists.txt.
+  if(NOT PYTHON_EXECUTABLE)
+    if(Python_EXECUTABLE)
+      set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
+    elseif(Python3_EXECUTABLE)
+      set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+    endif()
+  endif()
+
   execute_process(
     COMMAND "${PYTHON_EXECUTABLE}" -c "import sysconfig; print(sysconfig.get_path('purelib'))"
     OUTPUT_STRIP_TRAILING_WHITESPACE
