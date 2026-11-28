@@ -57,6 +57,7 @@ set(py_test_files
   test_lifetime_safety.py
   test_mle_am_diag_gmm.py
   test_mle_diag_gmm.py
+  test_online_ivector_feature.py
   test_scalar_clusterable.py
   test_selfcontained.py
   test_transition_model.py

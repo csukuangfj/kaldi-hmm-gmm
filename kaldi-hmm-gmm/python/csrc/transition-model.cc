@@ -11,6 +11,7 @@
 #include "kaldi-hmm-gmm/csrc/transition-model.h"
 
 #include "kaldi-decoder/csrc/transition-information.h"
+#include "kaldi-hmm-gmm/python/csrc/transition-information.h"
 #include "kaldi_native_io/csrc/kaldi-io.h"
 
 namespace khg {
@@ -182,7 +183,13 @@ void PybindTransitionModel(py::module *m) {
 
             return {tuples,    hmm_topo, state2id,  id2state,
                     id2pdf_id, num_pdfs, log_probs, non_self_loop_log_probs};
-          }));
+          }))
+      // name-matching conduit provider, see transition-information.h; the
+      // class_'s own default shadows the base class's, so this class needs
+      // its own -- and py::prepend must put it FIRST in the overload
+      // chain, or the default's None return would shadow it
+      .def("_pybind11_conduit_v1_", TransitionInformationConduitMethod,
+           py::prepend());
 
   m->def(
       "get_pdfs_for_phones",

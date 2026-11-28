@@ -37,7 +37,8 @@ Files of a model's ``ivector/`` directory map to the fields as follows:
                        bool online_cmvn_iextractor, double max_count,
                        int32_t num_cg_iters, int32_t ivector_period,
                        int32_t num_gselect, double min_post,
-                       double posterior_scale) {
+                       double posterior_scale, bool use_most_recent_ivector,
+                       bool greedy_ivector_extractor) {
              PyConfig c;
              c.left_context = left_context;
              c.right_context = right_context;
@@ -56,6 +57,8 @@ Files of a model's ``ivector/`` directory map to the fields as follows:
              c.num_gselect = num_gselect;
              c.min_post = min_post;
              c.posterior_scale = posterior_scale;
+             c.use_most_recent_ivector = use_most_recent_ivector;
+             c.greedy_ivector_extractor = greedy_ivector_extractor;
              return c;
            }),
            py::arg("left_context") = 3, py::arg("right_context") = 3,
@@ -66,8 +69,10 @@ Files of a model's ``ivector/`` directory map to the fields as follows:
            py::arg("normalize_variance") = false, py::arg("skip_dims") = "",
            py::arg("online_cmvn_iextractor") = false,
            py::arg("max_count") = 0.0, py::arg("num_cg_iters") = 15,
-           py::arg("ivector_period") = 10, py::arg("num_gselect") = 0,
-           py::arg("min_post") = 0.0, py::arg("posterior_scale") = 1.0,
+           py::arg("ivector_period") = 10, py::arg("num_gselect") = 5,
+           py::arg("min_post") = 0.025, py::arg("posterior_scale") = 0.1,
+           py::arg("use_most_recent_ivector") = true,
+           py::arg("greedy_ivector_extractor") = false,
            R"doc(Construct with the given options (defaults match kaldi).
 
 :param left_context: Splice left context (``splice.conf``).
@@ -87,9 +92,14 @@ Files of a model's ``ivector/`` directory map to the fields as follows:
 :param max_count: Prior scaling above this frame count (vosk: 100).
 :param num_cg_iters: CG iterations per estimate (kaldi: 15).
 :param ivector_period: Re-estimate every N frames (kaldi: 10).
-:param num_gselect: Keep top-N UBM Gaussians (0 = all).
-:param min_post: UBM posterior pruning threshold (0 = off).
-:param posterior_scale: Scale of UBM posteriors (0 < s <= 1).)doc")
+:param num_gselect: Keep top-N UBM Gaussians (0 = all; kaldi: 5).
+:param min_post: UBM posterior pruning threshold (0 = off; kaldi: 0.025).
+:param posterior_scale: Scale of UBM posteriors (0 < s <= 1; kaldi: 0.1).
+:param use_most_recent_ivector: :class:`OnlineIvectorFeature` only: return
+   the iVector estimated at the requested frame (kaldi: True), else the one
+   of the last multiple of ``ivector_period``.
+:param greedy_ivector_extractor: :class:`OnlineIvectorFeature` only: use all
+   frames ready so far (kaldi: False).)doc")
       .def_readwrite("left_context", &PyConfig::left_context)
       .def_readwrite("right_context", &PyConfig::right_context)
       .def_property(
@@ -138,7 +148,11 @@ Files of a model's ``ivector/`` directory map to the fields as follows:
       .def_readwrite("ivector_period", &PyConfig::ivector_period)
       .def_readwrite("num_gselect", &PyConfig::num_gselect)
       .def_readwrite("min_post", &PyConfig::min_post)
-      .def_readwrite("posterior_scale", &PyConfig::posterior_scale);
+      .def_readwrite("posterior_scale", &PyConfig::posterior_scale)
+      .def_readwrite("use_most_recent_ivector",
+                     &PyConfig::use_most_recent_ivector)
+      .def_readwrite("greedy_ivector_extractor",
+                     &PyConfig::greedy_ivector_extractor);
 
   using PyDriver = OnlineIvectorExtractor;
   py::class_<PyDriver> driver(

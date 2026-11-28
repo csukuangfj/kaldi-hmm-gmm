@@ -208,6 +208,45 @@ Python example
    eng.flush()                        # end of utterance
    print(eng.get_ivectors().shape)    # [ceil(T/10), ivector_dim]
 
+Streaming, as kaldi's online2 decoders and vosk do it
+-----------------------------------------------------
+
+:class:`OnlineIvectorFeature` is a port of kaldi's
+:kaldi:`OnlineIvectorFeature <src/online2/online-ivector-feature.h>` itself:
+stats are accumulated lazily up to the frame asked for, and with
+``use_most_recent_ivector`` (default) :meth:`OnlineIvectorFeature.get_frame`
+returns the estimate at that frame.  Optional frame weights implement
+kaldi's silence weighting: :class:`OnlineSilenceWeighting` turns the
+decoder's current best path (one transition-id per decoder frame, e.g. from
+kaldi-decoder's ``LatticeFasterOnlineDecoder.get_best_path_transition_ids``)
+into delta-weights.  ``OnlineIvectorExtractorConfig`` defaults are kaldi's
+(``num_gselect=5``, ``min_post=0.025``, ``posterior_scale=0.1``); vosk adds
+``max_count=100`` and silence weight ``0.001``.
+
+.. code-block:: python
+
+   cfg = khg.OnlineIvectorExtractorConfig(
+       left_context=3, right_context=3, lda_mat=lda, global_cmvn_stats=gs,
+       max_count=100)
+   ivector = khg.OnlineIvectorFeature(cfg, extractor, ubm)
+   silence = khg.OnlineSilenceWeighting(
+       trans_model,
+       khg.OnlineSilenceWeightingConfig("1:2:3:4:5:6:7:8:9:10", 0.001),
+       frame_subsampling_factor=3)
+
+   for mfcc_chunk in stream:                       # every 0.2 s of audio
+       ivector.accept_features(mfcc_chunk)
+       if ivector.num_frames_ready > 0:
+           silence.compute_current_traceback(
+               decoder.get_best_path_transition_ids(False))
+           ivector.update_frame_weights(
+               silence.get_delta_weights(ivector.num_frames_ready))
+       # for each nnet chunk: the latest i-vector
+       iv = ivector.get_frame(ivector.num_frames_ready - 1)
+
+Parity: ``tests/parity/parity_online_ivector_feature.py`` compares against
+kaldi's ``ivector-extract-online2`` with and without frame weights.
+
 For a batch/offline computation with explicit posteriors, see
 :class:`IvectorExtractorUtteranceStats` and
 :meth:`IvectorExtractor.compute_ivector`.

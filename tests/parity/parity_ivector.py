@@ -84,7 +84,8 @@ def kaldi_reference(args, tmp, raw_ark):
          f"ark:{tmp / 'raw_sp.ark'}", f"ark:{stats_feats_ark}"])
 
     # UBM posteriors + i-vectors
-    run([str(kaldi / "gmmbin" / "gmm-global-get-post"), "--min-post=0",
+    run([str(kaldi / "gmmbin" / "gmm-global-get-post"), "--n=5",
+         "--min-post=0.025",
          str(md / "final.dubm"), f"ark:{post_feats_ark}", f"ark:{post_ark}"])
     run([str(kaldi / "ivectorbin" / "ivector-extract-online"),
          f"--ivector-period={args.ivector_period}",
@@ -109,7 +110,11 @@ def our_ivectors(args, raw_by_utt):
         global_cmvn_stats=gs.astype(np.float64),
         max_count=args.max_count,
         num_cg_iters=args.num_cg_iters,
-        ivector_period=args.ivector_period)
+        ivector_period=args.ivector_period,
+        # match the binary chain in kaldi_reference (gmm-global-get-post
+        # --n=5 --min-post=0.025; ivector-extract-online has no posterior
+        # scale), not the online2 defaults
+        num_gselect=5, min_post=0.025, posterior_scale=1.0)
     out = {}
     for utt, feats in raw_by_utt.items():
         eng = khg.OnlineIvectorExtractor(cfg, extractor, ubm)

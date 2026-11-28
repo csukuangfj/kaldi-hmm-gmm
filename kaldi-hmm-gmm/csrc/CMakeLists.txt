@@ -22,6 +22,7 @@ set(srcs
   mle-diag-gmm.cc
   model-common.cc
   online-ivector-extractor.cc
+  online-ivector-feature.cc
   training-graph-compiler.cc
   transition-model.cc
   tree-renderer.cc
@@ -58,6 +59,7 @@ if(KHG_ENABLE_TESTS)
     mle-am-diag-gmm-test.cc
     mle-diag-gmm-test.cc
     model-common-test.cc
+    online-ivector-feature-test.cc
     transition-model-test.cc
   )
 
